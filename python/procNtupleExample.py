@@ -27,8 +27,7 @@ eventNumber = array('f', [0.0] )
 #      ....
 
 from jetInfo import jetInfoDB
-
-# from jetHists import jetHists
+from jetHists import jetHists
 
 #pfJets_jetEta = array('f', [0,0,0,0,0,0] )
 
@@ -37,13 +36,13 @@ tree.SetBranchAddress( 'evt', eventNumber)
 
 pfJetsDB = jetInfoDB("pfJets")
 pfJetsDB.SetBranchAddresses(tree)
-
+pfJetHists = jetHists("pfJets")
 
 
 #
 # Make output ntuple
 # 
-f    = ROOT.TFile(o.outfileName,"recreate")
+outFile    = ROOT.TFile(o.outfileName,"recreate")
 nEventThisFile = tree.GetEntries()
 
 # pfJetHists = jetHists("pfJets",f) # Make "pfJets" in directory in output file 
@@ -74,7 +73,7 @@ for entry in xrange( 0,nEventThisFile): # let's only run over the first 100 even
     for pfJet in pfJets:
         print pfJet.pt
     
-        jetHits.Fill(pfJet)
+        pfJetHists.Fill(pfJet)
 
     #print pfJets.num[0], "vs",pfJets.trackSip3dSig.size()
     #print pfJets.trackSip3dSig
@@ -93,3 +92,5 @@ for entry in xrange( 0,nEventThisFile): # let's only run over the first 100 even
 
     
         
+
+pfJetHists.Write(outFile)
