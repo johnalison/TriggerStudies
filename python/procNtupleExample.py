@@ -48,47 +48,10 @@ tree.SetBranchAddress( 'pfJets_trackSip3dVal', pfJets_trackSip3dVal)
 # Make output ntuple
 # 
 f    = ROOT.TFile(o.outfileName,"recreate")
-#tree = ROOT.TTree("LBInfo","Online BS Information")
-#
-#RunNumber = array( 'i', [ 0 ] )
-#LBStart   = ROOT.std.vector('int')()
-#LBEnd     = ROOT.std.vector('int')()
-#          
-#BSx       = ROOT.std.vector('float')()
-#BSy       = ROOT.std.vector('float')()
-#BSz       = ROOT.std.vector('float')()
-#          
-#BSSigx    = ROOT.std.vector('float')()
-#BSSigy    = ROOT.std.vector('float')()
-#BSSigz    = ROOT.std.vector('float')()
-#BSSigxy   = ROOT.std.vector('float')()
-#          
-#BSTiltx   = ROOT.std.vector('float')()
-#BSTilty   = ROOT.std.vector('float')()
-#
-#BSStatus  = ROOT.std.vector('float')()
-#
-#
-#
-#tree.Branch( 'RunNumber', RunNumber, 'RunNumber/I' )
-#tree.Branch( 'LBStart',   LBStart)
-#tree.Branch( 'LBEnd',     LBEnd  )
-#tree.Branch( 'BSx',       BSx  )
-#tree.Branch( 'BSy',       BSy  )
-#tree.Branch( 'BSz',       BSz  )
-#tree.Branch( 'BSSigx',    BSSigx  )
-#tree.Branch( 'BSSigy',    BSSigy  )
-#tree.Branch( 'BSSigz',    BSSigz  )
-#tree.Branch( 'BSSigxy',   BSSigxy  )
-#tree.Branch( 'BSTiltX',   BSTiltx  )
-#tree.Branch( 'BSTiltY',   BSTilty  )
-#tree.Branch( 'BSStatus',  BSStatus  )
 nEventThisFile = tree.GetEntries()
 print( "Number of input events: %s" % nEventThisFile )
 
 iEvent = 0
-
-
 
 
 for entry in xrange( 0,nEventThisFile): # let's only run over the first 100 events for this example                                                         
