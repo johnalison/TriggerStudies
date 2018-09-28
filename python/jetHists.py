@@ -1,6 +1,6 @@
 import ROOT
 
-class jetHists:
+class JetHists:
 
     def __init__(self,name):
         

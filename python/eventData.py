@@ -1,7 +1,7 @@
 import ROOT
 from array import array
 
-class eventData:
+class EventData:
     def __init__(self):
         self.runNumber_arr          = array('f', [0.0] )
         self.eventNumber_arr        = array('f', [0.0] )

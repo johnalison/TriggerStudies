@@ -2,7 +2,7 @@ import ROOT
 from array import array
 
 
-class jetInfo:
+class JetInfo:
 
     def __init__(self,pt,eta,phi,mass): # add more here
         self.pt = pt
@@ -21,7 +21,7 @@ class jetInfo:
 #
 # Separate File ? 
 #
-class jetInfoDB:
+class JetInfoDB:
 
     def __init__(self,name,maxLenght = 40):
         self.name = name
@@ -49,7 +49,7 @@ class jetInfoDB:
         # thisJet = jetData(iJet) 
         jetList = []
         for iJet in range(self.num[0]):
-            jetList.append(jetInfo(self.pt[iJet], 
+            jetList.append(JetInfo(self.pt[iJet], 
                                    self.eta[iJet],
                                    self.phi[iJet],
                                    self.mass[iJet],

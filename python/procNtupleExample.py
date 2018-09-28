@@ -27,26 +27,23 @@ tree = inFile.Get("tree")
 # 
 #      ....
 
-from jetInfo import jetInfoDB
-from jetHists import jetHists
+from jetInfo  import JetInfoDB
+from jetHists import JetHists
 
 #pfJets_jetEta = array('f', [0,0,0,0,0,0] )
 
-from eventData import eventData
+from eventData  import EventData
+from eventHists import EventHists
+eventHists = EventHists("AllEvents")
 
-event_data = eventData()
-event_data.SetBranchAddress(tree)
-
-hPVDiff_OffVsTrue   = ROOT.TH1F("PVDiff_OffVsTrue","PVDiff_OffVsTrue",100,-0.02,0.02)
-#hPVDiff_OffVsTrue   = ROOT.TH1F("PVDiff_OffVsTrue","PVDiff_OffVsTrue",100,-0.1,0.1)
-hPVDiff_OffVsTrue_l = ROOT.TH1F("PVDiff_OffVsTrue_l","PVDiff_OffVsTrue",100,-1,1)
-hPVDiff_OffVsTrue_v = ROOT.TH1F("PVDiff_OffVsTrue_v","PVDiff_OffVsTrue",100,-5,5)
-hPVDiff_OffVs = ROOT.TH1F("PVDiff_OffVsTrue","PVDiff_OffVsTrue",100,-1,1)
+eventData = EventData()
+eventData.SetBranchAddress(tree)
 
 
-pfJetsDB = jetInfoDB("pfJets")
+
+pfJetsDB = JetInfoDB("pfJets")
 pfJetsDB.SetBranchAddresses(tree)
-pfJetHists = jetHists("pfJets")
+pfJetHists = JetHists("pfJets")
 
 
 #
@@ -76,9 +73,12 @@ for entry in xrange( 0,nEventThisFile): # let's only run over the first 100 even
         print "RunNumber",runNumber[0],
         print "EventNumber",eventNumber[0]
 
-    event_data.setEvent()
-    #print event_data.trueVertex,event_data.VerticesOff,event_data.FastPrimaryVertex
-    hPVDiff_OffVsTrue.Fill(event_data.VerticesOff-event_data.trueVertex)
+    eventData.setEvent()
+
+    #
+    # Fill All events
+    #
+    eventHists.Fill(eventData)
 
     # Converting from "row-level" info to "column-level" info
     pfJets = pfJetsDB.getJets()
@@ -103,7 +103,6 @@ for entry in xrange( 0,nEventThisFile): # let's only run over the first 100 even
 
     
         
-
+#outFile.cd()
 pfJetHists.Write(outFile)
-outFile.cd()
-hPVDiff_OffVsTrue.Write()
+eventHists.Write(outFile)
