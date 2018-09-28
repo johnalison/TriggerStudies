@@ -9,50 +9,54 @@ o, a = parser.parse_args()
 import ROOT
 from array import array
 
-ROOT.gROOT.ProcessLine('.L Loader.C+')
+#ROOT.gROOT.ProcessLine('.L Loader.C+')
 
 
 inFile = ROOT.TFile(o.infileName,"READ")
 print inFile
 
-inFile.ls()
 tree = inFile.Get("tree")
-#tree.Print("*")
+#tree.Print("pf*")
 #print tree
+
+
 
 #import sys
 #sys.exit(-1)
 
-#class trkInfo:
-# 
-#      ....
 
-from jetInfo  import JetInfoDB
-from jetHists import JetHists
-
-#pfJets_jetEta = array('f', [0,0,0,0,0,0] )
-
-from eventData  import EventData
-from eventHists import EventHists
-eventHists = EventHists("AllEvents")
-
-eventData = EventData()
-eventData.SetBranchAddress(tree)
-
-
-
-pfJetsDB = JetInfoDB("pfJets")
-pfJetsDB.SetBranchAddresses(tree)
-pfJetHists = JetHists("pfJets")
 
 
 #
-# Make output ntuple
+# Input Data 
+#
+from eventData  import EventData
+from jetInfo  import JetDataHandler
+eventData = EventData()
+eventData.SetBranchAddress(tree)
+
+pfJetsDB = JetDataHandler("pfJets")
+pfJetsDB.SetBranchAddress(tree)
+
+offJetsDB = JetDataHandler("offJets")
+offJetsDB.SetBranchAddress(tree)
+
+
+#
+# Make output ntuple/Hists
 # 
+from jetHists import JetHists
+from eventHists import EventHists
 outFile    = ROOT.TFile(o.outfileName,"recreate")
+
+eventHists = EventHists("AllEvents")
+pfJetHists = JetHists("pfJetsAll",outFile)
+pfJetHistsTrk = JetHists("pfJetsTrk",outFile)
+offJetHists   = JetHists("offJets",outFile)
+
+
 nEventThisFile = tree.GetEntries()
 
-# pfJetHists = jetHists("pfJets",f) # Make "pfJets" in directory in output file 
 
 print( "Number of input events: %s" % nEventThisFile )
 
@@ -82,27 +86,29 @@ for entry in xrange( 0,nEventThisFile): # let's only run over the first 100 even
 
     # Converting from "row-level" info to "column-level" info
     pfJets = pfJetsDB.getJets()
+
     
     for pfJet in pfJets:
+        if abs(pfJet.eta) > 2.5: continue
+        if pfJet.pt       < 35:  continue
+
         pfJetHists.Fill(pfJet)
+        if len(pfJet.trackSip3dSig):
+            pfJetHistsTrk.Fill(pfJet)
 
-    #print pfJets.num[0], "vs",pfJets.trackSip3dSig.size()
-    #print pfJets.trackSip3dSig
-    #for iJet in range(pfJets.num[0]):
-    #    thisVector = pfJets.getJet(iJet)
-    #    # thisJet = pfJetsDB.getJet(iJet)
-    #    #pfJetHits.Fill(thisJet)
-    #
-    #    print "\tjet (pt,eta,phi)",thisVector.Pt(),thisVector.Eta(),thisVector.Phi()
-    #
-    #    
-    #    for iTrk in range(pfJets.trackSip3dSig.at(iJet).size()):
-    #        sig = pfJets.trackSip3dSig.at(iJet).at(iTrk)
-    #        val = pfJets.trackSip3dVal.at(iJet).at(iTrk)
-    #        print "\t\t sig (val,err)",sig,"(",val,val/sig,")"
 
-    
+    offJets = offJetsDB.getJets()
+    for offJet in offJets:
+        if abs(offJet.eta) > 2.5: continue
+        if offJet.pt       < 35:  continue
+
+        offJetHists.Fill(offJet)
+
         
-#outFile.cd()
+#
+# Save Hists
+#
 pfJetHists.Write(outFile)
+pfJetHistsTrk.Write(outFile)
+offJetHists.Write(outFile)
 eventHists.Write(outFile)
