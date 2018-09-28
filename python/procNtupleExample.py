@@ -3,6 +3,7 @@ parser = optparse.OptionParser()
 parser.add_option('-i', '--inFileName',           dest="infileName",         default=None, help="Run in loop mode")
 parser.add_option('-o', '--outFileName',          dest="outfileName",        default=None, help="Run in loop mode")
 parser.add_option('-n', '--nevents',              dest="nevents",           default=None, help="Run in loop mode")
+parser.add_option('-d', '--debug',                dest="debug",    action="store_true",       default=False, help="Run in loop mode")
 o, a = parser.parse_args()
 
 import ROOT
@@ -16,11 +17,11 @@ print inFile
 
 inFile.ls()
 tree = inFile.Get("tree")
-#tree.Print("pfJet*")
+tree.Print("*")
 print tree
 
-runNumber = array('f', [0.0] )
-eventNumber = array('f', [0.0] )
+#import sys
+#sys.exit(-1)
 
 #class trkInfo:
 # 
@@ -31,8 +32,12 @@ from jetHists import jetHists
 
 #pfJets_jetEta = array('f', [0,0,0,0,0,0] )
 
-tree.SetBranchAddress( 'run', runNumber)
-tree.SetBranchAddress( 'evt', eventNumber)
+from eventData import eventData
+
+event_data = eventData()
+event_data.SetBranchAddress(tree)
+
+
 
 pfJetsDB = jetInfoDB("pfJets")
 pfJetsDB.SetBranchAddresses(tree)
@@ -62,17 +67,17 @@ for entry in xrange( 0,nEventThisFile): # let's only run over the first 100 even
     if o.nevents and (iEvent > int(o.nevents)):
         break
 
-    debug = True
-    if debug:
+    if o.debug:
         print "RunNumber",runNumber[0],
         print "EventNumber",eventNumber[0]
+
+    event_data.setEvent()
+    print event_data.trueVertex,event_data.VerticesOff,event_data.FastPrimaryVertex
 
     # Converting from "row-level" info to "column-level" info
     pfJets = pfJetsDB.getJets()
     
     for pfJet in pfJets:
-        print pfJet.pt
-    
         pfJetHists.Fill(pfJet)
 
     #print pfJets.num[0], "vs",pfJets.trackSip3dSig.size()
