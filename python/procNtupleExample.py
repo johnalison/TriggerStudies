@@ -17,8 +17,8 @@ print inFile
 
 inFile.ls()
 tree = inFile.Get("tree")
-tree.Print("*")
-print tree
+#tree.Print("*")
+#print tree
 
 #import sys
 #sys.exit(-1)
@@ -37,6 +37,11 @@ from eventData import eventData
 event_data = eventData()
 event_data.SetBranchAddress(tree)
 
+hPVDiff_OffVsTrue   = ROOT.TH1F("PVDiff_OffVsTrue","PVDiff_OffVsTrue",100,-0.02,0.02)
+#hPVDiff_OffVsTrue   = ROOT.TH1F("PVDiff_OffVsTrue","PVDiff_OffVsTrue",100,-0.1,0.1)
+hPVDiff_OffVsTrue_l = ROOT.TH1F("PVDiff_OffVsTrue_l","PVDiff_OffVsTrue",100,-1,1)
+hPVDiff_OffVsTrue_v = ROOT.TH1F("PVDiff_OffVsTrue_v","PVDiff_OffVsTrue",100,-5,5)
+hPVDiff_OffVs = ROOT.TH1F("PVDiff_OffVsTrue","PVDiff_OffVsTrue",100,-1,1)
 
 
 pfJetsDB = jetInfoDB("pfJets")
@@ -72,7 +77,8 @@ for entry in xrange( 0,nEventThisFile): # let's only run over the first 100 even
         print "EventNumber",eventNumber[0]
 
     event_data.setEvent()
-    print event_data.trueVertex,event_data.VerticesOff,event_data.FastPrimaryVertex
+    #print event_data.trueVertex,event_data.VerticesOff,event_data.FastPrimaryVertex
+    hPVDiff_OffVsTrue.Fill(event_data.VerticesOff-event_data.trueVertex)
 
     # Converting from "row-level" info to "column-level" info
     pfJets = pfJetsDB.getJets()
@@ -99,3 +105,5 @@ for entry in xrange( 0,nEventThisFile): # let's only run over the first 100 even
         
 
 pfJetHists.Write(outFile)
+outFile.cd()
+hPVDiff_OffVsTrue.Write()
