@@ -16,15 +16,8 @@ inFile = ROOT.TFile(o.infileName,"READ")
 print inFile
 
 tree = inFile.Get("tree")
-#tree.Print("pf*")
+#tree.Print("*")
 #print tree
-
-
-
-#import sys
-#sys.exit(-1)
-
-
 
 
 #
@@ -32,6 +25,8 @@ tree = inFile.Get("tree")
 #
 from eventData  import EventData
 from jetInfo  import JetDataHandler
+from leptonInfo  import LeptonDataHandler
+
 eventData = EventData()
 eventData.SetBranchAddress(tree)
 
@@ -41,6 +36,11 @@ pfJetsDB.SetBranchAddress(tree)
 offJetsDB = JetDataHandler("offJets")
 offJetsDB.SetBranchAddress(tree)
 
+muonDB = LeptonDataHandler("offTightMuons")
+muonDB.SetBranchAddress(tree)
+
+elecDB = LeptonDataHandler("offTightElectrons")
+elecDB.SetBranchAddress(tree)
 
 #
 # Make output ntuple/Hists
@@ -49,19 +49,28 @@ from jetHists import JetHists
 from eventHists import EventHists
 outFile    = ROOT.TFile(o.outfileName,"recreate")
 
-eventHists = EventHists("AllEvents")
-pfJetHists = JetHists("pfJetsAll",outFile)
-pfJetHistsTrk = JetHists("pfJetsTrk",outFile)
-offJetHists   = JetHists("offJets",outFile)
+eventHists     = EventHists("AllEvents")
+pfJetHistsPreOLap = JetHists("pfJetsPreOLap",outFile)
+pfJetHists        = JetHists("pfJets",outFile)
 
+
+offJetHistsPreOLap = JetHists("offJetsPreOLap",outFile)
+offJetHists        = JetHists("offJets",outFile)
 
 nEventThisFile = tree.GetEntries()
-
 
 print( "Number of input events: %s" % nEventThisFile )
 
 iEvent = 0
 
+
+def failOverlap(jet,leptons):
+    #print "thisJet",jet.vec.Eta(),jet.vec.Phi()
+    for l in leptons:
+        #print "\t",l.vec.Eta(),l.vec.Phi()
+        if jet.vec.DeltaR(l.vec) < 0.4:
+            return True
+    return False
 
 for entry in xrange( 0,nEventThisFile): # let's only run over the first 100 events for this example                                                         
     tree.GetEntry( entry )
@@ -85,16 +94,23 @@ for entry in xrange( 0,nEventThisFile): # let's only run over the first 100 even
     eventHists.Fill(eventData)
 
     # Converting from "row-level" info to "column-level" info
+    elecs  = elecDB.getLeps()
+    muons  = muonDB.getLeps()
     pfJets = pfJetsDB.getJets()
 
+    if len(elecs)+len(muons) < 2:
+        continue
+        
     
     for pfJet in pfJets:
         if abs(pfJet.eta) > 2.5: continue
         if pfJet.pt       < 35:  continue
 
+        pfJetHistsPreOLap.Fill(pfJet)        
+        if failOverlap(pfJet,elecs): continue
+        if failOverlap(pfJet,muons): continue
+
         pfJetHists.Fill(pfJet)
-        if len(pfJet.trackSip3dSig):
-            pfJetHistsTrk.Fill(pfJet)
 
 
     offJets = offJetsDB.getJets()
@@ -102,13 +118,18 @@ for entry in xrange( 0,nEventThisFile): # let's only run over the first 100 even
         if abs(offJet.eta) > 2.5: continue
         if offJet.pt       < 35:  continue
 
+        offJetHistsPreOLap.Fill(offJet)
+        if failOverlap(offJet,elecs): continue
+        if failOverlap(offJet,muons): continue
+
         offJetHists.Fill(offJet)
 
         
 #
 # Save Hists
 #
+pfJetHistsPreOLap.Write(outFile)
 pfJetHists.Write(outFile)
-pfJetHistsTrk.Write(outFile)
+offJetHistsPreOLap.Write(outFile)
 offJetHists.Write(outFile)
 eventHists.Write(outFile)

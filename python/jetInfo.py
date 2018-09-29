@@ -98,8 +98,8 @@ class JetData:
         self.chEmEF                            =  chEmEF                           
 
 
-        self.thisVector = ROOT.TLorentzVector()
-        self.thisVector.SetPtEtaPhiM(pt,eta,phi,mass)
+        self.vec = ROOT.TLorentzVector()
+        self.vec.SetPtEtaPhiM(pt,eta,phi,mass)
         
         self.trackSip3dSig = trackSip3dSig
         self.trackSip3dVal = trackSip3dVal
