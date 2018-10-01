@@ -79,6 +79,19 @@ class JetHists:
         self.chHadEF                          = self.makeHist('chHadEF'                      ,'chHadEF;chHadEF;Entries'                       ,100, -0.1,2.5)
         self.chEmEF                           = self.makeHist('chEmEF'                       ,'chEmEF;chEmEF;Entries'                        ,100, -0.1,2.5)
 
+        self.trackDecayLenVal_l         = self.makeHist("trackDecayLenVal_l"    ,    "trackDecayLenVal;trackDecayLenVal [cm];Entries", 100, -0.1,  5)
+        self.trackDecayLenVal           = self.makeHist("trackDecayLenVal"    ,    "trackDecayLenVal;trackDecayLenVal [cm];Entries", 100, -0.1,  0.5)
+        self.trackJetDistVal            = self.makeHist("trackJetDistVal"     ,    "trackJetDistVal;trackJetDistVal [cm];Entries",  100, -0.3,0.01)      
+        self.trackPtRel                 = self.makeHist("trackPtRel"          ,    "trackPtRel;track Pt Rel [GeV];Entries", 100, -0.1, 7)          
+        self.trackMomentum              = self.makeHist("trackMomentum"       ,    "trackMomentum;track momentum [GeV];Entries", 100, -0.1, 60)       
+        self.trackEta                   = self.makeHist("trackEta"            ,    "trackEta;track #eta;Entries", 100, -2.6, 2.6)            
+        self.trackPPar                  = self.makeHist("trackPPar"           ,    "trackPPar;track PPar [GeV];Entries",100, -0.1, 60)           
+        self.trackDeltaR                = self.makeHist("trackDeltaR"         ,    "trackDeltaR;track #Delta R;Entries", 100, -0.1, 0.35)         
+        self.trackEtaRel                = self.makeHist("trackEtaRel"         ,    "trackEtaRel;track Eta Rel;Entries", 100, 0, 7)         
+        self.trackPtRatio               = self.makeHist("trackPtRatio"        ,    "trackPtRatio;track Pt Ratio;Entries", 100, -0.1, 0.3)        
+        self.trackPParRatio             = self.makeHist("trackPParRatio"      ,    "trackPParRatio;track P Par Ratio;Entries", 100, 0.95, 1.02)      
+
+
 
     def makeHist(self,name,title,bins,low,high):
         h = ROOT.TH1F(name,title,bins,low,high)
@@ -172,6 +185,18 @@ class JetHists:
             self.ip2d_err_l.Fill(this_ip2d_err)
 
 
+            self.trackDecayLenVal_l   .Fill(jetInfo.trackDecayLenVal.at(iTrk))
+            self.trackDecayLenVal     .Fill(jetInfo.trackDecayLenVal.at(iTrk))
+            self.trackJetDistVal      .Fill(jetInfo.trackJetDistVal .at(iTrk))
+            self.trackPtRel           .Fill(jetInfo.trackPtRel      .at(iTrk))
+            self.trackMomentum        .Fill(jetInfo.trackMomentum   .at(iTrk))
+            self.trackEta             .Fill(jetInfo.trackEta        .at(iTrk))
+            self.trackPPar            .Fill(jetInfo.trackPPar       .at(iTrk))
+            self.trackDeltaR          .Fill(jetInfo.trackDeltaR     .at(iTrk))
+            #self.trackEtaRel          .Fill(jetInfo.trackEtaRel     .at(iTrk))
+            self.trackPtRatio         .Fill(jetInfo.trackPtRatio    .at(iTrk))
+            self.trackPParRatio       .Fill(jetInfo.trackPParRatio  .at(iTrk))
+
 
     def Write(self,outFile):
         self.thisDir.cd()
@@ -247,5 +272,20 @@ class JetHists:
 
         self.ip2d_err_l.Write()
         self.ip2d_err  .Write()
+
+        self.trackDecayLenVal_l   .Write()
+        self.trackDecayLenVal     .Write()
+        self.trackJetDistVal      .Write()        
+        self.trackPtRel           .Write()
+        self.trackMomentum        .Write()
+        self.trackEta             .Write()
+        self.trackPPar            .Write()
+        self.trackDeltaR          .Write()
+        self.trackEtaRel          .Write()
+        self.trackPtRatio         .Write()
+        self.trackPParRatio       .Write()
+
+
+
 
         outFile.cd()
