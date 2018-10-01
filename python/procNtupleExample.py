@@ -12,7 +12,7 @@ from array import array
 #ROOT.gROOT.ProcessLine('.L Loader.C+')
 
 
-inFile = ROOT.TFile(o.infileName,"READ")
+inFile = ROOT.TFile.Open(o.infileName,"READ")
 print inFile
 
 tree = inFile.Get("tree")
@@ -77,7 +77,7 @@ for entry in xrange( 0,nEventThisFile): # let's only run over the first 100 even
 
     iEvent +=1
     
-    if iEvent %10000 == 0:
+    if iEvent %1000 == 0:
         print "Processed .... ",iEvent,"Events"
     if o.nevents and (iEvent > int(o.nevents)):
         break
