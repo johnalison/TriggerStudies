@@ -12,8 +12,11 @@ class JetData:
                  ,vertexEnergyRatio                
                  ,vertexCategory                   
                  ,vertexBoostOverSqrtJetPt         
+                 ,trackJetPt               
                  ,trackSumJetEtRatio               
                  ,trackSumJetDeltaR                
+                 ,trackSip2dValAboveCharm          
+                 ,trackSip2dSigAboveCharm          
                  ,trackSip3dValAboveCharm          
                  ,trackSip3dSigAboveCharm          
                  ,totalMultiplicity                
@@ -62,8 +65,11 @@ class JetData:
         self.vertexEnergyRatio                 =  vertexEnergyRatio                
         self.vertexCategory                    =  vertexCategory                   
         self.vertexBoostOverSqrtJetPt          =  vertexBoostOverSqrtJetPt         
+        self.trackJetPt                        =  trackJetPt
         self.trackSumJetEtRatio                =  trackSumJetEtRatio               
         self.trackSumJetDeltaR                 =  trackSumJetDeltaR                
+        self.trackSip2dValAboveCharm           =  trackSip2dValAboveCharm          
+        self.trackSip2dSigAboveCharm           =  trackSip2dSigAboveCharm          
         self.trackSip3dValAboveCharm           =  trackSip3dValAboveCharm          
         self.trackSip3dSigAboveCharm           =  trackSip3dSigAboveCharm          
         self.totalMultiplicity                 =  totalMultiplicity                
@@ -134,10 +140,13 @@ class JetDataHandler:
         self.vertexEnergyRatio                  = array('f',[0]*maxLenght)
         self.vertexCategory                     = array('f',[0]*maxLenght)
         self.vertexBoostOverSqrtJetPt           = array('f',[0]*maxLenght)
+        self.trackJetPt                         = array('f',[0]*maxLenght)
         self.trackSumJetEtRatio                 = array('f',[0]*maxLenght)
         self.trackSumJetDeltaR                  = array('f',[0]*maxLenght)
         self.trackSip3dValAboveCharm            = array('f',[0]*maxLenght)
         self.trackSip3dSigAboveCharm            = array('f',[0]*maxLenght)
+        self.trackSip2dValAboveCharm            = array('f',[0]*maxLenght)
+        self.trackSip2dSigAboveCharm            = array('f',[0]*maxLenght)
         self.totalMultiplicity                  = array('i',[0]*maxLenght)
         self.photonMultiplicity                 = array('i',[0]*maxLenght)
         self.photonEnergyFraction               = array('f',[0]*maxLenght)
@@ -192,8 +201,11 @@ class JetDataHandler:
         intree.SetBranchAddress( self.name+'_vertexEnergyRatio'                 , self.vertexEnergyRatio                 )
         intree.SetBranchAddress( self.name+'_vertexCategory'                    , self.vertexCategory                    )
         intree.SetBranchAddress( self.name+'_vertexBoostOverSqrtJetPt'          , self.vertexBoostOverSqrtJetPt          )
+        intree.SetBranchAddress( self.name+'_trackJetPt'                        , self.trackJetPt                )
         intree.SetBranchAddress( self.name+'_trackSumJetEtRatio'                , self.trackSumJetEtRatio                )
         intree.SetBranchAddress( self.name+'_trackSumJetDeltaR'                 , self.trackSumJetDeltaR                 )
+        intree.SetBranchAddress( self.name+'_trackSip2dValAboveCharm'           , self.trackSip2dValAboveCharm           )
+        intree.SetBranchAddress( self.name+'_trackSip2dSigAboveCharm'           , self.trackSip2dSigAboveCharm           )
         intree.SetBranchAddress( self.name+'_trackSip3dValAboveCharm'           , self.trackSip3dValAboveCharm           )
         intree.SetBranchAddress( self.name+'_trackSip3dSigAboveCharm'           , self.trackSip3dSigAboveCharm           )
         intree.SetBranchAddress( self.name+'_totalMultiplicity'                 , self.totalMultiplicity                 )
@@ -249,8 +261,11 @@ class JetDataHandler:
                                    self.vertexEnergyRatio                 [iJet],
                                    self.vertexCategory                    [iJet],
                                    self.vertexBoostOverSqrtJetPt          [iJet],
+                                   self.trackJetPt                        [iJet],
                                    self.trackSumJetEtRatio                [iJet],
                                    self.trackSumJetDeltaR                 [iJet],
+                                   self.trackSip2dValAboveCharm           [iJet],
+                                   self.trackSip2dSigAboveCharm           [iJet],
                                    self.trackSip3dValAboveCharm           [iJet],
                                    self.trackSip3dSigAboveCharm           [iJet],
                                    self.totalMultiplicity                 [iJet],

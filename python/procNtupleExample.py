@@ -1,6 +1,7 @@
 import optparse
 parser = optparse.OptionParser()
 parser.add_option('-i', '--inFileName',           dest="infileName",         default=None, help="Run in loop mode")
+parser.add_option('--inputList',           dest="inputList",         default=False, action="store_true", help="Run in loop mode")
 parser.add_option('-o', '--outFileName',          dest="outfileName",        default=None, help="Run in loop mode")
 parser.add_option('-n', '--nevents',              dest="nevents",           default=None, help="Run in loop mode")
 parser.add_option('-d', '--debug',                dest="debug",    action="store_true",       default=False, help="Run in loop mode")
@@ -10,15 +11,33 @@ import ROOT
 from array import array
 
 #ROOT.gROOT.ProcessLine('.L Loader.C+')
+tree = ROOT.TChain("tree")
 
+if o.inputList:
+    inFile = open(o.infileName,"r")
+    for fName in inFile:
+        thisFileName = fName.rstrip()
+        if not len(thisFileName): continue
+        if thisFileName[0] =="#": continue
+        print "Adding: '"+thisFileName+"'"
 
-inFile = ROOT.TFile.Open(o.infileName,"READ")
-print inFile
+        tree.Add(thisFileName)
+    inFile.close()
+else:
+    print "Adding",o.infileName
+    tree.Add(o.infileName)
 
-tree = inFile.Get("tree")
+#myChain->Add("/somewhere/myfile2.root")
+
+#inFile = ROOT.TFile.Open(o.infileName,"READ")
+#print inFile
+
+#tree = inFile.Get("tree")
 #tree.Print("*")
 #print tree
 
+#import sys
+#sys.exit(-1)
 
 #
 # Input Data 
