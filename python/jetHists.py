@@ -81,14 +81,14 @@ class JetHists:
 
         self.trackDecayLenVal_l         = self.makeHist("trackDecayLenVal_l"    ,    "trackDecayLenVal;trackDecayLenVal [cm];Entries", 100, -0.1,  5)
         self.trackDecayLenVal           = self.makeHist("trackDecayLenVal"    ,    "trackDecayLenVal;trackDecayLenVal [cm];Entries", 100, -0.1,  0.5)
-        self.trackJetDistVal            = self.makeHist("trackJetDistVal"     ,    "trackJetDistVal;trackJetDistVal [cm];Entries",  100, -0.3,0.01)      
+        self.trackJetDistVal            = self.makeHist("trackJetDistVal"     ,    "trackJetDistVal;trackJetDistVal [cm];Entries",  100, -0.1,0.01)      
         self.trackPtRel                 = self.makeHist("trackPtRel"          ,    "trackPtRel;track Pt Rel [GeV];Entries", 100, -0.1, 7)          
         self.trackMomentum              = self.makeHist("trackMomentum"       ,    "trackMomentum;track momentum [GeV];Entries", 100, -0.1, 60)       
         self.trackEta                   = self.makeHist("trackEta"            ,    "trackEta;track #eta;Entries", 100, -2.6, 2.6)            
         self.trackPPar                  = self.makeHist("trackPPar"           ,    "trackPPar;track PPar [GeV];Entries",100, -0.1, 60)           
         self.trackDeltaR                = self.makeHist("trackDeltaR"         ,    "trackDeltaR;track #Delta R;Entries", 100, -0.1, 0.35)         
         self.trackEtaRel                = self.makeHist("trackEtaRel"         ,    "trackEtaRel;track Eta Rel;Entries", 100, 0, 7)         
-        self.trackPtRatio               = self.makeHist("trackPtRatio"        ,    "trackPtRatio;track Pt Ratio;Entries", 100, -0.1, 0.3)        
+        self.trackPtRatio               = self.makeHist("trackPtRatio"        ,    "trackPtRatio;track Pt Ratio;Entries", 100, -0.01, 0.3)        
         self.trackPParRatio             = self.makeHist("trackPParRatio"      ,    "trackPParRatio;track P Par Ratio;Entries", 100, 0.95, 1.02)      
 
 
