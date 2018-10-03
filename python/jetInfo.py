@@ -49,6 +49,9 @@ class JetData:
                  ,chMult                           
                  ,chHadEF                          
                  ,chEmEF                           
+                 ,partonFlavour
+                 ,hadronFlavour
+
                  ,trackSip3dSig,trackSip3dVal,trackSip2dSig,trackSip2dVal
 
                  ,trackDecayLenVal           
@@ -126,7 +129,8 @@ class JetData:
         self.chMult                            =  chMult                           
         self.chHadEF                           =  chHadEF                          
         self.chEmEF                            =  chEmEF                           
-
+        self.partonFlavour                     =  partonFlavour
+        self.hadronFlavour                     =  hadronFlavour
 
         self.vec = ROOT.TLorentzVector()
         self.vec.SetPtEtaPhiM(pt,eta,phi,mass)
@@ -161,6 +165,10 @@ class JetData:
         #self.trackNPixelHits            = trackNPixelHits            
 
 
+        #
+        #  For offline/online matching
+        #
+        self.matchedJet = None
 
         
 
@@ -226,7 +234,10 @@ class JetDataHandler:
         self.chMult                             = array('i',[0]*maxLenght)
         self.chHadEF                            = array('f',[0]*maxLenght)
         self.chEmEF                             = array('f',[0]*maxLenght)
+        self.partonFlavour                      = array('f',[0]*maxLenght)
+        self.hadronFlavour                      = array('f',[0]*maxLenght)
  
+
         # Eventually self.trackInfo = 
         self.trackSip3dSig = ROOT.std.vector('vector<float>')()
         self.trackSip3dVal = ROOT.std.vector('vector<float>')()
@@ -311,6 +322,10 @@ class JetDataHandler:
         intree.SetBranchAddress( self.name+'_chHadEF'                           , self.chHadEF                           )
         intree.SetBranchAddress( self.name+'_chEmEF'                            , self.chEmEF                            )
 
+        if self.name == "offJets":
+            intree.SetBranchAddress( self.name+'_partonFlavour'                            , self.partonFlavour                            )
+            intree.SetBranchAddress( self.name+'_hadronFlavour'                            , self.hadronFlavour                            )
+
         intree.SetBranchAddress( self.name+'_trackSip3dSig', self.trackSip3dSig)
         intree.SetBranchAddress( self.name+'_trackSip3dVal', self.trackSip3dVal)
         intree.SetBranchAddress( self.name+'_trackSip2dSig', self.trackSip2dSig)
@@ -394,6 +409,8 @@ class JetDataHandler:
                                    self.chMult                            [iJet],
                                    self.chHadEF                           [iJet],
                                    self.chEmEF                            [iJet],
+                                   self.partonFlavour                     [iJet],
+                                   self.hadronFlavour                     [iJet],
 
                                    self.trackSip3dSig[iJet],
                                    self.trackSip3dVal[iJet],
