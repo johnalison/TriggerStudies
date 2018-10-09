@@ -52,6 +52,9 @@ eventData.SetBranchAddress(tree)
 pfJetsDB = JetDataHandler("pfJets")
 pfJetsDB.SetBranchAddress(tree)
 
+caloJetsDB = JetDataHandler("caloJets")
+caloJetsDB.SetBranchAddress(tree)
+
 offJetsDB = JetDataHandler("offJets")
 offJetsDB.SetBranchAddress(tree)
 
@@ -66,12 +69,14 @@ elecDB.SetBranchAddress(tree)
 # 
 from jetHists import JetHists
 from eventHists import EventHists
-outFile    = ROOT.TFile(o.outfileName,"recreate")
+outFile    = ROOT.TFile(str(o.outfileName),"recreate")
 
 eventHists     = EventHists("AllEvents")
 pfJetHistsPreOLap = JetHists("pfJetsPreOLap",outFile)
 pfJetHists        = JetHists("pfJets",outFile)
 
+caloJetHistsPreOLap = JetHists("caloJetsPreOLap",outFile)
+caloJetHists        = JetHists("caloJets",outFile)
 
 offJetHistsPreOLap = JetHists("offJetsPreOLap",outFile)
 offJetHists        = JetHists("offJets",outFile)
@@ -116,6 +121,7 @@ for entry in xrange( 0,nEventThisFile): # let's only run over the first 100 even
     elecs  = elecDB.getLeps()
     muons  = muonDB.getLeps()
     pfJets = pfJetsDB.getJets()
+    caloJets = caloJetsDB.getJets()
 
     if len(elecs)+len(muons) < 2:
         continue
@@ -131,6 +137,15 @@ for entry in xrange( 0,nEventThisFile): # let's only run over the first 100 even
 
         pfJetHists.Fill(pfJet)
 
+    for caloJet in caloJets:
+        if abs(caloJet.eta) > 2.5: continue
+        if caloJet.pt       < 35:  continue
+
+        caloJetHistsPreOLap.Fill(caloJet)
+        if failOverlap(caloJet,elecs): continue
+        if failOverlap(caloJet,muons): continue
+
+        caloJetHists.Fill(caloJet)
 
     offJets = offJetsDB.getJets()
     for offJet in offJets:
@@ -149,6 +164,8 @@ for entry in xrange( 0,nEventThisFile): # let's only run over the first 100 even
 #
 pfJetHistsPreOLap.Write(outFile)
 pfJetHists.Write(outFile)
+caloJetHistsPreOLap.Write(outFile)
+caloJetHists.Write(outFile)
 offJetHistsPreOLap.Write(outFile)
 offJetHists.Write(outFile)
 eventHists.Write(outFile)
