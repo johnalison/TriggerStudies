@@ -72,14 +72,19 @@ from eventHists import EventHists
 outFile    = ROOT.TFile(str(o.outfileName),"recreate")
 
 eventHists     = EventHists("AllEvents")
-pfJetHistsPreOLap = JetHists("pfJetsPreOLap",outFile)
+pfJetHistsPreOLap = JetHists("pfJetsPreOLap",outFile,light=True)
 pfJetHists        = JetHists("pfJets",outFile)
+pfJetHists_matched    = JetHists("pfJets_matched" ,outFile)
+pfJetHists_matchedB   = JetHists("pfJets_matchedB",outFile)
+pfJetHists_matchedL   = JetHists("pfJets_matchedL",outFile)
 
-caloJetHistsPreOLap = JetHists("caloJetsPreOLap",outFile)
 caloJetHists        = JetHists("caloJets",outFile)
+caloJetHistsPreOLap = JetHists("caloJetsOffPreOLap",outFile)
 
-offJetHistsPreOLap = JetHists("offJetsPreOLap",outFile)
-offJetHists        = JetHists("offJets",outFile)
+offJetHistsPreOLap = JetHists("offJetsPreOLap",outFile,light=True)
+offJetHists        = JetHists("offJets",  outFile)
+offJetHistsBJets   = JetHists("offJets_B",outFile)
+offJetHistsLFJets  = JetHists("offJets_L",outFile)
 
 nEventThisFile = tree.GetEntries()
 
@@ -127,15 +132,6 @@ for entry in xrange( 0,nEventThisFile): # let's only run over the first 100 even
         continue
         
     
-    for pfJet in pfJets:
-        if abs(pfJet.eta) > 2.5: continue
-        if pfJet.pt       < 35:  continue
-
-        pfJetHistsPreOLap.Fill(pfJet)        
-        if failOverlap(pfJet,elecs): continue
-        if failOverlap(pfJet,muons): continue
-
-        pfJetHists.Fill(pfJet)
 
     for caloJet in caloJets:
         if abs(caloJet.eta) > 2.5: continue
@@ -157,15 +153,49 @@ for entry in xrange( 0,nEventThisFile): # let's only run over the first 100 even
         if failOverlap(offJet,muons): continue
 
         offJetHists.Fill(offJet)
+        
+        if offJet.hadronFlavour == 5:
+            offJetHistsBJets.Fill(offJet)
+        else:
+            offJetHistsLFJets.Fill(offJet)
 
+        # Match offline to online
+        for pfJet in pfJets:            
+            deltaR = pfJet.vec.DeltaR(offJet.vec)
+            if deltaR < 0.4:
+                pfJet.matchedJet = offJet
+                break
+
+    for pfJet in pfJets:
+        if abs(pfJet.eta) > 2.5: continue
+        if pfJet.pt       < 35:  continue
+
+        pfJetHistsPreOLap.Fill(pfJet)        
+        if failOverlap(pfJet,elecs): continue
+        if failOverlap(pfJet,muons): continue
+
+        pfJetHists.Fill(pfJet)
+
+        if pfJet.matchedJet:
+            pfJetHists_matched .Fill(pfJet)
+
+            if pfJet.matchedJet.hadronFlavour == 5:            
+                pfJetHists_matchedB.Fill(pfJet)
+            else:
+                pfJetHists_matchedL.Fill(pfJet)
         
 #
 # Save Hists
 #
-pfJetHistsPreOLap.Write(outFile)
-pfJetHists.Write(outFile)
-caloJetHistsPreOLap.Write(outFile)
-caloJetHists.Write(outFile)
-offJetHistsPreOLap.Write(outFile)
-offJetHists.Write(outFile)
-eventHists.Write(outFile)
+pfJetHistsPreOLap   .Write(outFile)
+pfJetHists          .Write(outFile)
+pfJetHists_matched  .Write(outFile)
+pfJetHists_matchedB .Write(outFile)
+pfJetHists_matchedL .Write(outFile)
+caloJetHistsPreOLap .Write(outFile)
+caloJetHists	    .Write(outFile)
+offJetHistsPreOLap  .Write(outFile)
+offJetHists         .Write(outFile)
+offJetHistsBJets    .Write(outFile)
+offJetHistsLFJets   .Write(outFile)
+eventHists          .Write(outFile)
