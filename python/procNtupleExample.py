@@ -69,7 +69,7 @@ elecDB.SetBranchAddress(tree)
 # 
 from jetHists import JetHists
 from eventHists import EventHists
-outFile = ROOT.TFile(o.outfileName,"recreate")
+outFile    = ROOT.TFile(str(o.outfileName),"recreate")
 
 eventHists     = EventHists("AllEvents")
 
@@ -137,6 +137,15 @@ for entry in xrange( 0,nEventThisFile): # let's only run over the first 100 even
     if len(elecs)+len(muons) < 2:
         continue
 
+    for caloJet in caloJets:
+        if abs(caloJet.eta) > 2.5: continue
+        if caloJet.pt       < 35:  continue
+
+        caloJetHistsPreOLap.Fill(caloJet)
+        if failOverlap(caloJet,elecs): continue
+        if failOverlap(caloJet,muons): continue
+
+        caloJetHists.Fill(caloJet)
 
     offJets = offJetsDB.getJets()
     for offJet in offJets:
@@ -164,13 +173,6 @@ for entry in xrange( 0,nEventThisFile): # let's only run over the first 100 even
                 pfJet.matchedJet = offJet
                 offJet.matchedJet = pfJet
                 break
-
-
-        if offJet.matchedJet:
-            offJetHistsMatchOnline.Fill(offJet)
-        else:
-            offJetHistsNoMatchOnline.Fill(offJet)
-            
 
 
         # Match offline to online
