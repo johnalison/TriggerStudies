@@ -18,7 +18,7 @@ class JetHists:
         if not self.light:
             self.deepcsv_bb = self.makeHist("deepcsv_bb","deepcsv_bb;deepcsv_bb;Entries",100,-2,2)
     
-            self.nTrk = self.makeHist("nTrk","nTrk;nTracks;Entries",25,-0.5,24.5)
+            self.nTrk = self.makeHist("nTrk","nTrk;nTracks;Entries",42,-1.5,40.5)
     
             self.ip3d_l = self.makeHist("ip3d_l","ip3d;IP3D [cm]",100,-0.2,0.2)
             self.ip3d   = self.makeHist("ip3d",  "ip3d;IP3D [cm]",100,-0.05,0.05)
@@ -47,7 +47,7 @@ class JetHists:
             self.vertexBoostOverSqrtJetPt         = self.makeHist('vertexBoostOverSqrtJetPt'     ,'vertexBoostOverSqrtJetPt;Vertex Boost/#sqrt{jet P_{T}}'      ,100, -0.1, 1.1)
             self.trackJetPt                       = self.makeHist('trackJetPt'           ,'trackJetPt;Track Jet P_{T} [GeV]'            ,100, 0,400)
             self.trackSumJetEtRatio               = self.makeHist('trackSumJetEtRatio'           ,'trackSumJetEtRatio;Track-jet/Jet E_{T} Ratio'            ,100, -0.1,1.5)
-            self.trackSumJetDeltaR                = self.makeHist('trackSumJetDeltaR'            ,'trackSumJetDeltaR; Track-Jet - Jet #Delta R'             ,100, -0.1, 2)
+            self.trackSumJetDeltaR                = self.makeHist('trackSumJetDeltaR'            ,'trackSumJetDeltaR; Track-Jet - Jet #Delta R'             ,100, -0.1, 0.35)
             self.trackSip2dValAboveCharm          = self.makeHist('trackSip2dValAboveCharm'      ,'trackSip2dValAboveCharm;trackSip2dValAboveCharm'       ,100, -0.2, 0.2)
             self.trackSip2dSigAboveCharm          = self.makeHist('trackSip2dSigAboveCharm'      ,'trackSip3dSigAboveCharm;trackSip2SiglAboveCharm'       ,100, -50, 50)
             self.trackSip3dValAboveCharm          = self.makeHist('trackSip3dValAboveCharm'      ,'trackSip3dValAboveCharm;trackSip3dValAboveCharm'       ,100, -0.2, 0.2) 
@@ -125,7 +125,8 @@ class JetHists:
             self.vertexBoostOverSqrtJetPt         .Fill(jetInfo.vertexBoostOverSqrtJetPt         )
             self.trackJetPt                       .Fill(jetInfo.trackJetPt               )
             self.trackSumJetEtRatio               .Fill(jetInfo.trackSumJetEtRatio               )
-            self.trackSumJetDeltaR                .Fill(jetInfo.trackSumJetDeltaR                )
+            if jetInfo.jetNSelectedTracks > 0:
+                self.trackSumJetDeltaR                .Fill(jetInfo.trackSumJetDeltaR                )
             self.trackSip2dValAboveCharm          .Fill(jetInfo.trackSip2dValAboveCharm          )
             self.trackSip2dSigAboveCharm          .Fill(jetInfo.trackSip2dSigAboveCharm          )
             self.trackSip3dValAboveCharm          .Fill(jetInfo.trackSip3dValAboveCharm          )

@@ -52,6 +52,9 @@ eventData.SetBranchAddress(tree)
 pfJetsDB = JetDataHandler("pfJets")
 pfJetsDB.SetBranchAddress(tree)
 
+caloJetsDB = JetDataHandler("caloJets")
+caloJetsDB.SetBranchAddress(tree)
+
 offJetsDB = JetDataHandler("offJets")
 offJetsDB.SetBranchAddress(tree)
 
@@ -69,11 +72,19 @@ from eventHists import EventHists
 outFile = ROOT.TFile(o.outfileName,"recreate")
 
 eventHists     = EventHists("AllEvents")
-pfJetHistsPreOLap = JetHists("pfJetsPreOLap",outFile,light=True)
-pfJetHists        = JetHists("pfJets",outFile)
+
+pfJetHistsPreOLap     = JetHists("pfJetsPreOLap",outFile,light=True)
+pfJetHists            = JetHists("pfJets",outFile)
 pfJetHists_matched    = JetHists("pfJets_matched" ,outFile)
 pfJetHists_matchedB   = JetHists("pfJets_matchedB",outFile)
 pfJetHists_matchedL   = JetHists("pfJets_matchedL",outFile)
+
+
+caloJetHistsPreOLap     = JetHists("caloJetsPreOLap",outFile,light=True)
+caloJetHists            = JetHists("caloJets",outFile)
+caloJetHists_matched    = JetHists("caloJets_matched" ,outFile)
+caloJetHists_matchedB   = JetHists("caloJets_matchedB",outFile)
+caloJetHists_matchedL   = JetHists("caloJets_matchedL",outFile)
 
 
 offJetHistsPreOLap = JetHists("offJetsPreOLap",outFile,light=True)
@@ -121,11 +132,10 @@ for entry in xrange( 0,nEventThisFile): # let's only run over the first 100 even
     elecs  = elecDB.getLeps()
     muons  = muonDB.getLeps()
     pfJets = pfJetsDB.getJets()
+    caloJets = caloJetsDB.getJets()
 
     if len(elecs)+len(muons) < 2:
         continue
-        
-    
 
 
     offJets = offJetsDB.getJets()
@@ -144,13 +154,35 @@ for entry in xrange( 0,nEventThisFile): # let's only run over the first 100 even
         else:
             offJetHistsLFJets.Fill(offJet)
 
+
+
+
         # Match offline to online
         for pfJet in pfJets:            
             deltaR = pfJet.vec.DeltaR(offJet.vec)
             if deltaR < 0.4:
                 pfJet.matchedJet = offJet
+                offJet.matchedJet = pfJet
                 break
 
+
+        if offJet.matchedJet:
+            offJetHistsMatchOnline.Fill(offJet)
+        else:
+            offJetHistsNoMatchOnline.Fill(offJet)
+            
+
+
+        # Match offline to online
+        for caloJet in caloJets:            
+            deltaR = caloJet.vec.DeltaR(offJet.vec)
+            if deltaR < 0.4:
+                caloJet.matchedJet = offJet
+                break
+
+    #
+    #  pf Jets
+    #
     for pfJet in pfJets:
         if abs(pfJet.eta) > 2.5: continue
         if pfJet.pt       < 35:  continue
@@ -168,6 +200,31 @@ for entry in xrange( 0,nEventThisFile): # let's only run over the first 100 even
                 pfJetHists_matchedB.Fill(pfJet)
             else:
                 pfJetHists_matchedL.Fill(pfJet)
+
+
+
+    #
+    #  calo Jets
+    #
+    for caloJet in caloJets:
+        if abs(caloJet.eta) > 2.5: continue
+        if caloJet.pt       < 35:  continue
+
+        caloJetHistsPreOLap.Fill(caloJet)        
+        if failOverlap(caloJet,elecs): continue
+        if failOverlap(caloJet,muons): continue
+
+        caloJetHists.Fill(caloJet)
+
+        if caloJet.matchedJet:
+            caloJetHists_matched .Fill(caloJet)
+
+            if caloJet.matchedJet.hadronFlavour == 5:            
+                caloJetHists_matchedB.Fill(caloJet)
+            else:
+                caloJetHists_matchedL.Fill(caloJet)
+
+
         
 #
 # Save Hists
@@ -177,6 +234,13 @@ pfJetHists          .Write(outFile)
 pfJetHists_matched  .Write(outFile)
 pfJetHists_matchedB .Write(outFile)
 pfJetHists_matchedL .Write(outFile)
+
+caloJetHistsPreOLap   .Write(outFile)
+caloJetHists          .Write(outFile)
+caloJetHists_matched  .Write(outFile)
+caloJetHists_matchedB .Write(outFile)
+caloJetHists_matchedL .Write(outFile)
+
 offJetHistsPreOLap  .Write(outFile)
 offJetHists         .Write(outFile)
 offJetHistsBJets    .Write(outFile)
