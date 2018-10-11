@@ -1,5 +1,5 @@
 import ROOT
-
+from array import array
 
 
 class JetHists:
@@ -31,7 +31,18 @@ class JetHists:
     
             self.ip2d_l = self.makeHist("ip2d_l","ip2d;IP2D [cm]",100,-0.2,0.2)
             self.ip2d   = self.makeHist("ip2d",  "ip2d;IP2D [cm]",100,-0.05,0.05)
-    
+
+            
+            nBinsPt = array("d",[0,2,4,6,8,10,15,20,30,40,60])
+            self.ip2d_vs_pt   = ROOT.TH2F("ip2d_vs_pt",  "ip2d_vs_pt;P_T [GeV]; IP2D [cm]",len(nBinsPt)-1,nBinsPt,100,-0.03,0.03)
+            self.ip2d_vs_pt.SetDirectory(self.thisDir)    
+
+
+            nBinsEta = array("d",[0.0, 0.25, 0.5, 0.75, 1.0, 1.25, 1.5, 1.75, 2.0, 2.25, 2.5])
+            self.ip2d_vs_eta   = ROOT.TH2F("ip2d_vs_eta",  "ip2d_vs_eta;|#eta|; IP2D [cm]",len(nBinsEta)-1,nBinsEta,100,-0.03,0.03)
+            self.ip2d_vs_eta.SetDirectory(self.thisDir)    
+
+
             self.ip2d_sig_l = self.makeHist("ip2d_sig_l","ip2d sig;IP2D significance",100,-100,100)
             self.ip2d_sig   = self.makeHist("ip2d_sig",  "ip2d sig;IP2D significance",100,-10,10)
     
@@ -194,14 +205,20 @@ class JetHists:
                 this_ip2d_err = this_ip2d/this_ip2d_sig
                 self.ip2d_err  .Fill(this_ip2d_err)
                 self.ip2d_err_l.Fill(this_ip2d_err)
+
+                this_trackMomentum = jetInfo.trackMomentum   .at(iTrk)
+                self.ip2d_vs_pt.Fill(this_trackMomentum, this_ip2d)
+                
+                this_trackEta = jetInfo.trackEta        .at(iTrk)
+                self.ip2d_vs_eta.Fill(abs(this_trackEta), this_ip2d)
     
     
                 self.trackDecayLenVal_l   .Fill(jetInfo.trackDecayLenVal.at(iTrk))
                 self.trackDecayLenVal     .Fill(jetInfo.trackDecayLenVal.at(iTrk))
                 self.trackJetDistVal      .Fill(jetInfo.trackJetDistVal .at(iTrk))
                 self.trackPtRel           .Fill(jetInfo.trackPtRel      .at(iTrk))
-                self.trackMomentum        .Fill(jetInfo.trackMomentum   .at(iTrk))
-                self.trackEta             .Fill(jetInfo.trackEta        .at(iTrk))
+                self.trackMomentum        .Fill(this_trackMomentum) 
+                self.trackEta             .Fill(this_trackEta)
                 self.trackPPar            .Fill(jetInfo.trackPPar       .at(iTrk))
                 self.trackDeltaR          .Fill(jetInfo.trackDeltaR     .at(iTrk))
                 #self.trackEtaRel          .Fill(jetInfo.trackEtaRel     .at(iTrk))
@@ -286,6 +303,9 @@ class JetHists:
     
             self.ip2d_err_l.Write()
             self.ip2d_err  .Write()
+
+            self.ip2d_vs_pt.Write()
+            self.ip2d_vs_eta.Write()
     
             self.trackDecayLenVal_l   .Write()
             self.trackDecayLenVal     .Write()
