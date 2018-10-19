@@ -9,6 +9,13 @@
 # Run over multiple files
 > python     ../python/procNtupleExample.py -i inputList.txt  --inputList  -o TestFile.root
 
+# Make ROC
+> python ../python/makeROC.py --inFileName TestFile.root --outFileName TestROC.root
+# Plot ROC
+> cd ../../
+> git clone git@github.com:patrickbryant/PlotTools.git
+> cd TriggerStudies/run
+> python ../python/plotROC.py --inFileName TestROC.root --outFileName TestROC
 
 # Making commits
 Any new feature you wish to add will need to be in a new branch:
