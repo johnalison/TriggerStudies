@@ -1,6 +1,6 @@
 import ROOT
+from trackInfo import TrackData
 from array import array
-
 
 class JetData:
 
@@ -53,7 +53,6 @@ class JetData:
                  ,hadronFlavour
 
                  ,trackSip3dSig,trackSip3dVal,trackSip2dSig,trackSip2dVal
-
                  ,trackDecayLenVal           
                  #,trackDecayLenSig           
                  ,trackJetDistVal            
@@ -135,47 +134,127 @@ class JetData:
         self.vec = ROOT.TLorentzVector()
         self.vec.SetPtEtaPhiM(pt,eta,phi,mass)
         
-        self.trackSip3dSig = trackSip3dSig
-        self.trackSip3dVal = trackSip3dVal
-
-        self.trackSip2dSig = trackSip2dSig
-        self.trackSip2dVal = trackSip2dVal
-
-        self.trackDecayLenVal           = trackDecayLenVal           
-        #self.trackDecayLenSig           = trackDecayLenSig           
-        self.trackJetDistVal            = trackJetDistVal            
-        #self.trackJetDistSig            = trackJetDistSig            
-        #self.trackGhostTrackWeight      = trackGhostTrackWeight      
-        #self.trackGhostTrackDistSig     = trackGhostTrackDistSig     
-        #self.trackGhostTrackDistVal     = trackGhostTrackDistVal     
-        self.trackPtRel                 = trackPtRel                 
-        self.trackMomentum              = trackMomentum              
-        self.trackEta                   = trackEta                   
-        #self.trackPhi                   = trackPhi                   
-        #self.trackCharge                = trackCharge                
-        self.trackPPar                  = trackPPar                  
-        self.trackDeltaR                = trackDeltaR                
-        self.trackEtaRel                = trackEtaRel                
-        self.trackPtRatio               = trackPtRatio               
-        self.trackPParRatio             = trackPParRatio             
-        #self.trackP0Par                 = trackP0Par                 
-        #self.trackP0ParRatio            = trackP0ParRatio            
-        #self.trackChi2                  = trackChi2                  
-        #self.trackNTotalHits            = trackNTotalHits            
-        #self.trackNPixelHits            = trackNPixelHits            
-
+        self.GetTracks(trackSip3dSig,
+                       trackSip3dVal,
+                       trackSip2dSig,
+                       trackSip2dVal,
+                       trackDecayLenVal,
+                       trackJetDistVal,
+                       trackPtRel,
+                       trackMomentum,
+                       trackEta,
+                       trackPPar,
+                       trackDeltaR,
+                       trackPtRatio,
+                       trackPParRatio,
+                   )
 
         #
         #  For offline/online matching
         #
         self.matchedJet = None
 
-        
+    def GetTracks(self,
+                  trackSip3dSig,
+                  trackSip3dVal,
+                  trackSip2dSig,
+                  trackSip2dVal,
+                  trackDecayLenVal,
+                  trackJetDistVal,
+                  trackPtRel,
+                  trackMomentum,
+                  trackEta,
+                  trackPPar,
+                  trackDeltaR,
+                  trackPtRatio,
+                  trackPParRatio,
+              ):
 
+        self.tracks    = []
+        for iTrack in range(len(trackSip3dSig)):
+            self.tracks.append(TrackData(trackSip3dSig[iTrack],
+                                         trackSip3dVal[iTrack],
+                                         trackSip2dSig[iTrack],
+                                         trackSip2dVal[iTrack],
+                                         trackDecayLenVal[iTrack],
+                                         trackJetDistVal[iTrack],
+                                         trackPtRel[iTrack],
+                                         trackMomentum[iTrack],
+                                         trackEta[iTrack],
+                                         trackPPar[iTrack],
+                                         trackDeltaR[iTrack],
+                                         trackPtRatio[iTrack],
+                                         trackPParRatio[iTrack],
+                                     ))
 
 #
 # Separate File ? 
 #
+# class TrackDataHandler:
+    
+#     def __init__(self,name):
+#         self.name = name
+
+#         self.trackSip3dSig = ROOT.std.vector('vector<float>')()
+#         self.trackSip3dVal = ROOT.std.vector('vector<float>')()
+
+#         self.trackSip2dSig = ROOT.std.vector('vector<float>')()
+#         self.trackSip2dVal = ROOT.std.vector('vector<float>')()
+
+#         self.trackDecayLenVal           = ROOT.std.vector('vector<float>')()
+#         #self.trackDecayLenSig           = ROOT.std.vector('vector<float>')()
+#         self.trackJetDistVal            = ROOT.std.vector('vector<float>')()
+#         #self.trackJetDistSig            = ROOT.std.vector('vector<float>')()
+#         #self.trackGhostTrackWeight      = ROOT.std.vector('vector<float>')()
+#         #self.trackGhostTrackDistSig     = ROOT.std.vector('vector<float>')()
+#         #self.trackGhostTrackDistVal     = ROOT.std.vector('vector<float>')()
+#         self.trackPtRel                 = ROOT.std.vector('vector<float>')()
+#         self.trackMomentum              = ROOT.std.vector('vector<float>')()
+#         self.trackEta                   = ROOT.std.vector('vector<float>')()
+#         #self.trackPhi                   = ROOT.std.vector('vector<float>')()
+#         #self.trackCharge                = ROOT.std.vector('vector<float>')()
+#         self.trackPPar                  = ROOT.std.vector('vector<float>')()
+#         self.trackDeltaR                = ROOT.std.vector('vector<float>')()
+#         self.trackEtaRel                = ROOT.std.vector('vector<float>')()
+#         self.trackPtRatio               = ROOT.std.vector('vector<float>')()
+#         self.trackPParRatio             = ROOT.std.vector('vector<float>')()
+#         #self.trackP0Par                 = ROOT.std.vector('vector<float>')()
+#         #self.trackP0ParRatio            = ROOT.std.vector('vector<float>')()
+#         #self.trackChi2                  = ROOT.std.vector('vector<float>')()
+#         #self.trackNTotalHits            = ROOT.std.vector('vector<float>')()
+#         #self.trackNPixelHits            = ROOT.std.vector('vector<float>')()
+
+#     def SetBranchAddress(self,intree):
+
+#         intree.SetBranchAddress( self.name+'_trackSip3dSig', self.trackSip3dSig)
+#         intree.SetBranchAddress( self.name+'_trackSip3dVal', self.trackSip3dVal)
+#         intree.SetBranchAddress( self.name+'_trackSip2dSig', self.trackSip2dSig)
+#         intree.SetBranchAddress( self.name+'_trackSip2dVal', self.trackSip2dVal)
+
+#         intree.SetBranchAddress( self.name+'_trackDecayLenVal'           ,  self.trackDecayLenVal           )
+#         #intree.SetBranchAddress( self.name+'_trackDecayLenSig'           ,  self.trackDecayLenSig           )
+#         intree.SetBranchAddress( self.name+'_trackJetDistVal'            ,  self.trackJetDistVal            )
+#         #intree.SetBranchAddress( self.name+'_trackJetDistSig'            ,  self.trackJetDistSig            )
+#         #intree.SetBranchAddress( self.name+'_trackGhostTrackWeight'      ,  self.trackGhostTrackWeight      )
+#         #intree.SetBranchAddress( self.name+'_trackGhostTrackDistSig'     ,  self.trackGhostTrackDistSig     )
+#         #intree.SetBranchAddress( self.name+'_trackGhostTrackDistVal'     ,  self.trackGhostTrackDistVal     )
+#         intree.SetBranchAddress( self.name+'_trackPtRel'                 ,  self.trackPtRel                 )
+#         intree.SetBranchAddress( self.name+'_trackMomentum'              ,  self.trackMomentum              )
+#         intree.SetBranchAddress( self.name+'_trackEta'                   ,  self.trackEta                   )
+#         #intree.SetBranchAddress( self.name+'_trackPhi'                   ,  self.trackPhi                   )
+#         #intree.SetBranchAddress( self.name+'_trackCharge'                ,  self.trackCharge                )
+#         intree.SetBranchAddress( self.name+'_trackPPar'                  ,  self.trackPPar                  )
+#         intree.SetBranchAddress( self.name+'_trackDeltaR'                ,  self.trackDeltaR                )
+#         intree.SetBranchAddress( self.name+'_trackEtaRel'                ,  self.trackEtaRel                )
+#         intree.SetBranchAddress( self.name+'_trackPtRatio'               ,  self.trackPtRatio               )
+#         intree.SetBranchAddress( self.name+'_trackPParRatio'             ,  self.trackPParRatio             )
+#         #intree.SetBranchAddress( self.name+'_trackP0Par'                 ,  self.trackP0Par                 )
+#         #intree.SetBranchAddress( self.name+'_trackP0ParRatio'            ,  self.trackP0ParRatio            )
+#         #intree.SetBranchAddress( self.name+'_trackChi2'                  ,  self.trackChi2                  )
+#         #intree.SetBranchAddress( self.name+'_trackNTotalHits'            ,  self.trackNTotalHits            )
+#         #intree.SetBranchAddress( self.name+'_trackNPixelHits'            ,  self.trackNPixelHits            )
+
+
 class JetDataHandler:
 
     def __init__(self,name,maxLenght = 40):
@@ -239,6 +318,8 @@ class JetDataHandler:
  
 
         # Eventually self.trackInfo = 
+        #self.trackInfo = TrackDataHandler(name)
+
         self.trackSip3dSig = ROOT.std.vector('vector<float>')()
         self.trackSip3dVal = ROOT.std.vector('vector<float>')()
 
@@ -326,6 +407,8 @@ class JetDataHandler:
             intree.SetBranchAddress( self.name+'_partonFlavour'                            , self.partonFlavour                            )
             intree.SetBranchAddress( self.name+'_hadronFlavour'                            , self.hadronFlavour                            )
 
+        #self.trackInfo.SetBranchAddress(intree)
+
         intree.SetBranchAddress( self.name+'_trackSip3dSig', self.trackSip3dSig)
         intree.SetBranchAddress( self.name+'_trackSip3dVal', self.trackSip3dVal)
         intree.SetBranchAddress( self.name+'_trackSip2dSig', self.trackSip2dSig)
@@ -411,7 +494,6 @@ class JetDataHandler:
                                    self.chEmEF                            [iJet],
                                    self.partonFlavour                     [iJet],
                                    self.hadronFlavour                     [iJet],
-
                                    self.trackSip3dSig[iJet],
                                    self.trackSip3dVal[iJet],
                                    self.trackSip2dSig[iJet],
