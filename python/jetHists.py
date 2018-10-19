@@ -1,4 +1,6 @@
 import ROOT
+from helpers import makeHist
+from trackHists import TrackHists
 from array import array
 
 
@@ -8,113 +10,65 @@ class JetHists:
         
         self.name = name
         self.thisDir = outFile.mkdir(self.name)
-        self.pt   = self.makeHist("pt","pt;P_{T} [GeV];Entries",  100,0,400)
-        self.eta  = self.makeHist("eta","eta;jet #eta;Entries",100,-3,3)
-        self.phi  = self.makeHist("phi","phi;jet #phi;Entries",100,-3.2,3.2)
-        self.mass = self.makeHist("mass","mass;jet mass [GeV];Entries",100,-1,200)
-        self.deepcsv = self.makeHist("deepcsv","deepcsv;deepcsv;Entries",100,-2,2)
+        self.pt   = makeHist(self.thisDir, "pt","pt;P_{T} [GeV];Entries",  100,0,400)
+        self.eta  = makeHist(self.thisDir, "eta","eta;jet #eta;Entries",100,-3,3)
+        self.phi  = makeHist(self.thisDir, "phi","phi;jet #phi;Entries",100,-3.2,3.2)
+        self.mass = makeHist(self.thisDir, "mass","mass;jet mass [GeV];Entries",100,-1,200)
+        self.deepcsv = makeHist(self.thisDir, "deepcsv","deepcsv;deepcsv;Entries",100,-2,2)
 
         self.light = light
         if not self.light:
-            self.deepcsv_bb = self.makeHist("deepcsv_bb","deepcsv_bb;deepcsv_bb;Entries",100,-2,2)
+            self.deepcsv_bb = makeHist(self.thisDir, "deepcsv_bb","deepcsv_bb;deepcsv_bb;Entries",100,-2,2)
     
-            self.nTrk = self.makeHist("nTrk","nTrk;nTracks;Entries",42,-1.5,40.5)
-    
-            self.ip3d_l = self.makeHist("ip3d_l","ip3d;IP3D [cm]",100,-0.2,0.2)
-            self.ip3d   = self.makeHist("ip3d",  "ip3d;IP3D [cm]",100,-0.05,0.05)
-    
-            self.ip3d_sig_l = self.makeHist("ip3d_sig_l","ip3d sig;IP3D significance",100,-100,100)
-            self.ip3d_sig   = self.makeHist("ip3d_sig",  "ip3d sig;IP3D significance",100,-10,10)
-    
-            self.ip3d_err_l = self.makeHist("ip3d_err_l","ip3d err;IP3D uncertianty [cm]",100,-0.01,0.1)
-            self.ip3d_err   = self.makeHist("ip3d_err",  "ip3d err;IP3D uncertianty [cm]",100,-0.001,0.01)
-    
-            self.ip2d_l = self.makeHist("ip2d_l","ip2d;IP2D [cm]",100,-0.2,0.2)
-            self.ip2d   = self.makeHist("ip2d",  "ip2d;IP2D [cm]",100,-0.05,0.05)
+            self.vertexNTracks                    = makeHist(self.thisDir, 'vertexNTracks'                ,'vertexNTracks;nVertex Tracks;Entries'                 ,22, -2.5, 19.5)
+            self.vertexMass                       = makeHist(self.thisDir, 'vertexMass'                   ,'vertexMass;Vertex Mass [GeV]'                    ,100, -0.5, 50)
+            self.vertexJetDeltaR                  = makeHist(self.thisDir, 'vertexJetDeltaR'              ,'vertexJetDeltaR;Vertex-Jet #Delta R'               ,100, -0.01, 0.4)
+            self.vertexFitProb                    = makeHist(self.thisDir, 'vertexFitProb'                ,'vertexFitProb;Vertex Fit Prob'                 ,100, -50, 50)
+            self.vertexEnergyRatio                = makeHist(self.thisDir, 'vertexEnergyRatio'            ,'vertexEnergyRatio;Vertex Energy Fraction '             ,100, -0.1, 3)
+            self.vertexCategory                   = makeHist(self.thisDir, 'vertexCategory'               ,'vertexCategory;Vertex Category'                ,4 ,-1.5,2.5)
+            self.vertexBoostOverSqrtJetPt         = makeHist(self.thisDir, 'vertexBoostOverSqrtJetPt'     ,'vertexBoostOverSqrtJetPt;Vertex Boost/#sqrt{jet P_{T}}'      ,100, -0.1, 1.1)
+            self.trackJetPt                       = makeHist(self.thisDir, 'trackJetPt'           ,'trackJetPt;Track Jet P_{T} [GeV]'            ,100, 0,400)
+            self.trackSumJetEtRatio               = makeHist(self.thisDir, 'trackSumJetEtRatio'           ,'trackSumJetEtRatio;Track-jet/Jet E_{T} Ratio'            ,100, -0.1,1.5)
+            self.trackSumJetDeltaR                = makeHist(self.thisDir, 'trackSumJetDeltaR'            ,'trackSumJetDeltaR; Track-Jet - Jet #Delta R'             ,100, -0.1, 0.35)
+            self.trackSip2dValAboveCharm          = makeHist(self.thisDir, 'trackSip2dValAboveCharm'      ,'trackSip2dValAboveCharm;trackSip2dValAboveCharm'       ,100, -0.2, 0.2)
+            self.trackSip2dSigAboveCharm          = makeHist(self.thisDir, 'trackSip2dSigAboveCharm'      ,'trackSip3dSigAboveCharm;trackSip2SiglAboveCharm'       ,100, -50, 50)
+            self.trackSip3dValAboveCharm          = makeHist(self.thisDir, 'trackSip3dValAboveCharm'      ,'trackSip3dValAboveCharm;trackSip3dValAboveCharm'       ,100, -0.2, 0.2) 
+            self.trackSip3dSigAboveCharm          = makeHist(self.thisDir, 'trackSip3dSigAboveCharm'      ,'trackSip3dSigAboveCharm;trackSip3dSigAboveCharm'       ,100, -50, 50)
+            self.totalMultiplicity                = makeHist(self.thisDir, 'totalMultiplicity'            ,'totalMultiplicity;total multiplicity'             ,62, -1.5, 60.5)
+            self.photonMultiplicity               = makeHist(self.thisDir, 'photonMultiplicity'           ,'photonMultiplicity;photon multiplicity'            ,42, -1.5, 40.5)
+            self.photonEnergyFraction             = makeHist(self.thisDir, 'photonEnergyFraction'         ,'photonEnergyFraction;photon energy fraction'          ,100, -0.1,1.5)
+            self.neutralHadronMultiplicity        = makeHist(self.thisDir, 'neutralHadronMultiplicity'    ,'neutralHadronMultiplicity;neutralHadronMultiplicity'     ,22, -1.5, 20.5)
+            self.neutralHadronEnergyFraction      = makeHist(self.thisDir, 'neutralHadronEnergyFraction'  ,'neutralHadronEnergyFraction;neutralHadronEnergyFraction'   ,100, -0.1,1.5)
+            self.neMult                           = makeHist(self.thisDir, 'neMult'                       ,'neMult;neMult'                        ,62, -1.5, 60.5)
+            self.neHadEF                          = makeHist(self.thisDir, 'neHadEF'                      ,'neHadEF;neHadEF'                       ,100, -0.1,2.5)
+            self.neEmEF                           = makeHist(self.thisDir, 'neEmEF'                       ,'neEmEF;neEmEF'                        ,100, -0.1,2.5)
+            self.muonMultiplicity                 = makeHist(self.thisDir, 'muonMultiplicity'             ,'muonMultiplicity;muonMultiplicity'              ,12, -1.5, 10.5)
+            self.muonEnergyFraction               = makeHist(self.thisDir, 'muonEnergyFraction'           ,'muonEnergyFraction;muonEnergyFraction'            ,100, -0.1,1.5)
+            self.mult                             = makeHist(self.thisDir, 'mult'                         ,'mult;mult'                          ,62, -1.5, 60.5)
+            self.muEF                             = makeHist(self.thisDir, 'muEF'                         ,'muEF;muEF'                          ,100, -0.1,2.5)
+            self.massVertexEnergyFraction         = makeHist(self.thisDir, 'massVertexEnergyFraction'     ,'massVertexEnergyFraction;massVertexEnergyFraction'      ,100, -0.1,2.5)
+            self.jetNTracksEtaRel                 = makeHist(self.thisDir, 'jetNTracksEtaRel'             ,'jetNTracksEtaRel;jetNTracksEtaRel'              ,22, -1.5, 20.5)
+            self.jetNTracks                       = makeHist(self.thisDir, 'jetNTracks'                   ,'jetNTracks;Number Tracks'                    ,42, -1.5, 40.5)
+            self.jetNSelectedTracks               = makeHist(self.thisDir, 'jetNSelectedTracks'           ,'jetNSelectedTracks;Number Selected Tracks'            ,42, -1.5, 40.5)
+            self.jetNSecondaryVertices            = makeHist(self.thisDir, 'jetNSecondaryVertices'        ,'jetNSecondaryVertices;Number Secondary Vertices'         ,12, -1.5, 10.5)
+            self.hadronPhotonMultiplicity         = makeHist(self.thisDir, 'hadronPhotonMultiplicity'     ,'hadronPhotonMultiplicity;hadronPhotonMultiplicity'      ,62, -1.5, 60.5)
+            self.hadronMultiplicity               = makeHist(self.thisDir, 'hadronMultiplicity'           ,'hadronMultiplicity;hadronMultiplicity'            ,42, -1.5, 40.5)
+            self.flightDistance1dSig              = makeHist(self.thisDir, 'flightDistance1dSig'          ,'flightDistance1dSig;flightDistance1dSig'           ,100, -10, 150)
+            self.flightDistance1dVal              = makeHist(self.thisDir, 'flightDistance1dVal'          ,'flightDistance1dVal;flightDistance1dVal'           ,100, -0.1, 5)
+            self.flightDistance2dSig              = makeHist(self.thisDir, 'flightDistance2dSig'          ,'flightDistance2dSig;flightDistance2dSig'           ,100, -10, 150)
+            self.flightDistance2dVal              = makeHist(self.thisDir, 'flightDistance2dVal'          ,'flightDistance2dVal;flightDistance2dVal'           ,100, -0.1, 5)
+            self.flightDistance3dSig              = makeHist(self.thisDir, 'flightDistance3dSig'          ,'flightDistance3dSig;flightDistance3dSig'           ,100, -10, 150)
+            self.flightDistance3dVal              = makeHist(self.thisDir, 'flightDistance3dVal'          ,'flightDistance3dVal;flightDistance3dVal'           ,100, -0.1, 5)
+            self.chargedHadronMultiplicity        = makeHist(self.thisDir, 'chargedHadronMultiplicity'    ,'chargedHadronMultiplicity;chargedHadronMultiplicity'     ,42, -1.5, 40.5)
+            self.chargedHadronEnergyFraction      = makeHist(self.thisDir, 'chargedHadronEnergyFraction'  ,'chargedHadronEnergyFraction;chargedHadronEnergyFraction'   ,100, -0.1,1.5)
+            self.chMult                           = makeHist(self.thisDir, 'chMult'                       ,'chMult;chMult'                        ,42, -1.5, 40.5)
+            self.chHadEF                          = makeHist(self.thisDir, 'chHadEF'                      ,'chHadEF;chHadEF;Entries'                       ,100, -0.1,2.5)
+            self.chEmEF                           = makeHist(self.thisDir, 'chEmEF'                       ,'chEmEF;chEmEF;Entries'                        ,100, -0.1,2.5)
+            self.partonFlavour                    = makeHist(self.thisDir, 'partonFlavour'                ,'partonFlavour;partonFlavour;Entries'                        ,60, -30.5,29.5)
+            self.hadronFlavour                    = makeHist(self.thisDir, 'hadronFlavour'                ,'hadronFlavour;hadronFlavour;Entries'                        ,60, -30.5,29.5)
 
-            
-            nBinsPt = array("d",[0,2,4,6,8,10,15,20,30,40,60])
-            self.ip2d_vs_pt   = ROOT.TH2F("ip2d_vs_pt",  "ip2d_vs_pt;P_T [GeV]; IP2D [cm]",len(nBinsPt)-1,nBinsPt,100,-0.03,0.03)
-            self.ip2d_vs_pt.SetDirectory(self.thisDir)    
-
-
-            nBinsEta = array("d",[0.0, 0.25, 0.5, 0.75, 1.0, 1.25, 1.5, 1.75, 2.0, 2.25, 2.5])
-            self.ip2d_vs_eta   = ROOT.TH2F("ip2d_vs_eta",  "ip2d_vs_eta;|#eta|; IP2D [cm]",len(nBinsEta)-1,nBinsEta,100,-0.03,0.03)
-            self.ip2d_vs_eta.SetDirectory(self.thisDir)    
-
-
-            self.ip2d_sig_l = self.makeHist("ip2d_sig_l","ip2d sig;IP2D significance",100,-100,100)
-            self.ip2d_sig   = self.makeHist("ip2d_sig",  "ip2d sig;IP2D significance",100,-10,10)
+            self.trackHists                 = TrackHists(name, self.thisDir)
     
-            self.ip2d_err_l = self.makeHist("ip2d_err_l","ip2d err;IP2D uncertianty [cm]",100,-0.01,0.1)
-            self.ip2d_err   = self.makeHist("ip2d_err",  "ip2d err;IP2D uncertianty [cm]",100,-0.001,0.01)
-    
-            self.vertexNTracks                    = self.makeHist('vertexNTracks'                ,'vertexNTracks;nVertex Tracks;Entries'                 ,22, -2.5, 19.5)
-            self.vertexMass                       = self.makeHist('vertexMass'                   ,'vertexMass;Vertex Mass [GeV]'                    ,100, -0.5, 50)
-            self.vertexJetDeltaR                  = self.makeHist('vertexJetDeltaR'              ,'vertexJetDeltaR;Vertex-Jet #Delta R'               ,100, -0.01, 0.4)
-            self.vertexFitProb                    = self.makeHist('vertexFitProb'                ,'vertexFitProb;Vertex Fit Prob'                 ,100, -50, 50)
-            self.vertexEnergyRatio                = self.makeHist('vertexEnergyRatio'            ,'vertexEnergyRatio;Vertex Energy Fraction '             ,100, -0.1, 3)
-            self.vertexCategory                   = self.makeHist('vertexCategory'               ,'vertexCategory;Vertex Category'                ,4 ,-1.5,2.5)
-            self.vertexBoostOverSqrtJetPt         = self.makeHist('vertexBoostOverSqrtJetPt'     ,'vertexBoostOverSqrtJetPt;Vertex Boost/#sqrt{jet P_{T}}'      ,100, -0.1, 1.1)
-            self.trackJetPt                       = self.makeHist('trackJetPt'           ,'trackJetPt;Track Jet P_{T} [GeV]'            ,100, 0,400)
-            self.trackSumJetEtRatio               = self.makeHist('trackSumJetEtRatio'           ,'trackSumJetEtRatio;Track-jet/Jet E_{T} Ratio'            ,100, -0.1,1.5)
-            self.trackSumJetDeltaR                = self.makeHist('trackSumJetDeltaR'            ,'trackSumJetDeltaR; Track-Jet - Jet #Delta R'             ,100, -0.1, 0.35)
-            self.trackSip2dValAboveCharm          = self.makeHist('trackSip2dValAboveCharm'      ,'trackSip2dValAboveCharm;trackSip2dValAboveCharm'       ,100, -0.2, 0.2)
-            self.trackSip2dSigAboveCharm          = self.makeHist('trackSip2dSigAboveCharm'      ,'trackSip3dSigAboveCharm;trackSip2SiglAboveCharm'       ,100, -50, 50)
-            self.trackSip3dValAboveCharm          = self.makeHist('trackSip3dValAboveCharm'      ,'trackSip3dValAboveCharm;trackSip3dValAboveCharm'       ,100, -0.2, 0.2) 
-            self.trackSip3dSigAboveCharm          = self.makeHist('trackSip3dSigAboveCharm'      ,'trackSip3dSigAboveCharm;trackSip3dSigAboveCharm'       ,100, -50, 50)
-            self.totalMultiplicity                = self.makeHist('totalMultiplicity'            ,'totalMultiplicity;total multiplicity'             ,62, -1.5, 60.5)
-            self.photonMultiplicity               = self.makeHist('photonMultiplicity'           ,'photonMultiplicity;photon multiplicity'            ,42, -1.5, 40.5)
-            self.photonEnergyFraction             = self.makeHist('photonEnergyFraction'         ,'photonEnergyFraction;photon energy fraction'          ,100, -0.1,1.5)
-            self.neutralHadronMultiplicity        = self.makeHist('neutralHadronMultiplicity'    ,'neutralHadronMultiplicity;neutralHadronMultiplicity'     ,22, -1.5, 20.5)
-            self.neutralHadronEnergyFraction      = self.makeHist('neutralHadronEnergyFraction'  ,'neutralHadronEnergyFraction;neutralHadronEnergyFraction'   ,100, -0.1,1.5)
-            self.neMult                           = self.makeHist('neMult'                       ,'neMult;neMult'                        ,62, -1.5, 60.5)
-            self.neHadEF                          = self.makeHist('neHadEF'                      ,'neHadEF;neHadEF'                       ,100, -0.1,2.5)
-            self.neEmEF                           = self.makeHist('neEmEF'                       ,'neEmEF;neEmEF'                        ,100, -0.1,2.5)
-            self.muonMultiplicity                 = self.makeHist('muonMultiplicity'             ,'muonMultiplicity;muonMultiplicity'              ,12, -1.5, 10.5)
-            self.muonEnergyFraction               = self.makeHist('muonEnergyFraction'           ,'muonEnergyFraction;muonEnergyFraction'            ,100, -0.1,1.5)
-            self.mult                             = self.makeHist('mult'                         ,'mult;mult'                          ,62, -1.5, 60.5)
-            self.muEF                             = self.makeHist('muEF'                         ,'muEF;muEF'                          ,100, -0.1,2.5)
-            self.massVertexEnergyFraction         = self.makeHist('massVertexEnergyFraction'     ,'massVertexEnergyFraction;massVertexEnergyFraction'      ,100, -0.1,2.5)
-            self.jetNTracksEtaRel                 = self.makeHist('jetNTracksEtaRel'             ,'jetNTracksEtaRel;jetNTracksEtaRel'              ,22, -1.5, 20.5)
-            self.jetNTracks                       = self.makeHist('jetNTracks'                   ,'jetNTracks;Number Tracks'                    ,42, -1.5, 40.5)
-            self.jetNSelectedTracks               = self.makeHist('jetNSelectedTracks'           ,'jetNSelectedTracks;Number Selected Tracks'            ,42, -1.5, 40.5)
-            self.jetNSecondaryVertices            = self.makeHist('jetNSecondaryVertices'        ,'jetNSecondaryVertices;Number Secondary Vertices'         ,12, -1.5, 10.5)
-            self.hadronPhotonMultiplicity         = self.makeHist('hadronPhotonMultiplicity'     ,'hadronPhotonMultiplicity;hadronPhotonMultiplicity'      ,62, -1.5, 60.5)
-            self.hadronMultiplicity               = self.makeHist('hadronMultiplicity'           ,'hadronMultiplicity;hadronMultiplicity'            ,42, -1.5, 40.5)
-            self.flightDistance1dSig              = self.makeHist('flightDistance1dSig'          ,'flightDistance1dSig;flightDistance1dSig'           ,100, -10, 150)
-            self.flightDistance1dVal              = self.makeHist('flightDistance1dVal'          ,'flightDistance1dVal;flightDistance1dVal'           ,100, -0.1, 5)
-            self.flightDistance2dSig              = self.makeHist('flightDistance2dSig'          ,'flightDistance2dSig;flightDistance2dSig'           ,100, -10, 150)
-            self.flightDistance2dVal              = self.makeHist('flightDistance2dVal'          ,'flightDistance2dVal;flightDistance2dVal'           ,100, -0.1, 5)
-            self.flightDistance3dSig              = self.makeHist('flightDistance3dSig'          ,'flightDistance3dSig;flightDistance3dSig'           ,100, -10, 150)
-            self.flightDistance3dVal              = self.makeHist('flightDistance3dVal'          ,'flightDistance3dVal;flightDistance3dVal'           ,100, -0.1, 5)
-            self.chargedHadronMultiplicity        = self.makeHist('chargedHadronMultiplicity'    ,'chargedHadronMultiplicity;chargedHadronMultiplicity'     ,42, -1.5, 40.5)
-            self.chargedHadronEnergyFraction      = self.makeHist('chargedHadronEnergyFraction'  ,'chargedHadronEnergyFraction;chargedHadronEnergyFraction'   ,100, -0.1,1.5)
-            self.chMult                           = self.makeHist('chMult'                       ,'chMult;chMult'                        ,42, -1.5, 40.5)
-            self.chHadEF                          = self.makeHist('chHadEF'                      ,'chHadEF;chHadEF;Entries'                       ,100, -0.1,2.5)
-            self.chEmEF                           = self.makeHist('chEmEF'                       ,'chEmEF;chEmEF;Entries'                        ,100, -0.1,2.5)
-            self.partonFlavour                    = self.makeHist('partonFlavour'                ,'partonFlavour;partonFlavour;Entries'                        ,60, -30.5,29.5)
-            self.hadronFlavour                    = self.makeHist('hadronFlavour'                ,'hadronFlavour;hadronFlavour;Entries'                        ,60, -30.5,29.5)
-    
-            self.trackDecayLenVal_l         = self.makeHist("trackDecayLenVal_l"    ,    "trackDecayLenVal;trackDecayLenVal [cm];Entries", 100, -0.1,  5)
-            self.trackDecayLenVal           = self.makeHist("trackDecayLenVal"    ,    "trackDecayLenVal;trackDecayLenVal [cm];Entries", 100, -0.1,  0.5)
-            self.trackJetDistVal            = self.makeHist("trackJetDistVal"     ,    "trackJetDistVal;trackJetDistVal [cm];Entries",  100, -0.1,0.01)      
-            self.trackPtRel                 = self.makeHist("trackPtRel"          ,    "trackPtRel;track Pt Rel [GeV];Entries", 100, -0.1, 7)          
-            self.trackMomentum              = self.makeHist("trackMomentum"       ,    "trackMomentum;track momentum [GeV];Entries", 100, -0.1, 60)       
-            self.trackEta                   = self.makeHist("trackEta"            ,    "trackEta;track #eta;Entries", 100, -2.6, 2.6)            
-            self.trackPPar                  = self.makeHist("trackPPar"           ,    "trackPPar;track PPar [GeV];Entries",100, -0.1, 60)           
-            self.trackDeltaR                = self.makeHist("trackDeltaR"         ,    "trackDeltaR;track #Delta R;Entries", 100, -0.1, 0.35)         
-            self.trackEtaRel                = self.makeHist("trackEtaRel"         ,    "trackEtaRel;track Eta Rel;Entries", 100, 0, 7)         
-            self.trackPtRatio               = self.makeHist("trackPtRatio"        ,    "trackPtRatio;track Pt Ratio;Entries", 100, -0.01, 0.3)        
-            self.trackPParRatio             = self.makeHist("trackPParRatio"      ,    "trackPParRatio;track P Par Ratio;Entries", 100, 0.95, 1.02)      
-    
-
-
-    def makeHist(self,name,title,bins,low,high):
-        h = ROOT.TH1F(name,title,bins,low,high)
-        h.SetDirectory(self.thisDir)
-        return h
-
         
     def Fill(self,jetInfo):
         self.pt  .Fill(jetInfo.pt)
@@ -175,56 +129,8 @@ class JetHists:
             self.partonFlavour                    .Fill(jetInfo.partonFlavour                           )
             self.hadronFlavour                    .Fill(jetInfo.hadronFlavour                           )
     
-    
-            nTracks = len(jetInfo.trackSip3dVal)
-            self.nTrk.Fill(nTracks)
-    
-            #print len(jetInfo.trackSip3dVal)#, len(jetInfo.trackSip2dVal)
-            for iTrk in range(nTracks):
-                this_ip3d = jetInfo.trackSip3dVal.at(iTrk)
-                self.ip3d  .Fill(this_ip3d)
-                self.ip3d_l.Fill(this_ip3d)
-    
-                this_ip3d_sig = jetInfo.trackSip3dSig.at(iTrk)
-                self.ip3d_sig  .Fill(this_ip3d_sig)
-                self.ip3d_sig_l.Fill(this_ip3d_sig)
-    
-                this_ip3d_err = this_ip3d/this_ip3d_sig
-                self.ip3d_err  .Fill(this_ip3d_err)
-                self.ip3d_err_l.Fill(this_ip3d_err)
-    
-    
-                this_ip2d = jetInfo.trackSip2dVal.at(iTrk)
-                self.ip2d  .Fill(this_ip2d)
-                self.ip2d_l.Fill(this_ip2d)
-    
-                this_ip2d_sig = jetInfo.trackSip2dSig.at(iTrk)
-                self.ip2d_sig  .Fill(this_ip2d_sig)
-                self.ip2d_sig_l.Fill(this_ip2d_sig)
-    
-                this_ip2d_err = this_ip2d/this_ip2d_sig
-                self.ip2d_err  .Fill(this_ip2d_err)
-                self.ip2d_err_l.Fill(this_ip2d_err)
+            self.trackHists.Fill(jetInfo.tracks)
 
-                this_trackMomentum = jetInfo.trackMomentum   .at(iTrk)
-                self.ip2d_vs_pt.Fill(this_trackMomentum, this_ip2d)
-                
-                this_trackEta = jetInfo.trackEta        .at(iTrk)
-                self.ip2d_vs_eta.Fill(abs(this_trackEta), this_ip2d)
-    
-    
-                self.trackDecayLenVal_l   .Fill(jetInfo.trackDecayLenVal.at(iTrk))
-                self.trackDecayLenVal     .Fill(jetInfo.trackDecayLenVal.at(iTrk))
-                self.trackJetDistVal      .Fill(jetInfo.trackJetDistVal .at(iTrk))
-                self.trackPtRel           .Fill(jetInfo.trackPtRel      .at(iTrk))
-                self.trackMomentum        .Fill(this_trackMomentum) 
-                self.trackEta             .Fill(this_trackEta)
-                self.trackPPar            .Fill(jetInfo.trackPPar       .at(iTrk))
-                self.trackDeltaR          .Fill(jetInfo.trackDeltaR     .at(iTrk))
-                #self.trackEtaRel          .Fill(jetInfo.trackEtaRel     .at(iTrk))
-                self.trackPtRatio         .Fill(jetInfo.trackPtRatio    .at(iTrk))
-                self.trackPParRatio       .Fill(jetInfo.trackPParRatio  .at(iTrk))
-    
 
     def Write(self,outFile):
         self.thisDir.cd()
@@ -283,43 +189,7 @@ class JetHists:
             self.partonFlavour                           .Write()
             self.hadronFlavour                           .Write()
     
-            self.nTrk.Write()
-    
-            self.ip3d_l.Write()
-            self.ip3d  .Write()
-    
-            self.ip3d_sig_l.Write()
-            self.ip3d_sig  .Write()
-    
-            self.ip3d_err_l.Write()
-            self.ip3d_err  .Write()
-    
-    
-            self.ip2d_l.Write()
-            self.ip2d  .Write()
-    
-            self.ip2d_sig_l.Write()
-            self.ip2d_sig  .Write()
-    
-            self.ip2d_err_l.Write()
-            self.ip2d_err  .Write()
-
-            self.ip2d_vs_pt.Write()
-            self.ip2d_vs_eta.Write()
-    
-            self.trackDecayLenVal_l   .Write()
-            self.trackDecayLenVal     .Write()
-            self.trackJetDistVal      .Write()        
-            self.trackPtRel           .Write()
-            self.trackMomentum        .Write()
-            self.trackEta             .Write()
-            self.trackPPar            .Write()
-            self.trackDeltaR          .Write()
-            self.trackEtaRel          .Write()
-            self.trackPtRatio         .Write()
-            self.trackPParRatio       .Write()
-    
-    
+            self.trackHists.Write()
     
     
         outFile.cd()
