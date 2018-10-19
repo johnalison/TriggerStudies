@@ -13,8 +13,12 @@
 > python ../python/makeROC.py --inFileName TestFile.root --outFileName TestROC.root
 # Plot ROC
 > cd ../../
+
+checkout PlotTools
 > git clone git@github.com:patrickbryant/PlotTools.git
+
 > cd TriggerStudies/run
+
 > python ../python/plotROC.py --inFileName TestROC.root --outFileName TestROC
 
 # Making commits
@@ -29,5 +33,7 @@ and push your commits to the remote (setting upstream):
 
 and then submit a pull request. When it’s been merged, you can run:
 > git checkout master
+
 > git pull --rebase origin master
+
 > git remote prune origin
