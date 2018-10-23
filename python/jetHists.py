@@ -10,14 +10,25 @@ class JetHists:
         
         self.name = name
         self.thisDir = outFile.mkdir(self.name)
-        self.pt   = makeHist(self.thisDir, "pt","pt;P_{T} [GeV];Entries",  100,0,400)
+        self.pt   = makeHist(self.thisDir, "pt",  "pt  ;P_{T} [GeV];Entries",  100,0, 400)
+        self.pt_l = makeHist(self.thisDir, "pt_l","pt_l;P_{T} [GeV];Entries",  100,0,1000)
         self.eta  = makeHist(self.thisDir, "eta","eta;jet #eta;Entries",100,-3,3)
         self.phi  = makeHist(self.thisDir, "phi","phi;jet #phi;Entries",100,-3.2,3.2)
         self.mass = makeHist(self.thisDir, "mass","mass;jet mass [GeV];Entries",100,-1,200)
-        self.deepcsv = makeHist(self.thisDir, "deepcsv","deepcsv;deepcsv;Entries",100,-2,2)
+        self.deepcsv = makeHist(self.thisDir, "deepcsv","deepcsv;deepcsv;Entries",200,0,1)
 
         self.light = light
         if not self.light:
+            self.matched_dPt      = makeHist(self.thisDir, "matched_dPt",     "matched_dPt     ;P_{T}-P_{T}^{matched} [GeV];Entries",  100,-50, 50)
+            self.matched_dEta     = makeHist(self.thisDir, "matched_dEta",    "matched_dEta    ;#eta-#eta^{matched};Entries",100,-0.5,0.5)
+            self.matched_dPhi     = makeHist(self.thisDir, "matched_dPhi",    "matched_dPhi    ;#phi-#phi^{matched};Entries",100,-0.5,0.5)
+            self.matched_dMass    = makeHist(self.thisDir, "matched_dMass",   "matched_dMass   ;mass-mass^{matched} [GeV];Entries",100,-50,50)
+            self.matched_dDeepcsv = makeHist(self.thisDir, "matched_dDeepcsv","matched_dDeepcsv;DeepCSV-DeepCSV^{matched};Entries",100,-1,1)
+
+            self.deepcsv_matched = makeHist(self.thisDir, "deepcsv_matched","deepcsv;deepcsv;Entries",200,0,1)
+            self.deepcsv_vs_matched_deepcsv = ROOT.TH2F("deepcsv_vs_matched_deepcsv",  "Events;DeepCSV;Matched DeepCSV",100,-1,1,100,-1,1)
+            self.deepcsv_vs_matched_deepcsv.SetDirectory(self.thisDir)    
+
             self.deepcsv_bb = makeHist(self.thisDir, "deepcsv_bb","deepcsv_bb;deepcsv_bb;Entries",100,-2,2)
     
             self.vertexNTracks                    = makeHist(self.thisDir, 'vertexNTracks'                ,'vertexNTracks;nVertex Tracks;Entries'                 ,22, -2.5, 19.5)
@@ -67,17 +78,29 @@ class JetHists:
             self.partonFlavour                    = makeHist(self.thisDir, 'partonFlavour'                ,'partonFlavour;partonFlavour;Entries'                        ,60, -30.5,29.5)
             self.hadronFlavour                    = makeHist(self.thisDir, 'hadronFlavour'                ,'hadronFlavour;hadronFlavour;Entries'                        ,60, -30.5,29.5)
 
+            self.nTrk = makeHist(self.thisDir, "nTrk","nTrk;nTracks;Entries",42,-1.5,40.5)
             self.trackHists                 = TrackHists(name, self.thisDir)
     
         
     def Fill(self,jetInfo):
         self.pt  .Fill(jetInfo.pt)
+        self.pt_l.Fill(jetInfo.pt)
         self.eta .Fill(jetInfo.eta)
         self.phi .Fill(jetInfo.phi)
         self.mass.Fill(jetInfo.mass)
         self.deepcsv.Fill(jetInfo.deepcsv)
 
         if not self.light:
+            if jetInfo.matchedJet:
+                self.matched_dPt  .Fill(jetInfo.pt - jetInfo.matchedJet.pt)
+                self.matched_dEta .Fill(jetInfo.eta - jetInfo.matchedJet.eta)
+                self.matched_dPhi .Fill(jetInfo.phi - jetInfo.matchedJet.phi)
+                self.matched_dMass.Fill(jetInfo.mass - jetInfo.matchedJet.mass)
+                self.matched_dDeepcsv.Fill(jetInfo.deepcsv - jetInfo.matchedJet.deepcsv)
+
+                self.deepcsv_matched.Fill(jetInfo.matchedJet.deepcsv)
+                self.deepcsv_vs_matched_deepcsv.Fill(jetInfo.deepcsv, jetInfo.matchedJet.deepcsv)
+
             self.deepcsv_bb.Fill(jetInfo.deepcsv_bb)
     
     
@@ -129,17 +152,30 @@ class JetHists:
             self.partonFlavour                    .Fill(jetInfo.partonFlavour                           )
             self.hadronFlavour                    .Fill(jetInfo.hadronFlavour                           )
     
-            self.trackHists.Fill(jetInfo.tracks)
+            nTracks = len(jetInfo.tracks)
+            self.nTrk.Fill(nTracks)
+            for track in jetInfo.tracks:
+                self.trackHists.Fill(track)
 
 
     def Write(self,outFile):
         self.thisDir.cd()
         self.pt  .Write()
+        self.pt_l.Write()
         self.eta .Write()
         self.phi .Write()
         self.mass.Write()
         self.deepcsv.Write()
         if not self.light:
+            self.matched_dPt  .Write()
+            self.matched_dEta .Write()
+            self.matched_dPhi .Write()
+            self.matched_dMass.Write()
+            self.matched_dDeepcsv.Write()
+
+            self.deepcsv_matched.Write()
+            self.deepcsv_vs_matched_deepcsv.Write()
+
             self.deepcsv_bb.Write()
     
             self.vertexNTracks                    .Write()
@@ -189,6 +225,7 @@ class JetHists:
             self.partonFlavour                           .Write()
             self.hadronFlavour                           .Write()
     
+            self.nTrk.Write()
             self.trackHists.Write()
     
     

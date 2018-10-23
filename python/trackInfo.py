@@ -45,3 +45,5 @@ class TrackData:
         #self.Chi2                  = Chi2                  
         #self.NTotalHits            = NTotalHits            
         #self.NPixelHits            = NPixelHits            
+
+        self.matchedTrack = None

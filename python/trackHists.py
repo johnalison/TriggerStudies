@@ -4,14 +4,14 @@ from helpers import makeHist
 
 class TrackHists:
 
-    def __init__(self,name, directory):
+    def __init__(self,name, directory, outFile = None):
         
         self.name = name
-        self.thisDir = directory
-        #self.thisDir = outFile.mkdir(self.name)
-
-        self.nTrk = makeHist(self.thisDir, "nTrk","nTrk;nTracks;Entries",42,-1.5,40.5)
-            
+        if directory:
+            self.thisDir = directory
+        else:
+            self.thisDir = outFile.mkdir(self.name)
+        
         self.ip3d_l = makeHist(self.thisDir, "ip3d_l","ip3d;IP3D [cm]",100,-0.2,0.2)
         self.ip3d   = makeHist(self.thisDir, "ip3d",  "ip3d;IP3D [cm]",100,-0.05,0.05)
             
@@ -53,61 +53,64 @@ class TrackHists:
         self.trackPtRatio               = makeHist(self.thisDir, "trackPtRatio"        ,    "trackPtRatio;track Pt Ratio;Entries", 100, -0.01, 0.3)        
         self.trackPParRatio             = makeHist(self.thisDir, "trackPParRatio"      ,    "trackPParRatio;track P Par Ratio;Entries", 100, 0.95, 1.02)      
 
+        self.track_matched_dPtRel    = makeHist(self.thisDir, "track_matched_dPtRel"   ,    "track_matched_dPtRel;p_{T}^{Rel}-p_{T}^{Rel, matched} [GeV];Entries", 100, -5, 5)
+        self.track_matched_dMomentum = makeHist(self.thisDir, "track_matched_dMomentum",    "track_matched_dMomentum;p-p^{matched} [GeV];Entries", 100, -10, 10)
+        self.track_matched_dEta      = makeHist(self.thisDir, "track_matched_dEta"     ,    "track_matched_dEta;#eta-#eta^{matched};Entries", 100, -0.5, 0.5)            
 
-    def Fill(self, tracks):
-        nTracks = len(tracks)
-        self.nTrk.Fill(nTracks)
 
-        for track in tracks:
-            this_ip3d = track.Sip3dVal
-            self.ip3d  .Fill(this_ip3d)
-            self.ip3d_l.Fill(this_ip3d)
-            
-            this_ip3d_sig = track.Sip3dSig
-            self.ip3d_sig  .Fill(this_ip3d_sig)
-            self.ip3d_sig_l.Fill(this_ip3d_sig)
+    def Fill(self, track):
+        this_ip3d = track.Sip3dVal
+        self.ip3d  .Fill(this_ip3d)
+        self.ip3d_l.Fill(this_ip3d)
+        
+        this_ip3d_sig = track.Sip3dSig
+        self.ip3d_sig  .Fill(this_ip3d_sig)
+        self.ip3d_sig_l.Fill(this_ip3d_sig)
+        
+        this_ip3d_err = this_ip3d/this_ip3d_sig
+        self.ip3d_err  .Fill(this_ip3d_err)
+        self.ip3d_err_l.Fill(this_ip3d_err)
+        
     
-            this_ip3d_err = this_ip3d/this_ip3d_sig
-            self.ip3d_err  .Fill(this_ip3d_err)
-            self.ip3d_err_l.Fill(this_ip3d_err)
-            
-    
-            this_ip2d = track.Sip2dVal
-            self.ip2d  .Fill(this_ip2d)
-            self.ip2d_l.Fill(this_ip2d)
-            
-            this_ip2d_sig = track.Sip2dSig
-            self.ip2d_sig  .Fill(this_ip2d_sig)
-            self.ip2d_sig_l.Fill(this_ip2d_sig)
-            
-            this_ip2d_err = this_ip2d/this_ip2d_sig
-            self.ip2d_err  .Fill(this_ip2d_err)
-            self.ip2d_err_l.Fill(this_ip2d_err)
+        this_ip2d = track.Sip2dVal
+        self.ip2d  .Fill(this_ip2d)
+        self.ip2d_l.Fill(this_ip2d)
+        
+        this_ip2d_sig = track.Sip2dSig
+        self.ip2d_sig  .Fill(this_ip2d_sig)
+        self.ip2d_sig_l.Fill(this_ip2d_sig)
+        
+        this_ip2d_err = this_ip2d/this_ip2d_sig
+        self.ip2d_err  .Fill(this_ip2d_err)
+        self.ip2d_err_l.Fill(this_ip2d_err)
 
-            this_trackMomentum = track.Momentum   
-            self.ip2d_vs_pt.Fill(this_trackMomentum, this_ip2d)
-            
-            this_trackEta = track.Eta        
-            self.ip2d_vs_eta.Fill(abs(this_trackEta), this_ip2d)
-            
+        this_trackMomentum = track.Momentum   
+        self.ip2d_vs_pt.Fill(this_trackMomentum, this_ip2d)
+        
+        this_trackEta = track.Eta        
+        self.ip2d_vs_eta.Fill(abs(this_trackEta), this_ip2d)
+        
 
-            self.trackDecayLenVal_l   .Fill(track.DecayLenVal)
-            self.trackDecayLenVal     .Fill(track.DecayLenVal)
-            self.trackJetDistVal      .Fill(track.JetDistVal )
-            self.trackPtRel           .Fill(track.PtRel      )
-            self.trackMomentum        .Fill(this_trackMomentum) 
-            self.trackEta             .Fill(this_trackEta)
-            self.trackPPar            .Fill(track.PPar       )
-            self.trackDeltaR          .Fill(track.DeltaR     )
-            #self.trackEtaRel          .Fill(track.EtaRel     )
-            self.trackPtRatio         .Fill(track.PtRatio    )
-            self.trackPParRatio       .Fill(track.PParRatio  )
+        self.trackDecayLenVal_l   .Fill(track.DecayLenVal)
+        self.trackDecayLenVal     .Fill(track.DecayLenVal)
+        self.trackJetDistVal      .Fill(track.JetDistVal )
+        self.trackPtRel           .Fill(track.PtRel      )
+        self.trackMomentum        .Fill(this_trackMomentum) 
+        self.trackEta             .Fill(this_trackEta)
+        self.trackPPar            .Fill(track.PPar       )
+        self.trackDeltaR          .Fill(track.DeltaR     )
+        #self.trackEtaRel          .Fill(track.EtaRel     )
+        self.trackPtRatio         .Fill(track.PtRatio    )
+        self.trackPParRatio       .Fill(track.PParRatio  )
+
+        if track.matchedTrack:
+            self.track_matched_dPtRel   .Fill(track.PtRel    - track.matchedTrack.PtRel)
+            self.track_matched_dMomentum.Fill(track.Momentum - track.matchedTrack.Momentum) 
+            self.track_matched_dEta     .Fill(track.Eta      - track.matchedTrack.Eta)
 
 
-    def Write(self):
+    def Write(self, outFile=None):
         self.thisDir.cd()
-
-        self.nTrk.Write()
     
         self.ip3d_l.Write()
         self.ip3d  .Write()
@@ -143,3 +146,8 @@ class TrackHists:
         self.trackPtRatio         .Write()
         self.trackPParRatio       .Write()
     
+        self.track_matched_dPtRel   .Write()
+        self.track_matched_dMomentum.Write()
+        self.track_matched_dEta     .Write()
+
+        if outFile: outFile.cd()
