@@ -21,6 +21,11 @@ checkout PlotTools
 
 > python ../python/plotROC.py -i TestROC.root -o TestROC
 
+# Plot All The Things
+> python ../python/plots.py -i TestFile.root
+
+This will make a run/plots directory with lots and lots of plots. 
+
 # Making commits
 Any new feature you wish to add will need to be in a new branch:
 > git checkout -b feature/newFeature
