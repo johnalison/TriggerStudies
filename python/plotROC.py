@@ -33,3 +33,50 @@ parameters = {"outputDir":"",
           }
 
 PlotTools.plot(samples,parameters,o.debug)
+
+
+samples = collections.OrderedDict()
+samples[o.infileName] = collections.OrderedDict()
+samples[o.infileName]["offJets_ROC"] = {"color":"ROOT.kBlack",
+                                        "drawOptions":"AL",
+                                        "label":"offJets",
+                                        "legend": 1,
+                                    }
+samples[o.infileName]["offJets_matched_online60_ROC"] = {"color":"ROOT.kRed",
+                                                         "drawOptions":"L",
+                                                         "label":"Online WP60",
+                                                         "legend": 2,
+                                                     }
+samples[o.infileName]["offJets_matched_online70_ROC"] = {"color":"ROOT.kMagenta",
+                                                         "drawOptions":"L",
+                                                         "label":"Online WP70",
+                                                         "legend": 3,
+                                                     }
+samples[o.infileName]["offJets_matched_online80_ROC"] = {"color":"ROOT.kGreen+2",
+                                                         "drawOptions":"L",
+                                                         "label":"Online WP80",
+                                                         "legend": 4,
+                                                     }
+samples[o.infileName]["offJets_matched_online90_ROC"] = {"color":"ROOT.kBlue",
+                                                         "drawOptions":"L",
+                                                         "label":"Online WP90",
+                                                         "legend": 5,
+                                                     }
+samples[o.infileName]["offJets_matched_ROC"] = {"color":"ROOT.kGray+1",
+                                                "drawOptions":"L",
+                                                "label":"pfJets",
+                                                "legend": 6,
+                                            }
+
+parameters = {"outputDir":"",
+              "outputName":o.outfileName+"_onlineTag",
+              "xTitle":"b-jet Efficiency",
+              "yTitle":"light jet Rejection",
+              "xMin": 0,
+              "xMax": 1,
+              "logY": True,
+              "yMax": 5e4,
+              "yMin": 1,
+          }
+
+PlotTools.plot(samples,parameters,o.debug)

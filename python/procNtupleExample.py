@@ -68,10 +68,15 @@ elecDB.SetBranchAddress(tree)
 # Make output ntuple/Hists
 # 
 from jetHists import JetHists
+from trackHists import TrackHists
 from eventHists import EventHists
 outFile    = ROOT.TFile(str(o.outfileName),"recreate")
 
 eventHists     = EventHists("AllEvents")
+
+pfTrackHists_matched  = TrackHists("pfTracks_matched", None, outFile)
+offTrackHists_matched = TrackHists("offTracks_matched", None, outFile)
+offTrackHists = TrackHists("offTracks", None, outFile)
 
 pfJetHistsPreOLap     = JetHists("pfJetsPreOLap",outFile,light=True)
 pfJetHists            = JetHists("pfJets",outFile)
@@ -88,9 +93,55 @@ caloJetHists_matchedL   = JetHists("caloJets_matchedL",outFile)
 
 
 offJetHistsPreOLap = JetHists("offJetsPreOLap",outFile,light=True)
-offJetHists        = JetHists("offJets",  outFile)
-offJetHistsBJets   = JetHists("offJets_B",outFile)
-offJetHistsLFJets  = JetHists("offJets_L",outFile)
+
+offJetHists   = JetHists("offJets",  outFile)
+offJetHists_B = JetHists("offJets_B",outFile)
+offJetHists_L = JetHists("offJets_L",outFile)
+
+offJetHists_matched        = JetHists("offJets_matched",  outFile)
+offJetHists_matchedJet     = JetHists("offJets_matchedJet",  outFile)
+offJetHists_B_matched      = JetHists("offJets_B_matched",outFile)
+offJetHists_L_matched      = JetHists("offJets_L_matched",outFile)
+
+offJetHists_matched_online60   = JetHists("offJets_matched_online60",  outFile)
+offJetHists_B_matched_online60 = JetHists("offJets_B_matched_online60",  outFile)
+offJetHists_L_matched_online60 = JetHists("offJets_L_matched_online60",  outFile)
+
+offJetHists_matched_online70   = JetHists("offJets_matched_online70",  outFile)
+offJetHists_B_matched_online70 = JetHists("offJets_B_matched_online70",  outFile)
+offJetHists_L_matched_online70 = JetHists("offJets_L_matched_online70",  outFile)
+
+offJetHists_matched_online80   = JetHists("offJets_matched_online80",  outFile)
+offJetHists_B_matched_online80 = JetHists("offJets_B_matched_online80",  outFile)
+offJetHists_L_matched_online80 = JetHists("offJets_L_matched_online80",  outFile)
+
+offJetHists_matched_online90   = JetHists("offJets_matched_online90",  outFile)
+offJetHists_B_matched_online90 = JetHists("offJets_B_matched_online90",  outFile)
+offJetHists_L_matched_online90 = JetHists("offJets_L_matched_online90",  outFile)
+
+offJetHists_offline70   = JetHists("offJets_offline70",  outFile)
+offJetHists_offline70_B = JetHists("offJets_offline70_B",outFile)
+offJetHists_offline70_L = JetHists("offJets_offline70_L",outFile)
+
+offJetHists_offline70_matched        = JetHists("offJets_offline70_matched",  outFile)
+offJetHists_offline70_B_matched      = JetHists("offJets_offline70_B_matched",outFile)
+offJetHists_offline70_L_matched      = JetHists("offJets_offline70_L_matched",outFile)
+
+offJetHists_offline70_matched_online60   = JetHists("offJets_offline70_matched_online60",  outFile)
+offJetHists_offline70_B_matched_online60 = JetHists("offJets_offline70_B_matched_online60",  outFile)
+offJetHists_offline70_L_matched_online60 = JetHists("offJets_offline70_L_matched_online60",  outFile)
+
+offJetHists_offline70_matched_online70   = JetHists("offJets_offline70_matched_online70",  outFile)
+offJetHists_offline70_B_matched_online70 = JetHists("offJets_offline70_B_matched_online70",  outFile)
+offJetHists_offline70_L_matched_online70 = JetHists("offJets_offline70_L_matched_online70",  outFile)
+
+offJetHists_offline70_matched_online80   = JetHists("offJets_offline70_matched_online80",  outFile)
+offJetHists_offline70_B_matched_online80 = JetHists("offJets_offline70_B_matched_online80",  outFile)
+offJetHists_offline70_L_matched_online80 = JetHists("offJets_offline70_L_matched_online80",  outFile)
+
+offJetHists_offline70_matched_online90   = JetHists("offJets_offline70_matched_online90",  outFile)
+offJetHists_offline70_B_matched_online90 = JetHists("offJets_offline70_B_matched_online90",  outFile)
+offJetHists_offline70_L_matched_online90 = JetHists("offJets_offline70_L_matched_online90",  outFile)
 
 nEventThisFile = tree.GetEntries()
 
@@ -156,16 +207,6 @@ for entry in xrange( 0,nEventThisFile): # let's only run over the first 100 even
         if failOverlap(offJet,elecs): continue
         if failOverlap(offJet,muons): continue
 
-        offJetHists.Fill(offJet)
-        
-        if offJet.hadronFlavour == 5:
-            offJetHistsBJets.Fill(offJet)
-        else:
-            offJetHistsLFJets.Fill(offJet)
-
-
-
-
         # Match offline to online
         for pfJet in pfJets:            
             deltaR = pfJet.vec.DeltaR(offJet.vec)
@@ -174,6 +215,95 @@ for entry in xrange( 0,nEventThisFile): # let's only run over the first 100 even
                 offJet.matchedJet = pfJet
                 break
 
+
+        # hist offline tracks
+        for offTrack in offJet.tracks:
+            offTrackHists.Fill(offTrack)
+
+            # match tracks
+            if offJet.matchedJet:
+                dEta = 1e6
+                closest_track = None
+                for pfTrack in offJet.matchedJet.tracks:
+                    this_dEta = abs(offTrack.Eta - pfTrack.Eta)
+                    if this_dEta < dEta: 
+                        dEta = this_dEta
+                        closest_track = pfTrack
+                if dEta < 0.06:
+                    offTrack.matchedTrack = closest_track
+                    offTrackHists_matched.Fill(offTrack)
+                    pfTrackHists_matched .Fill(offTrack.matchedTrack)
+
+        # Fill offJetHists
+        # offJets_ROC
+        #  wp60 DeepCSV > 0.76 (actual efficiency = 0.604992842829)
+        #  wp70 DeepCSV > 0.56 (actual efficiency = 0.717503578586)
+        #  wp80 DeepCSV > 0.36 (actual efficiency = 0.808474091039)
+        #  wp90 DeepCSV > 0.12 (actual efficiency = 0.912533638706)
+        offJetHists.Fill(offJet)
+        if offJet.deepcsv > 0.56: offJetHists_offline70.Fill(offJet)
+        if offJet.hadronFlavour == 5:
+            offJetHists_B.Fill(offJet)
+            if offJet.deepcsv > 0.56: offJetHists_offline70_B.Fill(offJet)
+        else:
+            offJetHists_L.Fill(offJet)
+            if offJet.deepcsv > 0.56: offJetHists_offline70_L.Fill(offJet)
+
+        if offJet.matchedJet: 
+            offJetHists_matched.Fill(offJet)
+            offJetHists_matchedJet.Fill(offJet.matchedJet)
+            if offJet.deepcsv > 0.56: offJetHists_offline70_matched.Fill(offJet)
+            if offJet.hadronFlavour == 5:
+                offJetHists_B_matched.Fill(offJet)
+                if offJet.deepcsv > 0.56: offJetHists_offline70_B_matched.Fill(offJet)
+            else:
+                offJetHists_L_matched.Fill(offJet)
+                if offJet.deepcsv > 0.56: offJetHists_offline70_L_matched.Fill(offJet)
+            
+            # pfJets_matched_ROC
+            #  wp60 DeepCSV > 0.64 (actual efficiency = 0.610276798066)
+            #  wp70 DeepCSV > 0.48 (actual efficiency = 0.708732661175)
+            #  wp80 DeepCSV > 0.28 (actual efficiency = 0.814155211306)
+            #  wp90 DeepCSV > 0.08 (actual efficiency = 0.924525480128)
+            if offJet.matchedJet.deepcsv > 0.64: #approximate 60% Online WP
+                offJetHists_matched_online60.Fill(offJet)
+                if offJet.deepcsv > 0.56: offJetHists_offline70_matched_online60.Fill(offJet)
+                if offJet.hadronFlavour == 5:
+                    offJetHists_B_matched_online60.Fill(offJet)
+                    if offJet.deepcsv > 0.56: offJetHists_offline70_B_matched_online60.Fill(offJet)
+                else:
+                    offJetHists_L_matched_online60.Fill(offJet)
+                    if offJet.deepcsv > 0.56: offJetHists_offline70_L_matched_online60.Fill(offJet)
+
+            if offJet.matchedJet.deepcsv > 0.48: #approximate 70% Online WP
+                offJetHists_matched_online70.Fill(offJet)
+                if offJet.deepcsv > 0.56: offJetHists_offline70_matched_online70.Fill(offJet)
+                if offJet.hadronFlavour == 5:
+                    offJetHists_B_matched_online70.Fill(offJet)
+                    if offJet.deepcsv > 0.56: offJetHists_offline70_B_matched_online70.Fill(offJet)
+                else:
+                    offJetHists_L_matched_online70.Fill(offJet)
+                    if offJet.deepcsv > 0.56: offJetHists_offline70_L_matched_online70.Fill(offJet)
+
+            if offJet.matchedJet.deepcsv > 0.28: #approximate 80% Online WP
+                offJetHists_matched_online80.Fill(offJet)
+                if offJet.deepcsv > 0.56: offJetHists_offline70_matched_online80.Fill(offJet)
+                if offJet.hadronFlavour == 5:
+                    offJetHists_B_matched_online80.Fill(offJet)
+                    if offJet.deepcsv > 0.56: offJetHists_offline70_B_matched_online80.Fill(offJet)
+                else:
+                    offJetHists_L_matched_online80.Fill(offJet)
+                    if offJet.deepcsv > 0.56: offJetHists_offline70_L_matched_online80.Fill(offJet)
+
+            if offJet.matchedJet.deepcsv > 0.08: #approximate 90% Online WP
+                offJetHists_matched_online90.Fill(offJet)
+                if offJet.deepcsv > 0.56: offJetHists_offline70_matched_online90.Fill(offJet)
+                if offJet.hadronFlavour == 5:
+                    offJetHists_B_matched_online90.Fill(offJet)
+                    if offJet.deepcsv > 0.56: offJetHists_offline70_B_matched_online90.Fill(offJet)
+                else:
+                    offJetHists_L_matched_online90.Fill(offJet)
+                    if offJet.deepcsv > 0.56: offJetHists_offline70_L_matched_online90.Fill(offJet)
 
         # Match offline to online
         for caloJet in caloJets:            
@@ -231,6 +361,10 @@ for entry in xrange( 0,nEventThisFile): # let's only run over the first 100 even
 #
 # Save Hists
 #
+pfTrackHists_matched.Write(outFile)
+offTrackHists_matched.Write(outFile)
+offTrackHists.Write(outFile)
+
 pfJetHistsPreOLap   .Write(outFile)
 pfJetHists          .Write(outFile)
 pfJetHists_matched  .Write(outFile)
@@ -244,7 +378,54 @@ caloJetHists_matchedB .Write(outFile)
 caloJetHists_matchedL .Write(outFile)
 
 offJetHistsPreOLap  .Write(outFile)
+
 offJetHists         .Write(outFile)
-offJetHistsBJets    .Write(outFile)
-offJetHistsLFJets   .Write(outFile)
+offJetHists_B       .Write(outFile)
+offJetHists_L       .Write(outFile)
+
+offJetHists_matched.Write(outFile)
+offJetHists_matchedJet.Write(outFile)
+offJetHists_B_matched.Write(outFile)
+offJetHists_L_matched.Write(outFile)
+
+offJetHists_matched_online60.Write(outFile)
+offJetHists_B_matched_online60.Write(outFile)
+offJetHists_L_matched_online60.Write(outFile)
+
+offJetHists_matched_online70.Write(outFile)
+offJetHists_B_matched_online70.Write(outFile)
+offJetHists_L_matched_online70.Write(outFile)
+
+offJetHists_matched_online80.Write(outFile)
+offJetHists_B_matched_online80.Write(outFile)
+offJetHists_L_matched_online80.Write(outFile)
+
+offJetHists_matched_online90.Write(outFile)
+offJetHists_B_matched_online90.Write(outFile)
+offJetHists_L_matched_online90.Write(outFile)
+
+offJetHists_offline70         .Write(outFile)
+offJetHists_offline70_B       .Write(outFile)
+offJetHists_offline70_L       .Write(outFile)
+
+offJetHists_offline70_matched.Write(outFile)
+offJetHists_offline70_B_matched.Write(outFile)
+offJetHists_offline70_L_matched.Write(outFile)
+
+offJetHists_offline70_matched_online60.Write(outFile)
+offJetHists_offline70_B_matched_online60.Write(outFile)
+offJetHists_offline70_L_matched_online60.Write(outFile)
+
+offJetHists_offline70_matched_online70.Write(outFile)
+offJetHists_offline70_B_matched_online70.Write(outFile)
+offJetHists_offline70_L_matched_online70.Write(outFile)
+
+offJetHists_offline70_matched_online80.Write(outFile)
+offJetHists_offline70_B_matched_online80.Write(outFile)
+offJetHists_offline70_L_matched_online80.Write(outFile)
+
+offJetHists_offline70_matched_online90.Write(outFile)
+offJetHists_offline70_B_matched_online90.Write(outFile)
+offJetHists_offline70_L_matched_online90.Write(outFile)
+
 eventHists          .Write(outFile)
