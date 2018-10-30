@@ -1,4 +1,5 @@
 import optparse
+import copy
 parser = optparse.OptionParser()
 parser.add_option('-i', '--inFileName',           dest="infileName",         default=None, help="Run in loop mode")
 parser.add_option('--inputList',           dest="inputList",         default=False, action="store_true", help="Run in loop mode")
@@ -208,31 +209,49 @@ for entry in xrange( 0,nEventThisFile): # let's only run over the first 100 even
         if failOverlap(offJet,muons): continue
 
         # Match offline to online
-        for pfJet in pfJets:            
-            deltaR = pfJet.vec.DeltaR(offJet.vec)
-            if deltaR < 0.4:
-                pfJet.matchedJet = offJet
-                offJet.matchedJet = pfJet
-                break
+        dR = 1e6
+        matchedJet = None
+        for pfJet in pfJets: 
+            this_dR = pfJet.vec.DeltaR(offJet.vec)
+            if this_dR < 0.4 and this_dR < dR:
+                dR = this_dR
+                matchedJet = pfJet
+        if dR < 0.4:
+            matchedJet.matchedJet = offJet
+            offJet.matchedJet = matchedJet
 
 
-        # hist offline tracks
-        for offTrack in offJet.tracks:
-            offTrackHists.Fill(offTrack)
+        # match tracks if we matched jets
+        if offJet.matchedJet:
+            for offTrack in offJet.tracks:
+                # for track eff plots need ratio of matched offline tracks over all offline tracks in offline jets matched to an online jet. 
+                offTrackHists.Fill(offTrack)
 
-            # match tracks
-            if offJet.matchedJet:
-                dEta = 1e6
-                closest_track = None
+                dEta, dEta2 = 1e6, 1e6
+                matchedTrack  = None
+                secondClosest = None
                 for pfTrack in offJet.matchedJet.tracks:
                     this_dEta = abs(offTrack.Eta - pfTrack.Eta)
+                    if this_dEta > dEta and this_dEta < dEta2:
+                        dEta2 = this_dEta
+                        secondClosest = pfTrack
                     if this_dEta < dEta: 
-                        dEta = this_dEta
-                        closest_track = pfTrack
-                if dEta < 0.06:
-                    offTrack.matchedTrack = closest_track
+                        dEta2 = dEta
+                        secondClosest = matchedTrack
+
+                        dEta  = this_dEta
+                        matchedTrack = pfTrack
+
+
+                if dEta < 0.02:
+                    matchedTrack.matchedTrack = offTrack
+                    offTrack.matchedTrack = matchedTrack
+                    offTrack.secondClosest = secondClosest
                     offTrackHists_matched.Fill(offTrack)
                     pfTrackHists_matched .Fill(offTrack.matchedTrack)
+
+                    
+                    
 
         # Fill offJetHists
         # offJets_ROC

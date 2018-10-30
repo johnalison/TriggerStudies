@@ -46,4 +46,5 @@ class TrackData:
         #self.NTotalHits            = NTotalHits            
         #self.NPixelHits            = NPixelHits            
 
-        self.matchedTrack = None
+        self.matchedTrack  = None
+        self.secondClosest = None

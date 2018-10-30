@@ -44,19 +44,33 @@ class TrackHists:
         self.trackDecayLenVal_l         = makeHist(self.thisDir, "trackDecayLenVal_l"  ,    "trackDecayLenVal;trackDecayLenVal [cm];Entries", 100, -0.1,  5)
         self.trackDecayLenVal           = makeHist(self.thisDir, "trackDecayLenVal"    ,    "trackDecayLenVal;trackDecayLenVal [cm];Entries", 100, -0.1,  0.5)
         self.trackJetDistVal            = makeHist(self.thisDir, "trackJetDistVal"     ,    "trackJetDistVal;trackJetDistVal [cm];Entries",  100, -0.1,0.01)      
-        self.trackPtRel                 = makeHist(self.thisDir, "trackPtRel"          ,    "trackPtRel;track Pt Rel [GeV];Entries", 100, -0.1, 7)          
+        self.trackPtRel                 = makeHist(self.thisDir, "trackPtRel"          ,    "trackPtRel;track p_{T} Rel [GeV];Entries", 100, -0.1, 7)          
         self.trackMomentum              = makeHist(self.thisDir, "trackMomentum"       ,    "trackMomentum;track momentum [GeV];Entries", 100, -0.1, 60)       
+
+        binsPt = []
+        for bin in range(28):
+            binsPt.append(0.9*1.24**bin)
+        binsPt = array("d",binsPt)
+        self.trackPt_logx               = ROOT.TH1F("trackPt_logx", "trackPt;track p_{T} [GeV];Entries", len(binsPt)-1, binsPt)
+        self.trackPt_logx.SetDirectory(self.thisDir)
+
         self.trackEta                   = makeHist(self.thisDir, "trackEta"            ,    "trackEta;track #eta;Entries", 100, -2.6, 2.6)            
         self.trackPPar                  = makeHist(self.thisDir, "trackPPar"           ,    "trackPPar;track PPar [GeV];Entries",100, -0.1, 60)           
-        self.trackDeltaR                = makeHist(self.thisDir, "trackDeltaR"         ,    "trackDeltaR;track #Delta R;Entries", 100, -0.1, 0.35)         
+        self.trackDeltaR                = makeHist(self.thisDir, "trackDeltaR"         ,    "trackDeltaR;track #DeltaR;Entries", 100, -0.1, 0.35)         
         self.trackEtaRel                = makeHist(self.thisDir, "trackEtaRel"         ,    "trackEtaRel;track Eta Rel;Entries", 100, 0, 7)         
-        self.trackPtRatio               = makeHist(self.thisDir, "trackPtRatio"        ,    "trackPtRatio;track Pt Ratio;Entries", 100, -0.01, 0.3)        
+        self.trackPtRatio               = makeHist(self.thisDir, "trackPtRatio"        ,    "trackPtRatio;track p_{T} Ratio;Entries", 100, -0.01, 0.3)        
         self.trackPParRatio             = makeHist(self.thisDir, "trackPParRatio"      ,    "trackPParRatio;track P Par Ratio;Entries", 100, 0.95, 1.02)      
 
+        self.track_matched_dip2d     = makeHist(self.thisDir, "track_matched_dip2d"    ,    "track_matched_dip2d;IP2D-IP2D^{matched} [cm];Entries",100,-0.05,0.05)
         self.track_matched_dPtRel    = makeHist(self.thisDir, "track_matched_dPtRel"   ,    "track_matched_dPtRel;p_{T}^{Rel}-p_{T}^{Rel, matched} [GeV];Entries", 100, -5, 5)
-        self.track_matched_dMomentum = makeHist(self.thisDir, "track_matched_dMomentum",    "track_matched_dMomentum;p-p^{matched} [GeV];Entries", 100, -10, 10)
-        self.track_matched_dEta      = makeHist(self.thisDir, "track_matched_dEta"     ,    "track_matched_dEta;#eta-#eta^{matched};Entries", 100, -0.5, 0.5)            
+        self.track_matched_dMomentum = makeHist(self.thisDir, "track_matched_dMomentum",    "track_matched_dMomentum;p_{T}-p_{T}^{matched} [GeV];Entries", 100, -10, 10)
+        self.track_matched_dEta      = makeHist(self.thisDir, "track_matched_dEta"     ,    "track_matched_dEta;#eta-#eta^{matched};Entries", 500, -0.1, 0.1)            
+        self.track_matched_dEta_s    = makeHist(self.thisDir, "track_matched_dEta_s"   ,    "track_matched_dEta;#eta-#eta^{matched};Entries", 500, -0.01, 0.01)            
 
+        self.track_secondClosest_dEta      = makeHist(self.thisDir, "track_secondClosest_dEta",         "track_matched_dEta2;#eta-#eta^{second closest};Entries", 500, -0.1, 0.1)
+        self.track_secondClosest_dMomentum = makeHist(self.thisDir, "track_secondClosest_dMomentum",    "track_secondClosest_dMomentum;p_{T}-p_{T}^{second closest} [GeV];Entries", 100, -10, 10)
+        self.track_dEta12 = makeHist(self.thisDir, "track_dEta12", "track_dEta12;#eta^{matched}-#eta^{second closest};Entries", 500, -0.1, 0.1)
+  
 
     def Fill(self, track):
         this_ip3d = track.Sip3dVal
@@ -96,6 +110,7 @@ class TrackHists:
         self.trackJetDistVal      .Fill(track.JetDistVal )
         self.trackPtRel           .Fill(track.PtRel      )
         self.trackMomentum        .Fill(this_trackMomentum) 
+        self.trackPt_logx         .Fill(this_trackMomentum) 
         self.trackEta             .Fill(this_trackEta)
         self.trackPPar            .Fill(track.PPar       )
         self.trackDeltaR          .Fill(track.DeltaR     )
@@ -104,10 +119,17 @@ class TrackHists:
         self.trackPParRatio       .Fill(track.PParRatio  )
 
         if track.matchedTrack:
+            self.track_matched_dip2d    .Fill(track.Sip2dVal - track.matchedTrack.Sip2dVal)
             self.track_matched_dPtRel   .Fill(track.PtRel    - track.matchedTrack.PtRel)
             self.track_matched_dMomentum.Fill(track.Momentum - track.matchedTrack.Momentum) 
             self.track_matched_dEta     .Fill(track.Eta      - track.matchedTrack.Eta)
+            self.track_matched_dEta_s   .Fill(track.Eta      - track.matchedTrack.Eta)
 
+        if track.secondClosest:
+            self.track_secondClosest_dEta     .Fill(track.Eta      - track.secondClosest.Eta)
+            self.track_secondClosest_dMomentum.Fill(track.Momentum - track.secondClosest.Momentum) 
+
+            self.track_dEta12.Fill(track.matchedTrack.Eta - track.secondClosest.Eta)
 
     def Write(self, outFile=None):
         self.thisDir.cd()
@@ -139,6 +161,7 @@ class TrackHists:
         self.trackJetDistVal      .Write()        
         self.trackPtRel           .Write()
         self.trackMomentum        .Write()
+        self.trackPt_logx         .Write()
         self.trackEta             .Write()
         self.trackPPar            .Write()
         self.trackDeltaR          .Write()
@@ -146,8 +169,15 @@ class TrackHists:
         self.trackPtRatio         .Write()
         self.trackPParRatio       .Write()
     
+        self.track_matched_dip2d    .Write()
         self.track_matched_dPtRel   .Write()
         self.track_matched_dMomentum.Write()
         self.track_matched_dEta     .Write()
+        self.track_matched_dEta_s   .Write()
+
+        self.track_secondClosest_dEta.Write()
+        self.track_secondClosest_dMomentum.Write()
+        
+        self.track_dEta12.Write()
 
         if outFile: outFile.cd()

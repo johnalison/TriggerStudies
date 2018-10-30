@@ -22,6 +22,7 @@ class JetHists:
             self.matched_dPt      = makeHist(self.thisDir, "matched_dPt",     "matched_dPt     ;P_{T}-P_{T}^{matched} [GeV];Entries",  100,-50, 50)
             self.matched_dEta     = makeHist(self.thisDir, "matched_dEta",    "matched_dEta    ;#eta-#eta^{matched};Entries",100,-0.5,0.5)
             self.matched_dPhi     = makeHist(self.thisDir, "matched_dPhi",    "matched_dPhi    ;#phi-#phi^{matched};Entries",100,-0.5,0.5)
+            self.matched_dR       = makeHist(self.thisDir, "matched_dR",      "matched_dR      ;#DeltaR(Online,Offline);Entries",45, 0,0.45)
             self.matched_dMass    = makeHist(self.thisDir, "matched_dMass",   "matched_dMass   ;mass-mass^{matched} [GeV];Entries",100,-50,50)
             self.matched_dDeepcsv = makeHist(self.thisDir, "matched_dDeepcsv","matched_dDeepcsv;DeepCSV-DeepCSV^{matched};Entries",100,-1,1)
 
@@ -95,6 +96,7 @@ class JetHists:
                 self.matched_dPt  .Fill(jetInfo.pt - jetInfo.matchedJet.pt)
                 self.matched_dEta .Fill(jetInfo.eta - jetInfo.matchedJet.eta)
                 self.matched_dPhi .Fill(jetInfo.phi - jetInfo.matchedJet.phi)
+                self.matched_dR   .Fill(jetInfo.vec.DeltaR(jetInfo.matchedJet.vec))
                 self.matched_dMass.Fill(jetInfo.mass - jetInfo.matchedJet.mass)
                 self.matched_dDeepcsv.Fill(jetInfo.deepcsv - jetInfo.matchedJet.deepcsv)
 
@@ -170,6 +172,7 @@ class JetHists:
             self.matched_dPt  .Write()
             self.matched_dEta .Write()
             self.matched_dPhi .Write()
+            self.matched_dR   .Write()
             self.matched_dMass.Write()
             self.matched_dDeepcsv.Write()
 

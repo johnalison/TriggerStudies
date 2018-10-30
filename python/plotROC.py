@@ -21,7 +21,7 @@ samples[o.infileName]["pfJets_matched_ROC"] = {"color":"ROOT.kRed",
                                              "label":"Matched pfJets",
                                          }
 
-parameters = {"outputDir":"",
+parameters = {"outputDir":"plots/",
               "outputName":o.outfileName,
               "xTitle":"b-jet Efficiency",
               "yTitle":"light jet Rejection",
@@ -68,7 +68,7 @@ samples[o.infileName]["offJets_matched_ROC"] = {"color":"ROOT.kGray+1",
                                                 "legend": 6,
                                             }
 
-parameters = {"outputDir":"",
+parameters = {"outputDir":"plots/",
               "outputName":o.outfileName+"_onlineTag",
               "xTitle":"b-jet Efficiency",
               "yTitle":"light jet Rejection",
