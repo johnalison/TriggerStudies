@@ -346,6 +346,159 @@ for key in ROOT.gDirectory.GetListOfKeys():
     PlotTools.plot(samples, parameters)
 
 #Track Matching plots
+samples=collections.OrderedDict()
+samples[o.infileName] = collections.OrderedDict()
+
+samples[o.infileName]["offTracks_matched/track_matched_dEta"] = {"label"    : "First Match",
+                                                                 "legend"   : 1,
+                                                                 "color"    : "ROOT.kRed"}
+
+samples[o.infileName]["offTracks_matched/track_secondClosest_dEta"] = {"label"    : "Second Match",
+                                                                       "legend"   : 2,
+                                                                       "color"    : "ROOT.kBlue"}
+
+parameters = {"maxDigits" : 4,
+              "xMax"      : 0.02,
+              "xMin"      : -0.02,
+              "xTitleOffset" : 1,
+              "xTitle"    : "#eta-#eta^{match}",
+              "logY"      : True,
+              "outputDir" : "../run/plots/matching_pfTracks_over_offTracks/",
+              "outputName": "matching_dEta",
+          }
+PlotTools.plot(samples,parameters)
+
+samples=collections.OrderedDict()
+samples[o.infileName] = collections.OrderedDict()
+
+samples[o.infileName]["offTracks_matched/track_matched_dMomentum"] = {"label"    : "First Match",
+                                                                 "legend"   : 1,
+                                                                 "color"    : "ROOT.kRed"}
+
+samples[o.infileName]["offTracks_matched/track_secondClosest_dMomentum"] = {"label"    : "Second Match",
+                                                                       "legend"   : 2,
+                                                                       "color"    : "ROOT.kBlue"}
+
+parameters = {"maxDigits" : 4,
+              # "xMax"      : 0.02,
+              # "xMin"      : -0.02,
+              "xTitleOffset" : 1,
+              "xTitle"    : "p-p^{match}",
+              "logY"      : True,
+              "outputDir" : "../run/plots/matching_pfTracks_over_offTracks/",
+              "outputName": "matching_dMomentum",
+          }
+PlotTools.plot(samples,parameters)
+
+samples=collections.OrderedDict()
+samples[o.infileName] = collections.OrderedDict()
+
+samples[o.infileName]["offTracks_matched/track_matched_dR"] = {"label"    : "First Match",
+                                                                 "legend"   : 1,
+                                                                 "color"    : "ROOT.kRed"}
+
+samples[o.infileName]["offTracks_matched/track_secondClosest_dR"] = {"label"    : "Second Match",
+                                                                       "legend"   : 2,
+                                                                       "color"    : "ROOT.kBlue"}
+
+parameters = {"maxDigits" : 4,
+              # "xMax"      : 0.02,
+              # "xMin"      : -0.02,
+              "xTitleOffset" : 1,
+              "xTitle"    : "#DeltaR(track, match)",
+              "logY"      : True,
+              "outputDir" : "../run/plots/matching_pfTracks_over_offTracks/",
+              "outputName": "matching_dR",
+}
+PlotTools.plot(samples,parameters)
+
+samples=collections.OrderedDict()
+samples[o.infileName] = collections.OrderedDict()
+
+samples[o.infileName]["offTracks_matched/track_matched_dR_s"] = {"label"    : "First Match",
+                                                                 "legend"   : 1,
+                                                                 "color"    : "ROOT.kRed"}
+
+samples[o.infileName]["offTracks_matched/track_secondClosest_dR_s"] = {"label"    : "Second Match",
+                                                                       "legend"   : 2,
+                                                                       "color"    : "ROOT.kBlue"}
+
+parameters = {"maxDigits" : 4,
+              # "xMax"      : 0.02,
+              # "xMin"      : -0.02,
+              "xTitleOffset" : 1,
+              "xTitle"    : "#DeltaR(track, match)",
+              "logY"      : True,
+              "outputDir" : "../run/plots/matching_pfTracks_over_offTracks/",
+              "outputName": "matching_dR_s",
+}
+PlotTools.plot(samples,parameters)
+
+
+samples=collections.OrderedDict()
+samples[o.infileName] = collections.OrderedDict()
+
+samples[o.infileName]["offTracks_matched/track_matched_dEta_vs_dMomentum"] = {"TObject":"",
+                                                                              "drawOptions": "COLZ",
+                                                                          }
+
+parameters = {"maxDigits" : 4,
+              "xTitleOffset": 0.8,
+              "yTitleOffset": 0.8,
+              "logZ"      : True,
+              "outputDir" : "../run/plots/matching_pfTracks_over_offTracks/",
+              "outputName": "track_matched_dEta_vs_dMomentum",
+}
+PlotTools.plot(samples,parameters)
+
+samples=collections.OrderedDict()
+samples[o.infileName] = collections.OrderedDict()
+
+samples[o.infileName]["offTracks_matched/track_secondClosest_dEta_vs_dMomentum"] = {"TObject":"",
+                                                                              "drawOptions": "COLZ",
+                                                                          }
+
+parameters = {"maxDigits" : 4,
+              "xTitleOffset": 0.8,
+              "yTitleOffset": 0.8,
+              "logZ"      : True,
+              "outputDir" : "../run/plots/matching_pfTracks_over_offTracks/",
+              "outputName": "track_secondClosest_dEta_vs_dMomentum",
+}
+PlotTools.plot(samples,parameters)
+
+samples=collections.OrderedDict()
+samples[o.infileName] = collections.OrderedDict()
+
+samples[o.infileName]["offTracks_matched/track_matched_dEta_vs_dPhi"] = {"TObject":"",
+                                                                         "drawOptions": "COLZ",
+                                                                     }
+
+parameters = {"maxDigits" : 4,
+              "xTitleOffset": 0.8,
+              "yTitleOffset": 0.8,
+              "logZ"      : True,
+              "outputDir" : "../run/plots/matching_pfTracks_over_offTracks/",
+              "outputName": "track_matched_dEta_vs_dPhi",
+}
+PlotTools.plot(samples,parameters)
+
+# samples=collections.OrderedDict()
+# samples[o.infileName] = collections.OrderedDict()
+
+# samples[o.infileName]["offTracks_matched/track_secondClosest_dEta_vs_dPhi"] = {"TObject":"",
+#                                                                                "drawOptions": "COLZ",
+#                                                                            }
+
+# parameters = {"maxDigits" : 4,
+#               "xTitleOffset": 0.8,
+#               "yTitleOffset": 0.8,
+#               "logZ"      : True,
+#               "outputDir" : "../run/plots/matching_pfTracks_over_offTracks/",
+#               "outputName": "track_secondClosest_dEta_vs_dPhi",
+# }
+# PlotTools.plot(samples,parameters)
+
 f.cd("offTracks_matched")
 for key in ROOT.gDirectory.GetListOfKeys():
     if "TH1" not in key.GetClassName(): continue

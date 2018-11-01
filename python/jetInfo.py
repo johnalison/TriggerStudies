@@ -185,6 +185,7 @@ class JetData:
                                          trackDeltaR[iTrack],
                                          trackPtRatio[iTrack],
                                          trackPParRatio[iTrack],
+                                         jet = self,
                                      ))
 
 #

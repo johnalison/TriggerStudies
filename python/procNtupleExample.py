@@ -224,26 +224,27 @@ for entry in xrange( 0,nEventThisFile): # let's only run over the first 100 even
         # match tracks if we matched jets
         if offJet.matchedJet:
             for offTrack in offJet.tracks:
+                if not offJet.matchedJet.tracks: continue
                 # for track eff plots need ratio of matched offline tracks over all offline tracks in offline jets matched to an online jet. 
                 offTrackHists.Fill(offTrack)
 
-                dEta, dEta2 = 1e6, 1e6
+                dR, dR2 = 1e6, 1e6
                 matchedTrack  = None
                 secondClosest = None
                 for pfTrack in offJet.matchedJet.tracks:
-                    this_dEta = abs(offTrack.Eta - pfTrack.Eta)
-                    if this_dEta > dEta and this_dEta < dEta2:
-                        dEta2 = this_dEta
+                    this_dR = ((offTrack.eta - pfTrack.eta)**2 + (offTrack.dPhi(pfTrack)/2)**2)**0.5 #phi resolution is about half as good due to extrapolation from jet axis
+                    if this_dR > dR and this_dR < dR2:
+                        dR2 = this_dR
                         secondClosest = pfTrack
-                    if this_dEta < dEta: 
-                        dEta2 = dEta
+                    if this_dR < dR: 
+                        dR2 = dR
                         secondClosest = matchedTrack
 
-                        dEta  = this_dEta
+                        dR  = this_dR
                         matchedTrack = pfTrack
 
 
-                if dEta < 0.02:
+                if dR < 0.01:
                     matchedTrack.matchedTrack = offTrack
                     offTrack.matchedTrack = matchedTrack
                     offTrack.secondClosest = secondClosest
