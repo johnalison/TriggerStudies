@@ -243,8 +243,8 @@ for entry in xrange( 0,nEventThisFile): # let's only run over the first 100 even
                         dR  = this_dR
                         matchedTrack = pfTrack
 
-
-                if dR < 0.01:
+                #this dR is with dPhi/2. The dR in the plots does not have that resolution fudge factor
+                if dR < 0.005:
                     matchedTrack.matchedTrack = offTrack
                     offTrack.matchedTrack = matchedTrack
                     offTrack.secondClosest = secondClosest
