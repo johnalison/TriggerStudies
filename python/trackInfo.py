@@ -51,6 +51,8 @@ class TrackData:
         self.matchedTrack  = None
         self.secondClosest = None
 
+        self.nMatches = 0
+
         self.jet = jet
         if self.jet: self.calcPhiOptions()
 

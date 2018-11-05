@@ -153,6 +153,7 @@ class JetData:
         #  For offline/online matching
         #
         self.matchedJet = None
+        self.match_dR   = None
 
     def GetTracks(self,
                   trackSip3dSig,

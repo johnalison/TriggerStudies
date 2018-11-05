@@ -75,8 +75,11 @@ outFile    = ROOT.TFile(str(o.outfileName),"recreate")
 
 eventHists     = EventHists("AllEvents")
 
+pfTrackHists          = TrackHists("pfTracks", None, outFile)
+pfTrackHists_unmatched= TrackHists("pfTracks_unmatched", None, outFile)
 pfTrackHists_matched  = TrackHists("pfTracks_matched", None, outFile)
 offTrackHists_matched = TrackHists("offTracks_matched", None, outFile)
+offTrackHists_unmatched = TrackHists("offTracks_unmatched", None, outFile)
 offTrackHists = TrackHists("offTracks", None, outFile)
 
 pfJetHistsPreOLap     = JetHists("pfJetsPreOLap",outFile,light=True)
@@ -213,45 +216,61 @@ for entry in xrange( 0,nEventThisFile): # let's only run over the first 100 even
         matchedJet = None
         for pfJet in pfJets: 
             this_dR = pfJet.vec.DeltaR(offJet.vec)
-            if this_dR < 0.4 and this_dR < dR:
+            if this_dR < dR:
                 dR = this_dR
                 matchedJet = pfJet
-        if dR < 0.4:
+        if dR < 0.02:
             matchedJet.matchedJet = offJet
+            matchedJet.match_dR   = dR
             offJet.matchedJet = matchedJet
+            offJet.match_dR   = dR
 
 
         # match tracks if we matched jets
         if offJet.matchedJet:
-            for offTrack in offJet.tracks:
-                if not offJet.matchedJet.tracks: continue
-                # for track eff plots need ratio of matched offline tracks over all offline tracks in offline jets matched to an online jet. 
-                offTrackHists.Fill(offTrack)
+            if offJet.matchedJet.tracks: #dont include case where matched pf jet has no tracks due to bug where single tracks get dropped.
+                for offTrack in offJet.tracks:
+                    #need to check that the track (with matching resolution cone r=0.01) is in region where R=0.3 circles inside the two jets overlap!
+                    if offTrack.dR > 0.29 - offJet.match_dR: continue
+                    offTrackHists.Fill(offTrack)
 
-                dR, dR2 = 1e6, 1e6
-                matchedTrack  = None
-                secondClosest = None
-                for pfTrack in offJet.matchedJet.tracks:
-                    this_dR = ((offTrack.eta - pfTrack.eta)**2 + (offTrack.dPhi(pfTrack)/2)**2)**0.5 #phi resolution is about half as good due to extrapolation from jet axis
-                    if this_dR > dR and this_dR < dR2:
-                        dR2 = this_dR
-                        secondClosest = pfTrack
-                    if this_dR < dR: 
-                        dR2 = dR
-                        secondClosest = matchedTrack
+                    dR, dR2 = 1e6, 1e6
+                    matchedTrack  = None
+                    secondClosest = None
+                    for pfTrack in offJet.matchedJet.tracks:
+                        this_dR = ((offTrack.eta - pfTrack.eta)**2 + (offTrack.dPhi(pfTrack)/2)**2)**0.5 #phi resolution is about half as good due to extrapolation from jet axis
+                        if this_dR > dR and this_dR < dR2:
+                            dR2 = this_dR
+                            secondClosest = pfTrack
+                        if this_dR < dR: 
+                            dR2 = dR
+                            secondClosest = matchedTrack
+                            
+                            dR  = this_dR
+                            matchedTrack = pfTrack
 
-                        dR  = this_dR
-                        matchedTrack = pfTrack
-
-                #this dR is with dPhi/2. The dR in the plots does not have that resolution fudge factor
-                if dR < 0.005:
+                    #this dR is with dPhi/2. The dR in the plots does not have that resolution fudge factor
+                    if dR > 0.005: 
+                    #if dR > 1e5:
+                        offTrackHists_unmatched.Fill(offTrack)
+                        continue
                     matchedTrack.matchedTrack = offTrack
-                    offTrack.matchedTrack = matchedTrack
-                    offTrack.secondClosest = secondClosest
+                    offTrack.matchedTrack     = matchedTrack
+                    offTrack.secondClosest    = secondClosest
+                    offTrack.nMatches              += 1
+                    offTrack.matchedTrack.nMatches += 1
                     offTrackHists_matched.Fill(offTrack)
                     pfTrackHists_matched .Fill(offTrack.matchedTrack)
 
-                    
+                for pfTrack in offJet.matchedJet.tracks:
+                    #Keep in mind that some of these tracks can't possibly be matched due to regions where jet cones do not overlap
+                    pfTrackHists.Fill(pfTrack) #all pftracks in matched jets
+                    pfTrackHists.FillMatchStats(pfTrack) #check how often we match pfTracks to more than one offTrack
+                    if not pfTrack.nMatches:
+                        pfTrackHists_unmatched.Fill(pfTrack) #all unmatched pftracks
+                        pfTrackHists_unmatched.FillMatchStats(pfTrack)
+                    else:
+                        pfTrackHists_matched.FillMatchStats(pfTrack)
                     
 
         # Fill offJetHists
@@ -381,8 +400,11 @@ for entry in xrange( 0,nEventThisFile): # let's only run over the first 100 even
 #
 # Save Hists
 #
+pfTrackHists.Write(outFile)
+pfTrackHists_unmatched.Write(outFile)
 pfTrackHists_matched.Write(outFile)
 offTrackHists_matched.Write(outFile)
+offTrackHists_unmatched.Write(outFile)
 offTrackHists.Write(outFile)
 
 pfJetHistsPreOLap   .Write(outFile)
