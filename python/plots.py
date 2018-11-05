@@ -6,7 +6,7 @@ import PlotTools
 import optparse
 parser = optparse.OptionParser()
 parser.add_option('-i', '--inFileName',           dest="infileName",         default=None, help="Run in loop mode")
-parser.add_option('-o', '--outFileName',          dest="outfileName",        default=None, help="Run in loop mode")
+parser.add_option('-o', '--outFileName',          dest="outfileName",        default="../run/plots/", help="Run in loop mode")
 parser.add_option('-d', '--debug',                dest="debug",    action="store_true",       default=False, help="Run in loop mode")
 o, a = parser.parse_args()
 
@@ -14,6 +14,7 @@ varLabels = {"pt"     : "p_{T} [GeV]",
              "pt_l"   : "p_{T} [GeV]",
              "deepcsv": "Deep CSV",
              "deepcsv_matched": "Deep CSV",
+             "trackDeltaR" : "#DeltaR(track, jet)",
          }
 
 rebin = {"pt"   : range(0,120,4) + range(120,200,8) + range(200,260,12) + range(260,300,20) + [300, 340, 400],
@@ -40,7 +41,7 @@ parameters = {"ratio"     : True,
               "rTitle"    : "Online / Offline",
               "xTitle"    : "DeepCSV",
               "yTitle"    : "Jets / Bin",
-              "outputDir" : "../run/plots/",
+              "outputDir" : o.outfileName,
               "outputName": "pfJets_matched_deepcsv",
               "xleg"      : [0.2,0.4],
 }
@@ -68,7 +69,7 @@ parameters = {"ratio"     : True,
               "rTitle"    : "Online / Offline",
               "xTitle"    : "DeepCSV",
               "yTitle"    : "Arb. Units",
-              "outputDir" : "../run/plots/",
+              "outputDir" : o.outfileName,
               "outputName": "offJets_deepcsv",
               "xleg"      : [0.2,0.4],
 }
@@ -97,7 +98,7 @@ parameters = {"ratio"     : True,
               "rTitle"    : "Online / Offline",
               "xTitle"    : "DeepCSV",
               "yTitle"    : "Arb. Units",
-              "outputDir" : "../run/plots/",
+              "outputDir" : o.outfileName,
               "outputName": "offJets_B_deepcsv",
               "xleg"      : [0.2,0.4],
 }
@@ -126,7 +127,7 @@ parameters = {"ratio"     : True,
               "rTitle"    : "Online / Offline",
               "xTitle"    : "DeepCSV",
               "yTitle"    : "Arb. Units",
-              "outputDir" : "../run/plots/",
+              "outputDir" : o.outfileName,
               "outputName": "offJets_L_deepcsv",
               "xleg"      : [0.2,0.4],
 }
@@ -154,7 +155,7 @@ parameters = {"ratio"     : True,
               "rTitle"    : "Online / Offline",
               "xTitle"    : "DeepCSV",
               "yTitle"    : "Jets / Bin",
-              "outputDir" : "../run/plots/",
+              "outputDir" : o.outfileName,
               "outputName": "offJets_matched_online60_deepcsv",
               "xleg"      : [0.2,0.4],
 }
@@ -189,7 +190,7 @@ for var in ["pt","pt_l"]:
                   "rTitle"    : "Matched / All",
                   "xTitle"    : varLabels[var],
                   "yTitle"    : "Jets / Bin",
-                  "outputDir" : "../run/plots/",
+                  "outputDir" : o.outfileName,
                   "outputName": "offJets_B_"+var,
               }
 
@@ -222,7 +223,7 @@ for var in ["pt","pt_l"]:
                       "rTitle"    : "On. WP"+WP+" / No Req.",
                       "xTitle"    : varLabels[var],
                       "yTitle"    : "Jets / Bin",
-                      "outputDir" : "../run/plots/",
+                      "outputDir" : o.outfileName,
                       "outputName": "offJets_offline70_B_matched_online"+WP+"_"+var,
                   }
 
@@ -255,7 +256,7 @@ for var in ["pt","pt_l"]:
                       "rTitle"    : "On. WP"+WP+" / No Req.",
                       "xTitle"    : varLabels[var],
                       "yTitle"    : "Jets / Bin",
-                      "outputDir" : "../run/plots/",
+                      "outputDir" : o.outfileName,
                       "outputName": "offJets_B_matched_online"+WP+"_"+var,
                   }
 
@@ -285,11 +286,11 @@ for key in ROOT.gDirectory.GetListOfKeys():
     
     parameters = {"ratio"     : True,
                   "rMax"      : 1,
-                  "rMin"      : 0.8,
+                  "rMin"      : 0,
                   "logX"      : True if "logx" in var else False,
                   "maxDigits" : 4,
                   "rTitle"    : "Matched / All",
-                  "outputDir" : "../run/plots/matched_offJets_over_offJets/",
+                  "outputDir" : o.outfileName+"/matched_offJets_over_offJets/",
                   "outputName": var,
               }
 
@@ -310,7 +311,7 @@ for key in ROOT.gDirectory.GetListOfKeys():
                       "xTitleOffset" : 1,
                       "showStats" : 1100,
                       #"yMin" : 1,
-                      "outputDir" : "../run/plots/offJet_minus_pfJet/",
+                      "outputDir" : o.outfileName+"/offJet_minus_pfJet/",
                       "outputName": var,
                   }
     if var in varLabels: parameters["xTitle"] = varLabels[var]
@@ -336,7 +337,7 @@ for key in ROOT.gDirectory.GetListOfKeys():
                   "logX"      : True if "logx" in var else False,
                   "maxDigits" : 4,
                   "rTitle"    : "Matched / All",
-                  "outputDir" : "../run/plots/offJets_matchedJet_over_offJets_matched/",
+                  "outputDir" : o.outfileName+"/offJets_matchedJet_over_offJets_matched/",
                   "outputName": var,
               }
 
@@ -349,21 +350,19 @@ for key in ROOT.gDirectory.GetListOfKeys():
 samples=collections.OrderedDict()
 samples[o.infileName] = collections.OrderedDict()
 
-samples[o.infileName]["offTracks_matched/track_matched_dEta"] = {"label"    : "First Match",
-                                                                 "legend"   : 1,
-                                                                 "color"    : "ROOT.kRed"}
+samples[o.infileName]["offTracks_matched/track_matched_dEta_s"] = {"label"    : "First Match",
+                                                                   "legend"   : 1,
+                                                                   "color"    : "ROOT.kRed"}
 
-samples[o.infileName]["offTracks_matched/track_secondClosest_dEta"] = {"label"    : "Second Match",
-                                                                       "legend"   : 2,
-                                                                       "color"    : "ROOT.kBlue"}
+samples[o.infileName]["offTracks_matched/track_secondClosest_dEta_s"] = {"label"    : "Second Match",
+                                                                         "legend"   : 2,
+                                                                         "color"    : "ROOT.kBlue"}
 
 parameters = {"maxDigits" : 4,
-              "xMax"      : 0.02,
-              "xMin"      : -0.02,
               "xTitleOffset" : 1,
               "xTitle"    : "#eta-#eta^{match}",
               "logY"      : True,
-              "outputDir" : "../run/plots/matching_pfTracks_over_offTracks/",
+              "outputDir" : o.outfileName+"/matching_pfTracks_over_offTracks/",
               "outputName": "matching_dEta",
           }
 PlotTools.plot(samples,parameters)
@@ -385,7 +384,7 @@ parameters = {"maxDigits" : 4,
               "xTitleOffset" : 1,
               "xTitle"    : "p-p^{match}",
               "logY"      : True,
-              "outputDir" : "../run/plots/matching_pfTracks_over_offTracks/",
+              "outputDir" : o.outfileName+"/matching_pfTracks_over_offTracks/",
               "outputName": "matching_dMomentum",
           }
 PlotTools.plot(samples,parameters)
@@ -407,7 +406,7 @@ parameters = {"maxDigits" : 4,
               "xTitleOffset" : 1,
               "xTitle"    : "#DeltaR(track, match)",
               "logY"      : True,
-              "outputDir" : "../run/plots/matching_pfTracks_over_offTracks/",
+              "outputDir" : o.outfileName+"/matching_pfTracks_over_offTracks/",
               "outputName": "matching_dR",
 }
 PlotTools.plot(samples,parameters)
@@ -426,10 +425,12 @@ samples[o.infileName]["offTracks_matched/track_secondClosest_dR_s"] = {"label"  
 parameters = {"maxDigits" : 4,
               # "xMax"      : 0.02,
               # "xMin"      : -0.02,
+              "yMax"      : 3e5,
+              "yMin"      : 20,
               "xTitleOffset" : 1,
               "xTitle"    : "#DeltaR(track, match)",
               "logY"      : True,
-              "outputDir" : "../run/plots/matching_pfTracks_over_offTracks/",
+              "outputDir" : o.outfileName+"/matching_pfTracks_over_offTracks/",
               "outputName": "matching_dR_s",
 }
 PlotTools.plot(samples,parameters)
@@ -446,7 +447,7 @@ parameters = {"maxDigits" : 4,
               "xTitleOffset": 0.8,
               "yTitleOffset": 0.8,
               "logZ"      : True,
-              "outputDir" : "../run/plots/matching_pfTracks_over_offTracks/",
+              "outputDir" : o.outfileName+"/matching_pfTracks_over_offTracks/",
               "outputName": "track_matched_dEta_vs_dMomentum",
 }
 PlotTools.plot(samples,parameters)
@@ -462,7 +463,7 @@ parameters = {"maxDigits" : 4,
               "xTitleOffset": 0.8,
               "yTitleOffset": 0.8,
               "logZ"      : True,
-              "outputDir" : "../run/plots/matching_pfTracks_over_offTracks/",
+              "outputDir" : o.outfileName+"/matching_pfTracks_over_offTracks/",
               "outputName": "track_secondClosest_dEta_vs_dMomentum",
 }
 PlotTools.plot(samples,parameters)
@@ -478,7 +479,7 @@ parameters = {"maxDigits" : 4,
               "xTitleOffset": 0.8,
               "yTitleOffset": 0.8,
               "logZ"      : True,
-              "outputDir" : "../run/plots/matching_pfTracks_over_offTracks/",
+              "outputDir" : o.outfileName+"/matching_pfTracks_over_offTracks/",
               "outputName": "track_matched_dEta_vs_dPhi",
 }
 PlotTools.plot(samples,parameters)
@@ -494,7 +495,7 @@ PlotTools.plot(samples,parameters)
 #               "xTitleOffset": 0.8,
 #               "yTitleOffset": 0.8,
 #               "logZ"      : True,
-#               "outputDir" : "../run/plots/matching_pfTracks_over_offTracks/",
+#               "outputDir" : o.outfileName+"/matching_pfTracks_over_offTracks/",
 #               "outputName": "track_secondClosest_dEta_vs_dPhi",
 # }
 # PlotTools.plot(samples,parameters)
@@ -507,7 +508,7 @@ for key in ROOT.gDirectory.GetListOfKeys():
     samples=collections.OrderedDict()
     samples[o.infileName] = collections.OrderedDict()
 
-    samples[o.infileName]["offTracks_matched/"+var] = {"label"    : "Offline Tracks",
+    samples[o.infileName]["offTracks_matched/"+var] = {"label"    : "Matched Offline Tracks",
                                                        "legend"   : 1,
                                                        "ratio"    : "denom A",
                                                        "color"    : "ROOT.kRed"}
@@ -521,7 +522,7 @@ for key in ROOT.gDirectory.GetListOfKeys():
                   "logX"      : True if "logx" in var else False,
                   "maxDigits" : 4,
                   "rTitle"    : "Online / Offline",
-                  "outputDir" : "../run/plots/matching_pfTracks_over_offTracks/",
+                  "outputDir" : o.outfileName+"/matching_pfTracks_over_offTracks/",
                   "outputName": var,
               }
     if var in varLabels: parameters["xTitle"] = varLabels[var]
@@ -543,12 +544,36 @@ for key in ROOT.gDirectory.GetListOfKeys():
                       "showStats" : 1100,
                       "xTitleOffset" : 1,
                       #"yMin" : 1,
-                      "outputDir" : "../run/plots/offTrack_minus_pfTrack/",
+                      "outputDir" : o.outfileName+"/offTrack_minus_pfTrack/",
                       "outputName": var,
                   }
     if var in varLabels: parameters["xTitle"] = varLabels[var]
 
     PlotTools.plot(samples, parameters)
+
+
+#nMatches
+samples=collections.OrderedDict()
+samples[o.infileName] = collections.OrderedDict()
+
+samples[o.infileName]["pfTracks/track_nMatches"] = {"label"    : "PF Tracks (Matched Jets)",
+                                                    #"isData"   : True,
+                                                    "drawOptions": "HIST PE",
+                                                    "legend"   : 1,
+                                                    "color"    : "ROOT.kBlack"}
+
+parameters = {"maxDigits" : 4,
+              # "xMax"      : 0.02,
+              # "xMin"      : -0.02,
+              "yleg"      : [0.7, 0.8],
+              "yTitle"    : "# of PF tracks",
+              "xTitleOffset" : 1,
+              "xTitle"    : "# of matched offline tracks",
+              "logY"      : True,
+              "outputDir" : o.outfileName+"/matching_pfTracks_over_offTracks/",
+              "outputName": "pfTracks_nMatches",
+}
+PlotTools.plot(samples,parameters)
 
 #Track Matching Efficincy plots
 f.cd("offTracks")
@@ -574,7 +599,7 @@ for key in ROOT.gDirectory.GetListOfKeys():
                   "maxDigits" : 4,
                   "logX"      : True if "logx" in var else False,
                   "rTitle"    : "Online / Offline",
-                  "outputDir" : "../run/plots/matched_pfTracks_over_offTracks/",
+                  "outputDir" : o.outfileName+"/matched_pfTracks_over_offTracks/",
                   "outputName": var,
               }
     if var in varLabels: parameters["xTitle"] = varLabels[var]
@@ -600,7 +625,7 @@ for key in ROOT.gDirectory.GetListOfKeys():
                   "logX"      : True if "logx" in var else False,
                   "maxDigits" : 4,
                   "rTitle"    : "Matched / All",
-                  "outputDir" : "../run/plots/matched_offTracks_over_offTracks/",
+                  "outputDir" : o.outfileName+"/matched_offTracks_over_offTracks/",
                   "outputName": var,
               }
     if var in varLabels: parameters["xTitle"] = varLabels[var]
@@ -621,12 +646,162 @@ for key in ROOT.gDirectory.GetListOfKeys():
                   "ratioOnly" : True,
                   "logX"      : True if "logx" in var else False,
                   "xTitleOffset":0.5,
-                  "rMin"      : 0.9,
+                  "rMin"      : 0.6,
                   "rMax"      : 1.02,
                   #"maxDigits" : 4,
                   "rTitle"    : "Efficiency",
-                  "outputDir" : "../run/plots/matched_offTracks_over_offTracks/",
+                  "outputDir" : o.outfileName+"/matched_offTracks_over_offTracks/",
                   "outputName": var+"_efficiency",
+              }
+    if var in varLabels: parameters["xTitle"] = varLabels[var]
+
+    PlotTools.plot(samples, parameters)
+
+    samples=collections.OrderedDict()
+    samples[o.infileName] = collections.OrderedDict()
+
+    samples[o.infileName]["pfTracks/"+var] = {"label"    : "PF Tracks",
+                                              "legend"   : 1,
+                                              "isData"   : True,
+                                              "ratio"    : "numer A",
+                                              "color"    : "ROOT.kBlack",
+                                          }
+
+    samples[o.infileName]["pfTracks_unmatched/"+var] = {"label"    : "Unmatched",
+                                                        "ratio"    : "denom A",
+                                                        "stack"    : 1,
+                                                        "legend"   : 3,
+                                                        "color"    : "ROOT.kAzure-9"}
+
+    samples[o.infileName]["pfTracks_matched/"+var] = {"label"    : "Matched",
+                                                      "ratio"    : "denom A",
+                                                      "stack"    : 2,
+                                                      "legend"   : 2,
+                                                      "color"    : "ROOT.kYellow"}
+    
+    parameters = {"ratio"     : True,
+                  "maxDigits" : 4,
+                  "logX"      : True if "logx" in var else False,
+                  "rTitle"    : "Online / Stack",
+                  "outputDir" : o.outfileName+"/pfTracks/",
+                  "outputName": var,
+              }
+    if var in varLabels: parameters["xTitle"] = varLabels[var]
+
+    PlotTools.plot(samples, parameters)
+
+    samples=collections.OrderedDict()
+    samples[o.infileName] = collections.OrderedDict()
+
+    samples[o.infileName]["offTracks/"+var] = {"label"    : "Offline Tracks",
+                                              "legend"   : 1,
+                                              "isData"   : True,
+                                              "ratio"    : "numer A",
+                                              "color"    : "ROOT.kBlack",
+                                          }
+
+    samples[o.infileName]["offTracks_unmatched/"+var] = {"label"    : "Unmatched",
+                                                         "ratio"    : "denom A",
+                                                         "stack"    : 1,
+                                                         "legend"   : 3,
+                                                         "color"    : "ROOT.kAzure-9"}
+
+    samples[o.infileName]["offTracks_matched/"+var] = {"label"    : "Matched",
+                                                      "ratio"    : "denom A",
+                                                      "stack"    : 2,
+                                                      "legend"   : 2,
+                                                      "color"    : "ROOT.kYellow"}
+    
+    parameters = {"ratio"     : True,
+                  "maxDigits" : 4,
+                  "logX"      : True if "logx" in var else False,
+                  "rTitle"    : "Offline / Stack",
+                  "outputDir" : o.outfileName+"/offTracks/",
+                  "outputName": var,
+              }
+    if var in varLabels: parameters["xTitle"] = varLabels[var]
+
+    PlotTools.plot(samples, parameters)
+
+
+    samples=collections.OrderedDict()
+    samples[o.infileName] = collections.OrderedDict()
+
+    samples[o.infileName]["pfTracks/"+var] = {"label"    : "PF Tracks",
+                                              "legend"   : 1,
+                                              "ratio"    : "denom A",
+                                              "color"    : "ROOT.kRed",
+                                          }
+
+    samples[o.infileName]["pfTracks_unmatched/"+var] = {"label"    : "Unmatched",
+                                                        "ratio"    : "numer A",
+                                                        "isData"   : True,
+                                                        "legend"   : 2,
+                                                        "color"    : "ROOT.kBlack"}
+    
+    parameters = {"ratio"     : True,
+                  "maxDigits" : 4,
+                  "logX"      : True if "logx" in var else False,
+                  "rMax"      : 0.3,
+                  "rMin"      : 0,
+                  "rTitle"    : "Unmatched / All",
+                  "outputDir" : o.outfileName+"/unmatched_pfTracks_over_pfTracks/",
+                  "outputName": var,
+              }
+    if var in varLabels: parameters["xTitle"] = varLabels[var]
+
+    PlotTools.plot(samples, parameters)
+
+    samples=collections.OrderedDict()
+    samples[o.infileName] = collections.OrderedDict()
+
+    samples[o.infileName]["offTracks_unmatched/"+var] = {"label"    : "Unmatched Off Tracks",
+                                                         "legend"   : 1,
+                                                         "ratio"    : "denom A",
+                                                         "color"    : "ROOT.kRed",
+                                                     }
+
+    samples[o.infileName]["pfTracks_unmatched/"+var] = {"label"    : "Unmatched PF Tracks",
+                                                        "ratio"    : "numer A",
+                                                        "legend"   : 2,
+                                                        "isData"   : True,
+                                                        "color"    : "ROOT.kBlack"}
+    
+    parameters = {"ratio"     : True,
+                  "maxDigits" : 4,
+                  "logX"      : True if "logx" in var else False,
+                  "rTitle"    : "PF / Offline",
+                  "outputDir" : o.outfileName+"/unmatched_pfTracks_over_unmatched_offTracks/",
+                  "outputName": var,
+              }
+    if var in varLabels: parameters["xTitle"] = varLabels[var]
+
+    PlotTools.plot(samples, parameters)
+
+
+    samples=collections.OrderedDict()
+    samples[o.infileName] = collections.OrderedDict()
+
+    samples[o.infileName]["offTracks/"+var] = {"label"    : "Offline Tracks",
+                                              "legend"   : 1,
+                                              "ratio"    : "denom A",
+                                              "color"    : "ROOT.kRed",
+                                          }
+
+    samples[o.infileName]["offTracks_unmatched/"+var] = {"label"    : "Unmatched",
+                                                        "ratio"    : "numer A",
+                                                        "isData"   : True,
+                                                        "legend"   : 2,
+                                                        "color"    : "ROOT.kBlack"}
+    
+    parameters = {"ratio"     : True,
+                  "maxDigits" : 4,
+                  "logX"      : True if "logx" in var else False,
+                  "rMax"      : 0.3,
+                  "rMin"      : 0,
+                  "rTitle"    : "Unmatched / All",
+                  "outputDir" : o.outfileName+"/unmatched_offTracks_over_offTracks/",
+                  "outputName": var,
               }
     if var in varLabels: parameters["xTitle"] = varLabels[var]
 
