@@ -55,11 +55,18 @@ class TrackHists:
         self.trackPt_logx.SetDirectory(self.thisDir)
 
         self.trackEta                   = makeHist(self.thisDir, "trackEta"            ,    "trackEta;track #eta;Entries", 100, -2.6, 2.6)            
+        self.trackPhi                   = makeHist(self.thisDir, "trackPhi"            ,    "trackPhi;track #phi;Entries", 100, -3.2, 3.2)            
         self.trackPPar                  = makeHist(self.thisDir, "trackPPar"           ,    "trackPPar;track PPar [GeV];Entries",60, 0, 60)           
         self.trackDeltaR                = makeHist(self.thisDir, "trackDeltaR"         ,    "trackDeltaR;track #DeltaR;Entries", 160, -0.05, 0.35)         
         self.trackEtaRel                = makeHist(self.thisDir, "trackEtaRel"         ,    "trackEtaRel;track Eta Rel;Entries", 100, 0, 7)         
-        self.trackPtRatio               = makeHist(self.thisDir, "trackPtRatio"        ,    "trackPtRatio;track p_{T} Ratio;Entries", 100, -0.01, 0.3)        
-        self.trackPParRatio             = makeHist(self.thisDir, "trackPParRatio"      ,    "trackPParRatio;track P Par Ratio;Entries", 100, 0.95, 1.02)      
+        self.trackPtRatio               = makeHist(self.thisDir, "trackPtRatio"        ,    "trackPtRatio;track p_{T} Ratio;Entries", 100, -0.01, 0.3) 
+        self.trackPParRatio             = makeHist(self.thisDir, "trackPParRatio"      ,    "trackPParRatio;track P Par Ratio;Entries", 100, 0.95, 1.02)  
+
+        self.trackChi2                  = makeHist(self.thisDir, "trackChi2"            ,    "trackChi2;track Chi2;Entries", 100, -0.1, 6)            
+        self.trackNTotalHits            = makeHist(self.thisDir, "trackNTotalHits"      ,    "trackNTotalHits;trackNTotalHits;Entries", 30, -0.5, 29.5)
+        self.trackNPixelHits            = makeHist(self.thisDir, "trackNPixelHits"      ,    "trackNPixelHits;trackNPixelHits;Entries", 10, -0.5,  9.5)  
+        self.trackHasInnerPixHit        = makeHist(self.thisDir, "trackHasInnerPixHit"  ,    "trackHasInnerPixHit;trackHasInnerPixHit;Entries", 2, -0.5,  1.5)  
+
 
         self.track_nMatches = makeHist(self.thisDir, "track_nMatches", "track_nMatches;# of matched tracks;Entries", 6, -0.5, 5.5)
 
@@ -120,11 +127,18 @@ class TrackHists:
         self.trackMomentum        .Fill(track.momentum   ) 
         self.trackPt_logx         .Fill(track.momentum   ) 
         self.trackEta             .Fill(track.eta        )
+        self.trackPhi             .Fill(track.phi        )
         self.trackPPar            .Fill(track.pPar       )
         self.trackDeltaR          .Fill(track.dR         )
         #self.trackEtaRel          .Fill(track.etaRel     )
         self.trackPtRatio         .Fill(track.ptRatio    )
         self.trackPParRatio       .Fill(track.pParRatio  )
+
+        self.trackChi2                  .Fill(track.Chi2      )
+        self.trackNTotalHits            .Fill(track.NTotalHits) 
+        self.trackNPixelHits            .Fill(track.NPixelHits)
+        self.trackHasInnerPixHit        .Fill(track.JetDistSig)
+
 
         if track.matchedTrack:
             self.track_matched_dip2d    .Fill(track.ip2dVal  - track.matchedTrack.ip2dVal)
@@ -187,11 +201,17 @@ class TrackHists:
         self.trackMomentum        .Write()
         self.trackPt_logx         .Write()
         self.trackEta             .Write()
+        self.trackPhi             .Write()
         self.trackPPar            .Write()
         self.trackDeltaR          .Write()
         self.trackEtaRel          .Write()
         self.trackPtRatio         .Write()
         self.trackPParRatio       .Write()
+
+        self.trackChi2            .Write()
+        self.trackNTotalHits      .Write()
+        self.trackNPixelHits      .Write()
+        self.trackHasInnerPixHit  .Write()
 
         self.track_nMatches.Write()
     
