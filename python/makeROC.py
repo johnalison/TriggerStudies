@@ -62,10 +62,13 @@ def makeROC(inFile,outFile,name,reject,select,debug=False,reject_denom=None,sele
             print " wp90 DeepCSV >",wp90,"(actual efficiency = "+str(e_b[-1])+")"
 
 
-    ROC = ROOT.TGraph(len(e_l))
-    ROC.SetName(name)
+    ROC_r_l = ROOT.TGraph(len(e_l))
+    ROC_r_l.SetName(name+"_lightRejection")
+    ROC_e_l = ROOT.TGraph(len(e_l))
+    ROC_e_l.SetName(name+"_lightEfficiency")
     for p in range(len(e_l)):
-        ROC.SetPoint(p,ROOT.Double(e_b[p]),ROOT.Double(r_l[p]))
+        ROC_r_l.SetPoint(p,ROOT.Double(e_b[p]),ROOT.Double(r_l[p]))
+        ROC_e_l.SetPoint(p,ROOT.Double(e_b[p]),ROOT.Double(e_l[p]))
         
 
     if debug: 
@@ -73,7 +76,8 @@ def makeROC(inFile,outFile,name,reject,select,debug=False,reject_denom=None,sele
         print "r_l:",r_l
 
     outFile.cd()
-    ROC.Write()
+    ROC_r_l.Write()
+    ROC_e_l.Write()
 
 
 makeROC(inFile,outFile,"offJets_ROC","offJets_L/deepcsv","offJets_B/deepcsv")
