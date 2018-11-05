@@ -102,11 +102,17 @@ class JetHists:
             self.trackPtRel                 = self.makeHist("trackPtRel"          ,    "trackPtRel;track Pt Rel [GeV];Entries", 100, -0.1, 7)          
             self.trackMomentum              = self.makeHist("trackMomentum"       ,    "trackMomentum;track momentum [GeV];Entries", 100, -0.1, 60)       
             self.trackEta                   = self.makeHist("trackEta"            ,    "trackEta;track #eta;Entries", 100, -2.6, 2.6)            
+            self.trackPhi                   = self.makeHist("trackPhi"            ,    "trackPhi;track #phi;Entries", 100, -3.2, 3.2)            
             self.trackPPar                  = self.makeHist("trackPPar"           ,    "trackPPar;track PPar [GeV];Entries",100, -0.1, 60)           
             self.trackDeltaR                = self.makeHist("trackDeltaR"         ,    "trackDeltaR;track #Delta R;Entries", 100, -0.1, 0.35)         
             self.trackEtaRel                = self.makeHist("trackEtaRel"         ,    "trackEtaRel;track Eta Rel;Entries", 100, 0, 7)         
             self.trackPtRatio               = self.makeHist("trackPtRatio"        ,    "trackPtRatio;track Pt Ratio;Entries", 100, -0.01, 0.3)        
             self.trackPParRatio             = self.makeHist("trackPParRatio"      ,    "trackPParRatio;track P Par Ratio;Entries", 100, 0.95, 1.02)      
+
+            self.trackChi2                  = self.makeHist("trackChi2"            ,    "trackChi2;track Chi2;Entries", 100, -0.1, 6)            
+            self.trackNTotalHits            = self.makeHist("trackNTotalHits"      ,    "trackNTotalHits;trackNTotalHits;Entries", 30, -0.5, 29.5)
+            self.trackNPixelHits            = self.makeHist("trackNPixelHits"      ,    "trackNPixelHits;trackNPixelHits;Entries", 10, -0.5,  9.5)  
+            self.trackHasInnerPixHit        = self.makeHist("trackHasInnerPixHit"  ,    "trackHasInnerPixHit;trackHasInnerPixHit;Entries", 2, -0.5,  1.5)  
     
 
 
@@ -212,6 +218,7 @@ class JetHists:
                 this_trackEta = jetInfo.trackEta        .at(iTrk)
                 self.ip2d_vs_eta.Fill(abs(this_trackEta), this_ip2d)
     
+                this_trackPhi = jetInfo.trackPhi        .at(iTrk)
     
                 self.trackDecayLenVal_l   .Fill(jetInfo.trackDecayLenVal.at(iTrk))
                 self.trackDecayLenVal     .Fill(jetInfo.trackDecayLenVal.at(iTrk))
@@ -219,11 +226,18 @@ class JetHists:
                 self.trackPtRel           .Fill(jetInfo.trackPtRel      .at(iTrk))
                 self.trackMomentum        .Fill(this_trackMomentum) 
                 self.trackEta             .Fill(this_trackEta)
+                self.trackPhi             .Fill(this_trackPhi)
                 self.trackPPar            .Fill(jetInfo.trackPPar       .at(iTrk))
                 self.trackDeltaR          .Fill(jetInfo.trackDeltaR     .at(iTrk))
                 #self.trackEtaRel          .Fill(jetInfo.trackEtaRel     .at(iTrk))
                 self.trackPtRatio         .Fill(jetInfo.trackPtRatio    .at(iTrk))
                 self.trackPParRatio       .Fill(jetInfo.trackPParRatio  .at(iTrk))
+
+                self.trackChi2                  .Fill(jetInfo.trackChi2      .at(iTrk))
+                self.trackNTotalHits            .Fill(jetInfo.trackNTotalHits.at(iTrk)) 
+                self.trackNPixelHits            .Fill(jetInfo.trackNPixelHits.at(iTrk))
+                self.trackHasInnerPixHit        .Fill(jetInfo.trackJetDistSig.at(iTrk))
+
     
 
     def Write(self,outFile):
@@ -313,13 +327,16 @@ class JetHists:
             self.trackPtRel           .Write()
             self.trackMomentum        .Write()
             self.trackEta             .Write()
+            self.trackPhi             .Write()
             self.trackPPar            .Write()
             self.trackDeltaR          .Write()
             self.trackEtaRel          .Write()
             self.trackPtRatio         .Write()
             self.trackPParRatio       .Write()
     
-    
-    
-    
+            self.trackChi2            .Write()
+            self.trackNTotalHits      .Write()
+            self.trackNPixelHits      .Write()
+            self.trackHasInnerPixHit  .Write()
+
         outFile.cd()

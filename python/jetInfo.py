@@ -57,14 +57,14 @@ class JetData:
                  ,trackDecayLenVal           
                  #,trackDecayLenSig           
                  ,trackJetDistVal            
-                 #,trackJetDistSig            
+                 ,trackJetDistSig            
                  #,trackGhostTrackWeight      
                  #,trackGhostTrackDistSig     
                  #,trackGhostTrackDistVal     
                  ,trackPtRel                 
                  ,trackMomentum              
                  ,trackEta                   
-                 #,trackPhi                   
+                 ,trackPhi                   
                  #,trackCharge                
                  ,trackPPar                  
                  ,trackDeltaR                
@@ -73,9 +73,9 @@ class JetData:
                  ,trackPParRatio             
                  #,trackP0Par                 
                  #,trackP0ParRatio            
-                 #,trackChi2                  
-                 #,trackNTotalHits            
-                 #,trackNPixelHits            
+                 ,trackChi2                  
+                 ,trackNTotalHits            
+                 ,trackNPixelHits            
                  ): 
 
         self.pt = pt
@@ -144,14 +144,14 @@ class JetData:
         self.trackDecayLenVal           = trackDecayLenVal           
         #self.trackDecayLenSig           = trackDecayLenSig           
         self.trackJetDistVal            = trackJetDistVal            
-        #self.trackJetDistSig            = trackJetDistSig            
+        self.trackJetDistSig            = trackJetDistSig            
         #self.trackGhostTrackWeight      = trackGhostTrackWeight      
         #self.trackGhostTrackDistSig     = trackGhostTrackDistSig     
         #self.trackGhostTrackDistVal     = trackGhostTrackDistVal     
         self.trackPtRel                 = trackPtRel                 
         self.trackMomentum              = trackMomentum              
         self.trackEta                   = trackEta                   
-        #self.trackPhi                   = trackPhi                   
+        self.trackPhi                   = trackPhi                   
         #self.trackCharge                = trackCharge                
         self.trackPPar                  = trackPPar                  
         self.trackDeltaR                = trackDeltaR                
@@ -160,9 +160,9 @@ class JetData:
         self.trackPParRatio             = trackPParRatio             
         #self.trackP0Par                 = trackP0Par                 
         #self.trackP0ParRatio            = trackP0ParRatio            
-        #self.trackChi2                  = trackChi2                  
-        #self.trackNTotalHits            = trackNTotalHits            
-        #self.trackNPixelHits            = trackNPixelHits            
+        self.trackChi2                  = trackChi2                  
+        self.trackNTotalHits            = trackNTotalHits            
+        self.trackNPixelHits            = trackNPixelHits            
 
 
         #
@@ -248,14 +248,14 @@ class JetDataHandler:
         self.trackDecayLenVal           = ROOT.std.vector('vector<float>')()
         #self.trackDecayLenSig           = ROOT.std.vector('vector<float>')()
         self.trackJetDistVal            = ROOT.std.vector('vector<float>')()
-        #self.trackJetDistSig            = ROOT.std.vector('vector<float>')()
+        self.trackJetDistSig            = ROOT.std.vector('vector<float>')()
         #self.trackGhostTrackWeight      = ROOT.std.vector('vector<float>')()
         #self.trackGhostTrackDistSig     = ROOT.std.vector('vector<float>')()
         #self.trackGhostTrackDistVal     = ROOT.std.vector('vector<float>')()
         self.trackPtRel                 = ROOT.std.vector('vector<float>')()
         self.trackMomentum              = ROOT.std.vector('vector<float>')()
         self.trackEta                   = ROOT.std.vector('vector<float>')()
-        #self.trackPhi                   = ROOT.std.vector('vector<float>')()
+        self.trackPhi                   = ROOT.std.vector('vector<float>')()
         #self.trackCharge                = ROOT.std.vector('vector<float>')()
         self.trackPPar                  = ROOT.std.vector('vector<float>')()
         self.trackDeltaR                = ROOT.std.vector('vector<float>')()
@@ -264,9 +264,9 @@ class JetDataHandler:
         self.trackPParRatio             = ROOT.std.vector('vector<float>')()
         #self.trackP0Par                 = ROOT.std.vector('vector<float>')()
         #self.trackP0ParRatio            = ROOT.std.vector('vector<float>')()
-        #self.trackChi2                  = ROOT.std.vector('vector<float>')()
-        #self.trackNTotalHits            = ROOT.std.vector('vector<float>')()
-        #self.trackNPixelHits            = ROOT.std.vector('vector<float>')()
+        self.trackChi2                  = ROOT.std.vector('vector<float>')()
+        self.trackNTotalHits            = ROOT.std.vector('vector<float>')()
+        self.trackNPixelHits            = ROOT.std.vector('vector<float>')()
 
     def SetBranchAddress(self,intree):
         intree.SetBranchAddress( self.name+'_num',       self.num  )
@@ -334,14 +334,14 @@ class JetDataHandler:
         intree.SetBranchAddress( self.name+'_trackDecayLenVal'           ,  self.trackDecayLenVal           )
         #intree.SetBranchAddress( self.name+'_trackDecayLenSig'           ,  self.trackDecayLenSig           )
         intree.SetBranchAddress( self.name+'_trackJetDistVal'            ,  self.trackJetDistVal            )
-        #intree.SetBranchAddress( self.name+'_trackJetDistSig'            ,  self.trackJetDistSig            )
+        intree.SetBranchAddress( self.name+'_trackJetDistSig'            ,  self.trackJetDistSig            )
         #intree.SetBranchAddress( self.name+'_trackGhostTrackWeight'      ,  self.trackGhostTrackWeight      )
         #intree.SetBranchAddress( self.name+'_trackGhostTrackDistSig'     ,  self.trackGhostTrackDistSig     )
         #intree.SetBranchAddress( self.name+'_trackGhostTrackDistVal'     ,  self.trackGhostTrackDistVal     )
         intree.SetBranchAddress( self.name+'_trackPtRel'                 ,  self.trackPtRel                 )
         intree.SetBranchAddress( self.name+'_trackMomentum'              ,  self.trackMomentum              )
         intree.SetBranchAddress( self.name+'_trackEta'                   ,  self.trackEta                   )
-        #intree.SetBranchAddress( self.name+'_trackPhi'                   ,  self.trackPhi                   )
+        intree.SetBranchAddress( self.name+'_trackPhi'                   ,  self.trackPhi                   )
         #intree.SetBranchAddress( self.name+'_trackCharge'                ,  self.trackCharge                )
         intree.SetBranchAddress( self.name+'_trackPPar'                  ,  self.trackPPar                  )
         intree.SetBranchAddress( self.name+'_trackDeltaR'                ,  self.trackDeltaR                )
@@ -350,9 +350,9 @@ class JetDataHandler:
         intree.SetBranchAddress( self.name+'_trackPParRatio'             ,  self.trackPParRatio             )
         #intree.SetBranchAddress( self.name+'_trackP0Par'                 ,  self.trackP0Par                 )
         #intree.SetBranchAddress( self.name+'_trackP0ParRatio'            ,  self.trackP0ParRatio            )
-        #intree.SetBranchAddress( self.name+'_trackChi2'                  ,  self.trackChi2                  )
-        #intree.SetBranchAddress( self.name+'_trackNTotalHits'            ,  self.trackNTotalHits            )
-        #intree.SetBranchAddress( self.name+'_trackNPixelHits'            ,  self.trackNPixelHits            )
+        intree.SetBranchAddress( self.name+'_trackChi2'                  ,  self.trackChi2                  )
+        intree.SetBranchAddress( self.name+'_trackNTotalHits'            ,  self.trackNTotalHits            )
+        intree.SetBranchAddress( self.name+'_trackNPixelHits'            ,  self.trackNPixelHits            )
   
 
     def getJets(self):
@@ -420,14 +420,14 @@ class JetDataHandler:
                                    self.trackDecayLenVal           [iJet],
                                    #self.trackDecayLenSig           [iJet],
                                    self.trackJetDistVal            [iJet],
-                                   #self.trackJetDistSig            [iJet],
+                                   self.trackJetDistSig            [iJet],
                                    #self.trackGhostTrackWeight      [iJet],
                                    #self.trackGhostTrackDistSig     [iJet],
                                    #self.trackGhostTrackDistVal     [iJet],
                                    self.trackPtRel                 [iJet],
                                    self.trackMomentum              [iJet],
                                    self.trackEta                   [iJet],
-                                   #self.trackPhi                   [iJet],
+                                   self.trackPhi                   [iJet],
                                    #self.trackCharge                [iJet],
                                    self.trackPPar                  [iJet],
                                    self.trackDeltaR                [iJet],
@@ -436,9 +436,9 @@ class JetDataHandler:
                                    self.trackPParRatio             [iJet],
                                    #self.trackP0Par                 [iJet],
                                    #self.trackP0ParRatio            [iJet],
-                                   #self.trackChi2                  [iJet],
-                                   #self.trackNTotalHits            [iJet],
-                                   #self.trackNPixelHits            [iJet],
+                                   self.trackChi2                  [iJet],
+                                   self.trackNTotalHits            [iJet],
+                                   self.trackNPixelHits            [iJet],
                                    )
                            )
 
