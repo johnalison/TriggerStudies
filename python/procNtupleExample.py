@@ -192,15 +192,6 @@ for entry in xrange( 0,nEventThisFile): # let's only run over the first 100 even
     if len(elecs)+len(muons) < 2:
         continue
 
-    for caloJet in caloJets:
-        if abs(caloJet.eta) > 2.5: continue
-        if caloJet.pt       < 35:  continue
-
-        caloJetHistsPreOLap.Fill(caloJet)
-        if failOverlap(caloJet,elecs): continue
-        if failOverlap(caloJet,muons): continue
-
-        caloJetHists.Fill(caloJet)
 
     offJets = offJetsDB.getJets()
     for offJet in offJets:
@@ -238,7 +229,8 @@ for entry in xrange( 0,nEventThisFile): # let's only run over the first 100 even
                     matchedTrack  = None
                     secondClosest = None
                     for pfTrack in offJet.matchedJet.tracks:
-                        this_dR = ((offTrack.eta - pfTrack.eta)**2 + (offTrack.dPhi(pfTrack)/2)**2)**0.5 #phi resolution is about half as good due to extrapolation from jet axis
+                        #this_dR = ((offTrack.eta - pfTrack.eta)**2 + (offTrack.dPhi(pfTrack)/2)**2)**0.5 #phi resolution is about half as good due to extrapolation from jet axis
+                        this_dR = ((offTrack.eta - pfTrack.eta)**2 + (offTrack.dPhi(pfTrack))**2)**0.5 #phi resolution is about half as good due to extrapolation from jet axis
                         if this_dR > dR and this_dR < dR2:
                             dR2 = this_dR
                             secondClosest = pfTrack
