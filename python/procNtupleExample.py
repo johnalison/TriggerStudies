@@ -75,12 +75,12 @@ outFile    = ROOT.TFile(str(o.outfileName),"recreate")
 
 eventHists     = EventHists("AllEvents")
 
-pfTrackHists          = TrackHists("pfTracks", None, outFile)
-pfTrackHists_unmatched= TrackHists("pfTracks_unmatched", None, outFile)
-pfTrackHists_matched  = TrackHists("pfTracks_matched", None, outFile)
-offTrackHists_matched = TrackHists("offTracks_matched", None, outFile)
+pfTrackHists            = TrackHists("pfTracks", None, outFile)
+pfTrackHists_unmatched  = TrackHists("pfTracks_unmatched", None, outFile)
+pfTrackHists_matched    = TrackHists("pfTracks_matched", None, outFile)
+offTrackHists_matched   = TrackHists("offTracks_matched", None, outFile)
 offTrackHists_unmatched = TrackHists("offTracks_unmatched", None, outFile)
-offTrackHists = TrackHists("offTracks", None, outFile)
+offTrackHists           = TrackHists("offTracks", None, outFile)
 
 pfJetHistsPreOLap     = JetHists("pfJetsPreOLap",outFile,light=True)
 pfJetHists            = JetHists("pfJets",outFile)
@@ -242,7 +242,7 @@ for entry in xrange( 0,nEventThisFile): # let's only run over the first 100 even
                             matchedTrack = pfTrack
 
                     #this dR is with dPhi/2. The dR in the plots does not have that resolution fudge factor
-                    if dR > 0.005: 
+                    if dR > 0.01: 
                     #if dR > 1e5:
                         offTrackHists_unmatched.Fill(offTrack)
                         continue

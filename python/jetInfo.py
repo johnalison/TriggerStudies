@@ -395,13 +395,18 @@ class JetDataHandler:
         intree.SetBranchAddress( self.name+'_photonEnergyFraction'              , self.photonEnergyFraction              )
         intree.SetBranchAddress( self.name+'_neutralHadronMultiplicity'         , self.neutralHadronMultiplicity         )
         intree.SetBranchAddress( self.name+'_neutralHadronEnergyFraction'       , self.neutralHadronEnergyFraction       )
-        intree.SetBranchAddress( self.name+'_neMult'                            , self.neMult                            )
-        intree.SetBranchAddress( self.name+'_neHadEF'                           , self.neHadEF                           )
-        intree.SetBranchAddress( self.name+'_neEmEF'                            , self.neEmEF                            )
+        if not self.name == "caloJets":
+            intree.SetBranchAddress( self.name+'_neMult'                            , self.neMult                            )
+            intree.SetBranchAddress( self.name+'_neHadEF'                           , self.neHadEF                           )
+            intree.SetBranchAddress( self.name+'_neEmEF'                            , self.neEmEF                            )
+            intree.SetBranchAddress( self.name+'_mult'                              , self.mult                              )
+            intree.SetBranchAddress( self.name+'_muEF'                              , self.muEF                              )
+            intree.SetBranchAddress( self.name+'_chMult'                            , self.chMult                            )
+            intree.SetBranchAddress( self.name+'_chHadEF'                           , self.chHadEF                           )
+            intree.SetBranchAddress( self.name+'_chEmEF'                            , self.chEmEF                            )
+
         intree.SetBranchAddress( self.name+'_muonMultiplicity'                  , self.muonMultiplicity                  )
         intree.SetBranchAddress( self.name+'_muonEnergyFraction'                , self.muonEnergyFraction                )
-        intree.SetBranchAddress( self.name+'_mult'                              , self.mult                              )
-        intree.SetBranchAddress( self.name+'_muEF'                              , self.muEF                              )
         intree.SetBranchAddress( self.name+'_massVertexEnergyFraction'          , self.massVertexEnergyFraction          )
         intree.SetBranchAddress( self.name+'_jetNTracksEtaRel'                  , self.jetNTracksEtaRel                  )
         intree.SetBranchAddress( self.name+'_jetNTracks'                        , self.jetNTracks                        )
@@ -417,9 +422,6 @@ class JetDataHandler:
         intree.SetBranchAddress( self.name+'_flightDistance3dVal'               , self.flightDistance3dVal               )
         intree.SetBranchAddress( self.name+'_chargedHadronMultiplicity'         , self.chargedHadronMultiplicity         )
         intree.SetBranchAddress( self.name+'_chargedHadronEnergyFraction'       , self.chargedHadronEnergyFraction       )
-        intree.SetBranchAddress( self.name+'_chMult'                            , self.chMult                            )
-        intree.SetBranchAddress( self.name+'_chHadEF'                           , self.chHadEF                           )
-        intree.SetBranchAddress( self.name+'_chEmEF'                            , self.chEmEF                            )
 
         if self.name == "offJets":
             intree.SetBranchAddress( self.name+'_partonFlavour'                            , self.partonFlavour                            )
