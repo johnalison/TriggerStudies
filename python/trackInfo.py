@@ -1,4 +1,5 @@
 import ROOT
+import numpy as np
 
 class TrackData:
     
@@ -40,6 +41,7 @@ class TrackData:
         self.ptRel                 = PtRel
         self.momentum              = Momentum              
         self.eta                   = Eta                   
+        self.pt                    = Momentum/np.cosh(self.eta)
         self.phi                   = Phi
         #self.phi                   = Phi                   
         #self.Charge                = Charge                
@@ -64,6 +66,10 @@ class TrackData:
         if self.doPhiHack:
             if self.jet: self.calcPhiOptions()
 
+        self.vec = ROOT.TLorentzVector()
+        self.vec.SetPtEtaPhiM(self.pt,self.eta,self.phi,0)
+
+
 
     def calcPhiOptions(self):
         dEta  = self.eta - self.jet.eta
@@ -74,19 +80,13 @@ class TrackData:
 
     def dPhi(self,track2):
         if self.doPhiHack:
-            absDeltaPhi = [abs(self.phi[0] - track2.phi[0]),
-                           abs(self.phi[0] - track2.phi[1]),
-                           abs(self.phi[1] - track2.phi[0]),
-                           abs(self.phi[1] - track2.phi[1])]
-            index = absDeltaPhi.index(min(absDeltaPhi))
-            DeltaPhi = [self.phi[0] - track2.phi[0],
-                        self.phi[0] - track2.phi[1],
-                        self.phi[1] - track2.phi[0],
-                        self.phi[1] - track2.phi[1]]
-    
+            DeltaPhi = [abs(self.phi[0] - track2.phi[0])%np.pi,
+                        abs(self.phi[0] - track2.phi[1])%np.pi,
+                        abs(self.phi[1] - track2.phi[0])%np.pi,
+                        abs(self.phi[1] - track2.phi[1])%np.pi]
+            index = DeltaPhi.index(min(absDeltaPhi))    
             return DeltaPhi[index]
+
         else:
-            dPhi = self.phi - track2.phi
-            if dPhi >  3.14: dPhi -= 2*3.14
-            if dPhi < -3.14: dPhi += 2*3.14
-            return abs(dPhi)
+            dPhi = abs(self.phi - track2.phi)%np.pi
+            return dPhi
