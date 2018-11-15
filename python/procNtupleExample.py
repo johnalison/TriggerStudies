@@ -46,6 +46,7 @@ else:
 from eventData  import EventData
 from jetInfo  import JetDataHandler
 from leptonInfo  import LeptonDataHandler
+from trackDeltaHists import TrackDeltaHists
 
 eventData = EventData()
 eventData.SetBranchAddress(tree)
@@ -143,6 +144,8 @@ offJetHists_offline70_L_matched_online80 = JetHists("offJets_offline70_L_matched
 offJetHists_offline70_matched_online90   = JetHists("offJets_offline70_matched_online90",  outFile)
 offJetHists_offline70_B_matched_online90 = JetHists("offJets_offline70_B_matched_online90",  outFile)
 offJetHists_offline70_L_matched_online90 = JetHists("offJets_offline70_L_matched_online90",  outFile)
+
+trkDeltaHists = TrackDeltaHists("Track Deltas", outFile)
 
 nEventThisFile = tree.GetEntries()
 
@@ -250,7 +253,7 @@ for entry in xrange( 0,nEventThisFile): # let's only run over the first 100 even
                     offTrack.secondClosest = secondClosest
                     offTrackHists_matched.Fill(offTrack)
                     pfTrackHists_matched .Fill(offTrack.matchedTrack)
-
+		    trkDeltaHists        .Fill(offTrack,matchedTrack)
                     
                     
 
@@ -449,3 +452,6 @@ offJetHists_offline70_B_matched_online90.Write(outFile)
 offJetHists_offline70_L_matched_online90.Write(outFile)
 
 eventHists          .Write(outFile)
+
+trkDeltaHists       .Write(outFile)
+
