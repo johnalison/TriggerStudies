@@ -46,6 +46,7 @@ else:
 from eventData  import EventData
 from jetInfo  import JetDataHandler
 from leptonInfo  import LeptonDataHandler
+from trackDeltaHists import TrackDeltaHists
 
 eventData = EventData()
 eventData.SetBranchAddress(tree)
@@ -146,6 +147,8 @@ offJetHists_offline70_L_matched_online80 = JetHists("offJets_offline70_L_matched
 offJetHists_offline70_matched_online90   = JetHists("offJets_offline70_matched_online90",  outFile)
 offJetHists_offline70_B_matched_online90 = JetHists("offJets_offline70_B_matched_online90",  outFile)
 offJetHists_offline70_L_matched_online90 = JetHists("offJets_offline70_L_matched_online90",  outFile)
+
+trkDeltaHists = TrackDeltaHists("Track Deltas", outFile)
 
 nEventThisFile = tree.GetEntries()
 
@@ -253,6 +256,7 @@ for entry in xrange( 0,nEventThisFile): # let's only run over the first 100 even
                     offTrack.matchedTrack.nMatches += 1
                     offTrackHists_matched.Fill(offTrack)
                     pfTrackHists_matched .Fill(offTrack.matchedTrack)
+<<<<<<< HEAD
 
                 for pfTrack in offJet.matchedJet.tracks:
                     #Keep in mind that some of these tracks can't possibly be matched due to regions where jet cones do not overlap
@@ -263,6 +267,10 @@ for entry in xrange( 0,nEventThisFile): # let's only run over the first 100 even
                         pfTrackHists_unmatched.FillMatchStats(pfTrack)
                     else:
                         pfTrackHists_matched.FillMatchStats(pfTrack)
+=======
+		    trkDeltaHists        .Fill(offTrack,matchedTrack)
+                    
+>>>>>>> Adding trackDeltaHists class
                     
 
         # Fill offJetHists
@@ -463,3 +471,6 @@ offJetHists_offline70_B_matched_online90.Write(outFile)
 offJetHists_offline70_L_matched_online90.Write(outFile)
 
 eventHists          .Write(outFile)
+
+trkDeltaHists       .Write(outFile)
+
