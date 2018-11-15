@@ -75,12 +75,12 @@ outFile    = ROOT.TFile(str(o.outfileName),"recreate")
 
 eventHists     = EventHists("AllEvents")
 
-pfTrackHists          = TrackHists("pfTracks", None, outFile)
-pfTrackHists_unmatched= TrackHists("pfTracks_unmatched", None, outFile)
-pfTrackHists_matched  = TrackHists("pfTracks_matched", None, outFile)
-offTrackHists_matched = TrackHists("offTracks_matched", None, outFile)
+pfTrackHists            = TrackHists("pfTracks", None, outFile)
+pfTrackHists_unmatched  = TrackHists("pfTracks_unmatched", None, outFile)
+pfTrackHists_matched    = TrackHists("pfTracks_matched", None, outFile)
+offTrackHists_matched   = TrackHists("offTracks_matched", None, outFile)
 offTrackHists_unmatched = TrackHists("offTracks_unmatched", None, outFile)
-offTrackHists = TrackHists("offTracks", None, outFile)
+offTrackHists           = TrackHists("offTracks", None, outFile)
 
 pfJetHistsPreOLap     = JetHists("pfJetsPreOLap",outFile,light=True)
 pfJetHists            = JetHists("pfJets",outFile)
@@ -192,15 +192,6 @@ for entry in xrange( 0,nEventThisFile): # let's only run over the first 100 even
     if len(elecs)+len(muons) < 2:
         continue
 
-    for caloJet in caloJets:
-        if abs(caloJet.eta) > 2.5: continue
-        if caloJet.pt       < 35:  continue
-
-        caloJetHistsPreOLap.Fill(caloJet)
-        if failOverlap(caloJet,elecs): continue
-        if failOverlap(caloJet,muons): continue
-
-        caloJetHists.Fill(caloJet)
 
     offJets = offJetsDB.getJets()
     for offJet in offJets:
