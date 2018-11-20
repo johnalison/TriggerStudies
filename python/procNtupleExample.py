@@ -43,9 +43,10 @@ else:
 #
 # Input Data 
 #
-from eventData  import EventData
-from jetInfo  import JetDataHandler
-from leptonInfo  import LeptonDataHandler
+from eventData        import EventData
+from jetInfo          import JetDataHandler
+from leptonInfo       import LeptonDataHandler
+from eventDisplayData import EventDisplayData
 
 eventData = EventData()
 eventData.SetBranchAddress(tree)
@@ -68,7 +69,7 @@ elecDB.SetBranchAddress(tree)
 #
 # Make output ntuple/Hists
 # 
-from jetHists import JetHists
+from jetHists   import JetHists
 from trackHists import TrackHists
 from eventHists import EventHists
 outFile    = ROOT.TFile(str(o.outfileName),"recreate")
@@ -147,6 +148,13 @@ offJetHists_offline70_matched_online90   = JetHists("offJets_offline70_matched_o
 offJetHists_offline70_B_matched_online90 = JetHists("offJets_offline70_B_matched_online90",  outFile)
 offJetHists_offline70_L_matched_online90 = JetHists("offJets_offline70_L_matched_online90",  outFile)
 
+#
+#  Event Displays
+#
+makeEventDisplays = False
+from eventDisplayData import EventDisplayData
+eventDisplay = EventDisplayData("offline")
+
 nEventThisFile = tree.GetEntries()
 
 print( "Number of input events: %s" % nEventThisFile )
@@ -192,6 +200,7 @@ for entry in xrange( 0,nEventThisFile): # let's only run over the first 100 even
     if len(elecs)+len(muons) < 2:
         continue
 
+    if makeEventDisplays: eventDisplay.newEvent()
 
     offJets = offJetsDB.getJets()
     for offJet in offJets:
@@ -202,6 +211,8 @@ for entry in xrange( 0,nEventThisFile): # let's only run over the first 100 even
         if failOverlap(offJet,elecs): continue
         if failOverlap(offJet,muons): continue
 
+        if makeEventDisplays: eventDisplay.AddJet("offJetAll", offJet, doTracks=True)
+
         # Match offline to online
         dR = 1e6
         matchedJet = None
@@ -210,6 +221,7 @@ for entry in xrange( 0,nEventThisFile): # let's only run over the first 100 even
             if this_dR < dR:
                 dR = this_dR
                 matchedJet = pfJet
+
         if dR < 0.02:
             matchedJet.matchedJet = offJet
             matchedJet.match_dR   = dR
@@ -219,11 +231,16 @@ for entry in xrange( 0,nEventThisFile): # let's only run over the first 100 even
 
         # match tracks if we matched jets
         if offJet.matchedJet:
+            if makeEventDisplays:
+                eventDisplay.AddJet("offJet", offJet)
+                eventDisplay.AddJet("offMatchJet", offJet.matchedJet)
+
             if offJet.matchedJet.tracks: #dont include case where matched pf jet has no tracks due to bug where single tracks get dropped.
                 for offTrack in offJet.tracks:
                     #need to check that the track (with matching resolution cone r=0.01) is in region where R=0.3 circles inside the two jets overlap!
                     if offTrack.dR > 0.29 - offJet.match_dR: continue
                     offTrackHists.Fill(offTrack)
+                    if makeEventDisplays: eventDisplay.AddTrk("offJet_Trks", offTrack)
 
                     dR, dR2 = 1e6, 1e6
                     matchedTrack  = None
@@ -245,7 +262,9 @@ for entry in xrange( 0,nEventThisFile): # let's only run over the first 100 even
                     if dR > 0.01: 
                     #if dR > 1e5:
                         offTrackHists_unmatched.Fill(offTrack)
+                        if makeEventDisplays: eventDisplay.AddTrk("offJet_TrksNoMatch", offTrack)
                         continue
+                    if makeEventDisplays: eventDisplay.AddTrk("offJet_TrksMatch", offTrack)
                     matchedTrack.matchedTrack = offTrack
                     offTrack.matchedTrack     = matchedTrack
                     offTrack.secondClosest    = secondClosest
@@ -253,6 +272,8 @@ for entry in xrange( 0,nEventThisFile): # let's only run over the first 100 even
                     offTrack.matchedTrack.nMatches += 1
                     offTrackHists_matched.Fill(offTrack)
                     pfTrackHists_matched .Fill(offTrack.matchedTrack)
+
+
 
                 for pfTrack in offJet.matchedJet.tracks:
                     #Keep in mind that some of these tracks can't possibly be matched due to regions where jet cones do not overlap
@@ -350,9 +371,12 @@ for entry in xrange( 0,nEventThisFile): # let's only run over the first 100 even
         if abs(pfJet.eta) > 2.5: continue
         if pfJet.pt       < 35:  continue
 
+
         pfJetHistsPreOLap.Fill(pfJet)        
         if failOverlap(pfJet,elecs): continue
         if failOverlap(pfJet,muons): continue
+
+        if makeEventDisplays: eventDisplay.AddJet("pfJet", pfJet, doTracks=True)
 
         pfJetHists.Fill(pfJet)
 
@@ -463,3 +487,6 @@ offJetHists_offline70_B_matched_online90.Write(outFile)
 offJetHists_offline70_L_matched_online90.Write(outFile)
 
 eventHists          .Write(outFile)
+
+if makeEventDisplays:
+    eventDisplay.Write()
