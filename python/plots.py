@@ -41,7 +41,7 @@ parameters = {"ratio"     : True,
               "rTitle"    : "Online / Offline",
               "xTitle"    : "DeepCSV",
               "yTitle"    : "Jets / Bin",
-              "outputDir" : o.outfileName,
+              "outputDir" : o.outfileName+"/",
               "outputName": "pfJets_matched_deepcsv",
               "xleg"      : [0.2,0.4],
 }
@@ -69,7 +69,7 @@ parameters = {"ratio"     : True,
               "rTitle"    : "Online / Offline",
               "xTitle"    : "DeepCSV",
               "yTitle"    : "Arb. Units",
-              "outputDir" : o.outfileName,
+              "outputDir" : o.outfileName+"/",
               "outputName": "offJets_deepcsv",
               "xleg"      : [0.2,0.4],
 }
@@ -98,7 +98,7 @@ parameters = {"ratio"     : True,
               "rTitle"    : "Online / Offline",
               "xTitle"    : "DeepCSV",
               "yTitle"    : "Arb. Units",
-              "outputDir" : o.outfileName,
+              "outputDir" : o.outfileName+"/",
               "outputName": "offJets_B_deepcsv",
               "xleg"      : [0.2,0.4],
 }
@@ -127,7 +127,7 @@ parameters = {"ratio"     : True,
               "rTitle"    : "Online / Offline",
               "xTitle"    : "DeepCSV",
               "yTitle"    : "Arb. Units",
-              "outputDir" : o.outfileName,
+              "outputDir" : o.outfileName+"/",
               "outputName": "offJets_L_deepcsv",
               "xleg"      : [0.2,0.4],
 }
@@ -155,7 +155,7 @@ parameters = {"ratio"     : True,
               "rTitle"    : "Online / Offline",
               "xTitle"    : "DeepCSV",
               "yTitle"    : "Jets / Bin",
-              "outputDir" : o.outfileName,
+              "outputDir" : o.outfileName+"/",
               "outputName": "offJets_matched_online60_deepcsv",
               "xleg"      : [0.2,0.4],
 }
@@ -190,7 +190,7 @@ for var in ["pt","pt_l"]:
                   "rTitle"    : "Matched / All",
                   "xTitle"    : varLabels[var],
                   "yTitle"    : "Jets / Bin",
-                  "outputDir" : o.outfileName,
+                  "outputDir" : o.outfileName+"/",
                   "outputName": "offJets_B_"+var,
               }
 
@@ -223,7 +223,7 @@ for var in ["pt","pt_l"]:
                       "rTitle"    : "On. WP"+WP+" / No Req.",
                       "xTitle"    : varLabels[var],
                       "yTitle"    : "Jets / Bin",
-                      "outputDir" : o.outfileName,
+                      "outputDir" : o.outfileName+"/",
                       "outputName": "offJets_offline70_B_matched_online"+WP+"_"+var,
                   }
 
@@ -256,7 +256,7 @@ for var in ["pt","pt_l"]:
                       "rTitle"    : "On. WP"+WP+" / No Req.",
                       "xTitle"    : varLabels[var],
                       "yTitle"    : "Jets / Bin",
-                      "outputDir" : o.outfileName,
+                      "outputDir" : o.outfileName+"/",
                       "outputName": "offJets_B_matched_online"+WP+"_"+var,
                   }
 
@@ -439,9 +439,8 @@ PlotTools.plot(samples,parameters)
 samples=collections.OrderedDict()
 samples[o.infileName] = collections.OrderedDict()
 
-samples[o.infileName]["offTracks_matched/track_matched_dEta_vs_dMomentum"] = {"TObject":"",
-                                                                              "drawOptions": "COLZ",
-                                                                          }
+
+samples[o.infileName]["offTracks_matched/track_matched_dEta_vs_dMomentum"] = {"drawOptions": "COLZ"}
 
 parameters = {"maxDigits" : 4,
               "xTitleOffset": 0.8,
@@ -452,12 +451,42 @@ parameters = {"maxDigits" : 4,
 }
 PlotTools.plot(samples,parameters)
 
+
 samples=collections.OrderedDict()
 samples[o.infileName] = collections.OrderedDict()
 
-samples[o.infileName]["offTracks_matched/track_secondClosest_dEta_vs_dMomentum"] = {"TObject":"",
-                                                                              "drawOptions": "COLZ",
-                                                                          }
+samples[o.infileName]["offTracks_matched/track_matched_phi_vs_dip2d"] = {"drawOptions": "COLZ"}
+
+parameters = {"maxDigits" : 3,
+              "xTitleOffset": 0.8,
+              "yTitleOffset": 0.85,
+              "logZ"      : True,
+              "outputDir" : o.outfileName+"/matching_pfTracks_over_offTracks/",
+              "outputName": "track_matched_phi_vs_dip2d",
+}
+PlotTools.plot(samples,parameters)
+
+
+samples=collections.OrderedDict()
+samples[o.infileName] = collections.OrderedDict()
+
+samples[o.infileName]["offTracks_matched/track_matched_eta_vs_dip2d"] = {"drawOptions": "COLZ"}
+
+parameters = {"maxDigits" : 3,
+              "xTitleOffset": 0.8,
+              "yTitleOffset": 0.85,
+              "logZ"      : True,
+              "outputDir" : o.outfileName+"/matching_pfTracks_over_offTracks/",
+              "outputName": "track_matched_eta_vs_dip2d",
+}
+PlotTools.plot(samples,parameters)
+
+
+samples=collections.OrderedDict()
+samples[o.infileName] = collections.OrderedDict()
+
+
+samples[o.infileName]["offTracks_matched/track_secondClosest_dEta_vs_dMomentum"] = {"drawOptions": "COLZ"}
 
 parameters = {"maxDigits" : 4,
               "xTitleOffset": 0.8,
@@ -468,12 +497,11 @@ parameters = {"maxDigits" : 4,
 }
 PlotTools.plot(samples,parameters)
 
+
 samples=collections.OrderedDict()
 samples[o.infileName] = collections.OrderedDict()
 
-samples[o.infileName]["offTracks_matched/track_matched_dEta_vs_dPhi"] = {"TObject":"",
-                                                                         "drawOptions": "COLZ",
-                                                                     }
+samples[o.infileName]["offTracks_matched/track_matched_dEta_vs_dPhi"] = {"drawOptions": "COLZ"}
 
 parameters = {"maxDigits" : 4,
               "xTitleOffset": 0.8,
@@ -483,6 +511,7 @@ parameters = {"maxDigits" : 4,
               "outputName": "track_matched_dEta_vs_dPhi",
 }
 PlotTools.plot(samples,parameters)
+
 
 # samples=collections.OrderedDict()
 # samples[o.infileName] = collections.OrderedDict()
@@ -499,6 +528,7 @@ PlotTools.plot(samples,parameters)
 #               "outputName": "track_secondClosest_dEta_vs_dPhi",
 # }
 # PlotTools.plot(samples,parameters)
+
 
 f.cd("offTracks_matched")
 for key in ROOT.gDirectory.GetListOfKeys():
