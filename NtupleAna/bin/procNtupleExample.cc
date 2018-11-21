@@ -13,11 +13,9 @@
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
 #include "FWCore/PythonParameterSet/interface/MakeParameterSets.h"
 
-
 #include "PhysicsTools/FWLite/interface/TFileService.h"
 
-
-
+#include "TriggerStudies/NtupleAna/interface/EventData.h"
 
 int main(int argc, char * argv[]){
   // load framework libraries
@@ -59,11 +57,9 @@ int main(int argc, char * argv[]){
   }
 
   
-  float runNumber_arr[1] = {0};
-  float eventNumber_arr[1] = {0};
-  
-  tree->SetBranchAddress("run", runNumber_arr);
-  tree->SetBranchAddress("evt", eventNumber_arr);
+  // Move to event data
+  NtupleAna::EventData eventData = NtupleAna::EventData();
+  eventData.SetBranchAddress(tree);
 
 
   int nEventThisFile = tree->GetEntries();
@@ -74,8 +70,14 @@ int main(int argc, char * argv[]){
     std::cout << "Processed .... "<<entry<<" Events"<<std::endl;
     tree->GetEntry( entry );
 
-    std::cout << "RunNumber: "  << runNumber_arr[0] << std::endl;
-    std::cout << "EventNumber: " << eventNumber_arr[0] << std::endl;
+    eventData.SetEvent();
+
+    std::cout << "RunNumber: "  << eventData.runNumber << std::endl;
+    std::cout << "EventNumber: " << eventData.eventNumber << std::endl;
+
+    std::cout << "\tDiff: " << eventData.VerticesOff - eventData.PixelVertices << std::endl;
+    
+
 
   }
 
