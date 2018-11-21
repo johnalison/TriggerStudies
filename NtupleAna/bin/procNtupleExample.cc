@@ -16,7 +16,7 @@
 #include "PhysicsTools/FWLite/interface/TFileService.h"
 
 #include "TriggerStudies/NtupleAna/interface/EventData.h"
-//from jetInfo          import JetDataHandler
+#include "TriggerStudies/NtupleAna/interface/JetDataHandler.h"
 //from leptonInfo       import LeptonDataHandler
 //from eventDisplayData import EventDisplayData
 
@@ -64,15 +64,15 @@ int main(int argc, char * argv[]){
   NtupleAna::EventData eventData = NtupleAna::EventData();
   eventData.SetBranchAddress(tree);
 
-//pfJetsDB = JetDataHandler("pfJets")
-//pfJetsDB.SetBranchAddress(tree)
-//
-//caloJetsDB = JetDataHandler("caloJets")
-//caloJetsDB.SetBranchAddress(tree)
-//
-//offJetsDB = JetDataHandler("offJets")
-//offJetsDB.SetBranchAddress(tree)
-//
+  NtupleAna::JetDataHandler pfJetsDB = NtupleAna::JetDataHandler("pfJets");
+  pfJetsDB.SetBranchAddress(tree);
+
+  NtupleAna::JetDataHandler caloJetsDB = NtupleAna::JetDataHandler("caloJets");
+  caloJetsDB.SetBranchAddress(tree);
+
+  NtupleAna::JetDataHandler offJetsDB = NtupleAna::JetDataHandler("offJets");
+  offJetsDB.SetBranchAddress(tree);
+
 //muonDB = LeptonDataHandler("offTightMuons")
 //muonDB.SetBranchAddress(tree)
 //
