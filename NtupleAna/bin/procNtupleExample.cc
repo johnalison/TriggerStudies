@@ -112,53 +112,53 @@ int main(int argc, char * argv[]){
   JetHists offJetHistsPreOLap = JetHists("offJetsPreOLap",fs);//light=True)
 
   JetHists offJetHists   = JetHists("offJets",  fs);
-//offJetHists_B = JetHists("offJets_B",fs);
-//offJetHists_L = JetHists("offJets_L",fs);
+  JetHists offJetHists_B = JetHists("offJets_B",fs);
+  JetHists offJetHists_L = JetHists("offJets_L",fs);
 
   JetHists offJetHists_matched        = JetHists("offJets_matched",  fs);
   JetHists offJetHists_matchedJet     = JetHists("offJets_matchedJet",  fs);
-//offJetHists_B_matched      = JetHists("offJets_B_matched",fs);
-//offJetHists_L_matched      = JetHists("offJets_L_matched",fs);
+  JetHists offJetHists_B_matched      = JetHists("offJets_B_matched",fs);
+  JetHists offJetHists_L_matched      = JetHists("offJets_L_matched",fs);
 
   JetHists offJetHists_matched_online60   = JetHists("offJets_matched_online60",  fs);
-//offJetHists_B_matched_online60 = JetHists("offJets_B_matched_online60",  fs);
-//offJetHists_L_matched_online60 = JetHists("offJets_L_matched_online60",  fs);
+  JetHists offJetHists_B_matched_online60 = JetHists("offJets_B_matched_online60",  fs);
+  JetHists offJetHists_L_matched_online60 = JetHists("offJets_L_matched_online60",  fs);
 
   JetHists offJetHists_matched_online70   = JetHists("offJets_matched_online70",  fs);
-//offJetHists_B_matched_online70 = JetHists("offJets_B_matched_online70",  fs);
-//offJetHists_L_matched_online70 = JetHists("offJets_L_matched_online70",  fs);
+  JetHists offJetHists_B_matched_online70 = JetHists("offJets_B_matched_online70",  fs);
+  JetHists offJetHists_L_matched_online70 = JetHists("offJets_L_matched_online70",  fs);
 
   JetHists offJetHists_matched_online80   = JetHists("offJets_matched_online80",  fs);
-//offJetHists_B_matched_online80 = JetHists("offJets_B_matched_online80",  fs);
-//offJetHists_L_matched_online80 = JetHists("offJets_L_matched_online80",  fs);
+  JetHists offJetHists_B_matched_online80 = JetHists("offJets_B_matched_online80",  fs);
+  JetHists offJetHists_L_matched_online80 = JetHists("offJets_L_matched_online80",  fs);
 
   JetHists offJetHists_matched_online90   = JetHists("offJets_matched_online90",  fs);
-//offJetHists_B_matched_online90 = JetHists("offJets_B_matched_online90",  fs);
-//offJetHists_L_matched_online90 = JetHists("offJets_L_matched_online90",  fs);
+  JetHists offJetHists_B_matched_online90 = JetHists("offJets_B_matched_online90",  fs);
+  JetHists offJetHists_L_matched_online90 = JetHists("offJets_L_matched_online90",  fs);
 
   JetHists offJetHists_offline70   = JetHists("offJets_offline70",  fs);
-//offJetHists_offline70_B = JetHists("offJets_offline70_B",fs);
-//offJetHists_offline70_L = JetHists("offJets_offline70_L",fs);
+  JetHists offJetHists_offline70_B = JetHists("offJets_offline70_B",fs);
+  JetHists offJetHists_offline70_L = JetHists("offJets_offline70_L",fs);
   
   JetHists offJetHists_offline70_matched        = JetHists("offJets_offline70_matched",  fs);
-//offJetHists_offline70_B_matched      = JetHists("offJets_offline70_B_matched",fs);
-//offJetHists_offline70_L_matched      = JetHists("offJets_offline70_L_matched",fs);
+  JetHists offJetHists_offline70_B_matched      = JetHists("offJets_offline70_B_matched",fs);
+  JetHists offJetHists_offline70_L_matched      = JetHists("offJets_offline70_L_matched",fs);
 
   JetHists offJetHists_offline70_matched_online60   = JetHists("offJets_offline70_matched_online60",  fs);
-//offJetHists_offline70_B_matched_online60 = JetHists("offJets_offline70_B_matched_online60",  fs);
-//offJetHists_offline70_L_matched_online60 = JetHists("offJets_offline70_L_matched_online60",  fs);
+  JetHists offJetHists_offline70_B_matched_online60 = JetHists("offJets_offline70_B_matched_online60",  fs);
+  JetHists offJetHists_offline70_L_matched_online60 = JetHists("offJets_offline70_L_matched_online60",  fs);
 
   JetHists offJetHists_offline70_matched_online70   = JetHists("offJets_offline70_matched_online70",  fs);
-//offJetHists_offline70_B_matched_online70 = JetHists("offJets_offline70_B_matched_online70",  fs);
-//offJetHists_offline70_L_matched_online70 = JetHists("offJets_offline70_L_matched_online70",  fs);
+  JetHists offJetHists_offline70_B_matched_online70 = JetHists("offJets_offline70_B_matched_online70",  fs);
+  JetHists offJetHists_offline70_L_matched_online70 = JetHists("offJets_offline70_L_matched_online70",  fs);
 
   JetHists offJetHists_offline70_matched_online80   = JetHists("offJets_offline70_matched_online80",  fs);
-//offJetHists_offline70_B_matched_online80 = JetHists("offJets_offline70_B_matched_online80",  fs);
-//offJetHists_offline70_L_matched_online80 = JetHists("offJets_offline70_L_matched_online80",  fs);
+  JetHists offJetHists_offline70_B_matched_online80 = JetHists("offJets_offline70_B_matched_online80",  fs);
+  JetHists offJetHists_offline70_L_matched_online80 = JetHists("offJets_offline70_L_matched_online80",  fs);
   
   JetHists offJetHists_offline70_matched_online90   = JetHists("offJets_offline70_matched_online90",  fs);
-//offJetHists_offline70_B_matched_online90 = JetHists("offJets_offline70_B_matched_online90",  fs);
-//offJetHists_offline70_L_matched_online90 = JetHists("offJets_offline70_L_matched_online90",  fs);
+  JetHists offJetHists_offline70_B_matched_online90 = JetHists("offJets_offline70_B_matched_online90",  fs);
+  JetHists offJetHists_offline70_L_matched_online90 = JetHists("offJets_offline70_L_matched_online90",  fs);
 
 //#
 //#  Event Displays
@@ -308,24 +308,26 @@ int main(int argc, char * argv[]){
       //  wp90 DeepCSV > 0.12 (actual efficiency = 0.912533638706)
       offJetHists.Fill(offJet);
       if(offJet.m_deepcsv > 0.56) offJetHists_offline70.Fill(offJet);
-//        if offJet.hadronFlavour == 5:
-//            offJetHists_B.Fill(offJet)
-//            if offJet.deepcsv > 0.56: offJetHists_offline70_B.Fill(offJet)
-//        else:
-//            offJetHists_L.Fill(offJet)
-//            if offJet.deepcsv > 0.56: offJetHists_offline70_L.Fill(offJet)
-//
+      if(offJet.m_hadronFlavour == 5){
+	offJetHists_B.Fill(offJet);
+	if(offJet.m_deepcsv > 0.56) offJetHists_offline70_B.Fill(offJet);
+      }else{
+	offJetHists_L.Fill(offJet);
+	if(offJet.m_deepcsv > 0.56) offJetHists_offline70_L.Fill(offJet);
+      }
+
       if(offJet.m_matchedJet){
 	offJetHists_matched.Fill(offJet);
 	offJetHists_matchedJet.Fill(*offJet.m_matchedJet);
 	if( offJet.m_deepcsv > 0.56) offJetHists_offline70_matched.Fill(offJet);
 
-//            if offJet.hadronFlavour == 5:
-//                offJetHists_B_matched.Fill(offJet)
-//                if offJet.deepcsv > 0.56: offJetHists_offline70_B_matched.Fill(offJet)
-//            else:
-//                offJetHists_L_matched.Fill(offJet)
-//                if offJet.deepcsv > 0.56: offJetHists_offline70_L_matched.Fill(offJet)
+	if(offJet.m_hadronFlavour == 5){
+	  offJetHists_B_matched.Fill(offJet);
+	  if(offJet.m_deepcsv > 0.56) offJetHists_offline70_B_matched.Fill(offJet);
+	}else{
+	  offJetHists_L_matched.Fill(offJet);
+	  if(offJet.m_deepcsv > 0.56) offJetHists_offline70_L_matched.Fill(offJet);
+	}
 
         // pfJets_matched_ROC
 	//  wp60 DeepCSV > 0.64 (actual efficiency = 0.610276798066)
@@ -335,47 +337,51 @@ int main(int argc, char * argv[]){
 	if(offJet.m_matchedJet->m_deepcsv > 0.64){ //approximate 60% Online WP
 	  offJetHists_matched_online60.Fill(offJet);
 	  if( offJet.m_deepcsv > 0.56) offJetHists_offline70_matched_online60.Fill(offJet);
-//                if offJet.hadronFlavour == 5:
-//                    offJetHists_B_matched_online60.Fill(offJet)
-//                    if offJet.deepcsv > 0.56: offJetHists_offline70_B_matched_online60.Fill(offJet)
-//                else:
-//                    offJetHists_L_matched_online60.Fill(offJet)
-//                    if offJet.deepcsv > 0.56: offJetHists_offline70_L_matched_online60.Fill(offJet)
+	  if(offJet.m_hadronFlavour == 5){
+	    offJetHists_B_matched_online60.Fill(offJet);
+	    if(offJet.m_deepcsv > 0.56) offJetHists_offline70_B_matched_online60.Fill(offJet);
+	  }else{
+	    offJetHists_L_matched_online60.Fill(offJet);
+	    if(offJet.m_deepcsv > 0.56) offJetHists_offline70_L_matched_online60.Fill(offJet);
+	  }
 	}
 
 	if(offJet.m_matchedJet->m_deepcsv > 0.48){ //approximate 70% Online WP
 	  offJetHists_matched_online70.Fill(offJet);
 	  if(offJet.m_deepcsv > 0.56) offJetHists_offline70_matched_online70.Fill(offJet);
-//                if offJet.hadronFlavour == 5:
-//                    offJetHists_B_matched_online70.Fill(offJet)
-//                    if offJet.deepcsv > 0.56: offJetHists_offline70_B_matched_online70.Fill(offJet)
-//                else:
-//                    offJetHists_L_matched_online70.Fill(offJet)
-//                    if offJet.deepcsv > 0.56: offJetHists_offline70_L_matched_online70.Fill(offJet)
+	  if(offJet.m_hadronFlavour == 5){
+	    offJetHists_B_matched_online70.Fill(offJet);
+	    if(offJet.m_deepcsv > 0.56) offJetHists_offline70_B_matched_online70.Fill(offJet);
+	  }else{
+	    offJetHists_L_matched_online70.Fill(offJet);
+	    if(offJet.m_deepcsv > 0.56) offJetHists_offline70_L_matched_online70.Fill(offJet);
+	  }
 	}
 	
 	if(offJet.m_matchedJet->m_deepcsv > 0.28){ //approximate 80% Online WP
 	  offJetHists_matched_online80.Fill(offJet);
 	  if(offJet.m_deepcsv > 0.56) offJetHists_offline70_matched_online80.Fill(offJet);
-//                if offJet.hadronFlavour == 5:
-//                    offJetHists_B_matched_online80.Fill(offJet)
-//                    if offJet.deepcsv > 0.56: offJetHists_offline70_B_matched_online80.Fill(offJet)
-//                else:
-//                    offJetHists_L_matched_online80.Fill(offJet)
-//                    if offJet.deepcsv > 0.56: offJetHists_offline70_L_matched_online80.Fill(offJet)
+	  if(offJet.m_hadronFlavour == 5){
+	    offJetHists_B_matched_online80.Fill(offJet);
+	    if(offJet.m_deepcsv > 0.56) offJetHists_offline70_B_matched_online80.Fill(offJet);
+	  }else{
+	    offJetHists_L_matched_online80.Fill(offJet);
+	    if(offJet.m_deepcsv > 0.56) offJetHists_offline70_L_matched_online80.Fill(offJet);
+	  }
 	}
-
+      
 	if(offJet.m_matchedJet->m_deepcsv > 0.08){ //approximate 90% Online WP
 	  offJetHists_matched_online90.Fill(offJet);
 	  if(offJet.m_deepcsv > 0.56) offJetHists_offline70_matched_online90.Fill(offJet);
-//                if offJet.hadronFlavour == 5:
-//                    offJetHists_B_matched_online90.Fill(offJet)
-//                    if offJet.deepcsv > 0.56: offJetHists_offline70_B_matched_online90.Fill(offJet)
-//                else:
-//                    offJetHists_L_matched_online90.Fill(offJet)
-//                    if offJet.deepcsv > 0.56: offJetHists_offline70_L_matched_online90.Fill(offJet)
+	  if(offJet.m_hadronFlavour == 5){
+	    offJetHists_B_matched_online90.Fill(offJet);
+	    if(offJet.m_deepcsv > 0.56) offJetHists_offline70_B_matched_online90.Fill(offJet);
+	  }else{
+	    offJetHists_L_matched_online90.Fill(offJet);
+	    if(offJet.m_deepcsv > 0.56) offJetHists_offline70_L_matched_online90.Fill(offJet);
+	  }
 	}
-      }
+      }//m_matchedJet
 
       // Match offline to online
       for(JetData& caloJet : caloJets){
@@ -386,7 +392,7 @@ int main(int argc, char * argv[]){
 	}
       }
     
-    }
+    }//offJets
 
     //
     //  pf Jets
@@ -409,10 +415,10 @@ int main(int argc, char * argv[]){
       if(pfJet.m_matchedJet){
 	pfJetHists_matched .Fill(pfJet);
 
-	  //if( pfJet.matchedJet.m_hadronFlavour == 5):            
-//                pfJetHists_matchedB.Fill(pfJet)
-//            else:
-//                pfJetHists_matchedL.Fill(pfJet)
+	if( pfJet.m_matchedJet->m_hadronFlavour == 5)
+	  pfJetHists_matchedB.Fill(pfJet);
+	else
+	  pfJetHists_matchedL.Fill(pfJet);
       }
     }
 
@@ -431,11 +437,11 @@ int main(int argc, char * argv[]){
 
       if(caloJet.m_matchedJet){
 	caloJetHists_matched .Fill(caloJet);
-//
-//            if caloJet.matchedJet.hadronFlavour == 5:            
-//                caloJetHists_matchedB.Fill(caloJet)
-//            else:
-//                caloJetHists_matchedL.Fill(caloJet)
+
+	if(caloJet.m_matchedJet->m_hadronFlavour == 5)
+	  caloJetHists_matchedB.Fill(caloJet);
+	else
+	  caloJetHists_matchedL.Fill(caloJet);
       }
     }
     
