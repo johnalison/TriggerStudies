@@ -97,19 +97,19 @@ int main(int argc, char * argv[]){
 //offTrackHists_unmatched = TrackHists("offTracks_unmatched", None, fs);
 //offTrackHists           = TrackHists("offTracks", None, fs);
 
-  JetHists pfJetHistsPreOLap     = JetHists("pfJetsPreOLap",fs);//,light=True)
+  JetHists pfJetHistsPreOLap     = JetHists("pfJetsPreOLap",fs,true);
   JetHists pfJetHists            = JetHists("pfJets", fs);
   JetHists pfJetHists_matched    = JetHists("pfJets_matched" ,fs);
   JetHists pfJetHists_matchedB   = JetHists("pfJets_matchedB",fs);
   JetHists pfJetHists_matchedL   = JetHists("pfJets_matchedL",fs);
 
-  JetHists caloJetHistsPreOLap     = JetHists("caloJetsPreOLap",fs);//light=True)
+  JetHists caloJetHistsPreOLap     = JetHists("caloJetsPreOLap",fs, true);
   JetHists caloJetHists            = JetHists("caloJets",fs);
   JetHists caloJetHists_matched    = JetHists("caloJets_matched" ,fs);
   JetHists caloJetHists_matchedB   = JetHists("caloJets_matchedB",fs);
   JetHists caloJetHists_matchedL   = JetHists("caloJets_matchedL",fs);
 
-  JetHists offJetHistsPreOLap = JetHists("offJetsPreOLap",fs);//light=True)
+  JetHists offJetHistsPreOLap = JetHists("offJetsPreOLap",fs, true);
 
   JetHists offJetHists   = JetHists("offJets",  fs);
   JetHists offJetHists_B = JetHists("offJets_B",fs);
@@ -406,7 +406,6 @@ int main(int argc, char * argv[]){
 
       if(NtupleAna::failOverlap(pfJet,elecs)) continue;
       if(NtupleAna::failOverlap(pfJet,muons)) continue;
-
 
 //        if makeEventDisplays: eventDisplay.AddJet("pfJet", pfJet, doTracks=True)
 
