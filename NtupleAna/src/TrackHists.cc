@@ -178,4 +178,10 @@ TrackHists::Fill (const TrackData& track){
   return;
 }
 
+void 
+TrackHists::FillMatchStats (const TrackData& track){
+  m_track_nMatches->Fill(track.m_nMatches);
+  return;
+}
+
 

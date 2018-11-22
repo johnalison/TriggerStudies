@@ -90,12 +90,12 @@ int main(int argc, char * argv[]){
 
   EventHists eventHists     = EventHists("AllEvents", fs);
 
-//pfTrackHists            = TrackHists("pfTracks", None, fs);
-//pfTrackHists_unmatched  = TrackHists("pfTracks_unmatched", None, fs);
-//pfTrackHists_matched    = TrackHists("pfTracks_matched", None, fs);
-//offTrackHists_matched   = TrackHists("offTracks_matched", None, fs);
-//offTrackHists_unmatched = TrackHists("offTracks_unmatched", None, fs);
-//offTrackHists           = TrackHists("offTracks", None, fs);
+  TrackHists pfTrackHists            = TrackHists("pfTracks", fs);
+  TrackHists pfTrackHists_unmatched  = TrackHists("pfTracks_unmatched", fs);
+  TrackHists pfTrackHists_matched    = TrackHists("pfTracks_matched", fs);
+  TrackHists offTrackHists_matched   = TrackHists("offTracks_matched", fs);
+  TrackHists offTrackHists_unmatched = TrackHists("offTracks_unmatched", fs);
+  TrackHists offTrackHists           = TrackHists("offTracks", fs);
 
   JetHists pfJetHistsPreOLap     = JetHists("pfJetsPreOLap",fs,true);
   JetHists pfJetHists            = JetHists("pfJets", fs);
@@ -242,62 +242,72 @@ int main(int argc, char * argv[]){
 //                eventDisplay.AddJet("offJet", offJet)
 //                eventDisplay.AddJet("offMatchJet", offJet.matchedJet)
 //
-//            for offTrack in offJet.tracks:
-//                #need to check that the track (with matching resolution cone r=0.01) is in region where R=0.3 circles inside the two jets overlap!
-//                #if offTrack.dR > 0.29 - offJet.match_dR: continue
-//                if offTrack.dR                                > 0.29: continue # offTrack is not in cone of offJet
-//                if offTrack.vec.DeltaR(offJet.matchedJet.vec) > 0.29: continue # offTrack is not in cone of pfJet
-//                offTrackHists.Fill(offTrack)
+	for(TrackData& offTrack: offJet.m_tracks){
+	  //need to check that the track (with matching resolution cone r=0.01) is in region where R=0.3 circles inside the two jets overlap!
+	  //if offTrack.dR > 0.29 - offJet.match_dR: continue
+	  if(offTrack.m_dR                                > 0.29) continue; // offTrack is not in cone of offJet
+	  if(offTrack.m_vec.DeltaR(offJet.m_matchedJet->m_vec) > 0.29) continue; // offTrack is not in cone of pfJet
+	  offTrackHists.Fill(offTrack);
+
 //                if makeEventDisplays: eventDisplay.AddTrk("offJet_Trks", offTrack)
-//
-//                dR, dR2 = 1e6, 1e6
-//                matchedTrack  = None
-//                secondClosest = None
-//                for pfTrack in offJet.matchedJet.tracks:
-//                    #need to check that the track (with matching resolution cone r=0.01) is in region where R=0.3 circles inside the two jets overlap!
-//                    if pfTrack.dR                     > 0.29: continue # pfTrack is not in cone of pfJet
-//                    if pfTrack.vec.DeltaR(offJet.vec) > 0.29: continue # pfTrack is not in cone of offJet
-//
-//                    #this_dR = ((offTrack.eta - pfTrack.eta)**2 + (offTrack.dPhi(pfTrack))**2)**0.5
-//                    this_dR = offTrack.vec.DeltaR(pfTrack.vec)
-//                    if this_dR > dR and this_dR < dR2:
-//                        dR2 = this_dR
-//                        secondClosest = pfTrack
-//                    if this_dR < dR: 
-//                        dR2 = dR
-//                        secondClosest = matchedTrack
-//                            
-//                        dR  = this_dR
-//                        matchedTrack = pfTrack
-//
-//                if dR > 0.01: 
-//                #if dR > 1e5:
-//                    offTrackHists_unmatched.Fill(offTrack)
-//                    if makeEventDisplays: eventDisplay.AddTrk("offJet_TrksNoMatch", offTrack)
-//                    continue
-//
+
+	  float dR = 1e6;
+	  float dR2 = 1e6;
+	  TrackData* matchedTrack  = nullptr;
+	  TrackData* secondClosest = nullptr;
+
+	  for(TrackData& pfTrack: offJet.m_matchedJet->m_tracks){
+	    //need to check that the track (with matching resolution cone r=0.01) is in region where R=0.3 circles inside the two jets overlap!
+	    if(pfTrack.m_dR                     > 0.29) continue; // pfTrack is not in cone of pfJet
+	    if(pfTrack.m_vec.DeltaR(offJet.m_vec) > 0.29) continue; // pfTrack is not in cone of offJet
+
+	    //this_dR = ((offTrack.eta - pfTrack.eta)**2 + (offTrack.dPhi(pfTrack))**2)**0.5
+	    float this_dR = offTrack.m_vec.DeltaR(pfTrack.m_vec);
+	    if(this_dR > dR && this_dR < dR2){
+	      dR2 = this_dR;
+	      secondClosest = &pfTrack;
+	    }
+
+	    if(this_dR < dR){
+	      dR2 = dR;
+	      secondClosest = matchedTrack;
+	      
+	      dR  = this_dR;
+	      matchedTrack = &pfTrack;
+	    }
+	  }
+	
+	  if( dR > 0.01){
+	    //if dR > 1e5:
+	    offTrackHists_unmatched.Fill(offTrack);
+	    //if makeEventDisplays: eventDisplay.AddTrk("offJet_TrksNoMatch", offTrack)
+	    continue;
+	  }
+
 //                if makeEventDisplays: eventDisplay.AddTrk("offJet_TrksMatch", offTrack)
-//                matchedTrack.matchedTrack = offTrack
-//                offTrack.matchedTrack     = matchedTrack
-//                offTrack.secondClosest    = secondClosest
-//                offTrack.nMatches              += 1
-//                offTrack.matchedTrack.nMatches += 1
-//                offTrackHists_matched.Fill(offTrack)
-//                pfTrackHists_matched .Fill(offTrack.matchedTrack)
-//
-//            for pfTrack in offJet.matchedJet.tracks:
-//                #need to check that the track (with matching resolution cone r=0.01) is in region where R=0.3 circles inside the two jets overlap!
-//                if pfTrack.dR                     > 0.29: continue # pfTrack is not in cone of pfJet
-//                if pfTrack.vec.DeltaR(offJet.vec) > 0.29: continue # pfTrack is not in cone of offJet
-//
-//                pfTrackHists.Fill(pfTrack) #all pftracks in matched jets
-//                pfTrackHists.FillMatchStats(pfTrack) #check how often we match pfTracks to more than one offTrack
-//                if not pfTrack.nMatches:
-//                    pfTrackHists_unmatched.Fill(pfTrack) #all unmatched pftracks
-//                    pfTrackHists_unmatched.FillMatchStats(pfTrack)
-//                else:
-//                    pfTrackHists_matched.FillMatchStats(pfTrack)
-//
+	  matchedTrack->m_matchedTrack = &offTrack;
+	  offTrack.m_matchedTrack     = matchedTrack;
+	  offTrack.m_secondClosest    = secondClosest;
+	  offTrack.m_nMatches              += 1;
+	  offTrack.m_matchedTrack->m_nMatches += 1;
+	  offTrackHists_matched.Fill(offTrack);
+	  pfTrackHists_matched .Fill(*offTrack.m_matchedTrack);
+	}
+
+	for(const TrackData& pfTrack: offJet.m_matchedJet->m_tracks){
+	  //need to check that the track (with matching resolution cone r=0.01) is in region where R=0.3 circles inside the two jets overlap!
+	  if(pfTrack.m_dR                     > 0.29) continue; // pfTrack is not in cone of pfJet
+	  if(pfTrack.m_vec.DeltaR(offJet.m_vec) > 0.29) continue; // pfTrack is not in cone of offJet
+
+	  pfTrackHists.Fill(pfTrack); //all pftracks in matched jets
+	  pfTrackHists.FillMatchStats(pfTrack); //check how often we match pfTracks to more than one offTrack
+	  if(!pfTrack.m_nMatches){
+	    pfTrackHists_unmatched.Fill(pfTrack); //all unmatched pftracks
+	    pfTrackHists_unmatched.FillMatchStats(pfTrack);
+	  }else{
+	    pfTrackHists_matched.FillMatchStats(pfTrack);
+	  }
+	}
       }
 
       // Fill offJetHists
