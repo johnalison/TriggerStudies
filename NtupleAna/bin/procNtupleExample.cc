@@ -90,12 +90,12 @@ int main(int argc, char * argv[]){
 
   EventHists eventHists     = EventHists("AllEvents", fs);
 
-//pfTrackHists            = TrackHists("pfTracks", None, outFile)
-//pfTrackHists_unmatched  = TrackHists("pfTracks_unmatched", None, outFile)
-//pfTrackHists_matched    = TrackHists("pfTracks_matched", None, outFile)
-//offTrackHists_matched   = TrackHists("offTracks_matched", None, outFile)
-//offTrackHists_unmatched = TrackHists("offTracks_unmatched", None, outFile)
-//offTrackHists           = TrackHists("offTracks", None, outFile)
+//pfTrackHists            = TrackHists("pfTracks", None, fs);
+//pfTrackHists_unmatched  = TrackHists("pfTracks_unmatched", None, fs);
+//pfTrackHists_matched    = TrackHists("pfTracks_matched", None, fs);
+//offTrackHists_matched   = TrackHists("offTracks_matched", None, fs);
+//offTrackHists_unmatched = TrackHists("offTracks_unmatched", None, fs);
+//offTrackHists           = TrackHists("offTracks", None, fs);
 
   JetHists pfJetHistsPreOLap     = JetHists("pfJetsPreOLap",fs);//,light=True)
   JetHists pfJetHists            = JetHists("pfJets", fs);
@@ -111,54 +111,54 @@ int main(int argc, char * argv[]){
 
   JetHists offJetHistsPreOLap = JetHists("offJetsPreOLap",fs);//light=True)
 
-//offJetHists   = JetHists("offJets",  outFile)
-//offJetHists_B = JetHists("offJets_B",outFile)
-//offJetHists_L = JetHists("offJets_L",outFile)
-//
-//offJetHists_matched        = JetHists("offJets_matched",  outFile)
-//offJetHists_matchedJet     = JetHists("offJets_matchedJet",  outFile)
-//offJetHists_B_matched      = JetHists("offJets_B_matched",outFile)
-//offJetHists_L_matched      = JetHists("offJets_L_matched",outFile)
-//
-//offJetHists_matched_online60   = JetHists("offJets_matched_online60",  outFile)
-//offJetHists_B_matched_online60 = JetHists("offJets_B_matched_online60",  outFile)
-//offJetHists_L_matched_online60 = JetHists("offJets_L_matched_online60",  outFile)
-//
-//offJetHists_matched_online70   = JetHists("offJets_matched_online70",  outFile)
-//offJetHists_B_matched_online70 = JetHists("offJets_B_matched_online70",  outFile)
-//offJetHists_L_matched_online70 = JetHists("offJets_L_matched_online70",  outFile)
-//
-//offJetHists_matched_online80   = JetHists("offJets_matched_online80",  outFile)
-//offJetHists_B_matched_online80 = JetHists("offJets_B_matched_online80",  outFile)
-//offJetHists_L_matched_online80 = JetHists("offJets_L_matched_online80",  outFile)
-//
-//offJetHists_matched_online90   = JetHists("offJets_matched_online90",  outFile)
-//offJetHists_B_matched_online90 = JetHists("offJets_B_matched_online90",  outFile)
-//offJetHists_L_matched_online90 = JetHists("offJets_L_matched_online90",  outFile)
-//
-//offJetHists_offline70   = JetHists("offJets_offline70",  outFile)
-//offJetHists_offline70_B = JetHists("offJets_offline70_B",outFile)
-//offJetHists_offline70_L = JetHists("offJets_offline70_L",outFile)
-//
-//offJetHists_offline70_matched        = JetHists("offJets_offline70_matched",  outFile)
-//offJetHists_offline70_B_matched      = JetHists("offJets_offline70_B_matched",outFile)
-//offJetHists_offline70_L_matched      = JetHists("offJets_offline70_L_matched",outFile)
-//
-//offJetHists_offline70_matched_online60   = JetHists("offJets_offline70_matched_online60",  outFile)
-//offJetHists_offline70_B_matched_online60 = JetHists("offJets_offline70_B_matched_online60",  outFile)
-//offJetHists_offline70_L_matched_online60 = JetHists("offJets_offline70_L_matched_online60",  outFile)
-//
-//offJetHists_offline70_matched_online70   = JetHists("offJets_offline70_matched_online70",  outFile)
-//offJetHists_offline70_B_matched_online70 = JetHists("offJets_offline70_B_matched_online70",  outFile)
-//offJetHists_offline70_L_matched_online70 = JetHists("offJets_offline70_L_matched_online70",  outFile)
-//
-//offJetHists_offline70_matched_online80   = JetHists("offJets_offline70_matched_online80",  outFile)
-//offJetHists_offline70_B_matched_online80 = JetHists("offJets_offline70_B_matched_online80",  outFile)
-//offJetHists_offline70_L_matched_online80 = JetHists("offJets_offline70_L_matched_online80",  outFile)
-//
-//offJetHists_offline70_matched_online90   = JetHists("offJets_offline70_matched_online90",  outFile)
-//offJetHists_offline70_B_matched_online90 = JetHists("offJets_offline70_B_matched_online90",  outFile)
-//offJetHists_offline70_L_matched_online90 = JetHists("offJets_offline70_L_matched_online90",  outFile)
+  JetHists offJetHists   = JetHists("offJets",  fs);
+//offJetHists_B = JetHists("offJets_B",fs);
+//offJetHists_L = JetHists("offJets_L",fs);
+
+  JetHists offJetHists_matched        = JetHists("offJets_matched",  fs);
+  JetHists offJetHists_matchedJet     = JetHists("offJets_matchedJet",  fs);
+//offJetHists_B_matched      = JetHists("offJets_B_matched",fs);
+//offJetHists_L_matched      = JetHists("offJets_L_matched",fs);
+
+  JetHists offJetHists_matched_online60   = JetHists("offJets_matched_online60",  fs);
+//offJetHists_B_matched_online60 = JetHists("offJets_B_matched_online60",  fs);
+//offJetHists_L_matched_online60 = JetHists("offJets_L_matched_online60",  fs);
+
+  JetHists offJetHists_matched_online70   = JetHists("offJets_matched_online70",  fs);
+//offJetHists_B_matched_online70 = JetHists("offJets_B_matched_online70",  fs);
+//offJetHists_L_matched_online70 = JetHists("offJets_L_matched_online70",  fs);
+
+  JetHists offJetHists_matched_online80   = JetHists("offJets_matched_online80",  fs);
+//offJetHists_B_matched_online80 = JetHists("offJets_B_matched_online80",  fs);
+//offJetHists_L_matched_online80 = JetHists("offJets_L_matched_online80",  fs);
+
+  JetHists offJetHists_matched_online90   = JetHists("offJets_matched_online90",  fs);
+//offJetHists_B_matched_online90 = JetHists("offJets_B_matched_online90",  fs);
+//offJetHists_L_matched_online90 = JetHists("offJets_L_matched_online90",  fs);
+
+  JetHists offJetHists_offline70   = JetHists("offJets_offline70",  fs);
+//offJetHists_offline70_B = JetHists("offJets_offline70_B",fs);
+//offJetHists_offline70_L = JetHists("offJets_offline70_L",fs);
+  
+  JetHists offJetHists_offline70_matched        = JetHists("offJets_offline70_matched",  fs);
+//offJetHists_offline70_B_matched      = JetHists("offJets_offline70_B_matched",fs);
+//offJetHists_offline70_L_matched      = JetHists("offJets_offline70_L_matched",fs);
+
+  JetHists offJetHists_offline70_matched_online60   = JetHists("offJets_offline70_matched_online60",  fs);
+//offJetHists_offline70_B_matched_online60 = JetHists("offJets_offline70_B_matched_online60",  fs);
+//offJetHists_offline70_L_matched_online60 = JetHists("offJets_offline70_L_matched_online60",  fs);
+
+  JetHists offJetHists_offline70_matched_online70   = JetHists("offJets_offline70_matched_online70",  fs);
+//offJetHists_offline70_B_matched_online70 = JetHists("offJets_offline70_B_matched_online70",  fs);
+//offJetHists_offline70_L_matched_online70 = JetHists("offJets_offline70_L_matched_online70",  fs);
+
+  JetHists offJetHists_offline70_matched_online80   = JetHists("offJets_offline70_matched_online80",  fs);
+//offJetHists_offline70_B_matched_online80 = JetHists("offJets_offline70_B_matched_online80",  fs);
+//offJetHists_offline70_L_matched_online80 = JetHists("offJets_offline70_L_matched_online80",  fs);
+  
+  JetHists offJetHists_offline70_matched_online90   = JetHists("offJets_offline70_matched_online90",  fs);
+//offJetHists_offline70_B_matched_online90 = JetHists("offJets_offline70_B_matched_online90",  fs);
+//offJetHists_offline70_L_matched_online90 = JetHists("offJets_offline70_L_matched_online90",  fs);
 
 //#
 //#  Event Displays
@@ -216,26 +216,28 @@ int main(int argc, char * argv[]){
       if(NtupleAna::failOverlap(offJet,muons)) continue;
 
 //        if makeEventDisplays: eventDisplay.AddJet("offJetAll", offJet, doTracks=True)
-//
-//        # Match offline to online
-//        dR = 1e6
-//        matchedJet = None
-//        for pfJet in pfJets: 
-//            this_dR = pfJet.vec.DeltaR(offJet.vec)
-//            if this_dR < dR:
-//                dR = this_dR
-//                matchedJet = pfJet
-//
-//        if dR < 0.4:
-//            matchedJet.matchedJet = offJet
-//            matchedJet.match_dR   = dR
-//            offJet.matchedJet = matchedJet
-//            offJet.match_dR   = dR
-//
-//
-//        # match tracks if we matched jets
-//        if offJet.matchedJet:
-//
+
+      // Match offline to online
+      float dR = 1e6;
+      JetData* matchedJet = nullptr;
+      for(JetData pfJet : pfJets){
+	float this_dR = pfJet.m_vec.DeltaR(offJet.m_vec);
+	if (this_dR < dR){
+	  dR = this_dR;
+	  matchedJet = &pfJet;
+	}
+      }
+
+      if( dR < 0.4){
+	matchedJet->m_matchedJet = &offJet;
+	matchedJet->m_match_dR   = dR;
+	offJet.m_matchedJet = matchedJet;
+	offJet.m_match_dR   = dR;
+      }
+
+      // match tracks if we matched jets
+      if(offJet.m_matchedJet){
+
 //            if makeEventDisplays:
 //                eventDisplay.AddJet("offJet", offJet)
 //                eventDisplay.AddJet("offMatchJet", offJet.matchedJet)
@@ -296,16 +298,16 @@ int main(int argc, char * argv[]){
 //                else:
 //                    pfTrackHists_matched.FillMatchStats(pfTrack)
 //
-//                    
-//
-//        # Fill offJetHists
-//        # offJets_ROC
-//        #  wp60 DeepCSV > 0.76 (actual efficiency = 0.604992842829)
-//        #  wp70 DeepCSV > 0.56 (actual efficiency = 0.717503578586)
-//        #  wp80 DeepCSV > 0.36 (actual efficiency = 0.808474091039)
-//        #  wp90 DeepCSV > 0.12 (actual efficiency = 0.912533638706)
-//        offJetHists.Fill(offJet)
-//        if offJet.deepcsv > 0.56: offJetHists_offline70.Fill(offJet)
+      }
+
+      // Fill offJetHists
+      // offJets_ROC
+      //  wp60 DeepCSV > 0.76 (actual efficiency = 0.604992842829)
+      //  wp70 DeepCSV > 0.56 (actual efficiency = 0.717503578586)
+      //  wp80 DeepCSV > 0.36 (actual efficiency = 0.808474091039)
+      //  wp90 DeepCSV > 0.12 (actual efficiency = 0.912533638706)
+      offJetHists.Fill(offJet);
+      if(offJet.m_deepcsv > 0.56) offJetHists_offline70.Fill(offJet);
 //        if offJet.hadronFlavour == 5:
 //            offJetHists_B.Fill(offJet)
 //            if offJet.deepcsv > 0.56: offJetHists_offline70_B.Fill(offJet)
@@ -313,71 +315,78 @@ int main(int argc, char * argv[]){
 //            offJetHists_L.Fill(offJet)
 //            if offJet.deepcsv > 0.56: offJetHists_offline70_L.Fill(offJet)
 //
-//        if offJet.matchedJet: 
-//            offJetHists_matched.Fill(offJet)
-//            offJetHists_matchedJet.Fill(offJet.matchedJet)
-//            if offJet.deepcsv > 0.56: offJetHists_offline70_matched.Fill(offJet)
+      if(offJet.m_matchedJet){
+	offJetHists_matched.Fill(offJet);
+	offJetHists_matchedJet.Fill(*offJet.m_matchedJet);
+	if( offJet.m_deepcsv > 0.56) offJetHists_offline70_matched.Fill(offJet);
+
 //            if offJet.hadronFlavour == 5:
 //                offJetHists_B_matched.Fill(offJet)
 //                if offJet.deepcsv > 0.56: offJetHists_offline70_B_matched.Fill(offJet)
 //            else:
 //                offJetHists_L_matched.Fill(offJet)
 //                if offJet.deepcsv > 0.56: offJetHists_offline70_L_matched.Fill(offJet)
-//            
-//            # pfJets_matched_ROC
-//            #  wp60 DeepCSV > 0.64 (actual efficiency = 0.610276798066)
-//            #  wp70 DeepCSV > 0.48 (actual efficiency = 0.708732661175)
-//            #  wp80 DeepCSV > 0.28 (actual efficiency = 0.814155211306)
-//            #  wp90 DeepCSV > 0.08 (actual efficiency = 0.924525480128)
-//            if offJet.matchedJet.deepcsv > 0.64: #approximate 60% Online WP
-//                offJetHists_matched_online60.Fill(offJet)
-//                if offJet.deepcsv > 0.56: offJetHists_offline70_matched_online60.Fill(offJet)
+
+        // pfJets_matched_ROC
+	//  wp60 DeepCSV > 0.64 (actual efficiency = 0.610276798066)
+	//  wp70 DeepCSV > 0.48 (actual efficiency = 0.708732661175)
+	//  wp80 DeepCSV > 0.28 (actual efficiency = 0.814155211306)
+	//  wp90 DeepCSV > 0.08 (actual efficiency = 0.924525480128)
+	if(offJet.m_matchedJet->m_deepcsv > 0.64){ //approximate 60% Online WP
+	  offJetHists_matched_online60.Fill(offJet);
+	  if( offJet.m_deepcsv > 0.56) offJetHists_offline70_matched_online60.Fill(offJet);
 //                if offJet.hadronFlavour == 5:
 //                    offJetHists_B_matched_online60.Fill(offJet)
 //                    if offJet.deepcsv > 0.56: offJetHists_offline70_B_matched_online60.Fill(offJet)
 //                else:
 //                    offJetHists_L_matched_online60.Fill(offJet)
 //                    if offJet.deepcsv > 0.56: offJetHists_offline70_L_matched_online60.Fill(offJet)
-//
-//            if offJet.matchedJet.deepcsv > 0.48: #approximate 70% Online WP
-//                offJetHists_matched_online70.Fill(offJet)
-//                if offJet.deepcsv > 0.56: offJetHists_offline70_matched_online70.Fill(offJet)
+	}
+
+	if(offJet.m_matchedJet->m_deepcsv > 0.48){ //approximate 70% Online WP
+	  offJetHists_matched_online70.Fill(offJet);
+	  if(offJet.m_deepcsv > 0.56) offJetHists_offline70_matched_online70.Fill(offJet);
 //                if offJet.hadronFlavour == 5:
 //                    offJetHists_B_matched_online70.Fill(offJet)
 //                    if offJet.deepcsv > 0.56: offJetHists_offline70_B_matched_online70.Fill(offJet)
 //                else:
 //                    offJetHists_L_matched_online70.Fill(offJet)
 //                    if offJet.deepcsv > 0.56: offJetHists_offline70_L_matched_online70.Fill(offJet)
-//
-//            if offJet.matchedJet.deepcsv > 0.28: #approximate 80% Online WP
-//                offJetHists_matched_online80.Fill(offJet)
-//                if offJet.deepcsv > 0.56: offJetHists_offline70_matched_online80.Fill(offJet)
+	}
+	
+	if(offJet.m_matchedJet->m_deepcsv > 0.28){ //approximate 80% Online WP
+	  offJetHists_matched_online80.Fill(offJet);
+	  if(offJet.m_deepcsv > 0.56) offJetHists_offline70_matched_online80.Fill(offJet);
 //                if offJet.hadronFlavour == 5:
 //                    offJetHists_B_matched_online80.Fill(offJet)
 //                    if offJet.deepcsv > 0.56: offJetHists_offline70_B_matched_online80.Fill(offJet)
 //                else:
 //                    offJetHists_L_matched_online80.Fill(offJet)
 //                    if offJet.deepcsv > 0.56: offJetHists_offline70_L_matched_online80.Fill(offJet)
-//
-//            if offJet.matchedJet.deepcsv > 0.08: #approximate 90% Online WP
-//                offJetHists_matched_online90.Fill(offJet)
-//                if offJet.deepcsv > 0.56: offJetHists_offline70_matched_online90.Fill(offJet)
+	}
+
+	if(offJet.m_matchedJet->m_deepcsv > 0.08){ //approximate 90% Online WP
+	  offJetHists_matched_online90.Fill(offJet);
+	  if(offJet.m_deepcsv > 0.56) offJetHists_offline70_matched_online90.Fill(offJet);
 //                if offJet.hadronFlavour == 5:
 //                    offJetHists_B_matched_online90.Fill(offJet)
 //                    if offJet.deepcsv > 0.56: offJetHists_offline70_B_matched_online90.Fill(offJet)
 //                else:
 //                    offJetHists_L_matched_online90.Fill(offJet)
 //                    if offJet.deepcsv > 0.56: offJetHists_offline70_L_matched_online90.Fill(offJet)
-//
-//        # Match offline to online
-//        for caloJet in caloJets:            
-//            deltaR = caloJet.vec.DeltaR(offJet.vec)
-//            if deltaR < 0.4:
-//                caloJet.matchedJet = offJet
-//                break
+	}
+      }
 
-    }
+      // Match offline to online
+      for(JetData& caloJet : caloJets){
+	float deltaR = caloJet.m_vec.DeltaR(offJet.m_vec);
+	if( deltaR < 0.4){
+	  caloJet.m_matchedJet = &offJet;
+	  break;
+	}
+      }
     
+    }
 
     //
     //  pf Jets
