@@ -3,6 +3,8 @@
 #if !defined(JetData_H)
 #define JetData_H
 
+#include <TLorentzVector.h>
+
 namespace NtupleAna {
 
 
@@ -65,9 +67,10 @@ namespace NtupleAna {
 //        float m_partonFlavour                     =  partonFlavour
 //        float m_hadronFlavour                     =  hadronFlavour
 
-    JetData* matchedJet = nullptr;
-    float match_dR   = -1;
+    JetData* m_matchedJet = nullptr;
+    float m_match_dR   = -1;
 
+    TLorentzVector m_vec;
 
 
   public:
@@ -198,8 +201,7 @@ namespace NtupleAna {
         //float m_partonFlavour                     =  partonFlavour
         //float m_hadronFlavour                     =  hadronFlavour
 
-        //vec = ROOT.TLorentzVector()
-        //vec.SetPtEtaPhiM(pt,eta,phi,mass)
+	  m_vec.SetPtEtaPhiM(pt,eta,phi,mass);
 	//
         //GetTracks(trackSip3dSig,
         //               trackSip3dVal,

@@ -17,14 +17,16 @@
 
 #include "TriggerStudies/NtupleAna/interface/EventData.h"
 #include "TriggerStudies/NtupleAna/interface/JetDataHandler.h"
-//from leptonInfo       import LeptonDataHandler
+#include "TriggerStudies/NtupleAna/interface/LeptonDataHandler.h"
 //from eventDisplayData import EventDisplayData
 
 //from trackHists import TrackHists
 #include "TriggerStudies/NtupleAna/interface/JetHists.h"
 #include "TriggerStudies/NtupleAna/interface/EventHists.h"
+#include "TriggerStudies/NtupleAna/interface/Helpers.h"
 
 using namespace NtupleAna;
+
 
 int main(int argc, char * argv[]){
   // load framework libraries
@@ -63,25 +65,23 @@ int main(int argc, char * argv[]){
   //
   // Input Data
   //
-  NtupleAna::EventData eventData = NtupleAna::EventData();
+  EventData eventData = EventData();
   eventData.SetBranchAddress(tree);
 
   JetDataHandler pfJetsDB = JetDataHandler("pfJets");
   pfJetsDB.SetBranchAddress(tree);
 
-  NtupleAna::JetDataHandler caloJetsDB = NtupleAna::JetDataHandler("caloJets");
+  JetDataHandler caloJetsDB = JetDataHandler("caloJets");
   caloJetsDB.SetBranchAddress(tree);
 
-  NtupleAna::JetDataHandler offJetsDB = NtupleAna::JetDataHandler("offJets");
+  JetDataHandler offJetsDB = JetDataHandler("offJets");
   offJetsDB.SetBranchAddress(tree);
 
-//muonDB = LeptonDataHandler("offTightMuons")
-//muonDB.SetBranchAddress(tree)
-//
-//elecDB = LeptonDataHandler("offTightElectrons")
-//elecDB.SetBranchAddress(tree)
+  LeptonDataHandler muonDB = LeptonDataHandler("offTightMuons");
+  muonDB.SetBranchAddress(tree);
 
-
+  LeptonDataHandler elecDB = LeptonDataHandler("offTightElectrons");
+  elecDB.SetBranchAddress(tree);
 
   //
   // Make output ntuple/Hists
@@ -99,15 +99,15 @@ int main(int argc, char * argv[]){
 
   JetHists pfJetHistsPreOLap     = JetHists("pfJetsPreOLap",fs);//,light=True)
   JetHists pfJetHists            = JetHists("pfJets", fs);
-//pfJetHists_matched    = JetHists("pfJets_matched" ,outFile)
-//pfJetHists_matchedB   = JetHists("pfJets_matchedB",outFile)
-//pfJetHists_matchedL   = JetHists("pfJets_matchedL",outFile)
+  JetHists pfJetHists_matched    = JetHists("pfJets_matched" ,fs);
+  JetHists pfJetHists_matchedB   = JetHists("pfJets_matchedB",fs);
+  JetHists pfJetHists_matchedL   = JetHists("pfJets_matchedL",fs);
 
   JetHists caloJetHistsPreOLap     = JetHists("caloJetsPreOLap",fs);//light=True)
-//caloJetHists            = JetHists("caloJets",outFile)
-//caloJetHists_matched    = JetHists("caloJets_matched" ,outFile)
-//caloJetHists_matchedB   = JetHists("caloJets_matchedB",outFile)
-//caloJetHists_matchedL   = JetHists("caloJets_matchedL",outFile)
+  JetHists caloJetHists            = JetHists("caloJets",fs);
+  JetHists caloJetHists_matched    = JetHists("caloJets_matched" ,fs);
+  JetHists caloJetHists_matchedB   = JetHists("caloJets_matchedB",fs);
+  JetHists caloJetHists_matchedL   = JetHists("caloJets_matchedL",fs);
 
   JetHists offJetHistsPreOLap = JetHists("offJetsPreOLap",fs);//light=True)
 
@@ -194,15 +194,14 @@ int main(int argc, char * argv[]){
     //
     eventHists.Fill(eventData);
 
-//    # Converting from "row-level" info to "column-level" info
-//    elecs  = elecDB.getLeps()
-//    muons  = muonDB.getLeps()
-    std::vector<NtupleAna::JetData> pfJets   = pfJetsDB.GetJets();
-    std::vector<NtupleAna::JetData> caloJets = caloJetsDB.GetJets();
+    // Converting from "row-level" info to "column-level" info
+    std::vector<NtupleAna::LeptonData> elecs  = elecDB.GetLeps();
+    std::vector<NtupleAna::LeptonData> muons  = muonDB.GetLeps();
+    std::vector<NtupleAna::JetData>    pfJets   = pfJetsDB.GetJets();
+    std::vector<NtupleAna::JetData>    caloJets = caloJetsDB.GetJets();
 
-//    if len(elecs)+len(muons) < 2:
-//        continue
-//
+    if((elecs.size()+muons.size()) < 2)  continue;
+
 //    if makeEventDisplays: eventDisplay.newEvent()
 
     std::vector<NtupleAna::JetData> offJets = offJetsDB.GetJets();
@@ -213,9 +212,9 @@ int main(int argc, char * argv[]){
       
       offJetHistsPreOLap.Fill(offJet);
 
-//        if failOverlap(offJet,elecs): continue
-//        if failOverlap(offJet,muons): continue
-//
+      if(NtupleAna::failOverlap(offJet,elecs)) continue;
+      if(NtupleAna::failOverlap(offJet,muons)) continue;
+
 //        if makeEventDisplays: eventDisplay.AddJet("offJetAll", offJet, doTracks=True)
 //
 //        # Match offline to online
@@ -389,20 +388,23 @@ int main(int argc, char * argv[]){
 
 
       pfJetHistsPreOLap.Fill(pfJet);
-//        if failOverlap(pfJet,elecs): continue
-//        if failOverlap(pfJet,muons): continue
-//
+
+      if(NtupleAna::failOverlap(pfJet,elecs)) continue;
+      if(NtupleAna::failOverlap(pfJet,muons)) continue;
+
+
 //        if makeEventDisplays: eventDisplay.AddJet("pfJet", pfJet, doTracks=True)
-//
-//        pfJetHists.Fill(pfJet)
-//
-//        if pfJet.matchedJet:
-//            pfJetHists_matched .Fill(pfJet)
-//
-//            if pfJet.matchedJet.hadronFlavour == 5:            
+
+      pfJetHists.Fill(pfJet);
+
+      if(pfJet.m_matchedJet){
+	pfJetHists_matched .Fill(pfJet);
+
+	  //if( pfJet.matchedJet.m_hadronFlavour == 5):            
 //                pfJetHists_matchedB.Fill(pfJet)
 //            else:
 //                pfJetHists_matchedL.Fill(pfJet)
+      }
     }
 
     //
@@ -413,19 +415,19 @@ int main(int argc, char * argv[]){
       if(caloJet.m_pt       < 35)   continue;
 
       caloJetHistsPreOLap.Fill(caloJet);
-//        if failOverlap(caloJet,elecs): continue
-//        if failOverlap(caloJet,muons): continue
-//
-//        caloJetHists.Fill(caloJet)
-//
-//        if caloJet.matchedJet:
-//            caloJetHists_matched .Fill(caloJet)
+      if(NtupleAna::failOverlap(caloJet,elecs)) continue;
+      if(NtupleAna::failOverlap(caloJet,muons)) continue;
+
+      caloJetHists.Fill(caloJet);
+
+      if(caloJet.m_matchedJet){
+	caloJetHists_matched .Fill(caloJet);
 //
 //            if caloJet.matchedJet.hadronFlavour == 5:            
 //                caloJetHists_matchedB.Fill(caloJet)
 //            else:
 //                caloJetHists_matchedL.Fill(caloJet)
-//
+      }
     }
     
 
