@@ -1,6 +1,8 @@
 #include "TChain.h"
 
+#include "TriggerStudies/NtupleAna/interface/JetData.h"
 #include "TriggerStudies/NtupleAna/interface/JetHists.h"
+
 
 using namespace std;
 using namespace NtupleAna;
@@ -77,7 +79,14 @@ JetHists::JetHists(std::string name, fwlite::TFileService& fs, bool light) {
     m_partonFlavour                    = dir.make<TH1F>("partonFlavour"                ,"partonFlavour;partonFlavour;Entries"                        ,60, -30.5,29.5);
     m_hadronFlavour                    = dir.make<TH1F>("hadronFlavour"                ,"hadronFlavour;hadronFlavour;Entries"                        ,60, -30.5,29.5);
 
+
+
+    m_nTrk = dir.make<TH1F>("nTrk","nTrk;nTracks;Entries",42,-1.5,40.5);
+    m_trackHists = new TrackHists(name, fs);
+
   }
+
+
 
 } 
 
@@ -85,6 +94,8 @@ JetHists::~JetHists() {}
 
 
 void
+//JetHists::Fill (const JetData* jetPtr){
+//  const JetData& jetInfo = (*jetPtr);
 JetHists::Fill (const JetData& jetInfo){
 
   m_pt      ->Fill(jetInfo.m_pt);
@@ -157,6 +168,14 @@ JetHists::Fill (const JetData& jetInfo){
     m_chEmEF                           ->Fill(jetInfo.m_chEmEF                           );
     m_partonFlavour                    ->Fill(jetInfo.m_partonFlavour                           );
     m_hadronFlavour                    ->Fill(jetInfo.m_hadronFlavour                           );
+
+    unsigned int nTracks = jetInfo.m_tracks.size();
+    m_nTrk->Fill(nTracks);
+    for(const TrackData& track: jetInfo.m_tracks){
+      m_trackHists->Fill(track);
+    }
+
+
   }    
 
 

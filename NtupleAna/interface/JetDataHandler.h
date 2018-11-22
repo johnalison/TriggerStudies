@@ -3,7 +3,9 @@
 #if !defined(JetDataHandler_H)
 #define JetDataHandler_H
 
-#include "TriggerStudies/NtupleAna/interface/JetData.h"
+namespace NtupleAna{
+  class JetData;
+}
 
 
 namespace NtupleAna {

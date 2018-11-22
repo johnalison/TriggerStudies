@@ -4,6 +4,7 @@
 #define JetData_H
 
 #include <TLorentzVector.h>
+
 #include "TriggerStudies/NtupleAna/interface/TrackData.h"
 
 namespace NtupleAna {
@@ -72,7 +73,7 @@ namespace NtupleAna {
 
     TLorentzVector m_vec;
 
-    std::vector<TrackData> tracks;
+    std::vector<TrackData> m_tracks;
 
   public:
 
@@ -204,34 +205,39 @@ namespace NtupleAna {
           m_hadronFlavour                     =  hadronFlavour                   ;
 
 	  m_vec.SetPtEtaPhiM(pt,eta,phi,mass);
-	//
-        //GetTracks(trackSip3dSig,
-        //               trackSip3dVal,
-        //               trackSip2dSig,
-        //               trackSip2dVal,
-        //               trackDecayLenVal,
-        //               trackJetDistVal,
-        //               trackJetDistSig,
-        //               trackPtRel,
-        //               trackMomentum,
-        //               trackEta,
-        //               trackPhi,
-        //               trackPPar,
-        //               trackDeltaR,
-        //               trackPtRatio,
-        //               trackPParRatio,
-        //               trackChi2,
-        //               trackNTotalHits,
-        //               trackNPixelHits,
-        //           )
+
+	  m_tracks.clear();
+	  unsigned int nTracks = trackSip3dSig.size();
+	  for(unsigned int iTrack = 0; iTrack < nTracks; ++iTrack){
+            m_tracks.push_back(TrackData(trackSip3dSig.at(iTrack),
+                                         trackSip3dVal.at(iTrack),
+                                         trackSip2dSig.at(iTrack),
+                                         trackSip2dVal.at(iTrack),
+                                         trackDecayLenVal.at(iTrack),
+                                         trackJetDistVal.at(iTrack),
+                                         trackJetDistSig.at(iTrack),
+                                         trackPtRel.at(iTrack),
+                                         trackMomentum.at(iTrack),
+                                         trackEta.at(iTrack),
+                                         trackPhi.at(iTrack),
+                                         trackPPar.at(iTrack),
+                                         trackDeltaR.at(iTrack),
+                                         trackPtRatio.at(iTrack),
+                                         trackPParRatio.at(iTrack),
+                                         trackChi2.at(iTrack),
+                                         trackNTotalHits.at(iTrack),
+                                         trackNPixelHits.at(iTrack),
+                                         this
+					 )
+			       );
+	      }
 
 	  
-	}
+	};
 	
 
 	~JetData() {}; 
     
-    //void GetTracks();
     
   };
 

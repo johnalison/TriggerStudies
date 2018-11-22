@@ -20,7 +20,7 @@
 #include "TriggerStudies/NtupleAna/interface/LeptonDataHandler.h"
 //from eventDisplayData import EventDisplayData
 
-//from trackHists import TrackHists
+#include "TriggerStudies/NtupleAna/interface/TrackHists.h"
 #include "TriggerStudies/NtupleAna/interface/JetHists.h"
 #include "TriggerStudies/NtupleAna/interface/EventHists.h"
 #include "TriggerStudies/NtupleAna/interface/Helpers.h"

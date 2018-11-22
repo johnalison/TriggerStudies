@@ -6,7 +6,9 @@
 #include <TH1F.h>
 #include <TH2F.h>
 #include "PhysicsTools/FWLite/interface/TFileService.h"
+#include "TriggerStudies/NtupleAna/interface/TrackHists.h"
 #include "TriggerStudies/NtupleAna/interface/JetData.h"
+
 
 namespace NtupleAna {
 
@@ -83,13 +85,18 @@ namespace NtupleAna {
     TH1F* m_hadronFlavour                    ;
 
 
+    TH1F* m_nTrk; 
+    TrackHists* m_trackHists;
+
+
   public:
 
     JetHists(std::string name, fwlite::TFileService& fs, bool light=false);
 
     ~JetHists(); 
     
-    void Fill (const JetData& jetInfo);
+    //void Fill (const JetData* jetPtr);
+    void Fill (const JetData& jetPtr);
     
   };
 

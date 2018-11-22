@@ -5,11 +5,11 @@
 
 #include <math.h>
 #include <TLorentzVector.h>
-#include "TriggerStudies/NtupleAna/interface/JetData.h"
 
 namespace NtupleAna {
   class JetData;
 }
+
 
 namespace NtupleAna {
 
@@ -49,7 +49,7 @@ namespace NtupleAna {
     float m_NPixelHits            = 0;
 
     TrackData* m_matchedTrack  = nullptr;
-    float m_secondClosest = 1000;
+    TrackData* m_secondClosest = nullptr;
 
     unsigned int m_nMatches = 0;
 
@@ -112,7 +112,7 @@ namespace NtupleAna {
       m_NPixelHits            = NPixelHits        ;    
 
       m_matchedTrack  = nullptr;
-      m_secondClosest = 1000;
+      m_secondClosest = nullptr;
 
       m_nMatches = 0;
 

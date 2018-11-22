@@ -1,7 +1,7 @@
 #include "TChain.h"
 
 #include "TriggerStudies/NtupleAna/interface/JetDataHandler.h"
-
+#include "TriggerStudies/NtupleAna/interface/JetData.h"
 
 using namespace NtupleAna;
 using namespace std;
