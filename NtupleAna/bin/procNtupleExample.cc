@@ -20,9 +20,11 @@
 //from leptonInfo       import LeptonDataHandler
 //from eventDisplayData import EventDisplayData
 
-//from jetHists   import JetHists
 //from trackHists import TrackHists
+#include "TriggerStudies/NtupleAna/interface/JetHists.h"
 #include "TriggerStudies/NtupleAna/interface/EventHists.h"
+
+using namespace NtupleAna;
 
 int main(int argc, char * argv[]){
   // load framework libraries
@@ -64,7 +66,7 @@ int main(int argc, char * argv[]){
   NtupleAna::EventData eventData = NtupleAna::EventData();
   eventData.SetBranchAddress(tree);
 
-  NtupleAna::JetDataHandler pfJetsDB = NtupleAna::JetDataHandler("pfJets");
+  JetDataHandler pfJetsDB = JetDataHandler("pfJets");
   pfJetsDB.SetBranchAddress(tree);
 
   NtupleAna::JetDataHandler caloJetsDB = NtupleAna::JetDataHandler("caloJets");
@@ -86,7 +88,7 @@ int main(int argc, char * argv[]){
   // 
   fwlite::TFileService fs = fwlite::TFileService(outputHandler_.file());
 
-  NtupleAna::EventHists eventHists     = NtupleAna::EventHists("AllEvents", fs);
+  EventHists eventHists     = EventHists("AllEvents", fs);
 
 //pfTrackHists            = TrackHists("pfTracks", None, outFile)
 //pfTrackHists_unmatched  = TrackHists("pfTracks_unmatched", None, outFile)
@@ -94,23 +96,21 @@ int main(int argc, char * argv[]){
 //offTrackHists_matched   = TrackHists("offTracks_matched", None, outFile)
 //offTrackHists_unmatched = TrackHists("offTracks_unmatched", None, outFile)
 //offTrackHists           = TrackHists("offTracks", None, outFile)
-//
-//pfJetHistsPreOLap     = JetHists("pfJetsPreOLap",outFile,light=True)
-//pfJetHists            = JetHists("pfJets",outFile)
+
+  JetHists pfJetHistsPreOLap     = JetHists("pfJetsPreOLap",fs);//,light=True)
+  JetHists pfJetHists            = JetHists("pfJets", fs);
 //pfJetHists_matched    = JetHists("pfJets_matched" ,outFile)
 //pfJetHists_matchedB   = JetHists("pfJets_matchedB",outFile)
 //pfJetHists_matchedL   = JetHists("pfJets_matchedL",outFile)
-//
-//
-//caloJetHistsPreOLap     = JetHists("caloJetsPreOLap",outFile,light=True)
+
+  JetHists caloJetHistsPreOLap     = JetHists("caloJetsPreOLap",fs);//light=True)
 //caloJetHists            = JetHists("caloJets",outFile)
 //caloJetHists_matched    = JetHists("caloJets_matched" ,outFile)
 //caloJetHists_matchedB   = JetHists("caloJets_matchedB",outFile)
 //caloJetHists_matchedL   = JetHists("caloJets_matchedL",outFile)
-//
-//
-//offJetHistsPreOLap = JetHists("offJetsPreOLap",outFile,light=True)
-//
+
+  JetHists offJetHistsPreOLap = JetHists("offJetsPreOLap",fs);//light=True)
+
 //offJetHists   = JetHists("offJets",  outFile)
 //offJetHists_B = JetHists("offJets_B",outFile)
 //offJetHists_L = JetHists("offJets_L",outFile)
@@ -194,24 +194,25 @@ int main(int argc, char * argv[]){
     //
     eventHists.Fill(eventData);
 
-//
 //    # Converting from "row-level" info to "column-level" info
 //    elecs  = elecDB.getLeps()
 //    muons  = muonDB.getLeps()
-//    pfJets = pfJetsDB.getJets()
-//    caloJets = caloJetsDB.getJets()
-//
+    std::vector<NtupleAna::JetData> pfJets   = pfJetsDB.GetJets();
+    std::vector<NtupleAna::JetData> caloJets = caloJetsDB.GetJets();
+
 //    if len(elecs)+len(muons) < 2:
 //        continue
 //
 //    if makeEventDisplays: eventDisplay.newEvent()
-//
-//    offJets = offJetsDB.getJets()
-//    for offJet in offJets:
-//        if abs(offJet.eta) > 2.5: continue
-//        if offJet.pt       < 35:  continue
-//
-//        offJetHistsPreOLap.Fill(offJet)
+
+    std::vector<NtupleAna::JetData> offJets = offJetsDB.GetJets();
+    for(JetData offJet : offJets){
+
+      if(fabs(offJet.m_eta) > 2.5) continue;
+      if(offJet.m_pt       < 35)   continue;
+      
+      offJetHistsPreOLap.Fill(offJet);
+
 //        if failOverlap(offJet,elecs): continue
 //        if failOverlap(offJet,muons): continue
 //
@@ -375,16 +376,19 @@ int main(int argc, char * argv[]){
 //            if deltaR < 0.4:
 //                caloJet.matchedJet = offJet
 //                break
-//
-//    #
-//    #  pf Jets
-//    #
-//    for pfJet in pfJets:
-//        if abs(pfJet.eta) > 2.5: continue
-//        if pfJet.pt       < 35:  continue
-//
-//
-//        pfJetHistsPreOLap.Fill(pfJet)        
+
+    }
+    
+
+    //
+    //  pf Jets
+    //
+    for(JetData& pfJet : pfJets){
+      if(fabs(pfJet.m_eta) > 2.5) continue;
+      if(pfJet.m_pt       < 35)   continue;
+
+
+      pfJetHistsPreOLap.Fill(pfJet);
 //        if failOverlap(pfJet,elecs): continue
 //        if failOverlap(pfJet,muons): continue
 //
@@ -399,17 +403,16 @@ int main(int argc, char * argv[]){
 //                pfJetHists_matchedB.Fill(pfJet)
 //            else:
 //                pfJetHists_matchedL.Fill(pfJet)
-//
-//
-//
-//    #
-//    #  calo Jets
-//    #
-//    for caloJet in caloJets:
-//        if abs(caloJet.eta) > 2.5: continue
-//        if caloJet.pt       < 35:  continue
-//
-//        caloJetHistsPreOLap.Fill(caloJet)        
+    }
+
+    //
+    //  calo Jets
+    //
+    for(JetData& caloJet : caloJets){
+      if(fabs(caloJet.m_eta) > 2.5) continue;
+      if(caloJet.m_pt       < 35)   continue;
+
+      caloJetHistsPreOLap.Fill(caloJet);
 //        if failOverlap(caloJet,elecs): continue
 //        if failOverlap(caloJet,muons): continue
 //
@@ -423,62 +426,10 @@ int main(int argc, char * argv[]){
 //            else:
 //                caloJetHists_matchedL.Fill(caloJet)
 //
-
+    }
     
-
 
   }
 
-
-
-//    fwlite::Event ev(inFile);
-//    fwlite::Handle<LumiSummary> summary;
-//    
-//    std::cout << "----------- Accessing by event ----------------" << std::endl;
-//    
-//    // get run and luminosity blocks from events as well as associated 
-//    // products. (This works for both ChainEvent and MultiChainEvent.)
-//    for(ev.toBegin(); !ev.atEnd(); ++ev){
-//	// get the Luminosity block ID from the event
-//	std::cout << " Luminosity ID " << ev.getLuminosityBlock().id() << std::endl;
-//	// get the Run ID from the event
-//	std::cout <<" Run ID " << ev.getRun().id()<< std::endl;
-//	// get the Run ID from the luminosity block you got from the event
-//	std::cout << "Run via lumi " << ev.getLuminosityBlock().getRun().id() << std::endl;
-//	// get the integrated luminosity (or any luminosity product) from 
-//	// the event
-//	summary.getByLabel(ev.getLuminosityBlock(),"lumiProducer");
-//    }
-//    
-//    std::cout << "----------- Accessing by lumi block ----------------" << std::endl;
-//    
-//    double lumi_tot = 0.0;
-//    // loop over luminosity blocks (in analogy to looping over events)
-//    fwlite::LuminosityBlock ls(inFile);
-//    for(ls.toBegin(); !ls.atEnd(); ++ls){
-//	summary.getByLabel(ls,"lumiProducer");
-//	std::cout  << ls.id() << " Inst.  Luminosity = " << summary->avgInsRecLumi() << std::endl;
-//	// get the associated run from this lumi
-//	std::cout << "Run from lumi " << ls.getRun().id() << std::endl;
-//	// add up the luminosity by lumi block
-//	lumi_tot += summary->avgInsRecLumi();
-//    }
-//    // print the result
-//    std::cout << "----------------------------------------------------" << std::endl;
-//    std::cout << "Total luminosity from lumi sections = " << lumi_tot   << std::endl;
-//    std::cout << "----------------------------------------------------" << std::endl;
-//    
-//    std::cout << "----------- Accessing by run ----------------" << std::endl;
-//    
-//    // do the same for runs
-//    fwlite::Run r(inFile);
-//    for(r.toBegin(); !r.atEnd(); ++r) {
-//	std::cout << "Run " << r.id() << std::endl;
-//    }
-//    // close input file
-//    inFile->Close();
-//  }
-
-//  }
   return 0;
 }
