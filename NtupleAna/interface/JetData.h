@@ -4,6 +4,7 @@
 #define JetData_H
 
 #include <TLorentzVector.h>
+#include "TriggerStudies/NtupleAna/interface/TrackData.h"
 
 namespace NtupleAna {
 
@@ -71,80 +72,82 @@ namespace NtupleAna {
 
     TLorentzVector m_vec;
 
+    std::vector<TrackData> tracks;
 
   public:
 
 	JetData(float pt,float eta,float phi,float mass,float deepcsv,float deepcsv_bb
-                 ,float vertexNTracks                    
-                 ,float vertexMass                       
-                 ,float vertexJetDeltaR                  
-                 ,float vertexFitProb                    
-                 ,float vertexEnergyRatio                
-                 ,float vertexCategory                   
-                 ,float vertexBoostOverSqrtJetPt         
-                 ,float trackJetPt               
-                 ,float trackSumJetEtRatio               
-                 ,float trackSumJetDeltaR                
-                 ,float trackSip2dValAboveCharm          
-                 ,float trackSip2dSigAboveCharm          
-                 ,float trackSip3dValAboveCharm          
-                 ,float trackSip3dSigAboveCharm          
-                 ,float totalMultiplicity                
-                 ,float photonMultiplicity               
-                 ,float photonEnergyFraction             
-                 ,float neutralHadronMultiplicity        
-                 ,float neutralHadronEnergyFraction      
-                 ,float neMult                           
-                 ,float neHadEF                          
-                 ,float neEmEF                           
-                 ,float muonMultiplicity                 
-                 ,float muonEnergyFraction               
-                 ,float mult                             
-                 ,float muEF                             
-                 ,float massVertexEnergyFraction         
-                 ,float jetNTracksEtaRel                 
-                 ,float jetNTracks                       
-                 ,float jetNSelectedTracks               
-                 ,float jetNSecondaryVertices            
-                 ,float hadronPhotonMultiplicity         
-                 ,float hadronMultiplicity               
-                 ,float flightDistance1dSig              
-                 ,float flightDistance1dVal              
-                 ,float flightDistance2dSig              
-                 ,float flightDistance2dVal              
-                 ,float flightDistance3dSig              
-                 ,float flightDistance3dVal              
-                 ,float chargedHadronMultiplicity        
-                 ,float chargedHadronEnergyFraction
-                 ,float chMult                           
-                 ,float chHadEF                          
-                 ,float chEmEF                           
-                 ,float partonFlavour
-                 ,float hadronFlavour
+		,float vertexNTracks                    
+                ,float vertexMass                       
+                ,float vertexJetDeltaR                  
+                ,float vertexFitProb                    
+                ,float vertexEnergyRatio                
+                ,float vertexCategory                   
+                ,float vertexBoostOverSqrtJetPt         
+                ,float trackJetPt               
+                ,float trackSumJetEtRatio               
+                ,float trackSumJetDeltaR                
+                ,float trackSip2dValAboveCharm          
+                ,float trackSip2dSigAboveCharm          
+                ,float trackSip3dValAboveCharm          
+                ,float trackSip3dSigAboveCharm          
+                ,float totalMultiplicity                
+                ,float photonMultiplicity               
+                ,float photonEnergyFraction             
+                ,float neutralHadronMultiplicity        
+                ,float neutralHadronEnergyFraction      
+                ,float neMult                           
+                ,float neHadEF                          
+                ,float neEmEF                           
+                ,float muonMultiplicity                 
+                ,float muonEnergyFraction               
+                ,float mult                             
+                ,float muEF                             
+                ,float massVertexEnergyFraction         
+                ,float jetNTracksEtaRel                 
+                ,float jetNTracks                       
+                ,float jetNSelectedTracks               
+                ,float jetNSecondaryVertices            
+                ,float hadronPhotonMultiplicity         
+                ,float hadronMultiplicity               
+                ,float flightDistance1dSig              
+                ,float flightDistance1dVal              
+                ,float flightDistance2dSig              
+                ,float flightDistance2dVal              
+                ,float flightDistance3dSig              
+                ,float flightDistance3dVal              
+                ,float chargedHadronMultiplicity        
+                ,float chargedHadronEnergyFraction
+                ,float chMult                           
+                ,float chHadEF                          
+                ,float chEmEF                           
+                ,float partonFlavour
+		,float hadronFlavour
 	      
-//                 ,trackSip3dSig,trackSip3dVal,trackSip2dSig,trackSip2dVal
-//                 ,trackDecayLenVal           
-//                 #,trackDecayLenSig           
-//                 ,trackJetDistVal            
-//                 ,trackJetDistSig            
-//                 #,trackGhostTrackWeight      
-//                 #,trackGhostTrackDistSig     
-//                 #,trackGhostTrackDistVal     
-//                 ,trackPtRel                 
-//                 ,trackMomentum              
-//                 ,trackEta                   
-//                 ,trackPhi                   
-//                 #,trackCharge                
-//                 ,trackPPar                  
-//                 ,trackDeltaR                
-//                 ,trackEtaRel                
-//                 ,trackPtRatio               
-//                 ,trackPParRatio             
-//                 #,trackP0Par                 
-//                 #,trackP0ParRatio            
-//                 ,trackChi2                  
-//                 ,trackNTotalHits            
-//                 ,trackNPixelHits            
+		,std::vector<float> trackSip3dSig
+		,std::vector<float> trackSip3dVal,std::vector<float> trackSip2dSig,std::vector<float> trackSip2dVal
+		,std::vector<float> trackDecayLenVal           
+		//,std::vector<float> trackDecayLenSig           
+		,std::vector<float> trackJetDistVal            
+		,std::vector<float> trackJetDistSig            
+                //,std::vector<float> trackGhostTrackWeight      
+		//,std::vector<float> trackGhostTrackDistSig     
+		//,std::vector<float> trackGhostTrackDistVal     
+                ,std::vector<float> trackPtRel                 
+                ,std::vector<float> trackMomentum              
+                ,std::vector<float> trackEta                   
+                ,std::vector<float> trackPhi                   
+                //,std::vector<float> trackCharge                
+                ,std::vector<float> trackPPar                  
+                ,std::vector<float> trackDeltaR                
+                ,std::vector<float> trackEtaRel                
+                ,std::vector<float> trackPtRatio               
+                ,std::vector<float> trackPParRatio             
+		//,std::vector<float> trackP0Par                 
+		//,std::vector<float> trackP0ParRatio            
+		,std::vector<float> trackChi2                  
+		,std::vector<float> trackNTotalHits            
+		,std::vector<float> trackNPixelHits            
 		){
 	  m_pt         = pt        ;
 	  m_eta        = eta	 ;

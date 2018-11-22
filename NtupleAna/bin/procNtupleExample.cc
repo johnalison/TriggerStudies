@@ -205,7 +205,7 @@ int main(int argc, char * argv[]){
 //    if makeEventDisplays: eventDisplay.newEvent()
 
     std::vector<NtupleAna::JetData> offJets = offJetsDB.GetJets();
-    for(JetData offJet : offJets){
+    for(JetData& offJet : offJets){
 
       if(fabs(offJet.m_eta) > 2.5) continue;
       if(offJet.m_pt       < 35)   continue;

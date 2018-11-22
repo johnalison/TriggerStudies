@@ -72,6 +72,36 @@ namespace NtupleAna {
     float m_hadronFlavour                      [maxLength] = { };
 
 
+    std::vector<std::vector<float> >* m_trackSip3dSig = 0;
+    std::vector<std::vector<float> >* m_trackSip3dVal = 0;
+    
+    std::vector<std::vector<float> >* m_trackSip2dSig = 0;
+    std::vector<std::vector<float> >* m_trackSip2dVal = 0;
+    
+    std::vector<std::vector<float> >* m_trackDecayLenVal = 0;
+    //std::vector<std::vector<float> >* m_trackDecayLenSig = 0;
+    std::vector<std::vector<float> >* m_trackJetDistVal = 0;
+    std::vector<std::vector<float> >* m_trackJetDistSig = 0;
+    //std::vector<std::vector<float> >* m_trackGhostTrackWeight = 0;
+    //std::vector<std::vector<float> >* m_trackGhostTrackDistSig = 0;
+    //std::vector<std::vector<float> >* m_trackGhostTrackDistVal = 0;
+    std::vector<std::vector<float> >* m_trackPtRel = 0;
+    std::vector<std::vector<float> >* m_trackMomentum = 0;
+    std::vector<std::vector<float> >* m_trackEta = 0;
+    std::vector<std::vector<float> >* m_trackPhi = 0;
+    //std::vector<std::vector<float> >* m_trackCharge = 0;
+    std::vector<std::vector<float> >* m_trackPPar = 0;
+    std::vector<std::vector<float> >* m_trackDeltaR = 0;
+    std::vector<std::vector<float> >* m_trackEtaRel = 0;
+    std::vector<std::vector<float> >* m_trackPtRatio = 0;
+    std::vector<std::vector<float> >* m_trackPParRatio = 0;
+    //std::vector<std::vector<float> >* m_trackP0Par = 0;
+    //std::vector<std::vector<float> >* m_trackP0ParRatio = 0;
+    std::vector<std::vector<float> >* m_trackChi2 = 0;
+    std::vector<std::vector<float> >* m_trackNTotalHits = 0;
+    std::vector<std::vector<float> >* m_trackNPixelHits = 0;
+    
+
   public:
 
   JetDataHandler(std::string name) : m_name(name)  {

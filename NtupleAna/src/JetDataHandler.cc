@@ -69,6 +69,37 @@ JetDataHandler::SetBranchAddress(TChain* intree){
     intree->SetBranchAddress( (m_name+"_partonFlavour").c_str()                            , m_partonFlavour                            );
     intree->SetBranchAddress( (m_name+"_hadronFlavour").c_str()                            , m_hadronFlavour                            );
   }
+
+
+
+  intree->SetBranchAddress( (m_name+"_trackSip3dSig").c_str(), &m_trackSip3dSig);
+  intree->SetBranchAddress( (m_name+"_trackSip3dVal").c_str(), &m_trackSip3dVal);
+  intree->SetBranchAddress( (m_name+"_trackSip2dSig").c_str(), &m_trackSip2dSig);
+  intree->SetBranchAddress( (m_name+"_trackSip2dVal").c_str(), &m_trackSip2dVal);
+  			    
+  intree->SetBranchAddress( (m_name+"_trackDecayLenVal").c_str()           , &m_trackDecayLenVal           );
+  //intree->SetBranchAddress( (m_name+"_trackDecayLenSig").c_str()           , &m_trackDecayLenSig           );
+  intree->SetBranchAddress( (m_name+"_trackJetDistVal").c_str()            , &m_trackJetDistVal            );
+  intree->SetBranchAddress( (m_name+"_trackJetDistSig").c_str()            , &m_trackJetDistSig            );
+  //intree->SetBranchAddress( (m_name+"_trackGhostTrackWeight").c_str()      , &m_trackGhostTrackWeight      );
+  //intree->SetBranchAddress( (m_name+"_trackGhostTrackDistSig").c_str()     , &m_trackGhostTrackDistSig     );
+  //intree->SetBranchAddress( (m_name+"_trackGhostTrackDistVal").c_str()     , &m_trackGhostTrackDistVal     );
+  intree->SetBranchAddress( (m_name+"_trackPtRel").c_str()                 , &m_trackPtRel                 );
+  intree->SetBranchAddress( (m_name+"_trackMomentum").c_str()              , &m_trackMomentum              );
+  intree->SetBranchAddress( (m_name+"_trackEta").c_str()                   , &m_trackEta                   );
+  intree->SetBranchAddress( (m_name+"_trackPhi").c_str()                   , &m_trackPhi                   );
+  //intree->SetBranchAddress( (m_name+"_trackCharge").c_str()                , &m_trackCharge                );
+  intree->SetBranchAddress( (m_name+"_trackPPar").c_str()                  , &m_trackPPar                  );
+  intree->SetBranchAddress( (m_name+"_trackDeltaR").c_str()                , &m_trackDeltaR                );
+  intree->SetBranchAddress( (m_name+"_trackEtaRel").c_str()                , &m_trackEtaRel                );
+  intree->SetBranchAddress( (m_name+"_trackPtRatio").c_str()               , &m_trackPtRatio               );
+  intree->SetBranchAddress( (m_name+"_trackPParRatio").c_str()             , &m_trackPParRatio             );
+  //intree->SetBranchAddress( (m_name+"_trackP0Par").c_str()                 , &m_trackP0Par                 );
+  //intree->SetBranchAddress( (m_name+"_trackP0ParRatio").c_str()            , &m_trackP0ParRatio            );
+  intree->SetBranchAddress( (m_name+"_trackChi2").c_str()                  , &m_trackChi2                  );
+  intree->SetBranchAddress( (m_name+"_trackNTotalHits").c_str()            , &m_trackNTotalHits            );
+  intree->SetBranchAddress( (m_name+"_trackNPixelHits").c_str()            , &m_trackNPixelHits            );
+
   
 
   return;
@@ -131,7 +162,34 @@ JetDataHandler::GetJets(){
                                    m_chHadEF                           [iJet],
                                    m_chEmEF                            [iJet],
                                    m_partonFlavour                     [iJet],
-                                   m_hadronFlavour                     [iJet]
+                                   m_hadronFlavour                     [iJet],
+                                   m_trackSip3dSig->at(iJet),
+                                   m_trackSip3dVal->at(iJet),
+                                   m_trackSip2dSig->at(iJet),
+                                   m_trackSip2dVal->at(iJet),
+				   
+                                   m_trackDecayLenVal           ->at(iJet),
+                                   //m_trackDecayLenSig           ->at(iJet),
+                                   m_trackJetDistVal            ->at(iJet),
+                                   m_trackJetDistSig            ->at(iJet),
+                                   //m_trackGhostTrackWeight      ->at(iJet),
+                                   //m_trackGhostTrackDistSig     ->at(iJet),
+                                   //m_trackGhostTrackDistVal     ->at(iJet),
+                                   m_trackPtRel                 ->at(iJet),
+                                   m_trackMomentum              ->at(iJet),
+                                   m_trackEta                   ->at(iJet),
+                                   m_trackPhi                   ->at(iJet),
+                                   //m_trackCharge                ->at(iJet),
+                                   m_trackPPar                  ->at(iJet),
+                                   m_trackDeltaR                ->at(iJet),
+                                   m_trackEtaRel                ->at(iJet),
+                                   m_trackPtRatio               ->at(iJet),
+                                   m_trackPParRatio             ->at(iJet),
+                                   //m_trackP0Par                 ->at(iJet),
+                                   //m_trackP0ParRatio            ->at(iJet),
+                                   m_trackChi2                  ->at(iJet),
+                                   m_trackNTotalHits            ->at(iJet),
+                                   m_trackNPixelHits            ->at(iJet)
 				   )
 			   );
     
