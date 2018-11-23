@@ -18,7 +18,8 @@
 #include "TriggerStudies/NtupleAna/interface/EventData.h"
 #include "TriggerStudies/NtupleAna/interface/JetDataHandler.h"
 #include "TriggerStudies/NtupleAna/interface/LeptonDataHandler.h"
-//from eventDisplayData import EventDisplayData
+#include "TriggerStudies/NtupleAna/interface/EventDisplayData.h"
+
 
 #include "TriggerStudies/NtupleAna/interface/TrackHists.h"
 #include "TriggerStudies/NtupleAna/interface/JetHists.h"
@@ -32,7 +33,7 @@ int main(int argc, char * argv[]){
   // load framework libraries
   gSystem->Load( "libFWCoreFWLite" );
   FWLiteEnabler::enable();
-
+  
   // parse arguments
   if ( argc < 2 ) {
     std::cout << "Usage : " << argv[0] << " [parameters.py]" << std::endl;
@@ -45,8 +46,16 @@ int main(int argc, char * argv[]){
 
   // get the python configuration
   const edm::ParameterSet& process = edm::readPSetsFrom(argv[1])->getParameter<edm::ParameterSet>("process");
-  fwlite::InputSource inputHandler_(process); fwlite::OutputFiles outputHandler_(process);
+  fwlite::InputSource inputHandler_(process); 
+  fwlite::OutputFiles outputHandler_(process);
 
+  //
+  // Get the config
+  //
+  // now get each parameter
+  const edm::ParameterSet& ana = process.getParameter<edm::ParameterSet>("procNtupleExample");
+  bool makeEventDisplays = ana.getParameter<bool>("MakeEventDisplays");
+  bool debug = ana.getParameter<bool>("debug");
 
   //
   //  Inint Tree
@@ -160,25 +169,24 @@ int main(int argc, char * argv[]){
   JetHists offJetHists_offline70_B_matched_online90 = JetHists("offJets_offline70_B_matched_online90",  fs);
   JetHists offJetHists_offline70_L_matched_online90 = JetHists("offJets_offline70_L_matched_online90",  fs);
 
-//#
-//#  Event Displays
-//#
-//makeEventDisplays = False
-//from eventDisplayData import EventDisplayData
-//eventDisplay = EventDisplayData("offline")
+  //
+  //  Event Displays
+  //
+  EventDisplayData eventDisplay = EventDisplayData("offline");
 
-  bool debug = false;
-
+  
   std::cout << " In procNtupleExample " << std::endl;
 
   int nEventThisFile = tree->GetEntries();
+  int maxEvents = inputHandler_.maxEvents();
   std::cout <<  "Number of input events: " << nEventThisFile << std::endl;
 
-
   for(int entry = 0; entry<nEventThisFile; entry++){
-
-    if(entry %1000 == 0)
+    
+    if(entry %1000 == 0 || debug)
       std::cout << "Processed .... "<<entry<<" Events"<<std::endl;
+    if( (maxEvents > 0) && (entry > maxEvents))
+      break;
 
     tree->GetEntry( entry );
 
@@ -202,7 +210,7 @@ int main(int argc, char * argv[]){
 
     if((elecs.size()+muons.size()) < 2)  continue;
 
-//    if makeEventDisplays: eventDisplay.newEvent()
+    if(makeEventDisplays) eventDisplay.NewEvent();
 
     std::vector<NtupleAna::JetData> offJets = offJetsDB.GetJets();
     for(JetData& offJet : offJets){
@@ -215,7 +223,7 @@ int main(int argc, char * argv[]){
       if(NtupleAna::failOverlap(offJet,elecs)) continue;
       if(NtupleAna::failOverlap(offJet,muons)) continue;
 
-//        if makeEventDisplays: eventDisplay.AddJet("offJetAll", offJet, doTracks=True)
+      if(makeEventDisplays) eventDisplay.AddJet("offJetAll", offJet, true);
 
       // Match offline to online
       float dR = 1e6;
@@ -238,10 +246,11 @@ int main(int argc, char * argv[]){
       // match tracks if we matched jets
       if(offJet.m_matchedJet){
 
-//            if makeEventDisplays:
-//                eventDisplay.AddJet("offJet", offJet)
-//                eventDisplay.AddJet("offMatchJet", offJet.matchedJet)
-//
+	if(makeEventDisplays){
+	  eventDisplay.AddJet("offJet", offJet);
+	  //eventDisplay.AddJet("offMatchJet", offJet.matchedJet);
+	}
+
 	for(TrackData& offTrack: offJet.m_tracks){
 	  //need to check that the track (with matching resolution cone r=0.01) is in region where R=0.3 circles inside the two jets overlap!
 	  //if offTrack.dR > 0.29 - offJet.match_dR: continue
@@ -417,7 +426,7 @@ int main(int argc, char * argv[]){
       if(NtupleAna::failOverlap(pfJet,elecs)) continue;
       if(NtupleAna::failOverlap(pfJet,muons)) continue;
 
-//        if makeEventDisplays: eventDisplay.AddJet("pfJet", pfJet, doTracks=True)
+      if(makeEventDisplays) eventDisplay.AddJet("pfJet", pfJet, true);
 
       pfJetHists.Fill(pfJet);
 
@@ -456,6 +465,11 @@ int main(int argc, char * argv[]){
     
 
   }
+
+
+  if(makeEventDisplays)
+    eventDisplay.Write();
+
 
   return 0;
 }
