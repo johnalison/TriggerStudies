@@ -11,6 +11,7 @@ using namespace NtupleAna;
 TrackHists::TrackHists(std::string name, fwlite::TFileService& fs) {
 
   TFileDirectory dir = fs.mkdir(name);
+  m_name = name;
 
   m_ip3d_l = dir.make<TH1F>("ip3d_l","ip3d;IP3D [cm]",100,-0.2,0.2);
   m_ip3d   = dir.make<TH1F>("ip3d",  "ip3d;IP3D [cm]",100,-0.05,0.05);
@@ -96,8 +97,7 @@ TrackHists::~TrackHists() {}
 
 void
 TrackHists::Fill (const TrackData& track){
-
-
+  
   m_ip3d  ->Fill(track.m_ip3dVal);
   m_ip3d_l->Fill(track.m_ip3dVal);
         
@@ -161,7 +161,7 @@ TrackHists::Fill (const TrackData& track){
     //m_track_matched_dEta_vs_dPhi     ->Fill(track.m_eta - track.m_matchedTrack->m_eta, matched_dPhi);
   }
 
-  if(track.m_secondClosest){
+  if(track.m_secondClosest != nullptr){
     m_track_secondClosest_dEta     ->Fill(track.m_eta      - track.m_secondClosest->m_eta);
     m_track_secondClosest_dEta_s   ->Fill(track.m_eta      - track.m_secondClosest->m_eta);
     m_track_secondClosest_dMomentum->Fill(track.m_momentum - track.m_secondClosest->m_momentum); 
@@ -169,11 +169,8 @@ TrackHists::Fill (const TrackData& track){
     //m_track_secondClosest_dR       ->Fill(secondClosest_dR);
     //m_track_secondClosest_dR_s     ->Fill(secondClosest_dR);
     m_track_secondClosest_dEta_vs_dMomentum->Fill(track.m_eta - track.m_secondClosest->m_eta, track.m_momentum - track.m_secondClosest->m_momentum);
-    
     m_track_dEta12->Fill(track.m_matchedTrack->m_eta - track.m_secondClosest->m_eta);
-
  }
-
 
   return;
 }

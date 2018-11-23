@@ -16,6 +16,7 @@ namespace NtupleAna {
 
   class TrackHists {
 
+    std::string m_name;
         
     TH1F* m_ip3d_l ;
     TH1F* m_ip3d   ;

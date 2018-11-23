@@ -205,14 +205,12 @@ int main(int argc, char * argv[]){
     // Converting from "row-level" info to "column-level" info
     std::vector<NtupleAna::LeptonData> elecs  = elecDB.GetLeps();
     std::vector<NtupleAna::LeptonData> muons  = muonDB.GetLeps();
+    std::vector<NtupleAna::JetData>    offJets = offJetsDB.GetJets();
     std::vector<NtupleAna::JetData>    pfJets   = pfJetsDB.GetJets();
     std::vector<NtupleAna::JetData>    caloJets = caloJetsDB.GetJets();
 
     if((elecs.size()+muons.size()) < 2)  continue;
 
-    if(makeEventDisplays) eventDisplay.NewEvent();
-
-    std::vector<NtupleAna::JetData> offJets = offJetsDB.GetJets();
     for(JetData& offJet : offJets){
 
       if(fabs(offJet.m_eta) > 2.5) continue;
@@ -228,7 +226,7 @@ int main(int argc, char * argv[]){
       // Match offline to online
       float dR = 1e6;
       JetData* matchedJet = nullptr;
-      for(JetData pfJet : pfJets){
+      for(JetData& pfJet : pfJets){
 	float this_dR = pfJet.m_vec.DeltaR(offJet.m_vec);
 	if (this_dR < dR){
 	  dR = this_dR;
@@ -248,7 +246,7 @@ int main(int argc, char * argv[]){
 
 	if(makeEventDisplays){
 	  eventDisplay.AddJet("offJet", offJet);
-	  //eventDisplay.AddJet("offMatchJet", offJet.matchedJet);
+	  eventDisplay.AddJet("offMatchJet", *offJet.m_matchedJet);
 	}
 
 	for(TrackData& offTrack: offJet.m_tracks){
@@ -258,7 +256,7 @@ int main(int argc, char * argv[]){
 	  if(offTrack.m_vec.DeltaR(offJet.m_matchedJet->m_vec) > 0.29) continue; // offTrack is not in cone of pfJet
 	  offTrackHists.Fill(offTrack);
 
-//                if makeEventDisplays: eventDisplay.AddTrk("offJet_Trks", offTrack)
+	  if(makeEventDisplays) eventDisplay.AddTrk("offJet_Trks", offTrack);
 
 	  float dR = 1e6;
 	  float dR2 = 1e6;
@@ -289,11 +287,11 @@ int main(int argc, char * argv[]){
 	  if( dR > 0.01){
 	    //if dR > 1e5:
 	    offTrackHists_unmatched.Fill(offTrack);
-	    //if makeEventDisplays: eventDisplay.AddTrk("offJet_TrksNoMatch", offTrack)
+	    if(makeEventDisplays) eventDisplay.AddTrk("offJet_TrksNoMatch", offTrack);
 	    continue;
 	  }
 
-//                if makeEventDisplays: eventDisplay.AddTrk("offJet_TrksMatch", offTrack)
+	  if(makeEventDisplays) eventDisplay.AddTrk("offJet_TrksMatch", offTrack);
 	  matchedTrack->m_matchedTrack = &offTrack;
 	  offTrack.m_matchedTrack     = matchedTrack;
 	  offTrack.m_secondClosest    = secondClosest;
@@ -462,8 +460,10 @@ int main(int argc, char * argv[]){
 	  caloJetHists_matchedL.Fill(caloJet);
       }
     }
+   
+    if(makeEventDisplays) eventDisplay.NewEvent();
+ 
     
-
   }
 
 

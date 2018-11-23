@@ -1,5 +1,14 @@
 
+
 # TriggerStudies
+
+# In C++
+
+# Compile
+> scram b -j 6
+
+# Run
+> procNtupleExample TriggerStudies/NtupleAna/scripts/procNtupleExampleConfig_cfg.py
 
 > mkdir run
 > cd run
@@ -42,3 +51,5 @@ and then submit a pull request. When it’s been merged, you can run:
 > git pull --rebase origin master
 
 > git remote prune origin
+
+
