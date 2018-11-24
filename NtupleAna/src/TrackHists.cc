@@ -26,11 +26,11 @@ TrackHists::TrackHists(std::string name, fwlite::TFileService& fs) {
   m_ip2d   = dir.make<TH1F>("ip2d",  "ip2d;IP2D [cm]",100,-0.05,0.05);
 
             
-  float nBinsPt[11] = {0,2,4,6,8,10,15,20,30,40,60};
-  //m_ip2d_vs_pt   = dir.make<TH2F>("ip2d_vs_pt",  "ip2d_vs_pt;P_T [GeV]; IP2D [cm]",10,nBinsPt,100,-0.03,0.03);
+  Double_t nBinsPt[11] = {0,2,4,6,8,10,15,20,30,40,60};
+  m_ip2d_vs_pt   = dir.make<TH2F>("ip2d_vs_pt",  "ip2d_vs_pt;P_T [GeV]; IP2D [cm]",10,nBinsPt,100,-0.03,0.03);
 
-  float nBinsEta[11] = {0.0, 0.25, 0.5, 0.75, 1.0, 1.25, 1.5, 1.75, 2.0, 2.25, 2.5};
-  //m_ip2d_vs_eta   = dir.make<TH2F>("ip2d_vs_eta",  "ip2d_vs_eta;|#eta|; IP2D [cm]",10,nBinsEta,100,-0.03,0.03);
+  Double_t nBinsEta[11] = {0.0, 0.25, 0.5, 0.75, 1.0, 1.25, 1.5, 1.75, 2.0, 2.25, 2.5};
+  m_ip2d_vs_eta   = dir.make<TH2F>("ip2d_vs_eta",  "ip2d_vs_eta;|#eta|; IP2D [cm]",10,nBinsEta,100,-0.03,0.03);
 
 
   m_ip2d_sig_l = dir.make<TH1F>("ip2d_sig_l","ip2d sig;IP2D significance",100,-100,100);
@@ -45,11 +45,9 @@ TrackHists::TrackHists(std::string name, fwlite::TFileService& fs) {
   m_trackPtRel                 = dir.make<TH1F>("trackPtRel"          ,    "trackPtRel;track p_{T} Rel [GeV];Entries", 100, -0.1, 7);          
   m_trackMomentum              = dir.make<TH1F>("trackMomentum"       ,    "trackMomentum;track momentum [GeV];Entries", 60, 0, 60);       
 
-  //binsPt = []
-  //  for bin in range(28);:
-  //binsPt.append(0.9*1.24**bin);
-  //binsPt = array("d",binsPt);
-  //m_trackPt_logx               = ROOT.TH1F("trackPt_logx", "trackPt;track p_{T} [GeV];Entries", len(binsPt);-1, binsPt);
+
+  Double_t binsPt[28] = {0.9, 1.116, 1.3838, 1.716, 2.1278, 2.6385, 3.2717, 4.0569, 5.0306, 6.2379, 7.735, 9.5914, 11.8933, 14.7477, 18.2872, 22.6761, 28.1183, 34.8667, 43.2347, 53.6111, 66.4777, 82.4324, 102.2162, 126.748, 157.1676, 194.8878, 241.6609, 299.6595};
+  m_trackPt_logx               = dir.make<TH1F>("trackPt_logx", "trackPt;track p_{T} [GeV];Entries", 27, binsPt);
   
   m_trackEta                   = dir.make<TH1F>("trackEta"            ,    "trackEta;track #eta;Entries", 100, -2.6, 2.6);            
   m_trackPhi                   = dir.make<TH1F>("trackPhi"            ,    "trackPhi;track #phi;Entries", 100, -3.2, 3.2);            
@@ -119,8 +117,8 @@ TrackHists::Fill (const TrackData& track){
   m_ip2d_err  ->Fill(this_ip2d_err);
   m_ip2d_err_l->Fill(this_ip2d_err);
 
-  //m_ip2d_vs_pt->Fill(     track.m_momentum, track.m_ip2dVal);
-  //m_ip2d_vs_eta->Fill(abs(track.m_eta);    , track.m_ip2dVal);
+  m_ip2d_vs_pt->Fill(     track.m_momentum, track.m_ip2dVal);
+  m_ip2d_vs_eta->Fill(fabs(track.m_eta)    , track.m_ip2dVal);
         
 
   m_trackDecayLenVal_l   ->Fill(track.m_decayLenVal);
@@ -128,7 +126,7 @@ TrackHists::Fill (const TrackData& track){
   m_trackJetDistVal      ->Fill(track.m_jetDistVal );
   m_trackPtRel           ->Fill(track.m_ptRel      );
   m_trackMomentum        ->Fill(track.m_momentum   ); 
-  //m_trackPt_logx         ->Fill(track.m_pt         ); 
+  m_trackPt_logx         ->Fill(track.m_pt         ); 
   m_trackEta             ->Fill(track.m_eta        );
   m_trackPhi             ->Fill(track.m_phi        );
   m_trackPPar            ->Fill(track.m_pPar       );
@@ -151,24 +149,29 @@ TrackHists::Fill (const TrackData& track){
     m_track_matched_dMomentum->Fill(track.m_momentum - track.m_matchedTrack->m_momentum); 
     m_track_matched_dEta     ->Fill(track.m_eta      - track.m_matchedTrack->m_eta);
     m_track_matched_dEta_s   ->Fill(track.m_eta      - track.m_matchedTrack->m_eta);
-    //m_track_matched_dPhi     ->Fill(track.m_dPhi(track.m_matchedTrack););
-    //matched_dPhi = track.m_dPhi(track.m_matchedTrack);
-    //matched_dR   = ( (track.m_eta-track.m_matchedTrack->m_eta)**2 + matched_dPhi**2 )**0.5;
-    //m_track_matched_dR       ->Fill(matched_dR);
-    //m_track_matched_dR_s     ->Fill(matched_dR);
+    float matched_dPhi = track.dPhi(*(track.m_matchedTrack));
+    m_track_matched_dPhi     ->Fill(matched_dPhi);
+
+    float matched_dEta = (track.m_eta-track.m_matchedTrack->m_eta);
+    float matched_dR   = pow(matched_dEta*matched_dEta + matched_dPhi*matched_dPhi , 0.5);
+    m_track_matched_dR       ->Fill(matched_dR);
+    m_track_matched_dR_s     ->Fill(matched_dR);
     
-    m_track_matched_dEta_vs_dMomentum->Fill(track.m_eta - track.m_matchedTrack->m_eta, track.m_momentum - track.m_matchedTrack->m_momentum);
-    //m_track_matched_dEta_vs_dPhi     ->Fill(track.m_eta - track.m_matchedTrack->m_eta, matched_dPhi);
+    m_track_matched_dEta_vs_dMomentum->Fill(matched_dEta, track.m_momentum - track.m_matchedTrack->m_momentum);
+    m_track_matched_dEta_vs_dPhi     ->Fill(matched_dEta, matched_dPhi);
   }
 
   if(track.m_secondClosest != nullptr){
     m_track_secondClosest_dEta     ->Fill(track.m_eta      - track.m_secondClosest->m_eta);
     m_track_secondClosest_dEta_s   ->Fill(track.m_eta      - track.m_secondClosest->m_eta);
     m_track_secondClosest_dMomentum->Fill(track.m_momentum - track.m_secondClosest->m_momentum); 
-    //secondClosest_dR = ( (track.m_eta-track.m_secondClosest->m_eta)**2 + track.m_dPhi(track.m_secondClosest)**2 );**0.5;
-    //m_track_secondClosest_dR       ->Fill(secondClosest_dR);
-    //m_track_secondClosest_dR_s     ->Fill(secondClosest_dR);
-    m_track_secondClosest_dEta_vs_dMomentum->Fill(track.m_eta - track.m_secondClosest->m_eta, track.m_momentum - track.m_secondClosest->m_momentum);
+
+    float secondClosest_dEta = track.m_eta-track.m_secondClosest->m_eta;
+    float secondClosest_dPhi = track.dPhi(*track.m_secondClosest);
+    float secondClosest_dR = pow( secondClosest_dEta*secondClosest_dEta + secondClosest_dPhi*secondClosest_dPhi, 0.5);
+    m_track_secondClosest_dR       ->Fill(secondClosest_dR);
+    m_track_secondClosest_dR_s     ->Fill(secondClosest_dR);
+    m_track_secondClosest_dEta_vs_dMomentum->Fill(secondClosest_dEta, track.m_momentum - track.m_secondClosest->m_momentum);
     m_track_dEta12->Fill(track.m_matchedTrack->m_eta - track.m_secondClosest->m_eta);
  }
 

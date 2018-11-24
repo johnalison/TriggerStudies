@@ -114,13 +114,11 @@ EventDisplayData::Write (){
     oroot.add_child(trkName, m_AllEvent_info[trkName]);
   }
 
-//to_string(
   ofstream myfile;
   myfile.open ("example.txt");
 
   pt::write_json(myfile, oroot);
   myfile.close();
-  //with open('Events_'+self.name+'.txt', 'w') as outfile:  
-  //    json.dump(self.eventDisplayData, outfile)    
+
   return;
 }

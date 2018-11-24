@@ -125,6 +125,8 @@ namespace NtupleAna {
 	
 
     ~TrackData() {}; 
+
+    float dPhi(const TrackData& rhs) const;
     
   };
 
