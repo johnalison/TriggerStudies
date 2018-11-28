@@ -47,6 +47,7 @@ JetHists::JetHists(std::string name, fwlite::TFileService& fs, bool light) {
     m_trackSip3dValAboveCharm          = dir.make<TH1F>("trackSip3dValAboveCharm"      ,"trackSip3dValAboveCharm;trackSip3dValAboveCharm"       ,100, -0.2, 0.2); 
     m_trackSip3dSigAboveCharm          = dir.make<TH1F>("trackSip3dSigAboveCharm"      ,"trackSip3dSigAboveCharm;trackSip3dSigAboveCharm"       ,100, -50, 50);
     m_totalMultiplicity                = dir.make<TH1F>("totalMultiplicity"            ,"totalMultiplicity;total multiplicity"             ,62, -1.5, 60.5);
+    m_totalFraction                    = dir.make<TH1F>("totalFraction"                ,"totalFraction;total fraction"             ,100, -0.1,1.5);
     m_photonMultiplicity               = dir.make<TH1F>("photonMultiplicity"           ,"photonMultiplicity;photon multiplicity"            ,42, -1.5, 40.5);
     m_photonEnergyFraction             = dir.make<TH1F>("photonEnergyFraction"         ,"photonEnergyFraction;photon energy fraction"          ,100, -0.1,1.5);
     m_neutralHadronMultiplicity        = dir.make<TH1F>("neutralHadronMultiplicity"    ,"neutralHadronMultiplicity;neutralHadronMultiplicity"     ,22, -1.5, 20.5);
@@ -137,6 +138,11 @@ JetHists::Fill (const JetData& jetInfo){
     m_trackSip3dValAboveCharm          ->Fill(jetInfo.m_trackSip3dValAboveCharm          );
     m_trackSip3dSigAboveCharm          ->Fill(jetInfo.m_trackSip3dSigAboveCharm          );
     m_totalMultiplicity                ->Fill(jetInfo.m_totalMultiplicity                );
+    m_totalFraction                    ->Fill(jetInfo.m_chargedHadronEnergyFraction
+					      + jetInfo.m_neutralHadronEnergyFraction
+					      + jetInfo.m_photonEnergyFraction
+					      + jetInfo.m_muonEnergyFraction);
+					      
     m_photonMultiplicity               ->Fill(jetInfo.m_photonMultiplicity               );
     m_photonEnergyFraction             ->Fill(jetInfo.m_photonEnergyFraction             );
     m_neutralHadronMultiplicity        ->Fill(jetInfo.m_neutralHadronMultiplicity        );

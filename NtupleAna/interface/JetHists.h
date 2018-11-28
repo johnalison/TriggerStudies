@@ -52,6 +52,7 @@ namespace NtupleAna {
     TH1F* m_trackSip3dValAboveCharm          ;
     TH1F* m_trackSip3dSigAboveCharm          ;
     TH1F* m_totalMultiplicity                ;
+    TH1F* m_totalFraction                ;
     TH1F* m_photonMultiplicity               ;
     TH1F* m_photonEnergyFraction             ;
     TH1F* m_neutralHadronMultiplicity        ;
