@@ -10,25 +10,24 @@ process = cms.PSet()
 #
 # Data
 #
-inputFileList = [line.rstrip() for line in open("TriggerStudies/NtupleAna/scripts/inputFiles_2018B.txt")]
+inputFileList = [line.rstrip() for line in open("TriggerStudies/NtupleAna/scripts/inputFiles_2017C.txt")]
 #inputFileList = [line.rstrip() for line in open("TriggerStudies/NtupleAna/scripts/inputFiles_2018C.txt")]
 
     
 process.fwliteInput = cms.PSet(
     fileNames = cms.vstring(inputFileList),
-    maxEvents   = cms.int32(-1),                             ## optional
+    maxEvents   = cms.int32(100000),                             ## optional
     outputEvery = cms.uint32(10),                            ## optional
     )
 
 process.fwliteOutput = cms.PSet(
-    fileName  = cms.string('TestFileOutput.root'),  ## mandatory
+    fileName  = cms.string('JetLevelStudyOutput.root'),  ## mandatory
 )
 
 
-process.procNtupleExample = cms.PSet(
+process.jetLevelStudy = cms.PSet(
     ## input specific for this analyzer
     debug = cms.bool(False),
-    MakeEventDisplays = cms.bool(False),
-    LoadTrkLevel = cms.bool(True),
+    LoadTrkLevel = cms.bool(False),
 )
 

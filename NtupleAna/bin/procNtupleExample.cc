@@ -55,6 +55,7 @@ int main(int argc, char * argv[]){
   // now get each parameter
   const edm::ParameterSet& ana = process.getParameter<edm::ParameterSet>("procNtupleExample");
   bool makeEventDisplays = ana.getParameter<bool>("MakeEventDisplays");
+  bool loadTrkLevel = ana.getParameter<bool>("LoadTrkLevel");
   bool debug = ana.getParameter<bool>("debug");
 
   //
@@ -77,13 +78,13 @@ int main(int argc, char * argv[]){
   EventData eventData = EventData();
   eventData.SetBranchAddress(tree);
 
-  JetDataHandler pfJetsDB = JetDataHandler("pfJets");
+  JetDataHandler pfJetsDB = JetDataHandler("pfJets",loadTrkLevel);
   pfJetsDB.SetBranchAddress(tree);
 
-  JetDataHandler caloJetsDB = JetDataHandler("caloJets");
+  JetDataHandler caloJetsDB = JetDataHandler("caloJets",loadTrkLevel);
   caloJetsDB.SetBranchAddress(tree);
 
-  JetDataHandler offJetsDB = JetDataHandler("offJets");
+  JetDataHandler offJetsDB = JetDataHandler("offJets",loadTrkLevel);
   offJetsDB.SetBranchAddress(tree);
 
   LeptonDataHandler muonDB = LeptonDataHandler("offTightMuons");

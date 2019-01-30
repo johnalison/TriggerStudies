@@ -16,6 +16,7 @@ namespace NtupleAna {
 
   public:
     std::string m_name;
+    bool  m_loadTrkLevel;
     static const int maxLength = 40;
 
     int  m_num         [maxLength] = { };
@@ -106,7 +107,7 @@ namespace NtupleAna {
 
   public:
 
-  JetDataHandler(std::string name) : m_name(name)  {
+    JetDataHandler(std::string name, bool loadTrkLevel = true) : m_name(name), m_loadTrkLevel(loadTrkLevel)  {
       
     }
 
@@ -115,6 +116,8 @@ namespace NtupleAna {
 
     void SetBranchAddress(TChain* intree);
     std::vector<JetData> GetJets();
+    std::vector<JetData> GetJetsAll();
+    std::vector<JetData> GetJetsNoTrks();
     
   };
 

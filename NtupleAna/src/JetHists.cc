@@ -18,20 +18,24 @@ JetHists::JetHists(std::string name, fwlite::TFileService& fs, bool light) {
   m_mass    = dir.make<TH1F>("mass","mass;jet mass [GeV];Entries",100,-1,200);
   m_deepcsv = dir.make<TH1F>("deepcsv","deepcsv;deepcsv;Entries",200,0,1);
 
+  m_matched_dPt      = dir.make<TH1F>("matched_dPt",     "matched_dPt     ;P_{T}-P_{T}^{matched} [GeV];Entries",  100,-50, 50);
+  m_matched_dEta     = dir.make<TH1F>("matched_dEta",    "matched_dEta    ;#eta-#eta^{matched};Entries",100,-0.5,0.5);
+  m_matched_dPhi     = dir.make<TH1F>("matched_dPhi",    "matched_dPhi    ;#phi-#phi^{matched};Entries",100,-0.5,0.5);
+  m_matched_dR       = dir.make<TH1F>("matched_dR",      "matched_dR      ;#DeltaR(Online,Offline);;Entries",45, 0,0.45);
+  m_matched_dMass    = dir.make<TH1F>("matched_dMass",   "matched_dMass   ;mass-mass^{matched} [GeV];Entries",100,-50,50);
+  m_matched_dDeepcsv = dir.make<TH1F>("matched_dDeepcsv","matched_dDeepcsv;DeepCSV-DeepCSV^{matched};Entries",100,-1,1);
+  
+  m_deepcsv_matched = dir.make<TH1F>("deepcsv_matched","deepcsv;deepcsv;Entries",200,0,1);
+  m_deepcsv_vs_matched_deepcsv = dir.make<TH2F>("deepcsv_vs_matched_deepcsv",  "Events;DeepCSV;Matched DeepCSV",100,-1,1,100,-1,1);
+  
+  m_deepcsv_bb = dir.make<TH1F>("deepcsv_bb","deepcsv_bb;deepcsv_bb;Entries",100,-2,2);
+
+  m_partonFlavour                    = dir.make<TH1F>("partonFlavour"                ,"partonFlavour;partonFlavour;Entries"                        ,60, -30.5,29.5);
+  m_hadronFlavour                    = dir.make<TH1F>("hadronFlavour"                ,"hadronFlavour;hadronFlavour;Entries"                        ,60, -30.5,29.5);
+
   m_light = light;
   if(!m_light){
-    m_matched_dPt      = dir.make<TH1F>("matched_dPt",     "matched_dPt     ;P_{T}-P_{T}^{matched} [GeV];Entries",  100,-50, 50);
-    m_matched_dEta     = dir.make<TH1F>("matched_dEta",    "matched_dEta    ;#eta-#eta^{matched};Entries",100,-0.5,0.5);
-    m_matched_dPhi     = dir.make<TH1F>("matched_dPhi",    "matched_dPhi    ;#phi-#phi^{matched};Entries",100,-0.5,0.5);
-    m_matched_dR       = dir.make<TH1F>("matched_dR",      "matched_dR      ;#DeltaR(Online,Offline);;Entries",45, 0,0.45);
-    m_matched_dMass    = dir.make<TH1F>("matched_dMass",   "matched_dMass   ;mass-mass^{matched} [GeV];Entries",100,-50,50);
-    m_matched_dDeepcsv = dir.make<TH1F>("matched_dDeepcsv","matched_dDeepcsv;DeepCSV-DeepCSV^{matched};Entries",100,-1,1);
-
-    m_deepcsv_matched = dir.make<TH1F>("deepcsv_matched","deepcsv;deepcsv;Entries",200,0,1);
-    m_deepcsv_vs_matched_deepcsv = dir.make<TH2F>("deepcsv_vs_matched_deepcsv",  "Events;DeepCSV;Matched DeepCSV",100,-1,1,100,-1,1);
-
-    m_deepcsv_bb = dir.make<TH1F>("deepcsv_bb","deepcsv_bb;deepcsv_bb;Entries",100,-2,2);
-    
+      
     m_vertexNTracks                    = dir.make<TH1F>("vertexNTracks"                ,"vertexNTracks;nVertex Tracks;Entries"                 ,22, -2.5, 19.5);
     m_vertexMass                       = dir.make<TH1F>("vertexMass"                   ,"vertexMass;Vertex Mass [GeV]"                    ,100, -0.5, 50);
     m_vertexJetDeltaR                  = dir.make<TH1F>("vertexJetDeltaR"              ,"vertexJetDeltaR;Vertex-Jet #Delta R"               ,100, -0.01, 0.4);
@@ -77,9 +81,6 @@ JetHists::JetHists(std::string name, fwlite::TFileService& fs, bool light) {
     m_chMult                           = dir.make<TH1F>("chMult"                       ,"chMult;chMult"                        ,42, -1.5, 40.5);
     m_chHadEF                          = dir.make<TH1F>("chHadEF"                      ,"chHadEF;chHadEF;Entries"                       ,100, -0.1,2.5);
     m_chEmEF                           = dir.make<TH1F>("chEmEF"                       ,"chEmEF;chEmEF;Entries"                        ,100, -0.1,2.5);
-    m_partonFlavour                    = dir.make<TH1F>("partonFlavour"                ,"partonFlavour;partonFlavour;Entries"                        ,60, -30.5,29.5);
-    m_hadronFlavour                    = dir.make<TH1F>("hadronFlavour"                ,"hadronFlavour;hadronFlavour;Entries"                        ,60, -30.5,29.5);
-
 
 
     m_nTrk = dir.make<TH1F>("nTrk","nTrk;nTracks;Entries",42,-1.5,40.5);
@@ -106,22 +107,20 @@ JetHists::Fill (const JetData& jetInfo){
   m_mass    ->Fill(jetInfo.m_mass);
   m_deepcsv ->Fill(jetInfo.m_deepcsv);
 
+  if(jetInfo.m_matchedJet){
+    m_matched_dPt     ->Fill(jetInfo.m_pt - jetInfo.m_matchedJet->m_pt);
+    m_matched_dEta    ->Fill(jetInfo.m_eta - jetInfo.m_matchedJet->m_eta);
+    m_matched_dPhi    ->Fill(jetInfo.m_phi - jetInfo.m_matchedJet->m_phi);
+    m_matched_dR      ->Fill(jetInfo.m_vec.DeltaR(jetInfo.m_matchedJet->m_vec));
+    m_matched_dMass   ->Fill(jetInfo.m_mass - jetInfo.m_matchedJet->m_mass);
+    m_matched_dDeepcsv->Fill(jetInfo.m_deepcsv - jetInfo.m_matchedJet->m_deepcsv);
+    
+    m_deepcsv_matched->Fill(jetInfo.m_matchedJet->m_deepcsv);
+    m_deepcsv_vs_matched_deepcsv->Fill(jetInfo.m_deepcsv, jetInfo.m_matchedJet->m_deepcsv);
+  }
+  m_deepcsv_bb->Fill(jetInfo.m_deepcsv_bb);
 
   if(!m_light){
-    if(jetInfo.m_matchedJet){
-      m_matched_dPt     ->Fill(jetInfo.m_pt - jetInfo.m_matchedJet->m_pt);
-      m_matched_dEta    ->Fill(jetInfo.m_eta - jetInfo.m_matchedJet->m_eta);
-      m_matched_dPhi    ->Fill(jetInfo.m_phi - jetInfo.m_matchedJet->m_phi);
-      m_matched_dR      ->Fill(jetInfo.m_vec.DeltaR(jetInfo.m_matchedJet->m_vec));
-      m_matched_dMass   ->Fill(jetInfo.m_mass - jetInfo.m_matchedJet->m_mass);
-      m_matched_dDeepcsv->Fill(jetInfo.m_deepcsv - jetInfo.m_matchedJet->m_deepcsv);
-      
-      m_deepcsv_matched->Fill(jetInfo.m_matchedJet->m_deepcsv);
-      m_deepcsv_vs_matched_deepcsv->Fill(jetInfo.m_deepcsv, jetInfo.m_matchedJet->m_deepcsv);
-    }
-    m_deepcsv_bb->Fill(jetInfo.m_deepcsv_bb);
-    
-    
     m_vertexNTracks                    ->Fill(jetInfo.m_vertexNTracks                    );
     m_vertexMass                       ->Fill(jetInfo.m_vertexMass                       );
     m_vertexJetDeltaR                  ->Fill(jetInfo.m_vertexJetDeltaR                  );
