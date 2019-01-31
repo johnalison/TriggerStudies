@@ -10,7 +10,9 @@ process = cms.PSet()
 #
 # Data
 #
-inputFileList = [line.rstrip() for line in open("TriggerStudies/NtupleAna/scripts/inputFiles_2017C.txt")]
+#inputFileList = [line.rstrip() for line in open("TriggerStudies/NtupleAna/scripts/inputFiles_2017C.txt")]
+inputFileList = [line.rstrip() for line in open("TriggerStudies/NtupleAna/scripts/inputFiles_ttbarMC2017.txt")]
+
 #inputFileList = [line.rstrip() for line in open("TriggerStudies/NtupleAna/scripts/inputFiles_2018C.txt")]
 
     
@@ -21,7 +23,7 @@ process.fwliteInput = cms.PSet(
     )
 
 process.fwliteOutput = cms.PSet(
-    fileName  = cms.string('JetLevelStudyOutput.root'),  ## mandatory
+    fileName  = cms.string('JetLevelStudyOutputMC.root'),  ## mandatory
 )
 
 

@@ -24,8 +24,11 @@ namespace NtupleAna {
     float m_eta        [maxLength] = { };
     float m_phi        [maxLength] = { };
     float m_mass       [maxLength] = { };
+    float m_csv        [maxLength] = { };
     float m_deepcsv    [maxLength] = { };
     float m_deepcsv_bb [maxLength] = { };
+    float m_passesTightLeptVetoID [maxLength] = { };
+    float m_lepOverlap04Tight     [maxLength] = { };
 
     float m_vertexNTracks                      [maxLength] = { };
     float m_vertexMass                         [maxLength] = { };

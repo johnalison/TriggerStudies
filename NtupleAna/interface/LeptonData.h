@@ -16,13 +16,15 @@ namespace NtupleAna {
     float m_eta  = 0;
     float m_phi  = 0;
     float m_mass = 0;
+    float m_superClusterEta = 0;
+    float m_iso = 0;
 
     TLorentzVector m_vec;
 
 
   public:
 
-  LeptonData(float pt, float eta, float phi, float mass) : m_pt(pt), m_eta(eta), m_phi(phi), m_mass(mass) {
+    LeptonData(float pt, float eta, float phi, float mass, float superClusterEta, float iso) : m_pt(pt), m_eta(eta), m_phi(phi), m_mass(mass), m_superClusterEta(superClusterEta), m_iso(iso) {
       m_vec.SetPtEtaPhiM(pt,eta,phi,mass);
     }; 
 

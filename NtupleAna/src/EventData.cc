@@ -24,6 +24,9 @@ EventData::SetBranchAddress (TChain* intree){
   intree->SetBranchAddress("VerticesOff"      ,  VerticesOff_arr);
   intree->SetBranchAddress("nPV"              ,  nPV_arr);
   intree->SetBranchAddress("trueVertex"       ,  trueVertex_arr);
+  intree->SetBranchAddress("HLT_Mu12_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_v4", HLT_Mu12_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_v4_arr);
+  intree->SetBranchAddress("HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_v4", HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_v4_arr);
+    
   
   return;
 }
@@ -42,6 +45,8 @@ EventData::SetEvent (){
   VerticesOff        = VerticesOff_arr      [0];
   nPV                = nPV_arr              [0];
   trueVertex         = trueVertex_arr       [0];
+  HLT_Mu12_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_v4         = HLT_Mu12_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_v4_arr [0];
+  HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_v4         = HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_v4_arr [0];
 
 
   return;

@@ -24,7 +24,8 @@
 #include "TriggerStudies/NtupleAna/interface/Helpers.h"
 
 using namespace NtupleAna;
-
+using std::cout; 
+using std::endl; 
 
 int main(int argc, char * argv[]){
   // load framework libraries
@@ -72,6 +73,7 @@ int main(int argc, char * argv[]){
   // Input Data
   //
   EventData eventData = EventData();
+  
   eventData.SetBranchAddress(tree);
 
   JetDataHandler pfJetsDB = JetDataHandler("pfJets",loadTrkLevel);
@@ -96,30 +98,36 @@ int main(int argc, char * argv[]){
 
   EventHists eventHists     = EventHists("AllEvents", fs);
 
-  JetHists pfJetHistsPreOLap     = JetHists("pfJetsPreOLap",fs,true);
-  JetHists pfJetHists            = JetHists("pfJets", fs, true);
-  JetHists pfJetHists_matched    = JetHists("pfJets_matched" ,fs, true);
-  JetHists pfJetHists_matchedB   = JetHists("pfJets_matchedB",fs, true);
-  JetHists pfJetHists_matchedL   = JetHists("pfJets_matchedL",fs, true);
-
-  JetHists caloJetHistsPreOLap     = JetHists("caloJetsPreOLap",fs, true);
-  JetHists caloJetHists            = JetHists("caloJets",fs, true);
-  JetHists caloJetHists_matched    = JetHists("caloJets_matched" ,fs, true);
-  JetHists caloJetHists_matchedB   = JetHists("caloJets_matchedB",fs, true);
-  JetHists caloJetHists_matchedL   = JetHists("caloJets_matchedL",fs, true);
-
   JetHists offJetHistsPreOLap = JetHists("offJetsPreOLap",fs, true);
+  JetHists offJetHistsBeforeProbe = JetHists("offJetsBeforeProbe",fs, true);
 
   JetHists offJetHists   = JetHists("offJets",  fs, true);
   JetHists offJetHists_B = JetHists("offJets_B",fs, true);
   JetHists offJetHists_L = JetHists("offJets_L",fs, true);
 
-  JetHists offJetHists_matched        = JetHists("offJets_matched",  fs, true);
-  JetHists offJetHists_matchedJet     = JetHists("offJets_matchedJet",  fs, true);
-  JetHists offJetHists_B_matched      = JetHists("offJets_B_matched",fs, true);
-  JetHists offJetHists_L_matched      = JetHists("offJets_L_matched",fs, true);
+  JetHists offJetHists_matchedPF               = JetHists("offJets_matchedPF",               fs, true);
+  JetHists offJetHists_matchedPFJet            = JetHists("offJets_matchedPFJet",            fs, true);
+  JetHists offJetHists_matchedPFcsvTag         = JetHists("offJets_matchedPFcsvTag",         fs, true);
+  JetHists offJetHists_matchedPFcsvTagJet      = JetHists("offJets_matchedPFcsvTagJet",      fs, true);
+  JetHists offJetHists_matchedPFDeepcsvTag     = JetHists("offJets_matchedPFDeepcsvTag",     fs, true);
+  JetHists offJetHists_matchedPFDeepcsvTagJet  = JetHists("offJets_matchedPFDeepcsvTagJet",  fs, true);
 
+  JetHists offJetHists_matchedCalo               = JetHists("offJets_matchedCalo",           fs, true);
+  JetHists offJetHists_matchedCaloJet            = JetHists("offJets_matchedCaloJet",        fs, true);
+  JetHists offJetHists_matchedCalocsvTag         = JetHists("offJets_matchedCalocsvTag",     fs, true);
+  JetHists offJetHists_matchedCalocsvTagJet      = JetHists("offJets_matchedCalocsvTagJet",  fs, true);
+  JetHists offJetHists_matchedCaloDeepcsvTag     = JetHists("offJets_matchedCaloDeepcsvTag",     fs, true);
+  JetHists offJetHists_matchedCaloDeepcsvTagJet  = JetHists("offJets_matchedCaloDeepcsvTagJet",  fs, true);
   
+
+  JetHists offJetHists_B_matched      = JetHists("offJets_B_matchedPF",fs, true);
+  JetHists offJetHists_L_matched      = JetHists("offJets_L_matchedPF",fs, true);
+
+
+  //float pfDeepCSV = 0.6324;
+  //float pfCSV = 0.8484;
+  //float caloCSV = 0.8484;
+
   std::cout << " In jetLevelStudy " << std::endl;
 
   int nEventThisFile = tree->GetEntries();
@@ -154,44 +162,84 @@ int main(int argc, char * argv[]){
     std::vector<NtupleAna::JetData>    pfJets   = pfJetsDB.GetJets();
     std::vector<NtupleAna::JetData>    caloJets = caloJetsDB.GetJets();
 
-    if((elecs.size()+muons.size()) < 2)  continue;
+    //
+    // Lepton Selection
+    //
+    //if((elecs.size()+muons.size()) < 2)  continue;
+    if(elecs.size() != 1)  continue;
+    if(muons.size() != 1)  continue;
+
+    //
+    // Trigger Selection
+    //
+    if(!(eventData.HLT_Mu12_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_v4 ||eventData.HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_v4 ))
+      continue;
+
+    //
+    // cut on number of clean jets
+    //
+    // Sum$(offCleanJets_pt > 30 && abs(offCleanJets_eta) < 2.4) >= 2"
+
+    //
+    // Cut on CSV Selection
+    //
+    unsigned int nOffJets = 0;
+    unsigned int nOffJetsTagged = 0;
+    for(JetData& offJet : offJets){
+      if(fabs(offJet.m_eta) > 2.4) continue;
+      if(offJet.m_pt       < 30)   continue;
+      if(NtupleAna::failOverlap(offJet,elecs)) continue;
+      if(NtupleAna::failOverlap(offJet,muons)) continue;
+      ++nOffJets;
+      if(offJet.m_deepcsv > 0.8001) ++nOffJetsTagged;
+
+    }
+    if(nOffJets < 2) continue;
+    
+
+    //for(auto elec: elecs){
+    //  cout << "Electron pt/eta " << elec.m_pt << "/" << elec.m_eta<<endl;
+    //}
+    //
+    //for(auto muon: muons){
+    //  cout << "Muon pt/eta/iso " << muon.m_pt << "/" << muon.m_eta << "/" << muon.m_iso << endl;
+    //}
+
 
     for(JetData& offJet : offJets){
 
-      if(fabs(offJet.m_eta) > 2.5) continue;
-      if(offJet.m_pt       < 35)   continue;
+      if(fabs(offJet.m_eta) > 2.4) continue;
+      if(offJet.m_pt       < 30)   continue;
       
       offJetHistsPreOLap.Fill(offJet);
 
+      if(!offJet.m_passesTightLeptVetoID) continue;
       if(NtupleAna::failOverlap(offJet,elecs)) continue;
       if(NtupleAna::failOverlap(offJet,muons)) continue;
 
+      //
+      // Check if Prob
+      //
+      bool isProbe = false;
+      for(JetData& offJetOther : offJets){
+	if(offJetOther.m_deepcsv       < 0.8001)   continue;	
+	if(offJet.m_vec.DeltaR(offJetOther.m_vec) < 0.4) continue;
 
-      // Match offline to online
-      float dR = 1e6;
-      JetData* matchedJet = nullptr;
-      for(JetData& pfJet : pfJets){
-	float this_dR = pfJet.m_vec.DeltaR(offJet.m_vec);
-	if (this_dR < dR){
-	  dR = this_dR;
-	  matchedJet = &pfJet;
-	}
+	if(offJetOther.m_pt       < 30)   continue;	
+	if(fabs(offJetOther.m_eta) > 2.4) continue;
+	if(!offJetOther.m_passesTightLeptVetoID) continue;
+	if(NtupleAna::failOverlap(offJetOther,elecs)) continue;
+	if(NtupleAna::failOverlap(offJetOther,muons)) continue;
+
+
+	isProbe = true;
       }
+      
+      offJetHistsBeforeProbe.Fill(offJet);
 
-      if( dR < 0.4){
-	matchedJet->m_matchedJet = &offJet;
-	matchedJet->m_match_dR   = dR;
-	offJet.m_matchedJet = matchedJet;
-	offJet.m_match_dR   = dR;
-      }
+      if(!isProbe) continue;
 
-      // match tracks if we matched jets
       // Fill offJetHists
-      // offJets_ROC
-      //  wp60 DeepCSV > 0.76 (actual efficiency = 0.604992842829)
-      //  wp70 DeepCSV > 0.56 (actual efficiency = 0.717503578586)
-      //  wp80 DeepCSV > 0.36 (actual efficiency = 0.808474091039)
-      //  wp90 DeepCSV > 0.12 (actual efficiency = 0.912533638706)
       offJetHists.Fill(offJet);
       if(offJet.m_hadronFlavour == 5){
 	offJetHists_B.Fill(offJet);
@@ -199,9 +247,31 @@ int main(int argc, char * argv[]){
 	offJetHists_L.Fill(offJet);
       }
 
-      if(offJet.m_matchedJet){
-	offJetHists_matched.Fill(offJet);
-	offJetHists_matchedJet.Fill(*offJet.m_matchedJet);
+      //
+      // Match offline to PF
+      //
+      float dR_PF = 1e6;
+      JetData* matchedJetPF = nullptr;
+
+      for(JetData& pfJet : pfJets){
+	float this_dR = pfJet.m_vec.DeltaR(offJet.m_vec);
+	if (this_dR < dR_PF){
+	  dR_PF = this_dR;
+	  matchedJetPF = &pfJet;
+	}
+      }
+
+      //
+      //  IF have a PF Match
+      //
+      if( dR_PF < 0.4){
+	matchedJetPF->m_matchedJet = &offJet;
+	matchedJetPF->m_match_dR   = dR_PF;
+	offJet.m_matchedJet = matchedJetPF;
+	offJet.m_match_dR   = dR_PF;
+
+	offJetHists_matchedPF.Fill(offJet);
+	offJetHists_matchedPFJet.Fill(*matchedJetPF);
 
 	if(offJet.m_hadronFlavour == 5){
 	  offJetHists_B_matched.Fill(offJet);
@@ -209,71 +279,84 @@ int main(int argc, char * argv[]){
 	  offJetHists_L_matched.Fill(offJet);
 	}
 
+	// 
+	// If pass CVS working point
+	//
+	if(matchedJetPF->m_csv >= 0.8484){
+	  offJetHists_matchedPFcsvTag.Fill(offJet);
+	  offJetHists_matchedPFcsvTagJet.Fill(*matchedJetPF);
+	}
+
+
+	// 
+	// If pass DeepCVS working point
+	//
+	if(matchedJetPF->m_deepcsv >= 0.6324){
+	  offJetHists_matchedPFDeepcsvTag.Fill(offJet);
+	  offJetHists_matchedPFDeepcsvTagJet.Fill(*matchedJetPF);
+	}
+	  
 
       }//m_matchedJet
 
-      // Match offline to online
+      //
+      // Match offline to Calo
+      //
+      float dR_Calo = 1e6;
+      JetData* matchedJetCalo = nullptr;
+
       for(JetData& caloJet : caloJets){
-	float deltaR = caloJet.m_vec.DeltaR(offJet.m_vec);
-	if( deltaR < 0.4){
-	  caloJet.m_matchedJet = &offJet;
-	  break;
+	float this_dR = caloJet.m_vec.DeltaR(offJet.m_vec);
+	if (this_dR < dR_Calo){
+	  dR_Calo = this_dR;
+	  matchedJetCalo = &caloJet;
 	}
       }
+
+      //
+      //  IF have a Calo Match
+      //
+      if( dR_Calo < 0.4){
+	matchedJetCalo->m_matchedJet = &offJet;
+	matchedJetCalo->m_match_dR   = dR_Calo;
+	//offJet.m_matchedJet = matchedJet;
+	//offJet.m_match_dR   = dR_PF;
+
+	offJetHists_matchedCalo.Fill(offJet);
+	offJetHists_matchedCaloJet.Fill(*matchedJetCalo);
+
+	//if(offJet.m_hadronFlavour == 5){
+	//  offJetHists_B_matched.Fill(offJet);
+	//}else{
+	//  offJetHists_L_matched.Fill(offJet);
+	//}
+
+	// 
+	// If pass CVS working point
+	//
+	if(matchedJetCalo->m_csv >= 0.8484){
+	  offJetHists_matchedCalocsvTag.Fill(offJet);
+	  offJetHists_matchedCalocsvTagJet.Fill(*matchedJetCalo);
+	}
+
+	// 
+	// If pass DeepCVS working point
+	//
+	if(matchedJetCalo->m_deepcsv >= 0.6324){
+	  offJetHists_matchedCaloDeepcsvTag.Fill(offJet);
+	  offJetHists_matchedCaloDeepcsvTagJet.Fill(*matchedJetCalo);
+	}
+
+      }//m_matchedJet
+
     
     }//offJets
 
-    //
-    //  pf Jets
-    //
-    for(JetData& pfJet : pfJets){
-      if(fabs(pfJet.m_eta) > 2.5) continue;
-      if(pfJet.m_pt       < 35)   continue;
 
-
-      pfJetHistsPreOLap.Fill(pfJet);
-
-      if(NtupleAna::failOverlap(pfJet,elecs)) continue;
-      if(NtupleAna::failOverlap(pfJet,muons)) continue;
-
-      pfJetHists.Fill(pfJet);
-
-      if(pfJet.m_matchedJet){
-	pfJetHists_matched .Fill(pfJet);
-
-	if( pfJet.m_matchedJet->m_hadronFlavour == 5)
-	  pfJetHists_matchedB.Fill(pfJet);
-	else
-	  pfJetHists_matchedL.Fill(pfJet);
-      }
-    }
-
-    //
-    //  calo Jets
-    //
-    for(JetData& caloJet : caloJets){
-      if(fabs(caloJet.m_eta) > 2.5) continue;
-      if(caloJet.m_pt       < 35)   continue;
-
-      caloJetHistsPreOLap.Fill(caloJet);
-      if(NtupleAna::failOverlap(caloJet,elecs)) continue;
-      if(NtupleAna::failOverlap(caloJet,muons)) continue;
-
-      caloJetHists.Fill(caloJet);
-
-      if(caloJet.m_matchedJet){
-	caloJetHists_matched .Fill(caloJet);
-
-	if(caloJet.m_matchedJet->m_hadronFlavour == 5)
-	  caloJetHists_matchedB.Fill(caloJet);
-	else
-	  caloJetHists_matchedL.Fill(caloJet);
-      }
-    }
    
  
     
-  }
+  }// Events 
 
 
 

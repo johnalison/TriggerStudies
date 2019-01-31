@@ -16,6 +16,7 @@ JetHists::JetHists(std::string name, fwlite::TFileService& fs, bool light) {
   m_eta     = dir.make<TH1F>("eta","eta;jet #eta;Entries",100,-3,3);
   m_phi     = dir.make<TH1F>("phi","phi;jet #phi;Entries",100,-3.2,3.2);
   m_mass    = dir.make<TH1F>("mass","mass;jet mass [GeV];Entries",100,-1,200);
+  m_csv     = dir.make<TH1F>("csv","csv;csv;Entries",200,0,1);
   m_deepcsv = dir.make<TH1F>("deepcsv","deepcsv;deepcsv;Entries",200,0,1);
 
   m_matched_dPt      = dir.make<TH1F>("matched_dPt",     "matched_dPt     ;P_{T}-P_{T}^{matched} [GeV];Entries",  100,-50, 50);
@@ -23,8 +24,12 @@ JetHists::JetHists(std::string name, fwlite::TFileService& fs, bool light) {
   m_matched_dPhi     = dir.make<TH1F>("matched_dPhi",    "matched_dPhi    ;#phi-#phi^{matched};Entries",100,-0.5,0.5);
   m_matched_dR       = dir.make<TH1F>("matched_dR",      "matched_dR      ;#DeltaR(Online,Offline);;Entries",45, 0,0.45);
   m_matched_dMass    = dir.make<TH1F>("matched_dMass",   "matched_dMass   ;mass-mass^{matched} [GeV];Entries",100,-50,50);
+  m_matched_dcsv     = dir.make<TH1F>("matched_dcsv","matched_dcsv;CSV-CSV^{matched};Entries",100,-1,1);
   m_matched_dDeepcsv = dir.make<TH1F>("matched_dDeepcsv","matched_dDeepcsv;DeepCSV-DeepCSV^{matched};Entries",100,-1,1);
   
+  m_csv_matched = dir.make<TH1F>("csv_matched","csv;csv;Entries",200,0,1);
+  m_csv_vs_matched_csv = dir.make<TH2F>("csv_vs_matched_csv",  "Events;CSV;Matched CSV",100,-1,1,100,-1,1);
+
   m_deepcsv_matched = dir.make<TH1F>("deepcsv_matched","deepcsv;deepcsv;Entries",200,0,1);
   m_deepcsv_vs_matched_deepcsv = dir.make<TH2F>("deepcsv_vs_matched_deepcsv",  "Events;DeepCSV;Matched DeepCSV",100,-1,1,100,-1,1);
   
@@ -105,6 +110,7 @@ JetHists::Fill (const JetData& jetInfo){
   m_eta     ->Fill(jetInfo.m_eta);
   m_phi     ->Fill(jetInfo.m_phi);
   m_mass    ->Fill(jetInfo.m_mass);
+  m_csv     ->Fill(jetInfo.m_csv);
   m_deepcsv ->Fill(jetInfo.m_deepcsv);
 
   if(jetInfo.m_matchedJet){
@@ -117,6 +123,9 @@ JetHists::Fill (const JetData& jetInfo){
     
     m_deepcsv_matched->Fill(jetInfo.m_matchedJet->m_deepcsv);
     m_deepcsv_vs_matched_deepcsv->Fill(jetInfo.m_deepcsv, jetInfo.m_matchedJet->m_deepcsv);
+
+    m_csv_matched->Fill(jetInfo.m_matchedJet->m_csv);
+    m_csv_vs_matched_csv->Fill(jetInfo.m_csv, jetInfo.m_matchedJet->m_csv);
   }
   m_deepcsv_bb->Fill(jetInfo.m_deepcsv_bb);
 
