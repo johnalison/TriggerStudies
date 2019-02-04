@@ -7,6 +7,7 @@
 #include "DataFormats/FWLite/interface/Event.h"
 #include "DataFormats/FWLite/interface/Handle.h"
 #include "FWCore/FWLite/interface/FWLiteEnabler.h"
+#include "PhysicsTools/FWLite/interface/CommandLineParser.h"
 
 #include "DataFormats/FWLite/interface/InputSource.h"
 #include "DataFormats/FWLite/interface/OutputFiles.h"
@@ -22,35 +23,55 @@
 #include "TriggerStudies/NtupleAna/interface/JetHists.h"
 #include "TriggerStudies/NtupleAna/interface/EventHists.h"
 #include "TriggerStudies/NtupleAna/interface/Helpers.h"
+#include "../../../HLTBTagging/measurements/modules/functions.h"
 
 using namespace NtupleAna;
 using std::cout; 
 using std::endl; 
+using optutl::CommandLineParser;
+
 
 int main(int argc, char * argv[]){
+  std::cout << " ======== jetLevelStudy ========== " << std::endl;
+
   // load framework libraries
   gSystem->Load( "libFWCoreFWLite" );
   FWLiteEnabler::enable();
   
-  // parse arguments
-  if ( argc < 2 ) {
-    std::cout << "Usage : " << argv[0] << " [parameters.py]" << std::endl;
-    return 0;
-  }
+  // initialize command line parser
+  CommandLineParser parser ("Analyze FWLite Histograms");
 
-  if( !edm::readPSetsFrom(argv[1])->existsAs<edm::ParameterSet>("process") ){
+  parser.addOption ("configFile",   CommandLineParser::kString,
+		    "configFileName");
+  parser.addOption ("puType",   CommandLineParser::kString,
+		    "pile-up correction type");
+  // set defaults
+  parser.integerValue ("maxEvents"  ) = -1;
+  parser.integerValue ("outputEvery") =   10000;
+  parser.stringValue  ("outputFile" ) = "TEST.root";  
+
+
+  parser.parseArguments (argc, argv);
+  //cout << "Running with "<<parser.integerValue("maxEvents") << " config file " << parser.stringValue("configFile") << endl;
+  std::string configFile     = parser.stringValue("configFile");
+  std::string outputFileName = parser.stringValue("outputFile");
+  std::string puType         = parser.stringValue("puType");
+  std::vector<std::string> inputFiles = parser.stringVector("inputFiles");
+
+  cout << "\t Running with configFile: " << configFile << endl;
+  cout << "\t Outputting to: " << outputFileName << endl;
+  cout << "\t puType: " << puType << endl;
+
+  
+  if( !edm::readPSetsFrom(configFile)->existsAs<edm::ParameterSet>("process") ){
     std::cout << " ERROR: ParametersSet 'process' is missing in your configuration file" << std::endl; exit(0);
   }
-
-  // get the python configuration
-  const edm::ParameterSet& process = edm::readPSetsFrom(argv[1])->getParameter<edm::ParameterSet>("process");
-  fwlite::InputSource inputHandler_(process); 
-  fwlite::OutputFiles outputHandler_(process);
 
   //
   // Get the config
   //
   // now get each parameter
+  const edm::ParameterSet& process = edm::readPSetsFrom(configFile)->getParameter<edm::ParameterSet>("process");
   const edm::ParameterSet& ana = process.getParameter<edm::ParameterSet>("jetLevelStudy");
   bool loadTrkLevel = ana.getParameter<bool>("LoadTrkLevel");
   bool debug = ana.getParameter<bool>("debug");
@@ -59,21 +80,25 @@ int main(int argc, char * argv[]){
   //  Inint Tree
   //
   TChain* tree = new TChain("tree");
-  for(unsigned int iFile=0; iFile<inputHandler_.files().size(); ++iFile){
+  cout << "\t inputFiles are: " << endl;
+  for(unsigned int iFile=0; iFile<inputFiles.size(); ++iFile){
     // open input file (can be located on castor)
-    std::cout << "inputFile is " << inputHandler_.files()[iFile].c_str() << std::endl;
+    std::cout << "\t\t " << inputFiles[iFile].c_str() << std::endl;
 
     //TFile* inFile = TFile::Open(inputFiles_[iFile].c_str());
     //if( inFile ){
-    tree->Add(inputHandler_.files()[iFile].c_str());
+    tree->Add(inputFiles[iFile].c_str());
     //}
   }
+
+  bool isMC = bool(tree->GetBranch("pu"));
+  cout << " \t isMC set to: " << isMC << endl;
+  cout << " ================================="<<endl;
 
   //
   // Input Data
   //
   EventData eventData = EventData();
-  
   eventData.SetBranchAddress(tree);
 
   JetDataHandler pfJetsDB = JetDataHandler("pfJets",loadTrkLevel);
@@ -82,28 +107,33 @@ int main(int argc, char * argv[]){
   JetDataHandler caloJetsDB = JetDataHandler("caloJets",loadTrkLevel);
   caloJetsDB.SetBranchAddress(tree);
 
-  JetDataHandler offJetsDB = JetDataHandler("offJets",loadTrkLevel);
+  //JetDataHandler offJetsDB = JetDataHandler("offJets",loadTrkLevel);
+  JetDataHandler offJetsDB = JetDataHandler("offCleanJets",loadTrkLevel, isMC);
   offJetsDB.SetBranchAddress(tree);
 
-  LeptonDataHandler muonDB = LeptonDataHandler("offTightMuons");
+  LeptonDataHandler muonDB = LeptonDataHandler("offTightMuons", isMC);
   muonDB.SetBranchAddress(tree);
 
-  LeptonDataHandler elecDB = LeptonDataHandler("offTightElectrons");
+  LeptonDataHandler elecDB = LeptonDataHandler("offTightElectrons", isMC);
   elecDB.SetBranchAddress(tree);
 
   //
   // Make output ntuple/Hists
   // 
-  fwlite::TFileService fs = fwlite::TFileService(outputHandler_.file());
+  fwlite::TFileService fs = fwlite::TFileService(outputFileName);
 
-  EventHists eventHists     = EventHists("AllEvents", fs);
+  EventHists allEventHists  = EventHists("AllEvents", fs);
+  EventHists eventHists     = EventHists("Events", fs);
+
 
   JetHists offJetHistsPreOLap = JetHists("offJetsPreOLap",fs, true);
   JetHists offJetHistsBeforeProbe = JetHists("offJetsBeforeProbe",fs, true);
 
   JetHists offJetHists   = JetHists("offJets",  fs, true);
   JetHists offJetHists_B = JetHists("offJets_B",fs, true);
+  JetHists offJetHists_C = JetHists("offJets_C",fs, true);
   JetHists offJetHists_L = JetHists("offJets_L",fs, true);
+
 
   JetHists offJetHists_matchedPF               = JetHists("offJets_matchedPF",               fs, true);
   JetHists offJetHists_matchedPFJet            = JetHists("offJets_matchedPFJet",            fs, true);
@@ -112,31 +142,51 @@ int main(int argc, char * argv[]){
   JetHists offJetHists_matchedPFDeepcsvTag     = JetHists("offJets_matchedPFDeepcsvTag",     fs, true);
   JetHists offJetHists_matchedPFDeepcsvTagJet  = JetHists("offJets_matchedPFDeepcsvTagJet",  fs, true);
 
+  JetHists offJetHists_B_matchedPF      = JetHists("offJets_B_matchedPF",fs, true);
+  JetHists offJetHists_C_matchedPF      = JetHists("offJets_C_matchedPF",fs, true);
+  JetHists offJetHists_L_matchedPF      = JetHists("offJets_L_matchedPF",fs, true);
+
+  JetHists offJetHists_B_matchedPFJet   = JetHists("offJets_B_matchedPFJet",fs, true);
+  JetHists offJetHists_C_matchedPFJet   = JetHists("offJets_C_matchedPFJet",fs, true);
+  JetHists offJetHists_L_matchedPFJet   = JetHists("offJets_L_matchedPFJet",fs, true);
+
+
   JetHists offJetHists_matchedCalo               = JetHists("offJets_matchedCalo",           fs, true);
   JetHists offJetHists_matchedCaloJet            = JetHists("offJets_matchedCaloJet",        fs, true);
   JetHists offJetHists_matchedCalocsvTag         = JetHists("offJets_matchedCalocsvTag",     fs, true);
   JetHists offJetHists_matchedCalocsvTagJet      = JetHists("offJets_matchedCalocsvTagJet",  fs, true);
   JetHists offJetHists_matchedCaloDeepcsvTag     = JetHists("offJets_matchedCaloDeepcsvTag",     fs, true);
   JetHists offJetHists_matchedCaloDeepcsvTagJet  = JetHists("offJets_matchedCaloDeepcsvTagJet",  fs, true);
-  
 
-  JetHists offJetHists_B_matched      = JetHists("offJets_B_matchedPF",fs, true);
-  JetHists offJetHists_L_matched      = JetHists("offJets_L_matchedPF",fs, true);
+  JetHists offJetHists_B_matchedCalo      = JetHists("offJets_B_matchedCalo",fs, true);
+  JetHists offJetHists_C_matchedCalo      = JetHists("offJets_C_matchedCalo",fs, true);
+  JetHists offJetHists_L_matchedCalo      = JetHists("offJets_L_matchedCalo",fs, true);
 
+
+  JetHists offJetHists_B_matchedCaloJet      = JetHists("offJets_B_matchedCaloJet",fs, true);
+  JetHists offJetHists_C_matchedCaloJet      = JetHists("offJets_C_matchedCaloJet",fs, true);
+  JetHists offJetHists_L_matchedCaloJet      = JetHists("offJets_L_matchedCaloJet",fs, true);
+
+  //
+  //  Init the pile-up function
+  //
+  float (*get_puWeight)(float);
+  get_puWeight = &get_puWeight_C_ReReco;
+  //get_puWeight_CDF
 
   //float pfDeepCSV = 0.6324;
   //float pfCSV = 0.8484;
   //float caloCSV = 0.8484;
 
-  std::cout << " In jetLevelStudy " << std::endl;
 
   int nEventThisFile = tree->GetEntries();
-  int maxEvents = inputHandler_.maxEvents();
+  int maxEvents = parser.integerValue("maxEvents");
+  int outputEvery = parser.integerValue("outputEvery");
   std::cout <<  "Number of input events: " << nEventThisFile << std::endl;
 
   for(int entry = 0; entry<nEventThisFile; entry++){
     
-    if(entry %1000 == 0 || debug)
+    if(entry %outputEvery == 0 || debug)
       std::cout << "Processed .... "<<entry<<" Events"<<std::endl;
     if( (maxEvents > 0) && (entry > maxEvents))
       break;
@@ -153,7 +203,7 @@ int main(int argc, char * argv[]){
     //
     // Fill All events
     //
-    eventHists.Fill(eventData);
+    allEventHists.Fill(eventData);
 
     // Converting from "row-level" info to "column-level" info
     std::vector<NtupleAna::LeptonData> elecs  = elecDB.GetLeps();
@@ -168,6 +218,14 @@ int main(int argc, char * argv[]){
     //if((elecs.size()+muons.size()) < 2)  continue;
     if(elecs.size() != 1)  continue;
     if(muons.size() != 1)  continue;
+
+    float eventWeight = 1.0;
+    if(isMC){
+      eventWeight = get_puWeight(eventData.pu) * elecs.at(0).m_SF * muons.at(0).m_SF;
+      //eventWeight = get_puWeight_CDF(eventData.pu) * elecs.at(0).m_SF * muons.at(0).m_SF;
+    }
+
+    //std::cout << "PU Weight " << get_puWeight_CDF(eventData.pu) << std::endl;
 
     //
     // Trigger Selection
@@ -194,13 +252,16 @@ int main(int argc, char * argv[]){
       if(offJet.m_deepcsv > 0.8001) ++nOffJetsTagged;
 
     }
-    if(nOffJets < 2) continue;
-    
+    if(nOffJets < 2      ) continue;
+    if(nOffJetsTagged < 1) continue;
+
+
+    eventHists.Fill(eventData, eventWeight);    
 
     //for(auto elec: elecs){
-    //  cout << "Electron pt/eta " << elec.m_pt << "/" << elec.m_eta<<endl;
+    //  cout << "Electron pt/eta " << elec.m_pt << "/" << elec.m_eta<< " " << elec.m_SF << endl;
     //}
-    //
+    
     //for(auto muon: muons){
     //  cout << "Muon pt/eta/iso " << muon.m_pt << "/" << muon.m_eta << "/" << muon.m_iso << endl;
     //}
@@ -211,7 +272,7 @@ int main(int argc, char * argv[]){
       if(fabs(offJet.m_eta) > 2.4) continue;
       if(offJet.m_pt       < 30)   continue;
       
-      offJetHistsPreOLap.Fill(offJet);
+      offJetHistsPreOLap.Fill(offJet, eventWeight);
 
       if(!offJet.m_passesTightLeptVetoID) continue;
       if(NtupleAna::failOverlap(offJet,elecs)) continue;
@@ -220,7 +281,8 @@ int main(int argc, char * argv[]){
       //
       // Check if Prob
       //
-      bool isProbe = false;
+      unsigned int nTags = 0;
+      float  tagSF = 1.0;
       for(JetData& offJetOther : offJets){
 	if(offJetOther.m_deepcsv       < 0.8001)   continue;	
 	if(offJet.m_vec.DeltaR(offJetOther.m_vec) < 0.4) continue;
@@ -231,20 +293,26 @@ int main(int argc, char * argv[]){
 	if(NtupleAna::failOverlap(offJetOther,elecs)) continue;
 	if(NtupleAna::failOverlap(offJetOther,muons)) continue;
 
-
-	isProbe = true;
+	++nTags;
+	if(isMC)
+	  tagSF = offJetOther.m_SF;
       }
       
-      offJetHistsBeforeProbe.Fill(offJet);
 
-      if(!isProbe) continue;
+      offJetHistsBeforeProbe.Fill(offJet, eventWeight);
+
+      if(nTags != 1) continue;
+
+      //cout << "Scaling eventWeight by: " << tagSF  << endl;
 
       // Fill offJetHists
-      offJetHists.Fill(offJet);
+      offJetHists.Fill(offJet, eventWeight*tagSF);
       if(offJet.m_hadronFlavour == 5){
-	offJetHists_B.Fill(offJet);
-      }else{
-	offJetHists_L.Fill(offJet);
+	offJetHists_B.Fill(offJet, eventWeight*tagSF);
+      }	else if(offJet.m_hadronFlavour == 4){
+	offJetHists_C.Fill(offJet, eventWeight*tagSF);
+      }	else if(offJet.m_hadronFlavour == 0){
+	offJetHists_L.Fill(offJet, eventWeight*tagSF);
       }
 
       //
@@ -270,21 +338,27 @@ int main(int argc, char * argv[]){
 	offJet.m_matchedJet = matchedJetPF;
 	offJet.m_match_dR   = dR_PF;
 
-	offJetHists_matchedPF.Fill(offJet);
-	offJetHists_matchedPFJet.Fill(*matchedJetPF);
+	offJetHists_matchedPF.Fill(offJet, eventWeight*tagSF);
+	offJetHists_matchedPFJet.Fill(*matchedJetPF, eventWeight*tagSF);
 
 	if(offJet.m_hadronFlavour == 5){
-	  offJetHists_B_matched.Fill(offJet);
-	}else{
-	  offJetHists_L_matched.Fill(offJet);
+	  offJetHists_B_matchedPF.Fill(offJet, eventWeight*tagSF);
+	  offJetHists_B_matchedPFJet.Fill(*matchedJetPF, eventWeight*tagSF);
+	}else if(offJet.m_hadronFlavour == 4){
+	  offJetHists_C_matchedPF.Fill(offJet, eventWeight*tagSF);
+	  offJetHists_C_matchedPFJet.Fill(*matchedJetPF, eventWeight*tagSF);
+	}else if(offJet.m_hadronFlavour == 0){
+	  offJetHists_L_matchedPF.Fill(offJet, eventWeight*tagSF);
+	  offJetHists_L_matchedPFJet.Fill(*matchedJetPF, eventWeight*tagSF);
 	}
+
 
 	// 
 	// If pass CVS working point
 	//
 	if(matchedJetPF->m_csv >= 0.8484){
-	  offJetHists_matchedPFcsvTag.Fill(offJet);
-	  offJetHists_matchedPFcsvTagJet.Fill(*matchedJetPF);
+	  offJetHists_matchedPFcsvTag.Fill(offJet, eventWeight*tagSF);
+	  offJetHists_matchedPFcsvTagJet.Fill(*matchedJetPF, eventWeight*tagSF);
 	}
 
 
@@ -292,8 +366,8 @@ int main(int argc, char * argv[]){
 	// If pass DeepCVS working point
 	//
 	if(matchedJetPF->m_deepcsv >= 0.6324){
-	  offJetHists_matchedPFDeepcsvTag.Fill(offJet);
-	  offJetHists_matchedPFDeepcsvTagJet.Fill(*matchedJetPF);
+	  offJetHists_matchedPFDeepcsvTag.Fill(offJet, eventWeight*tagSF);
+	  offJetHists_matchedPFDeepcsvTagJet.Fill(*matchedJetPF, eventWeight*tagSF);
 	}
 	  
 
@@ -322,29 +396,34 @@ int main(int argc, char * argv[]){
 	//offJet.m_matchedJet = matchedJet;
 	//offJet.m_match_dR   = dR_PF;
 
-	offJetHists_matchedCalo.Fill(offJet);
-	offJetHists_matchedCaloJet.Fill(*matchedJetCalo);
+	offJetHists_matchedCalo.Fill(offJet, eventWeight*tagSF);
+	offJetHists_matchedCaloJet.Fill(*matchedJetCalo, eventWeight*tagSF);
 
-	//if(offJet.m_hadronFlavour == 5){
-	//  offJetHists_B_matched.Fill(offJet);
-	//}else{
-	//  offJetHists_L_matched.Fill(offJet);
-	//}
+	if(offJet.m_hadronFlavour == 5){
+	  offJetHists_B_matchedCalo.Fill(offJet, eventWeight*tagSF);
+	  offJetHists_B_matchedCaloJet.Fill(*matchedJetCalo, eventWeight*tagSF);
+	}else if(offJet.m_hadronFlavour == 4){
+	  offJetHists_C_matchedCalo.Fill(offJet, eventWeight*tagSF);
+	  offJetHists_C_matchedCaloJet.Fill(*matchedJetCalo, eventWeight*tagSF);
+	}else if(offJet.m_hadronFlavour == 0){
+	  offJetHists_L_matchedCalo.Fill(offJet, eventWeight*tagSF);
+	  offJetHists_L_matchedCaloJet.Fill(*matchedJetCalo, eventWeight*tagSF);
+	}
 
 	// 
 	// If pass CVS working point
 	//
 	if(matchedJetCalo->m_csv >= 0.8484){
-	  offJetHists_matchedCalocsvTag.Fill(offJet);
-	  offJetHists_matchedCalocsvTagJet.Fill(*matchedJetCalo);
+	  offJetHists_matchedCalocsvTag.Fill(offJet, eventWeight*tagSF);
+	  offJetHists_matchedCalocsvTagJet.Fill(*matchedJetCalo, eventWeight*tagSF);
 	}
 
 	// 
 	// If pass DeepCVS working point
 	//
 	if(matchedJetCalo->m_deepcsv >= 0.6324){
-	  offJetHists_matchedCaloDeepcsvTag.Fill(offJet);
-	  offJetHists_matchedCaloDeepcsvTagJet.Fill(*matchedJetCalo);
+	  offJetHists_matchedCaloDeepcsvTag.Fill(offJet, eventWeight*tagSF);
+	  offJetHists_matchedCaloDeepcsvTagJet.Fill(*matchedJetCalo, eventWeight*tagSF);
 	}
 
       }//m_matchedJet

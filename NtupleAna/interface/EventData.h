@@ -18,6 +18,7 @@ namespace NtupleAna {
     float VerticesL3        =  0;
     float VerticesOff       =  0;
     float nPV               =  0;
+    float pu                =  0;
     float trueVertex        =  0;
     bool HLT_Mu12_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_v4 = false;
     bool HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_v4 = false;
@@ -32,9 +33,11 @@ namespace NtupleAna {
     float VerticesL3_arr        [1] = {0};
     float VerticesOff_arr       [1] = {0};
     float nPV_arr               [1] = {0};
+    float pu_arr                [1] = {0};
     float trueVertex_arr        [1] = {0};
     bool HLT_Mu12_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_v4_arr [1] = {false};
     bool HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_v4_arr [1] = {false};
+
 
   public:
 

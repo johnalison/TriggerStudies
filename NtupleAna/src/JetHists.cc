@@ -1,3 +1,4 @@
+
 #include "TChain.h"
 
 #include "TriggerStudies/NtupleAna/interface/JetData.h"
@@ -18,6 +19,7 @@ JetHists::JetHists(std::string name, fwlite::TFileService& fs, bool light) {
   m_mass    = dir.make<TH1F>("mass","mass;jet mass [GeV];Entries",100,-1,200);
   m_csv     = dir.make<TH1F>("csv","csv;csv;Entries",200,0,1);
   m_deepcsv = dir.make<TH1F>("deepcsv","deepcsv;deepcsv;Entries",200,0,1);
+  m_SF      = dir.make<TH1F>("SF",     "SF;SF;Entries",50,-0.1,2);
 
   m_matched_dPt      = dir.make<TH1F>("matched_dPt",     "matched_dPt     ;P_{T}-P_{T}^{matched} [GeV];Entries",  100,-50, 50);
   m_matched_dEta     = dir.make<TH1F>("matched_dEta",    "matched_dEta    ;#eta-#eta^{matched};Entries",100,-0.5,0.5);
@@ -103,90 +105,92 @@ JetHists::~JetHists() {}
 void
 //JetHists::Fill (const JetData* jetPtr){
 //  const JetData& jetInfo = (*jetPtr);
-JetHists::Fill (const JetData& jetInfo){
+JetHists::Fill (const JetData& jetInfo, float eventWeight){
 
-  m_pt      ->Fill(jetInfo.m_pt);
-  m_pt_l    ->Fill(jetInfo.m_pt);
-  m_eta     ->Fill(jetInfo.m_eta);
-  m_phi     ->Fill(jetInfo.m_phi);
-  m_mass    ->Fill(jetInfo.m_mass);
-  m_csv     ->Fill(jetInfo.m_csv);
-  m_deepcsv ->Fill(jetInfo.m_deepcsv);
+  m_pt      ->Fill(jetInfo.m_pt      , eventWeight);
+  m_pt_l    ->Fill(jetInfo.m_pt      , eventWeight);
+  m_eta     ->Fill(jetInfo.m_eta     , eventWeight);
+  m_phi     ->Fill(jetInfo.m_phi     , eventWeight);
+  m_mass    ->Fill(jetInfo.m_mass    , eventWeight);
+  m_csv     ->Fill(jetInfo.m_csv     , eventWeight);
+  m_deepcsv ->Fill(jetInfo.m_deepcsv , eventWeight);
+  m_SF      ->Fill(jetInfo.m_SF      , eventWeight);
 
   if(jetInfo.m_matchedJet){
-    m_matched_dPt     ->Fill(jetInfo.m_pt - jetInfo.m_matchedJet->m_pt);
-    m_matched_dEta    ->Fill(jetInfo.m_eta - jetInfo.m_matchedJet->m_eta);
-    m_matched_dPhi    ->Fill(jetInfo.m_phi - jetInfo.m_matchedJet->m_phi);
-    m_matched_dR      ->Fill(jetInfo.m_vec.DeltaR(jetInfo.m_matchedJet->m_vec));
-    m_matched_dMass   ->Fill(jetInfo.m_mass - jetInfo.m_matchedJet->m_mass);
-    m_matched_dDeepcsv->Fill(jetInfo.m_deepcsv - jetInfo.m_matchedJet->m_deepcsv);
+    m_matched_dPt     ->Fill(jetInfo.m_pt - jetInfo.m_matchedJet->m_pt            , eventWeight);
+    m_matched_dEta    ->Fill(jetInfo.m_eta - jetInfo.m_matchedJet->m_eta          , eventWeight);
+    m_matched_dPhi    ->Fill(jetInfo.m_phi - jetInfo.m_matchedJet->m_phi          , eventWeight);
+    m_matched_dR      ->Fill(jetInfo.m_vec.DeltaR(jetInfo.m_matchedJet->m_vec)    , eventWeight);
+    m_matched_dMass   ->Fill(jetInfo.m_mass - jetInfo.m_matchedJet->m_mass        , eventWeight);
+    m_matched_dDeepcsv->Fill(jetInfo.m_deepcsv - jetInfo.m_matchedJet->m_deepcsv  , eventWeight);
     
-    m_deepcsv_matched->Fill(jetInfo.m_matchedJet->m_deepcsv);
-    m_deepcsv_vs_matched_deepcsv->Fill(jetInfo.m_deepcsv, jetInfo.m_matchedJet->m_deepcsv);
+    m_deepcsv_matched->Fill(jetInfo.m_matchedJet->m_deepcsv, eventWeight);
+    m_deepcsv_vs_matched_deepcsv->Fill(jetInfo.m_deepcsv, jetInfo.m_matchedJet->m_deepcsv, eventWeight);
 
-    m_csv_matched->Fill(jetInfo.m_matchedJet->m_csv);
-    m_csv_vs_matched_csv->Fill(jetInfo.m_csv, jetInfo.m_matchedJet->m_csv);
+    m_csv_matched->Fill(jetInfo.m_matchedJet->m_csv, eventWeight);
+    m_csv_vs_matched_csv->Fill(jetInfo.m_csv, jetInfo.m_matchedJet->m_csv, eventWeight);
   }
-  m_deepcsv_bb->Fill(jetInfo.m_deepcsv_bb);
+  m_deepcsv_bb->Fill(jetInfo.m_deepcsv_bb, eventWeight);
+  m_partonFlavour                    ->Fill(jetInfo.m_partonFlavour   , eventWeight);
+  m_hadronFlavour                    ->Fill(jetInfo.m_hadronFlavour   , eventWeight);
+
 
   if(!m_light){
-    m_vertexNTracks                    ->Fill(jetInfo.m_vertexNTracks                    );
-    m_vertexMass                       ->Fill(jetInfo.m_vertexMass                       );
-    m_vertexJetDeltaR                  ->Fill(jetInfo.m_vertexJetDeltaR                  );
-    m_vertexFitProb                    ->Fill(jetInfo.m_vertexFitProb                    );
-    m_vertexEnergyRatio                ->Fill(jetInfo.m_vertexEnergyRatio                );
-    m_vertexCategory                   ->Fill(jetInfo.m_vertexCategory                   );
-    m_vertexBoostOverSqrtJetPt         ->Fill(jetInfo.m_vertexBoostOverSqrtJetPt         );
-    m_trackJetPt                       ->Fill(jetInfo.m_trackJetPt               );
-    m_trackSumJetEtRatio               ->Fill(jetInfo.m_trackSumJetEtRatio               );
+    m_vertexNTracks                    ->Fill(jetInfo.m_vertexNTracks               , eventWeight     );
+    m_vertexMass                       ->Fill(jetInfo.m_vertexMass                  , eventWeight     );
+    m_vertexJetDeltaR                  ->Fill(jetInfo.m_vertexJetDeltaR             , eventWeight     );
+    m_vertexFitProb                    ->Fill(jetInfo.m_vertexFitProb               , eventWeight     );
+    m_vertexEnergyRatio                ->Fill(jetInfo.m_vertexEnergyRatio           , eventWeight     );
+    m_vertexCategory                   ->Fill(jetInfo.m_vertexCategory              , eventWeight     );
+    m_vertexBoostOverSqrtJetPt         ->Fill(jetInfo.m_vertexBoostOverSqrtJetPt    , eventWeight     );
+    m_trackJetPt                       ->Fill(jetInfo.m_trackJetPt                  , eventWeight     );
+    m_trackSumJetEtRatio               ->Fill(jetInfo.m_trackSumJetEtRatio          , eventWeight     );
     if(jetInfo.m_jetNSelectedTracks > 0)
-      m_trackSumJetDeltaR                ->Fill(jetInfo.m_trackSumJetDeltaR                );
-    m_trackSip2dValAboveCharm          ->Fill(jetInfo.m_trackSip2dValAboveCharm          );
-    m_trackSip2dSigAboveCharm          ->Fill(jetInfo.m_trackSip2dSigAboveCharm          );
-    m_trackSip3dValAboveCharm          ->Fill(jetInfo.m_trackSip3dValAboveCharm          );
-    m_trackSip3dSigAboveCharm          ->Fill(jetInfo.m_trackSip3dSigAboveCharm          );
-    m_totalMultiplicity                ->Fill(jetInfo.m_totalMultiplicity                );
-    m_totalFraction                    ->Fill(jetInfo.m_chargedHadronEnergyFraction
-					      + jetInfo.m_neutralHadronEnergyFraction
-					      + jetInfo.m_photonEnergyFraction
-					      + jetInfo.m_muonEnergyFraction);
+      m_trackSumJetDeltaR                ->Fill(jetInfo.m_trackSumJetDeltaR , eventWeight );
+    m_trackSip2dValAboveCharm          ->Fill(jetInfo.m_trackSip2dValAboveCharm   , eventWeight       );
+    m_trackSip2dSigAboveCharm          ->Fill(jetInfo.m_trackSip2dSigAboveCharm   , eventWeight       );
+    m_trackSip3dValAboveCharm          ->Fill(jetInfo.m_trackSip3dValAboveCharm   , eventWeight       );
+    m_trackSip3dSigAboveCharm          ->Fill(jetInfo.m_trackSip3dSigAboveCharm   , eventWeight       );
+    m_totalMultiplicity                ->Fill(jetInfo.m_totalMultiplicity         , eventWeight       );
+    m_totalFraction                    ->Fill((jetInfo.m_chargedHadronEnergyFraction
+					       + jetInfo.m_neutralHadronEnergyFraction
+					       + jetInfo.m_photonEnergyFraction
+					       + jetInfo.m_muonEnergyFraction) , eventWeight);
 					      
-    m_photonMultiplicity               ->Fill(jetInfo.m_photonMultiplicity               );
-    m_photonEnergyFraction             ->Fill(jetInfo.m_photonEnergyFraction             );
-    m_neutralHadronMultiplicity        ->Fill(jetInfo.m_neutralHadronMultiplicity        );
-    m_neutralHadronEnergyFraction      ->Fill(jetInfo.m_neutralHadronEnergyFraction      );
-    m_neMult                           ->Fill(jetInfo.m_neMult                           );
-    m_neHadEF                          ->Fill(jetInfo.m_neHadEF                          );
-    m_neEmEF                           ->Fill(jetInfo.m_neEmEF                           );
-    m_muonMultiplicity                 ->Fill(jetInfo.m_muonMultiplicity                 );
-    m_muonEnergyFraction               ->Fill(jetInfo.m_muonEnergyFraction               );
-    m_mult                             ->Fill(jetInfo.m_mult                             );
-    m_muEF                             ->Fill(jetInfo.m_muEF                             );
-    m_massVertexEnergyFraction         ->Fill(jetInfo.m_massVertexEnergyFraction         );
-    m_jetNTracksEtaRel                 ->Fill(jetInfo.m_jetNTracksEtaRel                 );
-    m_jetNTracks                       ->Fill(jetInfo.m_jetNTracks                       );
-    m_jetNSelectedTracks               ->Fill(jetInfo.m_jetNSelectedTracks               );
-    m_jetNSecondaryVertices            ->Fill(jetInfo.m_jetNSecondaryVertices            );
-    m_hadronPhotonMultiplicity         ->Fill(jetInfo.m_hadronPhotonMultiplicity         );
-    m_hadronMultiplicity               ->Fill(jetInfo.m_hadronMultiplicity               );
-    m_flightDistance1dSig              ->Fill(jetInfo.m_flightDistance1dSig              );
-    m_flightDistance1dVal              ->Fill(jetInfo.m_flightDistance1dVal              );
-    m_flightDistance2dSig              ->Fill(jetInfo.m_flightDistance2dSig              );
-    m_flightDistance2dVal              ->Fill(jetInfo.m_flightDistance2dVal              );
-    m_flightDistance3dSig              ->Fill(jetInfo.m_flightDistance3dSig              );
-    m_flightDistance3dVal              ->Fill(jetInfo.m_flightDistance3dVal              );
-    m_chargedHadronMultiplicity        ->Fill(jetInfo.m_chargedHadronMultiplicity        );
-    m_chargedHadronEnergyFraction      ->Fill(jetInfo.m_chargedHadronEnergyFraction      );
-    m_chMult                           ->Fill(jetInfo.m_chMult                           );
-    m_chHadEF                          ->Fill(jetInfo.m_chHadEF                          );
-    m_chEmEF                           ->Fill(jetInfo.m_chEmEF                           );
-    m_partonFlavour                    ->Fill(jetInfo.m_partonFlavour                           );
-    m_hadronFlavour                    ->Fill(jetInfo.m_hadronFlavour                           );
+    m_photonMultiplicity               ->Fill(jetInfo.m_photonMultiplicity             , eventWeight  );
+    m_photonEnergyFraction             ->Fill(jetInfo.m_photonEnergyFraction           , eventWeight  );
+    m_neutralHadronMultiplicity        ->Fill(jetInfo.m_neutralHadronMultiplicity      , eventWeight  );
+    m_neutralHadronEnergyFraction      ->Fill(jetInfo.m_neutralHadronEnergyFraction    , eventWeight  );
+    m_neMult                           ->Fill(jetInfo.m_neMult                         , eventWeight  );
+    m_neHadEF                          ->Fill(jetInfo.m_neHadEF                        , eventWeight  );
+    m_neEmEF                           ->Fill(jetInfo.m_neEmEF                         , eventWeight  );
+    m_muonMultiplicity                 ->Fill(jetInfo.m_muonMultiplicity               , eventWeight  );
+    m_muonEnergyFraction               ->Fill(jetInfo.m_muonEnergyFraction             , eventWeight  );
+    m_mult                             ->Fill(jetInfo.m_mult                           , eventWeight  );
+    m_muEF                             ->Fill(jetInfo.m_muEF                           , eventWeight  );
+    m_massVertexEnergyFraction         ->Fill(jetInfo.m_massVertexEnergyFraction       , eventWeight  );
+    m_jetNTracksEtaRel                 ->Fill(jetInfo.m_jetNTracksEtaRel               , eventWeight  );
+    m_jetNTracks                       ->Fill(jetInfo.m_jetNTracks                     , eventWeight  );
+    m_jetNSelectedTracks               ->Fill(jetInfo.m_jetNSelectedTracks             , eventWeight  );
+    m_jetNSecondaryVertices            ->Fill(jetInfo.m_jetNSecondaryVertices          , eventWeight  );
+    m_hadronPhotonMultiplicity         ->Fill(jetInfo.m_hadronPhotonMultiplicity       , eventWeight  );
+    m_hadronMultiplicity               ->Fill(jetInfo.m_hadronMultiplicity             , eventWeight  );
+    m_flightDistance1dSig              ->Fill(jetInfo.m_flightDistance1dSig            , eventWeight  );
+    m_flightDistance1dVal              ->Fill(jetInfo.m_flightDistance1dVal            , eventWeight  );
+    m_flightDistance2dSig              ->Fill(jetInfo.m_flightDistance2dSig            , eventWeight  );
+    m_flightDistance2dVal              ->Fill(jetInfo.m_flightDistance2dVal            , eventWeight  );
+    m_flightDistance3dSig              ->Fill(jetInfo.m_flightDistance3dSig            , eventWeight  );
+    m_flightDistance3dVal              ->Fill(jetInfo.m_flightDistance3dVal            , eventWeight  );
+    m_chargedHadronMultiplicity        ->Fill(jetInfo.m_chargedHadronMultiplicity      , eventWeight  );
+    m_chargedHadronEnergyFraction      ->Fill(jetInfo.m_chargedHadronEnergyFraction    , eventWeight  );
+    m_chMult                           ->Fill(jetInfo.m_chMult                         , eventWeight  );
+    m_chHadEF                          ->Fill(jetInfo.m_chHadEF                        , eventWeight  );
+    m_chEmEF                           ->Fill(jetInfo.m_chEmEF                         , eventWeight  );
 
     unsigned int nTracks = jetInfo.m_tracks.size();
-    m_nTrk->Fill(nTracks);
+    m_nTrk->Fill(nTracks, eventWeight);
     for(const TrackData& track: jetInfo.m_tracks){
-      m_trackHists->Fill(track);
+      m_trackHists->Fill(track, eventWeight);
     }
 
 

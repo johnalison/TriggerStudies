@@ -13,6 +13,7 @@ namespace NtupleAna {
   public:
 
     std::string m_name;
+    bool m_isMC;
     static const int maxLength = 40;        
 
     int    m_num         [1] = { };
@@ -22,12 +23,13 @@ namespace NtupleAna {
     float  m_mass   [maxLength]  = { };
     float  m_superClusterEta   [maxLength]  = { };
     float  m_iso   [maxLength]  = { };
+    float  m_SF    [maxLength]  = { };
 
     bool m_isElectrons = false;
 
   public:
     
-    LeptonDataHandler(std::string name) : m_name(name)  {
+    LeptonDataHandler(std::string name, bool isMC = true) : m_name(name), m_isMC(isMC)  {
       if(m_name =="offTightElectrons") m_isElectrons = true;
     }
 

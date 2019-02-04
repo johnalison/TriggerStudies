@@ -17,9 +17,14 @@ JetDataHandler::SetBranchAddress(TChain* intree){
   intree->SetBranchAddress( (m_name+"_csv"       ).c_str(),   m_csv  );
   intree->SetBranchAddress( (m_name+"_deepcsv"   ).c_str(),   m_deepcsv  );
   intree->SetBranchAddress( (m_name+"_deepcsv_bb").c_str(),   m_deepcsv_bb  );
+
+  if(m_isMC && (m_name == "offJets" || m_name == "offCleanJets"))
+    intree->SetBranchAddress( (m_name+"_deepcsvSF["+m_name+"_num]"       ).c_str(),   m_SF  );
+
   if(m_name != "caloJets")
     intree->SetBranchAddress( (m_name+"_passesTightLeptVetoID").c_str(), m_passesTightLeptVetoID);
-  if(m_name == "offJets")
+
+  if(m_name == "offJets" || m_name == "offCleanJets")
     intree->SetBranchAddress( (m_name+"_lepOverlap04Tight").c_str(),   m_lepOverlap04Tight  );
 
   
@@ -102,7 +107,7 @@ JetDataHandler::SetBranchAddress(TChain* intree){
   
   }
   
-  if(m_name == "offJets"){
+  if(m_name == "offJets" || m_name == "offCleanJets"){
     intree->SetBranchAddress( (m_name+"_partonFlavour").c_str()                            , m_partonFlavour                            );
     intree->SetBranchAddress( (m_name+"_hadronFlavour").c_str()                            , m_hadronFlavour                            );
   }
@@ -125,6 +130,7 @@ JetDataHandler::GetJetsAll(){
 				   m_csv[iJet],
 				   m_deepcsv[iJet],
 				   m_deepcsv_bb[iJet],
+				   m_SF[iJet],
 				   m_passesTightLeptVetoID[iJet],
 				   m_lepOverlap04Tight[iJet],
                                    m_vertexNTracks                     [iJet],
@@ -221,6 +227,7 @@ JetDataHandler::GetJetsNoTrks(){
 				   m_csv[iJet],
 				   m_deepcsv[iJet],
 				   m_deepcsv_bb[iJet],
+				   m_SF[iJet],
 				   m_passesTightLeptVetoID[iJet],
 				   m_lepOverlap04Tight[iJet],
                                    -1,

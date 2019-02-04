@@ -22,6 +22,7 @@ namespace NtupleAna {
     TH1F* m_mass   ;
     TH1F* m_csv    ;
     TH1F* m_deepcsv;
+    TH1F* m_SF;
 
     bool m_light = false;
 
@@ -102,7 +103,7 @@ namespace NtupleAna {
     ~JetHists(); 
     
     //void Fill (const JetData* jetPtr);
-    void Fill (const JetData& jetPtr);
+    void Fill (const JetData& jetPtr, float eventWeight = 1.0);
     
   };
 

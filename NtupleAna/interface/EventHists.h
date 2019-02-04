@@ -1,3 +1,4 @@
+
 // -*- C++ -*-
 #if !defined(EventHists_H)
 #define EventHists_H
@@ -29,11 +30,11 @@ namespace NtupleAna {
 	hPVzDiff_vl = dir.make<TH1F>(("PVxDiff_"+name+"_vl").c_str(), ("PVDiff_"+name).c_str(),100,-20,20);
       }
       
-      void Fill(float diff) {
-        hPVzDiff_s ->Fill(diff);       
-        hPVzDiff   ->Fill(diff);
-        hPVzDiff_l ->Fill(diff);
-        hPVzDiff_vl->Fill(diff);
+      void Fill(float diff, float eventWeight) {
+        hPVzDiff_s ->Fill(diff, eventWeight);       
+        hPVzDiff   ->Fill(diff, eventWeight);
+        hPVzDiff_l ->Fill(diff, eventWeight);
+        hPVzDiff_vl->Fill(diff, eventWeight);
       }
       
     };
@@ -46,13 +47,17 @@ namespace NtupleAna {
     VtxDiffHists*  m_PVzDiff_PFVsOff     ;
     VtxDiffHists*  m_PVzDiff_L3VsOff     ;
 
+    
+    TH1F* m_nPV;
+    TH1F* m_pu;
+
   public:
 
-      EventHists(std::string name, fwlite::TFileService& fs);
+    EventHists(std::string name, fwlite::TFileService& fs);
 
-      ~EventHists(); 
+    ~EventHists(); 
 
-      void Fill (const EventData& eventData);
+    void Fill (const EventData& eventData, float eventWeight = 1.0);
     
   };
 

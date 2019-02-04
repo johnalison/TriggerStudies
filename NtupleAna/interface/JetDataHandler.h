@@ -17,6 +17,7 @@ namespace NtupleAna {
   public:
     std::string m_name;
     bool  m_loadTrkLevel;
+    bool  m_isMC;
     static const int maxLength = 40;
 
     int  m_num         [maxLength] = { };
@@ -27,6 +28,7 @@ namespace NtupleAna {
     float m_csv        [maxLength] = { };
     float m_deepcsv    [maxLength] = { };
     float m_deepcsv_bb [maxLength] = { };
+    float m_SF         [maxLength] = { };
     float m_passesTightLeptVetoID [maxLength] = { };
     float m_lepOverlap04Tight     [maxLength] = { };
 
@@ -110,7 +112,7 @@ namespace NtupleAna {
 
   public:
 
-    JetDataHandler(std::string name, bool loadTrkLevel = true) : m_name(name), m_loadTrkLevel(loadTrkLevel)  {
+    JetDataHandler(std::string name, bool loadTrkLevel = true, bool isMC = true) : m_name(name), m_loadTrkLevel(loadTrkLevel), m_isMC(isMC)  {
       
     }
 

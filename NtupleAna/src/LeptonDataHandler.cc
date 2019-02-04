@@ -13,6 +13,8 @@ LeptonDataHandler::SetBranchAddress(TChain* intree){
   intree->SetBranchAddress( (m_name+"_eta" ).c_str(),       m_eta  );
   intree->SetBranchAddress( (m_name+"_phi" ).c_str(),       m_phi  );
   intree->SetBranchAddress( (m_name+"_mass").c_str(),      m_mass );
+  if(m_isMC)
+    intree->SetBranchAddress( (m_name+"_SF["+m_name+"_num]"  ).c_str(),      m_SF);    
 
   if(m_isElectrons){
     intree->SetBranchAddress( (m_name+"_superClusterEta").c_str(),      m_superClusterEta );
@@ -49,7 +51,10 @@ LeptonDataHandler::GetLeps(){
       iso = m_iso[iLep];
       if(iso > 0.25) continue;
     }
-    
+
+    float SF = 1.0;
+    if(m_isMC)
+      SF = m_SF[iLep];
 
 
     outputLeps.push_back(  LeptonData(thisPt,
@@ -57,7 +62,8 @@ LeptonDataHandler::GetLeps(){
 				      m_phi[iLep],
 				      m_mass[iLep],
 				      superClusterEta,
-				      iso
+				      iso,
+				      SF
 				      )
 			   );
     
