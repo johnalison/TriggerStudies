@@ -31,6 +31,10 @@ using std::endl;
 using optutl::CommandLineParser;
 
 
+float OfflineDeepCSVTightCut  = 0.8001;
+float OfflineDeepCSVMediumCut = 0.4941;
+float OfflineDeepCSVLooseCut  = 0.1522;
+
 int main(int argc, char * argv[]){
   std::cout << " ======== jetLevelStudy ========== " << std::endl;
 
@@ -142,6 +146,10 @@ int main(int argc, char * argv[]){
   JetHists offJetHists_matchedPFDeepcsvTag     = JetHists("offJets_matchedPFDeepcsvTag",     fs, true);
   JetHists offJetHists_matchedPFDeepcsvTagJet  = JetHists("offJets_matchedPFDeepcsvTagJet",  fs, true);
 
+  JetHists offJetTightHists_matchedPFJet          = JetHists("offJetsTight_matchedPFJet",               fs, true);
+  JetHists offJetMediumHists_matchedPFJet         = JetHists("offJetsMedium_matchedPFJet",              fs, true);
+  JetHists offJetLooseHists_matchedPFJet          = JetHists("offJetsLoose_matchedPFJet",               fs, true);
+
   JetHists offJetHists_B_matchedPF      = JetHists("offJets_B_matchedPF",fs, true);
   JetHists offJetHists_C_matchedPF      = JetHists("offJets_C_matchedPF",fs, true);
   JetHists offJetHists_L_matchedPF      = JetHists("offJets_L_matchedPF",fs, true);
@@ -157,6 +165,10 @@ int main(int argc, char * argv[]){
   JetHists offJetHists_matchedCalocsvTagJet      = JetHists("offJets_matchedCalocsvTagJet",  fs, true);
   JetHists offJetHists_matchedCaloDeepcsvTag     = JetHists("offJets_matchedCaloDeepcsvTag",     fs, true);
   JetHists offJetHists_matchedCaloDeepcsvTagJet  = JetHists("offJets_matchedCaloDeepcsvTagJet",  fs, true);
+
+  JetHists offJetTightHists_matchedCaloJet          = JetHists("offJetsTight_matchedCaloJet",               fs, true);
+  JetHists offJetMediumHists_matchedCaloJet         = JetHists("offJetsMedium_matchedCaloJet",              fs, true);
+  JetHists offJetLooseHists_matchedCaloJet          = JetHists("offJetsLoose_matchedCaloJet",               fs, true);
 
   JetHists offJetHists_B_matchedCalo      = JetHists("offJets_B_matchedCalo",fs, true);
   JetHists offJetHists_C_matchedCalo      = JetHists("offJets_C_matchedCalo",fs, true);
@@ -243,18 +255,26 @@ int main(int argc, char * argv[]){
     //
     unsigned int nOffJets = 0;
     unsigned int nOffJetsTagged = 0;
+    float totalsSFWeight = 1.0;
     for(JetData& offJet : offJets){
       if(fabs(offJet.m_eta) > 2.4) continue;
       if(offJet.m_pt       < 30)   continue;
       if(NtupleAna::failOverlap(offJet,elecs)) continue;
       if(NtupleAna::failOverlap(offJet,muons)) continue;
-      ++nOffJets;
-      if(offJet.m_deepcsv > 0.8001) ++nOffJetsTagged;
+      if((offJet.m_deepcsv > 0) && fabs(offJet.m_deepcsv - (offJet.m_deepcsv_b + offJet.m_deepcsv_bb)) > 0.01)
+	cout << "Deepcsv: " << offJet.m_deepcsv << "_b+_bb" << (offJet.m_deepcsv_b + offJet.m_deepcsv_bb) <<endl;
 
+      ++nOffJets;
+      if(offJet.m_deepcsv > OfflineDeepCSVTightCut) ++nOffJetsTagged;
+      
+      if(isMC)
+	totalsSFWeight *= offJet.m_SF;
     }
     if(nOffJets < 2      ) continue;
     if(nOffJetsTagged < 1) continue;
 
+    if(isMC)
+      eventWeight*= totalsSFWeight;
 
     eventHists.Fill(eventData, eventWeight);    
 
@@ -282,9 +302,8 @@ int main(int argc, char * argv[]){
       // Check if Prob
       //
       unsigned int nTags = 0;
-      float  tagSF = 1.0;
       for(JetData& offJetOther : offJets){
-	if(offJetOther.m_deepcsv       < 0.8001)   continue;	
+	if(offJetOther.m_deepcsv       < OfflineDeepCSVTightCut)   continue;	
 	if(offJet.m_vec.DeltaR(offJetOther.m_vec) < 0.4) continue;
 
 	if(offJetOther.m_pt       < 30)   continue;	
@@ -294,8 +313,6 @@ int main(int argc, char * argv[]){
 	if(NtupleAna::failOverlap(offJetOther,muons)) continue;
 
 	++nTags;
-	if(isMC)
-	  tagSF = offJetOther.m_SF;
       }
       
 
@@ -306,13 +323,13 @@ int main(int argc, char * argv[]){
       //cout << "Scaling eventWeight by: " << tagSF  << endl;
 
       // Fill offJetHists
-      offJetHists.Fill(offJet, eventWeight*tagSF);
+      offJetHists.Fill(offJet, eventWeight);
       if(offJet.m_hadronFlavour == 5){
-	offJetHists_B.Fill(offJet, eventWeight*tagSF);
+	offJetHists_B.Fill(offJet, eventWeight);
       }	else if(offJet.m_hadronFlavour == 4){
-	offJetHists_C.Fill(offJet, eventWeight*tagSF);
+	offJetHists_C.Fill(offJet, eventWeight);
       }	else if(offJet.m_hadronFlavour == 0){
-	offJetHists_L.Fill(offJet, eventWeight*tagSF);
+	offJetHists_L.Fill(offJet, eventWeight);
       }
 
       //
@@ -338,18 +355,26 @@ int main(int argc, char * argv[]){
 	offJet.m_matchedJet = matchedJetPF;
 	offJet.m_match_dR   = dR_PF;
 
-	offJetHists_matchedPF.Fill(offJet, eventWeight*tagSF);
-	offJetHists_matchedPFJet.Fill(*matchedJetPF, eventWeight*tagSF);
+	offJetHists_matchedPF.Fill(offJet, eventWeight);
+	offJetHists_matchedPFJet.Fill(*matchedJetPF, eventWeight);
+
+	if((offJet.m_deepcsv > OfflineDeepCSVTightCut))
+	  offJetTightHists_matchedPFJet.Fill(*matchedJetPF, eventWeight);	  
+	if((offJet.m_deepcsv > OfflineDeepCSVMediumCut))
+	  offJetMediumHists_matchedPFJet.Fill(*matchedJetPF, eventWeight);	  
+	if((offJet.m_deepcsv > OfflineDeepCSVLooseCut))
+	  offJetLooseHists_matchedPFJet.Fill(*matchedJetPF, eventWeight);	  
+
 
 	if(offJet.m_hadronFlavour == 5){
-	  offJetHists_B_matchedPF.Fill(offJet, eventWeight*tagSF);
-	  offJetHists_B_matchedPFJet.Fill(*matchedJetPF, eventWeight*tagSF);
+	  offJetHists_B_matchedPF.Fill(offJet, eventWeight);
+	  offJetHists_B_matchedPFJet.Fill(*matchedJetPF, eventWeight);
 	}else if(offJet.m_hadronFlavour == 4){
-	  offJetHists_C_matchedPF.Fill(offJet, eventWeight*tagSF);
-	  offJetHists_C_matchedPFJet.Fill(*matchedJetPF, eventWeight*tagSF);
+	  offJetHists_C_matchedPF.Fill(offJet, eventWeight);
+	  offJetHists_C_matchedPFJet.Fill(*matchedJetPF, eventWeight);
 	}else if(offJet.m_hadronFlavour == 0){
-	  offJetHists_L_matchedPF.Fill(offJet, eventWeight*tagSF);
-	  offJetHists_L_matchedPFJet.Fill(*matchedJetPF, eventWeight*tagSF);
+	  offJetHists_L_matchedPF.Fill(offJet, eventWeight);
+	  offJetHists_L_matchedPFJet.Fill(*matchedJetPF, eventWeight);
 	}
 
 
@@ -357,8 +382,8 @@ int main(int argc, char * argv[]){
 	// If pass CVS working point
 	//
 	if(matchedJetPF->m_csv >= 0.8484){
-	  offJetHists_matchedPFcsvTag.Fill(offJet, eventWeight*tagSF);
-	  offJetHists_matchedPFcsvTagJet.Fill(*matchedJetPF, eventWeight*tagSF);
+	  offJetHists_matchedPFcsvTag.Fill(offJet, eventWeight);
+	  offJetHists_matchedPFcsvTagJet.Fill(*matchedJetPF, eventWeight);
 	}
 
 
@@ -366,8 +391,8 @@ int main(int argc, char * argv[]){
 	// If pass DeepCVS working point
 	//
 	if(matchedJetPF->m_deepcsv >= 0.6324){
-	  offJetHists_matchedPFDeepcsvTag.Fill(offJet, eventWeight*tagSF);
-	  offJetHists_matchedPFDeepcsvTagJet.Fill(*matchedJetPF, eventWeight*tagSF);
+	  offJetHists_matchedPFDeepcsvTag.Fill(offJet, eventWeight);
+	  offJetHists_matchedPFDeepcsvTagJet.Fill(*matchedJetPF, eventWeight);
 	}
 	  
 
@@ -396,34 +421,42 @@ int main(int argc, char * argv[]){
 	//offJet.m_matchedJet = matchedJet;
 	//offJet.m_match_dR   = dR_PF;
 
-	offJetHists_matchedCalo.Fill(offJet, eventWeight*tagSF);
-	offJetHists_matchedCaloJet.Fill(*matchedJetCalo, eventWeight*tagSF);
+	offJetHists_matchedCalo.Fill(offJet, eventWeight);
+	offJetHists_matchedCaloJet.Fill(*matchedJetCalo, eventWeight);
+
+	if((offJet.m_deepcsv > OfflineDeepCSVTightCut))
+	  offJetTightHists_matchedCaloJet.Fill(*matchedJetCalo, eventWeight);	  
+	if((offJet.m_deepcsv > OfflineDeepCSVMediumCut))
+	  offJetMediumHists_matchedCaloJet.Fill(*matchedJetCalo, eventWeight);	  
+	if((offJet.m_deepcsv > OfflineDeepCSVLooseCut))
+	  offJetLooseHists_matchedCaloJet.Fill(*matchedJetCalo, eventWeight);	  
+
 
 	if(offJet.m_hadronFlavour == 5){
-	  offJetHists_B_matchedCalo.Fill(offJet, eventWeight*tagSF);
-	  offJetHists_B_matchedCaloJet.Fill(*matchedJetCalo, eventWeight*tagSF);
+	  offJetHists_B_matchedCalo.Fill(offJet, eventWeight);
+	  offJetHists_B_matchedCaloJet.Fill(*matchedJetCalo, eventWeight);
 	}else if(offJet.m_hadronFlavour == 4){
-	  offJetHists_C_matchedCalo.Fill(offJet, eventWeight*tagSF);
-	  offJetHists_C_matchedCaloJet.Fill(*matchedJetCalo, eventWeight*tagSF);
+	  offJetHists_C_matchedCalo.Fill(offJet, eventWeight);
+	  offJetHists_C_matchedCaloJet.Fill(*matchedJetCalo, eventWeight);
 	}else if(offJet.m_hadronFlavour == 0){
-	  offJetHists_L_matchedCalo.Fill(offJet, eventWeight*tagSF);
-	  offJetHists_L_matchedCaloJet.Fill(*matchedJetCalo, eventWeight*tagSF);
+	  offJetHists_L_matchedCalo.Fill(offJet, eventWeight);
+	  offJetHists_L_matchedCaloJet.Fill(*matchedJetCalo, eventWeight);
 	}
 
 	// 
 	// If pass CVS working point
 	//
 	if(matchedJetCalo->m_csv >= 0.8484){
-	  offJetHists_matchedCalocsvTag.Fill(offJet, eventWeight*tagSF);
-	  offJetHists_matchedCalocsvTagJet.Fill(*matchedJetCalo, eventWeight*tagSF);
+	  offJetHists_matchedCalocsvTag.Fill(offJet, eventWeight);
+	  offJetHists_matchedCalocsvTagJet.Fill(*matchedJetCalo, eventWeight);
 	}
 
 	// 
 	// If pass DeepCVS working point
 	//
 	if(matchedJetCalo->m_deepcsv >= 0.6324){
-	  offJetHists_matchedCaloDeepcsvTag.Fill(offJet, eventWeight*tagSF);
-	  offJetHists_matchedCaloDeepcsvTagJet.Fill(*matchedJetCalo, eventWeight*tagSF);
+	  offJetHists_matchedCaloDeepcsvTag.Fill(offJet, eventWeight);
+	  offJetHists_matchedCaloDeepcsvTagJet.Fill(*matchedJetCalo, eventWeight);
 	}
 
       }//m_matchedJet

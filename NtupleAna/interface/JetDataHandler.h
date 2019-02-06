@@ -27,6 +27,7 @@ namespace NtupleAna {
     float m_mass       [maxLength] = { };
     float m_csv        [maxLength] = { };
     float m_deepcsv    [maxLength] = { };
+    float m_deepcsv_b  [maxLength] = { };
     float m_deepcsv_bb [maxLength] = { };
     float m_SF         [maxLength] = { };
     float m_passesTightLeptVetoID [maxLength] = { };

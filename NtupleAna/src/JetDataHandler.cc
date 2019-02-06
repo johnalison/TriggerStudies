@@ -16,6 +16,8 @@ JetDataHandler::SetBranchAddress(TChain* intree){
   intree->SetBranchAddress( (m_name+"_mass"      ).c_str(),   m_mass  );
   intree->SetBranchAddress( (m_name+"_csv"       ).c_str(),   m_csv  );
   intree->SetBranchAddress( (m_name+"_deepcsv"   ).c_str(),   m_deepcsv  );
+  if(m_name == "offJets" || m_name == "offCleanJets")
+    intree->SetBranchAddress( (m_name+"_deepcsv_b" ).c_str(),   m_deepcsv_b  );
   intree->SetBranchAddress( (m_name+"_deepcsv_bb").c_str(),   m_deepcsv_bb  );
 
   if(m_isMC && (m_name == "offJets" || m_name == "offCleanJets"))
@@ -129,6 +131,7 @@ JetDataHandler::GetJetsAll(){
 				   m_mass[iJet],
 				   m_csv[iJet],
 				   m_deepcsv[iJet],
+				   m_deepcsv_b[iJet],
 				   m_deepcsv_bb[iJet],
 				   m_SF[iJet],
 				   m_passesTightLeptVetoID[iJet],
@@ -226,6 +229,7 @@ JetDataHandler::GetJetsNoTrks(){
 				   m_mass[iJet],
 				   m_csv[iJet],
 				   m_deepcsv[iJet],
+				   m_deepcsv_b[iJet],
 				   m_deepcsv_bb[iJet],
 				   m_SF[iJet],
 				   m_passesTightLeptVetoID[iJet],
