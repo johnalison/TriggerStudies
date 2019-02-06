@@ -3,7 +3,9 @@ jetLevelStudy \
     maxEvents=-1 \
     outputFile=JetLevelStudyOutputData_runC.root \
     inputFiles=/eos/user/k/koschwei/HLTBTagging/DiLepton_v10_2/RunC/RunCFull.root \
-    puType=RunC
+    puFile=TriggerStudies/NtupleAna/data/PUWeights_runC.root
+
+
 
 
 

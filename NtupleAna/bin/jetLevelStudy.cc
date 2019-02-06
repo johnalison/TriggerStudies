@@ -23,7 +23,8 @@
 #include "TriggerStudies/NtupleAna/interface/JetHists.h"
 #include "TriggerStudies/NtupleAna/interface/EventHists.h"
 #include "TriggerStudies/NtupleAna/interface/Helpers.h"
-#include "../../../HLTBTagging/measurements/modules/functions.h"
+#include "TriggerStudies/NtupleAna/interface/PileUpWeightTool.h"
+//#include "../../../HLTBTagging/measurements/modules/functions.h"
 
 using namespace NtupleAna;
 using std::cout; 
@@ -47,8 +48,8 @@ int main(int argc, char * argv[]){
 
   parser.addOption ("configFile",   CommandLineParser::kString,
 		    "configFileName");
-  parser.addOption ("puType",   CommandLineParser::kString,
-		    "pile-up correction type");
+  parser.addOption ("puFile",   CommandLineParser::kString,
+		    "File with pile-up correction weights");
   // set defaults
   parser.integerValue ("maxEvents"  ) = -1;
   parser.integerValue ("outputEvery") =   10000;
@@ -59,12 +60,12 @@ int main(int argc, char * argv[]){
   //cout << "Running with "<<parser.integerValue("maxEvents") << " config file " << parser.stringValue("configFile") << endl;
   std::string configFile     = parser.stringValue("configFile");
   std::string outputFileName = parser.stringValue("outputFile");
-  std::string puType         = parser.stringValue("puType");
+  std::string puFile         = parser.stringValue("puFile");
   std::vector<std::string> inputFiles = parser.stringVector("inputFiles");
 
   cout << "\t Running with configFile: " << configFile << endl;
   cout << "\t Outputting to: " << outputFileName << endl;
-  cout << "\t puType: " << puType << endl;
+  cout << "\t puFile: " << puFile << endl;
 
   
   if( !edm::readPSetsFrom(configFile)->existsAs<edm::ParameterSet>("process") ){
@@ -126,8 +127,9 @@ int main(int argc, char * argv[]){
   // 
   fwlite::TFileService fs = fwlite::TFileService(outputFileName);
 
-  EventHists allEventHists  = EventHists("AllEvents", fs);
-  EventHists eventHists     = EventHists("Events", fs);
+  EventHists allEventHists        = EventHists("AllEvents", fs);
+  EventHists eventHists           = EventHists("Events", fs);
+  EventHists eventHistsNoPUWeight = EventHists("EventsNoPUWeight", fs);
 
 
   JetHists offJetHistsPreOLap = JetHists("offJetsPreOLap",fs, true);
@@ -182,9 +184,7 @@ int main(int argc, char * argv[]){
   //
   //  Init the pile-up function
   //
-  float (*get_puWeight)(float);
-  get_puWeight = &get_puWeight_C_ReReco;
-  //get_puWeight_CDF
+  PileUpWeightTool pileUpTool = PileUpWeightTool(puFile);
 
   //float pfDeepCSV = 0.6324;
   //float pfCSV = 0.8484;
@@ -232,9 +232,10 @@ int main(int argc, char * argv[]){
     if(muons.size() != 1)  continue;
 
     float eventWeight = 1.0;
+    float puWeight = 1.0;
     if(isMC){
-      eventWeight = get_puWeight(eventData.pu) * elecs.at(0).m_SF * muons.at(0).m_SF;
-      //eventWeight = get_puWeight_CDF(eventData.pu) * elecs.at(0).m_SF * muons.at(0).m_SF;
+      puWeight = pileUpTool.getWeight(eventData.nPV);
+      eventWeight =  puWeight * elecs.at(0).m_SF * muons.at(0).m_SF;
     }
 
     //std::cout << "PU Weight " << get_puWeight_CDF(eventData.pu) << std::endl;
@@ -277,6 +278,10 @@ int main(int argc, char * argv[]){
       eventWeight*= totalsSFWeight;
 
     eventHists.Fill(eventData, eventWeight);    
+    
+    if(puWeight)
+      eventHistsNoPUWeight.Fill(eventData, eventWeight/puWeight);    
+    // else the eventWeight is 0 anyway...
 
     //for(auto elec: elecs){
     //  cout << "Electron pt/eta " << elec.m_pt << "/" << elec.m_eta<< " " << elec.m_SF << endl;
