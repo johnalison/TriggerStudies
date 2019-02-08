@@ -17,8 +17,8 @@ JetHists::JetHists(std::string name, fwlite::TFileService& fs, bool light) {
   m_eta     = dir.make<TH1F>("eta","eta;jet #eta;Entries",100,-3,3);
   m_phi     = dir.make<TH1F>("phi","phi;jet #phi;Entries",100,-3.2,3.2);
   m_mass    = dir.make<TH1F>("mass","mass;jet mass [GeV];Entries",100,-1,200);
-  m_csv     = dir.make<TH1F>("csv","csv;csv;Entries",200,-0.2,1.2);
-  m_deepcsv = dir.make<TH1F>("deepcsv","deepcsv;deepcsv;Entries",200,-0.2,1.2);
+  m_csv     = dir.make<TH1F>("csv","csv;csv;Entries",140,-0.2,1.2);
+  m_deepcsv = dir.make<TH1F>("deepcsv","deepcsv;deepcsv;Entries",140,-0.2,1.2);
   m_SF      = dir.make<TH1F>("SF",     "SF;SF;Entries",50,-0.1,2);
 
   m_matched_dPt      = dir.make<TH1F>("matched_dPt",     "matched_dPt     ;P_{T}-P_{T}^{matched} [GeV];Entries",  100,-50, 50);
@@ -29,12 +29,12 @@ JetHists::JetHists(std::string name, fwlite::TFileService& fs, bool light) {
   m_matched_dcsv     = dir.make<TH1F>("matched_dcsv","matched_dcsv;CSV-CSV^{matched};Entries",100,-1,1);
   m_matched_dDeepcsv = dir.make<TH1F>("matched_dDeepcsv","matched_dDeepcsv;DeepCSV-DeepCSV^{matched};Entries",100,-1,1);
   
-  m_csv_matched = dir.make<TH1F>("csv_matched","csv;csv;Entries",200,-0.2,1.2);
-  m_csv_vs_matched_csv = dir.make<TH2F>("csv_vs_matched_csv",  "Events;CSV;Matched CSV",100,-0.2,1,100,-0.2,1);
-  m_csv_vs_matched_deepcsv = dir.make<TH2F>("csv_vs_matched_deepcsv",  "Events;CSV;Matched Deep CSV",100,-0.2,1,100,-0.2,1);
+  m_csv_matched = dir.make<TH1F>("csv_matched","csv;csv;Entries",140,-0.2,1.2);
+  m_csv_vs_matched_csv = dir.make<TH2F>("csv_vs_matched_csv",  "Events;CSV;Matched CSV",120,-0.2,1,120,-0.2,1);
+  m_csv_vs_matched_deepcsv = dir.make<TH2F>("csv_vs_matched_deepcsv",  "Events;CSV;Matched Deep CSV",120,-0.2,1,120,-0.2,1);
 
-  m_deepcsv_matched = dir.make<TH1F>("deepcsv_matched","deepcsv;deepcsv;Entries",200,-0.2,1.2);
-  m_deepcsv_vs_matched_deepcsv = dir.make<TH2F>("deepcsv_vs_matched_deepcsv",  "Events;DeepCSV;Matched DeepCSV",100,-0.2,1,100,-0.2,1);
+  m_deepcsv_matched = dir.make<TH1F>("deepcsv_matched","deepcsv;deepcsv;Entries",140,-0.2,1.2);
+  m_deepcsv_vs_matched_deepcsv = dir.make<TH2F>("deepcsv_vs_matched_deepcsv",  "Events;DeepCSV;Matched DeepCSV",120,-0.2,1,120,-0.2,1);
   
   m_deepcsv_bb = dir.make<TH1F>("deepcsv_bb","deepcsv_bb;deepcsv_bb;Entries",100,-2,2);
 

@@ -1,4 +1,4 @@
-./TriggerStudies/NtupleAna/run/runData_runC.sh &
-./TriggerStudies/NtupleAna/run/runTtbar_runC.sh &
-./TriggerStudies/NtupleAna/run/runST_runC.sh &
-./TriggerStudies/NtupleAna/run/runSantiT_runC.sh &
+RunPeriod=runD
+./TriggerStudies/NtupleAna/run/runTtbar_runN.sh $RunPeriod &
+./TriggerStudies/NtupleAna/run/runST_runN.sh $RunPeriod &
+./TriggerStudies/NtupleAna/run/runSantiT_runN.sh $RunPeriod &
