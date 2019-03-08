@@ -3,5 +3,5 @@ jetLevelStudy \
     configFile=TriggerStudies/NtupleAna/scripts/jetLevelStudyConfig_cfg.py \
     maxEvents=-1 \
     outputFile=JetLevelStudyOutputMC_ST_${RunPeriod}.root \
-    inputFiles=/eos/user/k/koschwei/HLTBTagging/DiLepton_v10/ST/ST_tW_part_mod_mod_mod.root \
+    inputFiles=/eos/user/j/johnda/public/BJetTrigger/2017/MC/ST_tW_All.root \
     puFile=TriggerStudies/NtupleAna/data/PUWeights_${RunPeriod}.root
