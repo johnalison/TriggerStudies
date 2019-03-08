@@ -94,7 +94,7 @@ namespace NtupleAna {
 
     ~TrackHists(); 
     
-    void Fill (const TrackData& track);
+    void Fill (const TrackData& track, float eventWeight = 1.0);
 
     void FillMatchStats(const TrackData& track);
 

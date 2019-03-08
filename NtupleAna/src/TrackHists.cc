@@ -94,7 +94,7 @@ TrackHists::~TrackHists() {}
 
 
 void
-TrackHists::Fill (const TrackData& track){
+TrackHists::Fill (const TrackData& track, float eventWeight){
   
   m_ip3d  ->Fill(track.m_ip3dVal);
   m_ip3d_l->Fill(track.m_ip3dVal);

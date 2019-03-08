@@ -20,7 +20,9 @@ namespace NtupleAna {
     TH1F* m_eta    ;
     TH1F* m_phi    ;
     TH1F* m_mass   ;
+    TH1F* m_csv    ;
     TH1F* m_deepcsv;
+    TH1F* m_SF;
 
     bool m_light = false;
 
@@ -29,7 +31,12 @@ namespace NtupleAna {
     TH1F* m_matched_dPhi     ;
     TH1F* m_matched_dR       ;
     TH1F* m_matched_dMass    ;
+    TH1F* m_matched_dcsv ;
     TH1F* m_matched_dDeepcsv ;
+
+    TH1F* m_csv_matched ;
+    TH2F* m_csv_vs_matched_csv;
+    TH2F* m_csv_vs_matched_deepcsv;
 
     TH1F* m_deepcsv_matched ;
     TH2F* m_deepcsv_vs_matched_deepcsv;
@@ -97,7 +104,7 @@ namespace NtupleAna {
     ~JetHists(); 
     
     //void Fill (const JetData* jetPtr);
-    void Fill (const JetData& jetPtr);
+    void Fill (const JetData& jetPtr, float eventWeight = 1.0);
     
   };
 

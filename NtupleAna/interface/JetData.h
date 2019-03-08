@@ -18,8 +18,13 @@ namespace NtupleAna {
     float m_eta        = 0;
     float m_phi        = 0;
     float m_mass       = 0;
+    float m_csv        = 0;
     float m_deepcsv    = 0;
+    float m_deepcsv_b  = 0;
     float m_deepcsv_bb = 0;
+    float m_SF         = 0;
+    float m_passesTightLeptVetoID = 0;    
+    float m_lepOverlap04Tight = 0;
     
     float m_vertexNTracks                     =  0;
     float m_vertexMass                        =  0;
@@ -77,7 +82,7 @@ namespace NtupleAna {
 
   public:
 
-	JetData(float pt,float eta,float phi,float mass,float deepcsv,float deepcsv_bb
+    JetData(float pt,float eta,float phi,float mass,float csv,float deepcsv,float deepcsv_b, float deepcsv_bb, float SF, float passesTightLeptVetoID, float lepOverlap04Tight
 		,float vertexNTracks                    
                 ,float vertexMass                       
                 ,float vertexJetDeltaR                  
@@ -154,8 +159,18 @@ namespace NtupleAna {
 	  m_eta        = eta	 ;
 	  m_phi        = phi	 ;
 	  m_mass       = mass	 ;
+
+	  m_csv        = csv	 ;
+	  if(m_csv < 0) m_csv = -0.1;
+	  
 	  m_deepcsv    = deepcsv	 ;
+	  if(m_deepcsv < 0) m_deepcsv = -0.1;
+
+	  m_deepcsv_b  = deepcsv_b;
 	  m_deepcsv_bb = deepcsv_bb;
+	  m_SF         = SF;
+	  m_passesTightLeptVetoID = passesTightLeptVetoID;
+	  m_lepOverlap04Tight = lepOverlap04Tight;
 
 	  m_vertexNTracks                     =  vertexNTracks                   ;
           m_vertexMass                        =  vertexMass                      ;

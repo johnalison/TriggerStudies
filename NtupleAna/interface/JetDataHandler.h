@@ -16,6 +16,8 @@ namespace NtupleAna {
 
   public:
     std::string m_name;
+    bool  m_loadTrkLevel;
+    bool  m_isMC;
     static const int maxLength = 40;
 
     int  m_num         [maxLength] = { };
@@ -23,8 +25,13 @@ namespace NtupleAna {
     float m_eta        [maxLength] = { };
     float m_phi        [maxLength] = { };
     float m_mass       [maxLength] = { };
+    float m_csv        [maxLength] = { };
     float m_deepcsv    [maxLength] = { };
+    float m_deepcsv_b  [maxLength] = { };
     float m_deepcsv_bb [maxLength] = { };
+    float m_SF         [maxLength] = { };
+    float m_passesTightLeptVetoID [maxLength] = { };
+    float m_lepOverlap04Tight     [maxLength] = { };
 
     float m_vertexNTracks                      [maxLength] = { };
     float m_vertexMass                         [maxLength] = { };
@@ -106,7 +113,7 @@ namespace NtupleAna {
 
   public:
 
-  JetDataHandler(std::string name) : m_name(name)  {
+    JetDataHandler(std::string name, bool loadTrkLevel = true, bool isMC = true) : m_name(name), m_loadTrkLevel(loadTrkLevel), m_isMC(isMC)  {
       
     }
 
@@ -115,6 +122,8 @@ namespace NtupleAna {
 
     void SetBranchAddress(TChain* intree);
     std::vector<JetData> GetJets();
+    std::vector<JetData> GetJetsAll();
+    std::vector<JetData> GetJetsNoTrks();
     
   };
 

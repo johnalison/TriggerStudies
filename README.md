@@ -1,5 +1,6 @@
 
 
+
 # TriggerStudies
 
 # In C++
@@ -9,6 +10,12 @@
 
 # Run
 > procNtupleExample TriggerStudies/NtupleAna/scripts/procNtupleExampleConfig_cfg.py
+
+# To make NPV file
+>  py TriggerStudies/NtupleAna/scripts/makePUWeightFile.py -d JetLevelStudyOutputData_runCandD.root -m JetLevelStudyOutputMC_All_runF_weighted.root -o TriggerStudies/NtupleAna/data/PUWeights_runCandD.root
+
+# To Run all MC for eg runE
+> source TriggerStudies/NtupleAna/run/runAll.sh runE
 
 > mkdir run
 > cd run

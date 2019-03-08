@@ -29,5 +29,6 @@ process.procNtupleExample = cms.PSet(
     ## input specific for this analyzer
     debug = cms.bool(False),
     MakeEventDisplays = cms.bool(False),
+    LoadTrkLevel = cms.bool(True),
 )
 
