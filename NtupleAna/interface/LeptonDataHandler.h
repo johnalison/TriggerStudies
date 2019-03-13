@@ -40,7 +40,7 @@ namespace NtupleAna {
 
     void SetBranchAddress (TChain* intree);
 
-    std::vector<LeptonData> GetLeps();
+    std::vector<LeptonData> GetLeps(float ptCut);
   };
 
 }

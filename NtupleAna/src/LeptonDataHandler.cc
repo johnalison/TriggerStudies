@@ -42,7 +42,7 @@ void LeptonDataHandler::SetBranchAddress(TChain* intree, std::string brName, flo
 
 
 vector<LeptonData> 
-LeptonDataHandler::GetLeps(){
+LeptonDataHandler::GetLeps(float ptCut){
 
   vector<LeptonData> outputLeps;
   for(int iLep = 0; iLep < m_num[0]; ++iLep){
@@ -54,14 +54,14 @@ LeptonDataHandler::GetLeps(){
     float iso             = -1;
 
     if(m_isElectrons){
-      if(thisPt < 30) continue;
+      if(thisPt < ptCut) continue;
       if(fabs(thisEta) > 2.4) continue;
       superClusterEta = m_superClusterEta[iLep];
       if(fabs(superClusterEta) > 1.4442 && fabs(superClusterEta) < 1.5660) continue;
             
 
     }else{
-      if(thisPt < 20) continue;
+      if(thisPt < ptCut) continue;
       if(fabs(thisEta) > 2.4) continue;
       iso = m_iso[iLep];
       if(iso > 0.25) continue;

@@ -204,8 +204,8 @@ int main(int argc, char * argv[]){
     eventHists.Fill(eventData);
 
     // Converting from "row-level" info to "column-level" info
-    std::vector<NtupleAna::LeptonData> elecs  = elecDB.GetLeps();
-    std::vector<NtupleAna::LeptonData> muons  = muonDB.GetLeps();
+    std::vector<NtupleAna::LeptonData> elecs  = elecDB.GetLeps(30);
+    std::vector<NtupleAna::LeptonData> muons  = muonDB.GetLeps(20);
     std::vector<NtupleAna::JetData>    offJets = offJetsDB.GetJets();
     std::vector<NtupleAna::JetData>    pfJets   = pfJetsDB.GetJets();
     std::vector<NtupleAna::JetData>    caloJets = caloJetsDB.GetJets();

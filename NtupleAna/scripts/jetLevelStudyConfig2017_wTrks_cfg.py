@@ -34,7 +34,7 @@ process = cms.PSet()
 process.jetLevelStudy = cms.PSet(
     ## input specific for this analyzer
     debug        = cms.bool(False),
-    LoadTrkLevel = cms.bool(True),
+    LoadTrkLevel = cms.bool(False),
     offJetName   = cms.string("offCleanJets"),
 )
 
