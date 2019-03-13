@@ -111,6 +111,10 @@ namespace NtupleAna {
     std::vector<std::vector<float> >* m_trackNPixelHits = 0;
     
 
+    void SetBranchAddress(TChain* intree, std::string brName, int* int_arr);
+    void SetBranchAddress(TChain* intree, std::string brName, float* float_arr);
+    void SetBranchAddress(TChain* intree, std::string brName, std::vector<std::vector<float> >** vector_ptr);
+
   public:
 
     JetDataHandler(std::string name, bool loadTrkLevel = true, bool isMC = true) : m_name(name), m_loadTrkLevel(loadTrkLevel), m_isMC(isMC)  {
