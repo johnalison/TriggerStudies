@@ -147,6 +147,19 @@ int main(int argc, char * argv[]){
   // Make output ntuple/Hists
   // 
   fwlite::TFileService fs = fwlite::TFileService(outputFileName);
+  
+  TFileDirectory cutFlowDir = fs.mkdir("CutFlow");
+  TH1F* hCutFlowHist = cutFlowDir.make<TH1F>("cutflow", "cutflow", 1, 1, 2);
+  hCutFlowHist->SetCanExtend(TH1::kAllAxes);
+  int cf_bin_all  = hCutFlowHist->GetXaxis()->FindBin("All");
+  int cf_bin_trig = hCutFlowHist->GetXaxis()->FindBin("Trigger");
+  int cf_bin_elec = hCutFlowHist->GetXaxis()->FindBin("HasElec");
+  int cf_bin_elecPt = hCutFlowHist->GetXaxis()->FindBin("HasElecPt");
+  int cf_bin_muon = hCutFlowHist->GetXaxis()->FindBin("HasMuon");
+  int cf_bin_muonPt = hCutFlowHist->GetXaxis()->FindBin("HasMuonPt");
+  int cf_bin_DiLep = hCutFlowHist->GetXaxis()->FindBin("PassDiLep");
+  int cf_bin_nJets = hCutFlowHist->GetXaxis()->FindBin("PassNJets");
+  int cf_bin_nBTags = hCutFlowHist->GetXaxis()->FindBin("PassNBTags");
 
   EventHists allEventHists        = EventHists("AllEvents", fs);
   EventHists eventHists           = EventHists("Events", fs);
@@ -224,6 +237,7 @@ int main(int argc, char * argv[]){
     if( (maxEvents > 0) && (entry > maxEvents))
       break;
 
+    hCutFlowHist ->Fill( cf_bin_all, 1 );
     tree->GetEntry( entry );
 
     eventData.SetEvent();
@@ -241,7 +255,7 @@ int main(int argc, char * argv[]){
       continue;
     }
     if(debug) cout << "Pass Trigger " << endl;
-
+    hCutFlowHist ->Fill( cf_bin_trig, 1 );
 
     //
     // Fill All events
@@ -249,18 +263,43 @@ int main(int argc, char * argv[]){
     allEventHists.Fill(eventData);
 
     // Converting from "row-level" info to "column-level" info
-    std::vector<NtupleAna::LeptonData> elecs  = elecDB.GetLeps();
-    std::vector<NtupleAna::LeptonData> muons  = muonDB.GetLeps();
+    std::vector<NtupleAna::LeptonData> elecsNoPt  = elecDB.GetLeps(5);
+    std::vector<NtupleAna::LeptonData> muonsNoPt  = muonDB.GetLeps(5);
+    std::vector<NtupleAna::LeptonData> elecs      = elecDB.GetLeps(30);
+    std::vector<NtupleAna::LeptonData> muons      = muonDB.GetLeps(20);
     std::vector<NtupleAna::JetData>    offJets = offJetsDB.GetJets();
     std::vector<NtupleAna::JetData>    pfJets   = pfJetsDB.GetJets();
     std::vector<NtupleAna::JetData>    caloJets = caloJetsDB.GetJets();
+
 
     //
     // Lepton Selection
     //
     //if((elecs.size()+muons.size()) < 2)  continue;
-    if(elecs.size() != 1)  continue;
-    if(muons.size() != 1)  continue;
+    if(elecsNoPt.size() > 0)  
+      hCutFlowHist ->Fill( cf_bin_elec, 1 );
+    if(muonsNoPt.size() > 0)  
+      hCutFlowHist ->Fill( cf_bin_muon, 1 );
+
+    unsigned int nElecPt30 = 0;
+    for(NtupleAna::LeptonData& elec : elecsNoPt){
+      if(elec.m_pt > 30) ++nElecPt30;
+    }
+
+    unsigned int nMuonPt20 = 0;
+    for(NtupleAna::LeptonData& muon : muonsNoPt){
+      if(muon.m_pt > 20) ++nMuonPt20;
+    }
+
+
+    if(nElecPt30 == 1) 
+      hCutFlowHist ->Fill( cf_bin_elecPt, 1 );      
+    if(nMuonPt20 == 1) 
+      hCutFlowHist ->Fill( cf_bin_muonPt, 1 );      
+
+    if(nElecPt30 != 1) continue;
+    if(nMuonPt20 != 1) continue;
+    hCutFlowHist ->Fill( cf_bin_DiLep, 1 );
 
     float eventWeight = 1.0;
     float puWeight = 1.0;
@@ -297,8 +336,9 @@ int main(int argc, char * argv[]){
 	totalsSFWeight *= offJet.m_SF;
     }
     if(nOffJets < 2      ) continue;
+    hCutFlowHist ->Fill( cf_bin_nJets, 1 );
     if(nOffJetsTagged < 1) continue;
-
+    hCutFlowHist ->Fill( cf_bin_nBTags, 1 );
     if(isMC)
       eventWeight*= totalsSFWeight;
 
