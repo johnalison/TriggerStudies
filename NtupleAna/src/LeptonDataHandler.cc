@@ -8,19 +8,34 @@ using namespace std;
 
 void
 LeptonDataHandler::SetBranchAddress(TChain* intree){
-  intree->SetBranchAddress( (m_name+"_num" ).c_str(),       m_num  );
-  intree->SetBranchAddress( (m_name+"_pt"  ).c_str(),        m_pt   );
-  intree->SetBranchAddress( (m_name+"_eta" ).c_str(),       m_eta  );
-  intree->SetBranchAddress( (m_name+"_phi" ).c_str(),       m_phi  );
-  intree->SetBranchAddress( (m_name+"_mass").c_str(),      m_mass );
-  if(m_isMC)
-    intree->SetBranchAddress( (m_name+"_SF["+m_name+"_num]"  ).c_str(),      m_SF);    
+  SetBranchAddress(intree, m_name+"_num" ,       m_num  );
+  SetBranchAddress(intree, m_name+"_pt"  ,        m_pt   );
+  SetBranchAddress(intree, m_name+"_eta" ,       m_eta  );
+  SetBranchAddress(intree, m_name+"_phi" ,       m_phi  );
+  SetBranchAddress(intree, m_name+"_mass",      m_mass );
+  SetBranchAddress(intree, m_name+"_SF["+m_name+"_num]",      m_SF);    
 
-  if(m_isElectrons){
-    intree->SetBranchAddress( (m_name+"_superClusterEta").c_str(),      m_superClusterEta );
-  }else{
-    intree->SetBranchAddress( (m_name+"_iso").c_str(),      m_iso );
+  SetBranchAddress(intree, m_name+"_superClusterEta",      m_superClusterEta );
+  SetBranchAddress(intree, m_name+"_iso",      m_iso );
+
+  return;
+}
+
+void LeptonDataHandler::SetBranchAddress(TChain* intree, std::string brName, int* int_arr){
+  if(intree->FindBranch(brName.c_str())){
+    intree->SetBranchStatus(brName.c_str(), 1);
+    intree->SetBranchAddress(brName.c_str(), int_arr);
   }
+  
+  return;
+}
+
+void LeptonDataHandler::SetBranchAddress(TChain* intree, std::string brName, float* float_arr){
+  if(intree->FindBranch(brName.c_str())){
+    intree->SetBranchStatus(brName.c_str(), 1);
+    intree->SetBranchAddress(brName.c_str(), float_arr);
+  }
+  
   return;
 }
 

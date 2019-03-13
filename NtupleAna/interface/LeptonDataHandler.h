@@ -27,6 +27,9 @@ namespace NtupleAna {
 
     bool m_isElectrons = false;
 
+    void SetBranchAddress(TChain* intree, std::string brName, int* int_arr);
+    void SetBranchAddress(TChain* intree, std::string brName, float* float_arr);
+
   public:
     
     LeptonDataHandler(std::string name, bool isMC = true) : m_name(name), m_isMC(isMC)  {

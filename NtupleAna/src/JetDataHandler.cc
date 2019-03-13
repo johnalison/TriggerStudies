@@ -9,116 +9,136 @@ using namespace std;
 void
 JetDataHandler::SetBranchAddress(TChain* intree){
 
-  intree->SetBranchAddress( (m_name+"_num"       ).c_str(),   m_num  );
-  intree->SetBranchAddress( (m_name+"_pt"        ).c_str(),   m_pt  );
-  intree->SetBranchAddress( (m_name+"_eta"       ).c_str(),   m_eta  );
-  intree->SetBranchAddress( (m_name+"_phi"       ).c_str(),   m_phi  );
-  intree->SetBranchAddress( (m_name+"_mass"      ).c_str(),   m_mass  );
-  intree->SetBranchAddress( (m_name+"_csv"       ).c_str(),   m_csv  );
-  intree->SetBranchAddress( (m_name+"_deepcsv"   ).c_str(),   m_deepcsv  );
-  if(m_name == "offJets" || m_name == "offCleanJets")
-    intree->SetBranchAddress( (m_name+"_deepcsv_b" ).c_str(),   m_deepcsv_b  );
-  intree->SetBranchAddress( (m_name+"_deepcsv_bb").c_str(),   m_deepcsv_bb  );
+  SetBranchAddress(intree, m_name+"_num"       ,   m_num  );
+  SetBranchAddress(intree, m_name+"_pt"        ,   m_pt  );
+  SetBranchAddress(intree, m_name+"_eta"       ,   m_eta  );
+  SetBranchAddress(intree, m_name+"_phi"       ,   m_phi  );
+  SetBranchAddress(intree, m_name+"_mass"      ,   m_mass  );
+  SetBranchAddress(intree, m_name+"_csv"       ,   m_csv  );
+  SetBranchAddress(intree, m_name+"_deepcsv"   ,   m_deepcsv  );
+  SetBranchAddress(intree, m_name+"_deepcsv_b" ,   m_deepcsv_b  );
+  SetBranchAddress(intree, m_name+"_deepcsv_bb",   m_deepcsv_bb  );
 
-  if(m_isMC && (m_name == "offJets" || m_name == "offCleanJets"))
-    intree->SetBranchAddress( (m_name+"_deepcsvSF["+m_name+"_num]"       ).c_str(),   m_SF  );
-
-  if(m_name != "caloJets")
-    intree->SetBranchAddress( (m_name+"_passesTightLeptVetoID").c_str(), m_passesTightLeptVetoID);
-
-  if(m_name == "offJets" || m_name == "offCleanJets")
-    intree->SetBranchAddress( (m_name+"_lepOverlap04Tight").c_str(),   m_lepOverlap04Tight  );
+  SetBranchAddress(intree, m_name+"_deepcsvSF["+m_name+"_num]",   m_SF  );
+  SetBranchAddress(intree, m_name+"_passesTightLeptVetoID"    , m_passesTightLeptVetoID);
+  SetBranchAddress(intree, m_name+"_lepOverlap04Tight"        ,   m_lepOverlap04Tight  );
 
   
   if(m_loadTrkLevel){
-    intree->SetBranchAddress( (m_name+"_vertexNTracks"                ).c_str()     , m_vertexNTracks                     );
-    intree->SetBranchAddress( (m_name+"_vertexMass"                   ).c_str()     , m_vertexMass                        );
-    intree->SetBranchAddress( (m_name+"_vertexJetDeltaR"              ).c_str()     , m_vertexJetDeltaR                   );
-    intree->SetBranchAddress( (m_name+"_vertexFitProb"                ).c_str()     , m_vertexFitProb                     );
-    intree->SetBranchAddress( (m_name+"_vertexEnergyRatio"            ).c_str()     , m_vertexEnergyRatio                 );
-    intree->SetBranchAddress( (m_name+"_vertexCategory"               ).c_str()     , m_vertexCategory                    );
-    intree->SetBranchAddress( (m_name+"_vertexBoostOverSqrtJetPt"     ).c_str()     , m_vertexBoostOverSqrtJetPt          );
-    intree->SetBranchAddress( (m_name+"_trackJetPt"                   ).c_str()     , m_trackJetPt                        );
-    intree->SetBranchAddress( (m_name+"_trackSumJetEtRatio"           ).c_str()     , m_trackSumJetEtRatio                );
-    intree->SetBranchAddress( (m_name+"_trackSumJetDeltaR"            ).c_str()     , m_trackSumJetDeltaR                 );
-    intree->SetBranchAddress( (m_name+"_trackSip2dValAboveCharm"      ).c_str()     , m_trackSip2dValAboveCharm           );
-    intree->SetBranchAddress( (m_name+"_trackSip2dSigAboveCharm"      ).c_str()     , m_trackSip2dSigAboveCharm           );
-    intree->SetBranchAddress( (m_name+"_trackSip3dValAboveCharm"      ).c_str()     , m_trackSip3dValAboveCharm           );
-    intree->SetBranchAddress( (m_name+"_trackSip3dSigAboveCharm"      ).c_str()     , m_trackSip3dSigAboveCharm           );
-    intree->SetBranchAddress( (m_name+"_totalMultiplicity"            ).c_str()     , m_totalMultiplicity                 );
-    intree->SetBranchAddress( (m_name+"_photonMultiplicity"           ).c_str()     , m_photonMultiplicity                );
-    intree->SetBranchAddress( (m_name+"_photonEnergyFraction"         ).c_str()     , m_photonEnergyFraction              );
-    intree->SetBranchAddress( (m_name+"_neutralHadronMultiplicity"    ).c_str()     , m_neutralHadronMultiplicity         );
-    intree->SetBranchAddress( (m_name+"_neutralHadronEnergyFraction"  ).c_str()     , m_neutralHadronEnergyFraction       );
-    if(m_name != "caloJets"){
-      intree->SetBranchAddress( (m_name+"_neMult"  ).c_str()                          , m_neMult                            );
-      intree->SetBranchAddress( (m_name+"_neHadEF" ).c_str()                          , m_neHadEF                           );
-      intree->SetBranchAddress( (m_name+"_neEmEF"  ).c_str()                          , m_neEmEF                            );
-      intree->SetBranchAddress( (m_name+"_mult"    ).c_str()                          , m_mult                              );
-      intree->SetBranchAddress( (m_name+"_muEF"    ).c_str()                          , m_muEF                              );
-      intree->SetBranchAddress( (m_name+"_chMult"  ).c_str()                          , m_chMult                            );
-      intree->SetBranchAddress( (m_name+"_chHadEF" ).c_str()                          , m_chHadEF                           );
-      intree->SetBranchAddress( (m_name+"_chEmEF"  ).c_str()                          , m_chEmEF                            );
-    }
+    SetBranchAddress(intree, m_name+"_vertexNTracks"                     , m_vertexNTracks                     );
+    SetBranchAddress(intree, m_name+"_vertexMass"                        , m_vertexMass                        );
+    SetBranchAddress(intree, m_name+"_vertexJetDeltaR"                   , m_vertexJetDeltaR                   );
+    SetBranchAddress(intree, m_name+"_vertexFitProb"                     , m_vertexFitProb                     );
+    SetBranchAddress(intree, m_name+"_vertexEnergyRatio"                 , m_vertexEnergyRatio                 );
+    SetBranchAddress(intree, m_name+"_vertexCategory"                    , m_vertexCategory                    );
+    SetBranchAddress(intree, m_name+"_vertexBoostOverSqrtJetPt"          , m_vertexBoostOverSqrtJetPt          );
+    SetBranchAddress(intree, m_name+"_trackJetPt"                        , m_trackJetPt                        );
+    SetBranchAddress(intree, m_name+"_trackSumJetEtRatio"                , m_trackSumJetEtRatio                );
+    SetBranchAddress(intree, m_name+"_trackSumJetDeltaR"                 , m_trackSumJetDeltaR                 );
+    SetBranchAddress(intree, m_name+"_trackSip2dValAboveCharm"           , m_trackSip2dValAboveCharm           );
+    SetBranchAddress(intree, m_name+"_trackSip2dSigAboveCharm"           , m_trackSip2dSigAboveCharm           );
+    SetBranchAddress(intree, m_name+"_trackSip3dValAboveCharm"           , m_trackSip3dValAboveCharm           );
+    SetBranchAddress(intree, m_name+"_trackSip3dSigAboveCharm"           , m_trackSip3dSigAboveCharm           );
+    SetBranchAddress(intree, m_name+"_totalMultiplicity"                 , m_totalMultiplicity                 );
+    SetBranchAddress(intree, m_name+"_photonMultiplicity"                , m_photonMultiplicity                );
+    SetBranchAddress(intree, m_name+"_photonEnergyFraction"              , m_photonEnergyFraction              );
+    SetBranchAddress(intree, m_name+"_neutralHadronMultiplicity"         , m_neutralHadronMultiplicity         );
+    SetBranchAddress(intree, m_name+"_neutralHadronEnergyFraction"       , m_neutralHadronEnergyFraction       );
 
-    intree->SetBranchAddress( (m_name+"_muonMultiplicity"           ).c_str()       , m_muonMultiplicity                  );
-    intree->SetBranchAddress( (m_name+"_muonEnergyFraction"         ).c_str()       , m_muonEnergyFraction                );
-    intree->SetBranchAddress( (m_name+"_massVertexEnergyFraction"   ).c_str()       , m_massVertexEnergyFraction          );
-    intree->SetBranchAddress( (m_name+"_jetNTracksEtaRel"           ).c_str()       , m_jetNTracksEtaRel                  );
-    intree->SetBranchAddress( (m_name+"_jetNTracks"                 ).c_str()       , m_jetNTracks                        );
-    intree->SetBranchAddress( (m_name+"_jetNSelectedTracks"         ).c_str()       , m_jetNSelectedTracks                );
-    intree->SetBranchAddress( (m_name+"_jetNSecondaryVertices"      ).c_str()       , m_jetNSecondaryVertices             );
-    intree->SetBranchAddress( (m_name+"_hadronPhotonMultiplicity"   ).c_str()       , m_hadronPhotonMultiplicity          );
-    intree->SetBranchAddress( (m_name+"_hadronMultiplicity"         ).c_str()       , m_hadronMultiplicity                );
-    intree->SetBranchAddress( (m_name+"_flightDistance1dSig"        ).c_str()       , m_flightDistance1dSig               );
-    intree->SetBranchAddress( (m_name+"_flightDistance1dVal"        ).c_str()       , m_flightDistance1dVal               );
-    intree->SetBranchAddress( (m_name+"_flightDistance2dSig"        ).c_str()       , m_flightDistance2dSig               );
-    intree->SetBranchAddress( (m_name+"_flightDistance2dVal"        ).c_str()       , m_flightDistance2dVal               );
-    intree->SetBranchAddress( (m_name+"_flightDistance3dSig"        ).c_str()       , m_flightDistance3dSig               );
-    intree->SetBranchAddress( (m_name+"_flightDistance3dVal"        ).c_str()       , m_flightDistance3dVal               );
-    intree->SetBranchAddress( (m_name+"_chargedHadronMultiplicity"  ).c_str()       , m_chargedHadronMultiplicity         );
-    intree->SetBranchAddress( (m_name+"_chargedHadronEnergyFraction").c_str()       , m_chargedHadronEnergyFraction       );
+    SetBranchAddress(intree, m_name+"_neMult"                            , m_neMult                            );
+    SetBranchAddress(intree, m_name+"_neHadEF"                           , m_neHadEF                           );
+    SetBranchAddress(intree, m_name+"_neEmEF"                            , m_neEmEF                            );
+    SetBranchAddress(intree, m_name+"_mult"                              , m_mult                              );
+    SetBranchAddress(intree, m_name+"_muEF"                              , m_muEF                              );
+    SetBranchAddress(intree, m_name+"_chMult"                            , m_chMult                            );
+    SetBranchAddress(intree, m_name+"_chHadEF"                           , m_chHadEF                           );
+    SetBranchAddress(intree, m_name+"_chEmEF"                            , m_chEmEF                            );
+    SetBranchAddress(intree, m_name+"_muonMultiplicity"                  , m_muonMultiplicity                  );
+    SetBranchAddress(intree, m_name+"_muonEnergyFraction"                , m_muonEnergyFraction                );
+    SetBranchAddress(intree, m_name+"_massVertexEnergyFraction"          , m_massVertexEnergyFraction          );
+    SetBranchAddress(intree, m_name+"_jetNTracksEtaRel"                  , m_jetNTracksEtaRel                  );
+    SetBranchAddress(intree, m_name+"_jetNTracks"                        , m_jetNTracks                        );
+    SetBranchAddress(intree, m_name+"_jetNSelectedTracks"                , m_jetNSelectedTracks                );
+    SetBranchAddress(intree, m_name+"_jetNSecondaryVertices"             , m_jetNSecondaryVertices             );
+    SetBranchAddress(intree, m_name+"_hadronPhotonMultiplicity"          , m_hadronPhotonMultiplicity          );
+    SetBranchAddress(intree, m_name+"_hadronMultiplicity"                , m_hadronMultiplicity                );
+    SetBranchAddress(intree, m_name+"_flightDistance1dSig"               , m_flightDistance1dSig               );
+    SetBranchAddress(intree, m_name+"_flightDistance1dVal"               , m_flightDistance1dVal               );
+    SetBranchAddress(intree, m_name+"_flightDistance2dSig"               , m_flightDistance2dSig               );
+    SetBranchAddress(intree, m_name+"_flightDistance2dVal"               , m_flightDistance2dVal               );
+    SetBranchAddress(intree, m_name+"_flightDistance3dSig"               , m_flightDistance3dSig               );
+    SetBranchAddress(intree, m_name+"_flightDistance3dVal"               , m_flightDistance3dVal               );
+    SetBranchAddress(intree, m_name+"_chargedHadronMultiplicity"         , m_chargedHadronMultiplicity         );
+    SetBranchAddress(intree, m_name+"_chargedHadronEnergyFraction"       , m_chargedHadronEnergyFraction       );
 
-    intree->SetBranchAddress( (m_name+"_trackSip3dSig").c_str(), &m_trackSip3dSig);
-    intree->SetBranchAddress( (m_name+"_trackSip3dVal").c_str(), &m_trackSip3dVal);
-    intree->SetBranchAddress( (m_name+"_trackSip2dSig").c_str(), &m_trackSip2dSig);
-    intree->SetBranchAddress( (m_name+"_trackSip2dVal").c_str(), &m_trackSip2dVal);
+    SetBranchAddress(intree, m_name+"_trackSip3dSig", &m_trackSip3dSig);
+    SetBranchAddress(intree, m_name+"_trackSip3dSig", &m_trackSip3dSig);
+    SetBranchAddress(intree, m_name+"_trackSip3dVal", &m_trackSip3dVal);
+    SetBranchAddress(intree, m_name+"_trackSip2dSig", &m_trackSip2dSig);
+    SetBranchAddress(intree, m_name+"_trackSip2dVal", &m_trackSip2dVal);
   			    
-    intree->SetBranchAddress( (m_name+"_trackDecayLenVal").c_str()           , &m_trackDecayLenVal           );
-    //intree->SetBranchAddress( (m_name+"_trackDecayLenSig").c_str()           , &m_trackDecayLenSig           );
-    intree->SetBranchAddress( (m_name+"_trackJetDistVal").c_str()            , &m_trackJetDistVal            );
-    intree->SetBranchAddress( (m_name+"_trackJetDistSig").c_str()            , &m_trackJetDistSig            );
-    //intree->SetBranchAddress( (m_name+"_trackGhostTrackWeight").c_str()      , &m_trackGhostTrackWeight      );
-    //intree->SetBranchAddress( (m_name+"_trackGhostTrackDistSig").c_str()     , &m_trackGhostTrackDistSig     );
-    //intree->SetBranchAddress( (m_name+"_trackGhostTrackDistVal").c_str()     , &m_trackGhostTrackDistVal     );
-    intree->SetBranchAddress( (m_name+"_trackPtRel").c_str()                 , &m_trackPtRel                 );
-    intree->SetBranchAddress( (m_name+"_trackMomentum").c_str()              , &m_trackMomentum              );
-    intree->SetBranchAddress( (m_name+"_trackEta").c_str()                   , &m_trackEta                   );
-    intree->SetBranchAddress( (m_name+"_trackPhi").c_str()                   , &m_trackPhi                   );
-    //intree->SetBranchAddress( (m_name+"_trackCharge").c_str()                , &m_trackCharge                );
-    intree->SetBranchAddress( (m_name+"_trackPPar").c_str()                  , &m_trackPPar                  );
-    intree->SetBranchAddress( (m_name+"_trackDeltaR").c_str()                , &m_trackDeltaR                );
-    intree->SetBranchAddress( (m_name+"_trackEtaRel").c_str()                , &m_trackEtaRel                );
-    intree->SetBranchAddress( (m_name+"_trackPtRatio").c_str()               , &m_trackPtRatio               );
-    intree->SetBranchAddress( (m_name+"_trackPParRatio").c_str()             , &m_trackPParRatio             );
-    //intree->SetBranchAddress( (m_name+"_trackP0Par").c_str()                 , &m_trackP0Par                 );
-    //intree->SetBranchAddress( (m_name+"_trackP0ParRatio").c_str()            , &m_trackP0ParRatio            );
-    intree->SetBranchAddress( (m_name+"_trackChi2").c_str()                  , &m_trackChi2                  );
-    intree->SetBranchAddress( (m_name+"_trackNTotalHits").c_str()            , &m_trackNTotalHits            );
-    intree->SetBranchAddress( (m_name+"_trackNPixelHits").c_str()            , &m_trackNPixelHits            );
+    SetBranchAddress(intree, m_name+"_trackDecayLenVal"           , &m_trackDecayLenVal           );
+//  SetBranchAddress(intree, m_name+"_trackDecayLenSig"           , &m_trackDecayLenSig           );
+    SetBranchAddress(intree, m_name+"_trackJetDistVal"            , &m_trackJetDistVal            );
+    SetBranchAddress(intree, m_name+"_trackJetDistSig"            , &m_trackJetDistSig            );
+//  SetBranchAddress(intree, m_name+"_trackGhostTrackWeight"      , &m_trackGhostTrackWeight      );
+//  SetBranchAddress(intree, m_name+"_trackGhostTrackDistSig"     , &m_trackGhostTrackDistSig     );
+//  SetBranchAddress(intree, m_name+"_trackGhostTrackDistVal"     , &m_trackGhostTrackDistVal     );
+    SetBranchAddress(intree, m_name+"_trackPtRel"                 , &m_trackPtRel                 );
+    SetBranchAddress(intree, m_name+"_trackMomentum"              , &m_trackMomentum              );
+    SetBranchAddress(intree, m_name+"_trackEta"                   , &m_trackEta                   );
+    SetBranchAddress(intree, m_name+"_trackPhi"                   , &m_trackPhi                   );
+//  SetBranchAddress(intree, m_name+"_trackCharge"                , &m_trackCharge                );
+    SetBranchAddress(intree, m_name+"_trackPPar"                  , &m_trackPPar                  );
+    SetBranchAddress(intree, m_name+"_trackDeltaR"                , &m_trackDeltaR                );
+    SetBranchAddress(intree, m_name+"_trackEtaRel"                , &m_trackEtaRel                );
+    SetBranchAddress(intree, m_name+"_trackPtRatio"               , &m_trackPtRatio               );
+    SetBranchAddress(intree, m_name+"_trackPParRatio"             , &m_trackPParRatio             );
+//  SetBranchAddress(intree, m_name+"_trackP0Par"                 , &m_trackP0Par                 );
+//  SetBranchAddress(intree, m_name+"_trackP0ParRatio"            , &m_trackP0ParRatio            );
+    SetBranchAddress(intree, m_name+"_trackChi2"                  , &m_trackChi2                  );
+    SetBranchAddress(intree, m_name+"_trackNTotalHits"            , &m_trackNTotalHits            );
+    SetBranchAddress(intree, m_name+"_trackNPixelHits"            , &m_trackNPixelHits            );
   
   }
   
-  if(m_name == "offJets" || m_name == "offCleanJets"){
-    intree->SetBranchAddress( (m_name+"_partonFlavour").c_str()                            , m_partonFlavour                            );
-    intree->SetBranchAddress( (m_name+"_hadronFlavour").c_str()                            , m_hadronFlavour                            );
-  }
 
-
-  
+  SetBranchAddress(intree, m_name+"_partonFlavour"                            , m_partonFlavour                            );
+  SetBranchAddress(intree, m_name+"_hadronFlavour"                            , m_hadronFlavour                            );
 
   return;
 }
+
+
+void JetDataHandler::SetBranchAddress(TChain* intree, std::string brName, int* int_arr){
+  if(intree->FindBranch(brName.c_str())){
+    intree->SetBranchStatus(brName.c_str(), 1);
+    intree->SetBranchAddress(brName.c_str(), int_arr);
+  }
+  
+  return;
+}
+
+void JetDataHandler::SetBranchAddress(TChain* intree, std::string brName, float* float_arr){
+  if(intree->FindBranch(brName.c_str())){
+    intree->SetBranchStatus(brName.c_str(), 1);
+    intree->SetBranchAddress(brName.c_str(), float_arr);
+  }
+  
+  return;
+}
+
+void JetDataHandler::SetBranchAddress(TChain* intree, std::string brName, std::vector<std::vector<float> >** vector_ptr){
+  if(intree->FindBranch(brName.c_str())){
+    intree->SetBranchStatus(brName.c_str(), 1);
+    intree->SetBranchAddress( brName.c_str(), vector_ptr);
+  }
+  
+  return;
+}
+
+
+
 
 vector<JetData> 
 JetDataHandler::GetJetsAll(){

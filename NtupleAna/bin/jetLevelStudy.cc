@@ -29,6 +29,7 @@
 using namespace NtupleAna;
 using std::cout; 
 using std::endl; 
+using std::string; 
 using optutl::CommandLineParser;
 
 
@@ -58,10 +59,10 @@ int main(int argc, char * argv[]){
 
   parser.parseArguments (argc, argv);
   //cout << "Running with "<<parser.integerValue("maxEvents") << " config file " << parser.stringValue("configFile") << endl;
-  std::string configFile     = parser.stringValue("configFile");
-  std::string outputFileName = parser.stringValue("outputFile");
-  std::string puFile         = parser.stringValue("puFile");
-  std::vector<std::string> inputFiles = parser.stringVector("inputFiles");
+  string configFile     = parser.stringValue("configFile");
+  string outputFileName = parser.stringValue("outputFile");
+  string puFile         = parser.stringValue("puFile");
+  std::vector<string> inputFiles = parser.stringVector("inputFiles");
 
   cout << "\t Running with configFile: " << configFile << endl;
   cout << "\t Outputting to: " << outputFileName << endl;
@@ -80,11 +81,13 @@ int main(int argc, char * argv[]){
   const edm::ParameterSet& ana = process.getParameter<edm::ParameterSet>("jetLevelStudy");
   bool loadTrkLevel = ana.getParameter<bool>("LoadTrkLevel");
   bool debug = ana.getParameter<bool>("debug");
-
+  string offJetName = ana.getParameter<string>("offJetName");
+  
   //
   //  Inint Tree
   //
   TChain* tree = new TChain("tree");
+
   cout << "\t inputFiles are: " << endl;
   for(unsigned int iFile=0; iFile<inputFiles.size(); ++iFile){
     // open input file (can be located on castor)
@@ -95,13 +98,32 @@ int main(int argc, char * argv[]){
     tree->Add(inputFiles[iFile].c_str());
     //}
   }
+  tree->SetBranchStatus("*",0);
+  TObjArray *branchList = tree->GetListOfBranches();
 
-  bool isMC = bool(tree->GetBranch("pu"));
+  int nBranch     = tree->GetNbranches();
+  for(int i=0;i<nBranch;i++){
+    //cout << "Turning off " << branchList->At(i)->GetName() << endl;
+    tree->SetBranchStatus(branchList->At(i)->GetName(),0);
+  }
+  //intree->SetBranchStatus("*",0);
+  //intree->SetBranchStatus("HLT*",0);
+  //tree->SetBranchStatus("nPV",0);
+
+  //for branch in Chain.GetListOfBranches():
+  //if( branch.GetName() == "TheBranchIWant" ):
+  //  DoSomeAnalysis()
+  //cout << tree->Print() << endl;
+  //tree->Print("HLT*");
+
+
+  bool isMC = bool(tree->FindBranch("pu"));
   cout << " \t isMC set to: " << isMC << endl;
   cout << " ================================="<<endl;
 
   //
   // Input Data
+
   //
   EventData eventData = EventData();
   eventData.SetBranchAddress(tree);
@@ -112,8 +134,7 @@ int main(int argc, char * argv[]){
   JetDataHandler caloJetsDB = JetDataHandler("caloJets",loadTrkLevel);
   caloJetsDB.SetBranchAddress(tree);
 
-  //JetDataHandler offJetsDB = JetDataHandler("offJets",loadTrkLevel);
-  JetDataHandler offJetsDB = JetDataHandler("offCleanJets",loadTrkLevel, isMC);
+  JetDataHandler offJetsDB = JetDataHandler(offJetName,loadTrkLevel, isMC);
   offJetsDB.SetBranchAddress(tree);
 
   LeptonDataHandler muonDB = LeptonDataHandler("offTightMuons", isMC);
@@ -132,7 +153,7 @@ int main(int argc, char * argv[]){
   EventHists eventHistsNoPUWeight = EventHists("EventsNoPUWeight", fs);
 
 
-  JetHists offJetHistsPreOLap = JetHists("offJetsPreOLap",fs, true);
+  JetHists offJetHistsPreOLap     = JetHists("offJetsPreOLap",fs, true);
   JetHists offJetHistsBeforeProbe = JetHists("offJetsBeforeProbe",fs, true);
 
   JetHists offJetHists   = JetHists("offJets",  fs, true);
@@ -141,8 +162,8 @@ int main(int argc, char * argv[]){
   JetHists offJetHists_L = JetHists("offJets_L",fs, true);
 
 
-  JetHists offJetHists_matchedPF               = JetHists("offJets_matchedPF",               fs, true);
-  JetHists offJetHists_matchedPFJet            = JetHists("offJets_matchedPFJet",            fs, true);
+  JetHists offJetHists_matchedPF               = JetHists("offJets_matchedPF",               fs, loadTrkLevel);
+  JetHists offJetHists_matchedPFJet            = JetHists("offJets_matchedPFJet",            fs, loadTrkLevel);
   JetHists offJetHists_matchedPFcsvTag         = JetHists("offJets_matchedPFcsvTag",         fs, true);
   JetHists offJetHists_matchedPFcsvTagJet      = JetHists("offJets_matchedPFcsvTagJet",      fs, true);
   JetHists offJetHists_matchedPFDeepcsvTag     = JetHists("offJets_matchedPFDeepcsvTag",     fs, true);
@@ -161,7 +182,7 @@ int main(int argc, char * argv[]){
   JetHists offJetHists_L_matchedPFJet   = JetHists("offJets_L_matchedPFJet",fs, true);
 
 
-  JetHists offJetHists_matchedCalo               = JetHists("offJets_matchedCalo",           fs, true);
+  JetHists offJetHists_matchedCalo               = JetHists("offJets_matchedCalo",           fs, false);
   JetHists offJetHists_matchedCaloJet            = JetHists("offJets_matchedCaloJet",        fs, true);
   JetHists offJetHists_matchedCalocsvTag         = JetHists("offJets_matchedCalocsvTag",     fs, true);
   JetHists offJetHists_matchedCalocsvTagJet      = JetHists("offJets_matchedCalocsvTagJet",  fs, true);
@@ -213,6 +234,16 @@ int main(int argc, char * argv[]){
     }
 
     //
+    // Trigger Selection
+    //
+    if(!(eventData.passTrigger())){
+      cout << "\t fail Trigger  " << endl;
+      continue;
+    }
+    if(debug) cout << "Pass Trigger " << endl;
+
+
+    //
     // Fill All events
     //
     allEventHists.Fill(eventData);
@@ -239,12 +270,6 @@ int main(int argc, char * argv[]){
     }
 
     //std::cout << "PU Weight " << get_puWeight_CDF(eventData.pu) << std::endl;
-
-    //
-    // Trigger Selection
-    //
-    if(!(eventData.HLT_Mu12_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_v4 ||eventData.HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_v4 ))
-      continue;
 
     //
     // cut on number of clean jets
