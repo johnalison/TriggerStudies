@@ -7,6 +7,7 @@
 #include "DataFormats/FWLite/interface/Event.h"
 #include "DataFormats/FWLite/interface/Handle.h"
 #include "FWCore/FWLite/interface/FWLiteEnabler.h"
+#include "PhysicsTools/FWLite/interface/CommandLineParser.h"
 
 #include "DataFormats/FWLite/interface/InputSource.h"
 #include "DataFormats/FWLite/interface/OutputFiles.h"
@@ -27,50 +28,82 @@
 #include "TriggerStudies/NtupleAna/interface/Helpers.h"
 
 using namespace NtupleAna;
-
+using std::cout; 
+using std::endl; 
+using std::string; 
+using optutl::CommandLineParser;
 
 int main(int argc, char * argv[]){
   // load framework libraries
   gSystem->Load( "libFWCoreFWLite" );
   FWLiteEnabler::enable();
   
-  // parse arguments
-  if ( argc < 2 ) {
-    std::cout << "Usage : " << argv[0] << " [parameters.py]" << std::endl;
-    return 0;
-  }
 
-  if( !edm::readPSetsFrom(argv[1])->existsAs<edm::ParameterSet>("process") ){
-    std::cout << " ERROR: ParametersSet 'process' is missing in your configuration file" << std::endl; exit(0);
-  }
+  // initialize command line parser
+  CommandLineParser parser ("Analyze FWLite Histograms");
 
-  // get the python configuration
-  const edm::ParameterSet& process = edm::readPSetsFrom(argv[1])->getParameter<edm::ParameterSet>("process");
-  fwlite::InputSource inputHandler_(process); 
-  fwlite::OutputFiles outputHandler_(process);
+  parser.addOption ("configFile",   CommandLineParser::kString,
+		    "configFileName");
+  parser.addOption ("puFile",   CommandLineParser::kString,
+		    "File with pile-up correction weights");
+  // set defaults
+  parser.integerValue ("maxEvents"  ) = -1;
+  parser.integerValue ("outputEvery") =   10000;
+  parser.stringValue  ("outputFile" ) = "TEST.root";  
+
+
+  parser.parseArguments (argc, argv);
+  //cout << "Running with "<<parser.integerValue("maxEvents") << " config file " << parser.stringValue("configFile") << endl;
+  string configFile     = parser.stringValue("configFile");
+  string outputFileName = parser.stringValue("outputFile");
+  string puFile         = parser.stringValue("puFile");
+  std::vector<string> inputFiles = parser.stringVector("inputFiles");
+
+  cout << "\t Running with configFile: " << configFile << endl;
+  cout << "\t Outputting to: " << outputFileName << endl;
+  cout << "\t puFile: " << puFile << endl;
+
+
+  if( !edm::readPSetsFrom(configFile)->existsAs<edm::ParameterSet>("process") ){
+    cout << " ERROR: ParametersSet 'process' is missing in your configuration file" << endl; exit(0);
+  }
 
   //
   // Get the config
   //
   // now get each parameter
+  const edm::ParameterSet& process = edm::readPSetsFrom(configFile)->getParameter<edm::ParameterSet>("process");
   const edm::ParameterSet& ana = process.getParameter<edm::ParameterSet>("procNtupleExample");
   bool makeEventDisplays = ana.getParameter<bool>("MakeEventDisplays");
   bool loadTrkLevel = ana.getParameter<bool>("LoadTrkLevel");
   bool debug = ana.getParameter<bool>("debug");
+  //string offJetName = ana.getParameter<string>("offJetName");
+  
 
   //
   //  Inint Tree
   //
   TChain* tree = new TChain("tree");
-  for(unsigned int iFile=0; iFile<inputHandler_.files().size(); ++iFile){
+  cout << "\t inputFiles are: " << endl;
+  for(unsigned int iFile=0; iFile<inputFiles.size(); ++iFile){
+    cout << "\t\t " << inputFiles[iFile].c_str() << endl;
     // open input file (can be located on castor)
-    std::cout << "inputFile is " << inputHandler_.files()[iFile].c_str() << std::endl;
 
     //TFile* inFile = TFile::Open(inputFiles_[iFile].c_str());
     //if( inFile ){
-    tree->Add(inputHandler_.files()[iFile].c_str());
+    tree->Add(inputFiles[iFile].c_str());
     //}
   }
+
+  tree->SetBranchStatus("*",0);
+  TObjArray *branchList = tree->GetListOfBranches();
+
+  int nBranch     = tree->GetNbranches();
+  for(int i=0;i<nBranch;i++){
+    //cout << "Turning off " << branchList->At(i)->GetName() << endl;
+    tree->SetBranchStatus(branchList->At(i)->GetName(),0);
+  }
+
 
   //
   // Input Data
@@ -96,7 +129,7 @@ int main(int argc, char * argv[]){
   //
   // Make output ntuple/Hists
   // 
-  fwlite::TFileService fs = fwlite::TFileService(outputHandler_.file());
+  fwlite::TFileService fs = fwlite::TFileService(outputFileName);
 
   EventHists eventHists     = EventHists("AllEvents", fs);
 
@@ -176,16 +209,17 @@ int main(int argc, char * argv[]){
   EventDisplayData eventDisplay = EventDisplayData("offline");
 
   
-  std::cout << " In procNtupleExample " << std::endl;
+  cout << " In procNtupleExample " << endl;
 
   int nEventThisFile = tree->GetEntries();
-  int maxEvents = inputHandler_.maxEvents();
-  std::cout <<  "Number of input events: " << nEventThisFile << std::endl;
+  int maxEvents = parser.integerValue("maxEvents");
+  int outputEvery = parser.integerValue("outputEvery");
+  cout <<  "Number of input events: " << nEventThisFile << endl;
 
   for(int entry = 0; entry<nEventThisFile; entry++){
     
-    if(entry %1000 == 0 || debug)
-      std::cout << "Processed .... "<<entry<<" Events"<<std::endl;
+    if(entry %outputEvery == 0 || debug)
+      cout << "Processed .... "<<entry<<" Events"<<endl;
     if( (maxEvents > 0) && (entry > maxEvents))
       break;
 
@@ -194,8 +228,8 @@ int main(int argc, char * argv[]){
     eventData.SetEvent();
 
     if(debug){
-      std::cout << "RunNumber: "  << eventData.runNumber << std::endl;
-      std::cout << "EventNumber: " << eventData.eventNumber << std::endl;
+      cout << "RunNumber: "  << eventData.runNumber << endl;
+      cout << "EventNumber: " << eventData.eventNumber << endl;
     }
 
     //

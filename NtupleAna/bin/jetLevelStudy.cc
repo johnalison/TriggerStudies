@@ -21,6 +21,7 @@
 #include "TriggerStudies/NtupleAna/interface/LeptonDataHandler.h"
 
 #include "TriggerStudies/NtupleAna/interface/JetHists.h"
+#include "TriggerStudies/NtupleAna/interface/LeptonHists.h"
 #include "TriggerStudies/NtupleAna/interface/EventHists.h"
 #include "TriggerStudies/NtupleAna/interface/Helpers.h"
 #include "TriggerStudies/NtupleAna/interface/PileUpWeightTool.h"
@@ -165,6 +166,10 @@ int main(int argc, char * argv[]){
   EventHists eventHists           = EventHists("Events", fs);
   EventHists eventHistsNoPUWeight = EventHists("EventsNoPUWeight", fs);
 
+  LeptonHists elecHistsPreSel     = LeptonHists("elecsPreSel",fs, true);
+  LeptonHists muonHistsPreSel     = LeptonHists("muonsPreSel",fs, false);
+  LeptonHists elecHists           = LeptonHists("elecs",      fs, true);
+  LeptonHists muonHists           = LeptonHists("muons",      fs, false);
 
   JetHists offJetHistsPreOLap     = JetHists("offJetsPreOLap",fs, true);
   JetHists offJetHistsBeforeProbe = JetHists("offJetsBeforeProbe",fs, true);
@@ -283,19 +288,32 @@ int main(int argc, char * argv[]){
 
     unsigned int nElecPt30 = 0;
     for(NtupleAna::LeptonData& elec : elecsNoPt){
+      elecHistsPreSel.Fill(elec, 1);
       if(elec.m_pt > 30) ++nElecPt30;
     }
+    elecHistsPreSel.m_n->Fill(elecsNoPt.size(), 1);
 
     unsigned int nMuonPt20 = 0;
     for(NtupleAna::LeptonData& muon : muonsNoPt){
+      muonHistsPreSel.Fill(muon, 1);
       if(muon.m_pt > 20) ++nMuonPt20;
     }
-
+    muonHistsPreSel.m_n->Fill(muonsNoPt.size(), 1);
 
     if(nElecPt30 == 1) 
       hCutFlowHist ->Fill( cf_bin_elecPt, 1 );      
     if(nMuonPt20 == 1) 
       hCutFlowHist ->Fill( cf_bin_muonPt, 1 );      
+
+    for(NtupleAna::LeptonData& elec : elecs){
+      elecHists.Fill(elec, 1);
+    }
+    elecHists.m_n->Fill(elecs.size(), 1);
+
+    for(NtupleAna::LeptonData& muon : muons){
+      muonHists.Fill(muon, 1);
+    }
+    muonHists.m_n->Fill(muons.size(), 1);
 
     if(nElecPt30 != 1) continue;
     if(nMuonPt20 != 1) continue;
