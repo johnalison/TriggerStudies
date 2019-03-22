@@ -120,10 +120,10 @@ int main(int argc, char * argv[]){
   JetDataHandler offJetsDB = JetDataHandler("offJets",loadTrkLevel);
   offJetsDB.SetBranchAddress(tree);
 
-  LeptonDataHandler muonDB = LeptonDataHandler("offTightMuons");
+  LeptonDataHandler muonDB = LeptonDataHandler("offTightMuons","2017");
   muonDB.SetBranchAddress(tree);
 
-  LeptonDataHandler elecDB = LeptonDataHandler("offTightElectrons");
+  LeptonDataHandler elecDB = LeptonDataHandler("offTightElectrons","2017");
   elecDB.SetBranchAddress(tree);
 
   //

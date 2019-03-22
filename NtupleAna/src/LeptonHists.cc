@@ -23,6 +23,8 @@ LeptonHists::LeptonHists(std::string name, fwlite::TFileService& fs, bool isElec
     m_superClusterEta      = dir.make<TH1F>("SuperClusterEta",     "SuperClusterEta;SuperClusterEta;Entries",100,-3,3);
   }else{
     m_iso      = dir.make<TH1F>("iso",     "iso;iso;Entries",100,-0.1,1.1);
+    m_iso_l    = dir.make<TH1F>("iso_l",   "iso;iso;Entries",100,-0.1,2);
+    m_iso_vl    = dir.make<TH1F>("iso_vl",   "iso;iso;Entries",100,-0.1,10);
   }
 } 
 
@@ -44,9 +46,10 @@ LeptonHists::Fill (const LeptonData& lepInfo, float eventWeight){
     m_superClusterEta     ->Fill(lepInfo.m_superClusterEta, eventWeight);
   }else{
     m_iso     ->Fill(lepInfo.m_iso, eventWeight);
+    m_iso_l     ->Fill(lepInfo.m_iso, eventWeight);
+    m_iso_vl     ->Fill(lepInfo.m_iso, eventWeight);
   }
 
   return;
 }
-
 

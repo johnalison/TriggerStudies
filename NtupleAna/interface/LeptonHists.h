@@ -22,6 +22,8 @@ namespace NtupleAna {
     TH1F* m_SF;
     TH1F* m_superClusterEta;
     TH1F* m_iso;
+    TH1F* m_iso_l;
+    TH1F* m_iso_vl;
 
     bool m_isElectrons = false;
 

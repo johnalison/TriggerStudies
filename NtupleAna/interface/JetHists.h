@@ -8,6 +8,7 @@
 #include "PhysicsTools/FWLite/interface/TFileService.h"
 #include "TriggerStudies/NtupleAna/interface/TrackHists.h"
 #include "TriggerStudies/NtupleAna/interface/JetData.h"
+#include "TriggerStudies/NtupleAna/interface/EventData.h"
 
 
 namespace NtupleAna {
@@ -92,6 +93,10 @@ namespace NtupleAna {
     TH1F* m_partonFlavour                    ;
     TH1F* m_hadronFlavour                    ;
 
+    TH1F* m_allJetsVsnPV             ;
+    TH1F* m_passCSVBTagJetsVsnPV     ;
+    TH1F* m_passDeepCSVBTagJetsVsnPV ;
+
 
     TH1F* m_nTrk; 
     TrackHists* m_trackHists;
@@ -104,7 +109,7 @@ namespace NtupleAna {
     ~JetHists(); 
     
     //void Fill (const JetData* jetPtr);
-    void Fill (const JetData& jetPtr, float eventWeight = 1.0);
+    void Fill (const JetData& jetPtr, float eventWeight = 1.0, const EventData* eventDataPtr = nullptr);
     
   };
 

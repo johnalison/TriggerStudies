@@ -138,10 +138,10 @@ int main(int argc, char * argv[]){
   JetDataHandler offJetsDB = JetDataHandler(offJetName,loadTrkLevel, isMC);
   offJetsDB.SetBranchAddress(tree);
 
-  LeptonDataHandler muonDB = LeptonDataHandler("offTightMuons", isMC);
+  LeptonDataHandler muonDB = LeptonDataHandler("offTightMuons", "2017", isMC);
   muonDB.SetBranchAddress(tree);
 
-  LeptonDataHandler elecDB = LeptonDataHandler("offTightElectrons", isMC);
+  LeptonDataHandler elecDB = LeptonDataHandler("offTightElectrons", "2017", isMC);
   elecDB.SetBranchAddress(tree);
 
   //
@@ -153,11 +153,12 @@ int main(int argc, char * argv[]){
   TH1F* hCutFlowHist = cutFlowDir.make<TH1F>("cutflow", "cutflow", 1, 1, 2);
   hCutFlowHist->SetCanExtend(TH1::kAllAxes);
   int cf_bin_all  = hCutFlowHist->GetXaxis()->FindBin("All");
-  int cf_bin_trig = hCutFlowHist->GetXaxis()->FindBin("Trigger");
+  int cf_bin_trig = hCutFlowHist->GetXaxis()->FindBin("PassTrigger");
   int cf_bin_elec = hCutFlowHist->GetXaxis()->FindBin("HasElec");
   int cf_bin_elecPt = hCutFlowHist->GetXaxis()->FindBin("HasElecPt");
   int cf_bin_muon = hCutFlowHist->GetXaxis()->FindBin("HasMuon");
   int cf_bin_muonPt = hCutFlowHist->GetXaxis()->FindBin("HasMuonPt");
+  int cf_bin_DiLepNoPt = hCutFlowHist->GetXaxis()->FindBin("HasDiLepNoPt");
   int cf_bin_DiLep = hCutFlowHist->GetXaxis()->FindBin("PassDiLep");
   int cf_bin_nJets = hCutFlowHist->GetXaxis()->FindBin("PassNJets");
   int cf_bin_nBTags = hCutFlowHist->GetXaxis()->FindBin("PassNBTags");
@@ -170,6 +171,7 @@ int main(int argc, char * argv[]){
   LeptonHists muonHistsPreSel     = LeptonHists("muonsPreSel",fs, false);
   LeptonHists elecHists           = LeptonHists("elecs",      fs, true);
   LeptonHists muonHists           = LeptonHists("muons",      fs, false);
+  LeptonHists muonHistsNoIso      = LeptonHists("muonsNoIso", fs, false);
 
   JetHists offJetHistsPreOLap     = JetHists("offJetsPreOLap",fs, true);
   JetHists offJetHistsBeforeProbe = JetHists("offJetsBeforeProbe",fs, true);
@@ -256,7 +258,7 @@ int main(int argc, char * argv[]){
     // Trigger Selection
     //
     if(!(eventData.passTrigger())){
-      cout << "\t fail Trigger  " << endl;
+      if(debug) cout << "\t fail Trigger  " << endl;
       continue;
     }
     if(debug) cout << "Pass Trigger " << endl;
@@ -272,9 +274,10 @@ int main(int argc, char * argv[]){
     std::vector<NtupleAna::LeptonData> muonsNoPt  = muonDB.GetLeps(5);
     std::vector<NtupleAna::LeptonData> elecs      = elecDB.GetLeps(30);
     std::vector<NtupleAna::LeptonData> muons      = muonDB.GetLeps(20);
-    std::vector<NtupleAna::JetData>    offJets = offJetsDB.GetJets();
-    std::vector<NtupleAna::JetData>    pfJets   = pfJetsDB.GetJets();
-    std::vector<NtupleAna::JetData>    caloJets = caloJetsDB.GetJets();
+    std::vector<NtupleAna::LeptonData> muonsNoIso = muonDB.GetLeps(20,1000);
+    std::vector<NtupleAna::JetData>    offJets    = offJetsDB.GetJets();
+    std::vector<NtupleAna::JetData>    pfJets     = pfJetsDB.GetJets();
+    std::vector<NtupleAna::JetData>    caloJets   = caloJetsDB.GetJets();
 
 
     //
@@ -285,6 +288,8 @@ int main(int argc, char * argv[]){
       hCutFlowHist ->Fill( cf_bin_elec, 1 );
     if(muonsNoPt.size() > 0)  
       hCutFlowHist ->Fill( cf_bin_muon, 1 );
+    if((muonsNoPt.size() > 0) && (elecsNoPt.size() >0)  )
+      hCutFlowHist ->Fill( cf_bin_DiLepNoPt, 1 );
 
     unsigned int nElecPt30 = 0;
     for(NtupleAna::LeptonData& elec : elecsNoPt){
@@ -296,9 +301,20 @@ int main(int argc, char * argv[]){
     unsigned int nMuonPt20 = 0;
     for(NtupleAna::LeptonData& muon : muonsNoPt){
       muonHistsPreSel.Fill(muon, 1);
-      if(muon.m_pt > 20) ++nMuonPt20;
+      if(muon.m_pt > 20){
+	++nMuonPt20;
+	//if(muon.m_iso < 0.25){
+	//++nMuonPt20Iso;
+	//}
+      }
     }
     muonHistsPreSel.m_n->Fill(muonsNoPt.size(), 1);
+
+    for(NtupleAna::LeptonData& muon : muonsNoIso){
+      muonHistsNoIso.Fill(muon, 1);
+    }
+    muonHistsNoIso.m_n->Fill(muonsNoIso.size(), 1);
+
 
     if(nElecPt30 == 1) 
       hCutFlowHist ->Fill( cf_bin_elecPt, 1 );      
@@ -323,11 +339,11 @@ int main(int argc, char * argv[]){
     float puWeight = 1.0;
     if(isMC){
       puWeight = pileUpTool.getWeight(eventData.nPV);
+      //cout << puWeight << endl;
+      cout << elecs.at(0).m_SF << " " << muons.at(0).m_SF << endl;
       eventWeight =  puWeight * elecs.at(0).m_SF * muons.at(0).m_SF;
     }
-
-    //std::cout << "PU Weight " << get_puWeight_CDF(eventData.pu) << std::endl;
-
+    
     //
     // cut on number of clean jets
     //
@@ -359,6 +375,8 @@ int main(int argc, char * argv[]){
     hCutFlowHist ->Fill( cf_bin_nBTags, 1 );
     if(isMC)
       eventWeight*= totalsSFWeight;
+
+    cout << "totalsSFWeight: "  << totalsSFWeight << endl;
 
     eventHists.Fill(eventData, eventWeight);    
     
@@ -455,14 +473,14 @@ int main(int argc, char * argv[]){
 
 
 	if(offJet.m_hadronFlavour == 5){
-	  offJetHists_B_matchedPF.Fill(offJet, eventWeight);
-	  offJetHists_B_matchedPFJet.Fill(*matchedJetPF, eventWeight);
+	  offJetHists_B_matchedPF.Fill(offJet, eventWeight, &eventData);
+	  offJetHists_B_matchedPFJet.Fill(*matchedJetPF, eventWeight, &eventData);
 	}else if(offJet.m_hadronFlavour == 4){
-	  offJetHists_C_matchedPF.Fill(offJet, eventWeight);
-	  offJetHists_C_matchedPFJet.Fill(*matchedJetPF, eventWeight);
+	  offJetHists_C_matchedPF.Fill(offJet, eventWeight, &eventData);
+	  offJetHists_C_matchedPFJet.Fill(*matchedJetPF, eventWeight, &eventData);
 	}else if(offJet.m_hadronFlavour == 0){
-	  offJetHists_L_matchedPF.Fill(offJet, eventWeight);
-	  offJetHists_L_matchedPFJet.Fill(*matchedJetPF, eventWeight);
+	  offJetHists_L_matchedPF.Fill(offJet, eventWeight, &eventData);
+	  offJetHists_L_matchedPFJet.Fill(*matchedJetPF, eventWeight, &eventData);
 	}
 
 
@@ -521,14 +539,14 @@ int main(int argc, char * argv[]){
 
 
 	if(offJet.m_hadronFlavour == 5){
-	  offJetHists_B_matchedCalo.Fill(offJet, eventWeight);
-	  offJetHists_B_matchedCaloJet.Fill(*matchedJetCalo, eventWeight);
+	  offJetHists_B_matchedCalo.Fill(offJet, eventWeight, &eventData);
+	  offJetHists_B_matchedCaloJet.Fill(*matchedJetCalo, eventWeight, &eventData);
 	}else if(offJet.m_hadronFlavour == 4){
-	  offJetHists_C_matchedCalo.Fill(offJet, eventWeight);
-	  offJetHists_C_matchedCaloJet.Fill(*matchedJetCalo, eventWeight);
+	  offJetHists_C_matchedCalo.Fill(offJet, eventWeight, &eventData);
+	  offJetHists_C_matchedCaloJet.Fill(*matchedJetCalo, eventWeight, &eventData);
 	}else if(offJet.m_hadronFlavour == 0){
-	  offJetHists_L_matchedCalo.Fill(offJet, eventWeight);
-	  offJetHists_L_matchedCaloJet.Fill(*matchedJetCalo, eventWeight);
+	  offJetHists_L_matchedCalo.Fill(offJet, eventWeight, &eventData);
+	  offJetHists_L_matchedCaloJet.Fill(*matchedJetCalo, eventWeight, &eventData);
 	}
 
 	// 
