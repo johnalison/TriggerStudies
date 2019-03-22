@@ -2,9 +2,38 @@
 #include <iostream>
 #include "TriggerStudies/NtupleAna/interface/JetDataHandler.h"
 #include "TriggerStudies/NtupleAna/interface/JetData.h"
+#include "CondFormats/BTauObjects/interface/BTagEntry.h"
+#include "CondFormats/BTauObjects/interface/BTagCalibration.h"
 
 using namespace NtupleAna;
 using namespace std;
+
+
+
+JetDataHandler::JetDataHandler(std::string name, bool loadTrkLevel, bool isMC, std::string SFName) : m_name(name), m_loadTrkLevel(loadTrkLevel), m_isMC(isMC)
+{
+      
+  if(m_isMC){
+    if(SFName == "2017"){
+      BTagCalibration calib = BTagCalibration("deepcsv", "TriggerStudies/NtupleAna/data/BTagSF2017/DeepCSV_94XSF_V4_B_F.csv");
+      
+      m_btagCalibrationTool = new BTagCalibrationReader(BTagEntry::OP_RESHAPING,              // 0 is for loose op, 1: medium, 2: tight, 3: discr. reshaping
+							"central"      // central systematic type
+							);
+
+      m_btagCalibrationTool->load(calib, 
+				  BTagEntry::FLAV_B,   // 0 is for b flavour, 1: FLAV_C, 2: FLAV_UDSG
+				  "iterativefit"      // measurement type
+				  );
+
+    }else{
+      cout << "JetDataHandler::Warning no scale factors for " << m_name << endl;
+    }
+
+  }
+
+}
+
 
 void
 JetDataHandler::SetBranchAddress(TChain* intree){
@@ -19,7 +48,7 @@ JetDataHandler::SetBranchAddress(TChain* intree){
   SetBranchAddress(intree, m_name+"_deepcsv_b" ,   m_deepcsv_b  );
   SetBranchAddress(intree, m_name+"_deepcsv_bb",   m_deepcsv_bb  );
 
-  SetBranchAddress(intree, m_name+"_deepcsvSF["+m_name+"_num]",   m_SF  );
+  //SetBranchAddress(intree, m_name+"_deepcsvSF["+m_name+"_num]",   m_SF  );
   SetBranchAddress(intree, m_name+"_passesTightLeptVetoID"    , m_passesTightLeptVetoID);
   SetBranchAddress(intree, m_name+"_lepOverlap04Tight"        ,   m_lepOverlap04Tight  );
 
@@ -151,6 +180,10 @@ JetDataHandler::GetJetsAll(){
 
   vector<JetData> outputJets;
   for(int iJet = 0; iJet < m_num[0]; ++iJet){
+    float SF = 1.0;
+    if(m_isMC && m_btagCalibrationTool)
+      SF = m_btagCalibrationTool->eval_auto_bounds("central", BTagEntry::FLAV_B, m_eta[iJet], m_pt[iJet], m_deepcsv[iJet]);
+	
     outputJets.push_back(  JetData(m_pt[iJet], 
 				   m_eta[iJet],
 				   m_phi[iJet],
@@ -159,7 +192,7 @@ JetDataHandler::GetJetsAll(){
 				   m_deepcsv[iJet],
 				   m_deepcsv_b[iJet],
 				   m_deepcsv_bb[iJet],
-				   m_SF[iJet],
+				   SF,
 				   m_passesTightLeptVetoID[iJet],
 				   m_lepOverlap04Tight[iJet],
                                    m_vertexNTracks                     [iJet],
@@ -249,6 +282,10 @@ JetDataHandler::GetJetsNoTrks(){
 
   vector<JetData> outputJets;
   for(int iJet = 0; iJet < m_num[0]; ++iJet){
+    float SF = 1.0;
+    if(m_isMC && m_btagCalibrationTool)
+      SF = m_btagCalibrationTool->eval_auto_bounds("central", BTagEntry::FLAV_B, m_eta[iJet], m_pt[iJet], m_deepcsv[iJet]);
+
     outputJets.push_back(  JetData(m_pt[iJet], 
 				   m_eta[iJet],
 				   m_phi[iJet],
@@ -257,7 +294,7 @@ JetDataHandler::GetJetsNoTrks(){
 				   m_deepcsv[iJet],
 				   m_deepcsv_b[iJet],
 				   m_deepcsv_bb[iJet],
-				   m_SF[iJet],
+				   SF,
 				   m_passesTightLeptVetoID[iJet],
 				   m_lepOverlap04Tight[iJet],
                                    -1,

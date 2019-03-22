@@ -3,6 +3,8 @@
 #if !defined(JetDataHandler_H)
 #define JetDataHandler_H
 
+#include "CondTools/BTau/interface/BTagCalibrationReader.h"
+
 namespace NtupleAna{
   class JetData;
 }
@@ -29,7 +31,6 @@ namespace NtupleAna {
     float m_deepcsv    [maxLength] = { };
     float m_deepcsv_b  [maxLength] = { };
     float m_deepcsv_bb [maxLength] = { };
-    float m_SF         [maxLength] = { };
     float m_passesTightLeptVetoID [maxLength] = { };
     float m_lepOverlap04Tight     [maxLength] = { };
 
@@ -115,11 +116,14 @@ namespace NtupleAna {
     void SetBranchAddress(TChain* intree, std::string brName, float* float_arr);
     void SetBranchAddress(TChain* intree, std::string brName, std::vector<std::vector<float> >** vector_ptr);
 
+  private:
+
+    BTagCalibrationReader* m_btagCalibrationTool = nullptr;
+    
+
   public:
 
-    JetDataHandler(std::string name, bool loadTrkLevel = true, bool isMC = true) : m_name(name), m_loadTrkLevel(loadTrkLevel), m_isMC(isMC)  {
-      
-    }
+    JetDataHandler(std::string name, bool loadTrkLevel = true, bool isMC = true, std::string SFName = "");
 
     ~JetDataHandler() { }; 
 
