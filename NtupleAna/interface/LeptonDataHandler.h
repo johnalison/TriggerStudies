@@ -4,6 +4,8 @@
 #define LeptonDataHandler_H
 
 #include "TriggerStudies/NtupleAna/interface/LeptonData.h"
+#include "TFile.h"
+#include "TH2D.h"
 
 namespace NtupleAna {
 
@@ -13,6 +15,7 @@ namespace NtupleAna {
   public:
 
     std::string m_name;
+    std::string m_year;
     bool m_isMC;
     static const int maxLength = 40;        
 
@@ -30,17 +33,22 @@ namespace NtupleAna {
     void SetBranchAddress(TChain* intree, std::string brName, int* int_arr);
     void SetBranchAddress(TChain* intree, std::string brName, float* float_arr);
 
+  private:
+
+    TFile* m_SFFile1 = nullptr;
+    TFile* m_SFFile2 = nullptr;
+    TH2D*  m_SFHist1 = nullptr;
+    TH2D*  m_SFHist2 = nullptr;
+
   public:
     
-    LeptonDataHandler(std::string name, bool isMC = true) : m_name(name), m_isMC(isMC)  {
-      if(m_name =="offTightElectrons") m_isElectrons = true;
-    }
+    LeptonDataHandler(std::string name, std::string year, bool isMC = true);
 
     ~LeptonDataHandler() {}; 
 
     void SetBranchAddress (TChain* intree);
 
-    std::vector<LeptonData> GetLeps(float ptCut);
+    std::vector<LeptonData> GetLeps(float ptCut, float isoCut=0.25);
   };
 
 }

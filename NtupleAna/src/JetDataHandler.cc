@@ -1,5 +1,5 @@
 #include "TChain.h"
-
+#include <iostream>
 #include "TriggerStudies/NtupleAna/interface/JetDataHandler.h"
 #include "TriggerStudies/NtupleAna/interface/JetData.h"
 
@@ -114,6 +114,8 @@ void JetDataHandler::SetBranchAddress(TChain* intree, std::string brName, int* i
   if(intree->FindBranch(brName.c_str())){
     intree->SetBranchStatus(brName.c_str(), 1);
     intree->SetBranchAddress(brName.c_str(), int_arr);
+  }else{
+    std::cout << "JetDataHandler::Cant find branch " << brName << std::endl;
   }
   
   return;
@@ -123,6 +125,8 @@ void JetDataHandler::SetBranchAddress(TChain* intree, std::string brName, float*
   if(intree->FindBranch(brName.c_str())){
     intree->SetBranchStatus(brName.c_str(), 1);
     intree->SetBranchAddress(brName.c_str(), float_arr);
+  }else{
+    std::cout << "JetDataHandler::Cant find branch " << brName << std::endl;
   }
   
   return;
@@ -132,6 +136,8 @@ void JetDataHandler::SetBranchAddress(TChain* intree, std::string brName, std::v
   if(intree->FindBranch(brName.c_str())){
     intree->SetBranchStatus(brName.c_str(), 1);
     intree->SetBranchAddress( brName.c_str(), vector_ptr);
+  }else{
+    std::cout << "JetDataHandler::Cant find branch " << brName << std::endl;
   }
   
   return;

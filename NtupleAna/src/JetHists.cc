@@ -41,6 +41,10 @@ JetHists::JetHists(std::string name, fwlite::TFileService& fs, bool light) {
   m_partonFlavour                    = dir.make<TH1F>("partonFlavour"                ,"partonFlavour;partonFlavour;Entries"                        ,60, -30.5,29.5);
   m_hadronFlavour                    = dir.make<TH1F>("hadronFlavour"                ,"hadronFlavour;hadronFlavour;Entries"                        ,60, -30.5,29.5);
 
+  m_allJetsVsnPV             = dir.make<TH1F>("AllJetsVsnPV",       "nPV  ;nPV ;All Jets",  100,-0.5, 99.5);
+  m_passCSVBTagJetsVsnPV     = dir.make<TH1F>("PassCSVBTagJetsVsnPV",  "nPV  ;nPV ;CSV BTagged Jets",  100,-0.5, 99.5);
+  m_passDeepCSVBTagJetsVsnPV = dir.make<TH1F>("PassDeepCSVBTagJetsVsnPV",  "nPV  ;nPV ;Deep CSV BTagged Jets",  100,-0.5, 99.5);
+
   m_light = light;
   if(!m_light){
       
@@ -106,7 +110,7 @@ JetHists::~JetHists() {}
 void
 //JetHists::Fill (const JetData* jetPtr){
 //  const JetData& jetInfo = (*jetPtr);
-JetHists::Fill (const JetData& jetInfo, float eventWeight){
+JetHists::Fill (const JetData& jetInfo, float eventWeight, const EventData* eventData){
 
   m_pt      ->Fill(jetInfo.m_pt      , eventWeight);
   m_pt_l    ->Fill(jetInfo.m_pt      , eventWeight);
@@ -196,8 +200,15 @@ JetHists::Fill (const JetData& jetInfo, float eventWeight){
     }
 
 
-  }    
+  }//m_light
 
+  if(eventData){
+    m_allJetsVsnPV->Fill(eventData->nPV, eventWeight);
+    if(jetInfo.m_csv > 0.8484)
+      m_passCSVBTagJetsVsnPV->Fill(eventData->nPV, eventWeight);
+    if(jetInfo.m_deepcsv > 0.8001)
+      m_passDeepCSVBTagJetsVsnPV->Fill(eventData->nPV, eventWeight);
+  }
 
 
   return;
