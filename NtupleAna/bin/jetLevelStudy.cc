@@ -135,7 +135,7 @@ int main(int argc, char * argv[]){
   JetDataHandler caloJetsDB = JetDataHandler("caloJets",loadTrkLevel);
   caloJetsDB.SetBranchAddress(tree);
 
-  JetDataHandler offJetsDB = JetDataHandler(offJetName,loadTrkLevel, isMC);
+  JetDataHandler offJetsDB = JetDataHandler(offJetName,loadTrkLevel, isMC, "2017");
   offJetsDB.SetBranchAddress(tree);
 
   LeptonDataHandler muonDB = LeptonDataHandler("offTightMuons", "2017", isMC);
@@ -339,8 +339,6 @@ int main(int argc, char * argv[]){
     float puWeight = 1.0;
     if(isMC){
       puWeight = pileUpTool.getWeight(eventData.nPV);
-      //cout << puWeight << endl;
-      cout << elecs.at(0).m_SF << " " << muons.at(0).m_SF << endl;
       eventWeight =  puWeight * elecs.at(0).m_SF * muons.at(0).m_SF;
     }
     
@@ -376,7 +374,7 @@ int main(int argc, char * argv[]){
     if(isMC)
       eventWeight*= totalsSFWeight;
 
-    cout << "totalsSFWeight: "  << totalsSFWeight << endl;
+    if(debug) cout << "totalsSFWeight: "  << totalsSFWeight << endl;
 
     eventHists.Fill(eventData, eventWeight);    
     
@@ -426,7 +424,6 @@ int main(int argc, char * argv[]){
 
       if(nTags != 1) continue;
 
-      //cout << "Scaling eventWeight by: " << tagSF  << endl;
 
       // Fill offJetHists
       offJetHists.Fill(offJet, eventWeight);

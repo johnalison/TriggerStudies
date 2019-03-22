@@ -4,6 +4,8 @@
 <use   name="CommonTools/Utils"/>
 <use   name="DataFormats/FWLite"/>
 <use   name="DataFormats/MuonReco"/>
+<use   name="CondFormats/BTauObjects"/>
+<use   name="CondTools/BTau"/>
 <export>
   <lib   name="1"/>
 </export>
