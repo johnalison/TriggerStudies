@@ -20,6 +20,7 @@ JetHists::JetHists(std::string name, fwlite::TFileService& fs, bool light) {
   m_csv     = dir.make<TH1F>("csv","csv;csv;Entries",140,-0.2,1.2);
   m_deepcsv = dir.make<TH1F>("deepcsv","deepcsv;deepcsv;Entries",140,-0.2,1.2);
   m_SF      = dir.make<TH1F>("SF",     "SF;SF;Entries",50,-0.1,2);
+  m_lepOverlap04Tight      = dir.make<TH1F>("lepOverlap04Tight",     "lepOverlap04Tight;lepOverlap04Tight;Entries",5,-1.5,3.5);
 
   m_matched_dPt      = dir.make<TH1F>("matched_dPt",     "matched_dPt     ;P_{T}-P_{T}^{matched} [GeV];Entries",  100,-50, 50);
   m_matched_dEta     = dir.make<TH1F>("matched_dEta",    "matched_dEta    ;#eta-#eta^{matched};Entries",100,-0.5,0.5);
@@ -120,6 +121,7 @@ JetHists::Fill (const JetData& jetInfo, float eventWeight, const EventData* even
   m_csv     ->Fill(jetInfo.m_csv     , eventWeight);
   m_deepcsv ->Fill(jetInfo.m_deepcsv , eventWeight);
   m_SF      ->Fill(jetInfo.m_SF      , eventWeight);
+  m_lepOverlap04Tight->Fill(jetInfo.m_lepOverlap04Tight, eventWeight);
 
   if(jetInfo.m_matchedJet){
     m_matched_dPt     ->Fill(jetInfo.m_pt - jetInfo.m_matchedJet->m_pt            , eventWeight);

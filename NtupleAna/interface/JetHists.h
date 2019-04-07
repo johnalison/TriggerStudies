@@ -24,6 +24,7 @@ namespace NtupleAna {
     TH1F* m_csv    ;
     TH1F* m_deepcsv;
     TH1F* m_SF;
+    TH1F* m_lepOverlap04Tight;
 
     bool m_light = false;
 

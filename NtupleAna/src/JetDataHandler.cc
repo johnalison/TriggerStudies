@@ -26,6 +26,18 @@ JetDataHandler::JetDataHandler(std::string name, bool loadTrkLevel, bool isMC, s
 				  "iterativefit"      // measurement type
 				  );
 
+      m_btagCalibrationTool->load(calib, 
+				  BTagEntry::FLAV_C,   // 0 is for b flavour, 1: FLAV_C, 2: FLAV_UDSG
+				  "iterativefit"      // measurement type
+				  );
+
+
+      m_btagCalibrationTool->load(calib, 
+				  BTagEntry::FLAV_UDSG,   // 0 is for b flavour, 1: FLAV_C, 2: FLAV_UDSG
+				  "iterativefit"      // measurement type
+				  );
+
+
     }else{
       cout << "JetDataHandler::Warning no scale factors for " << m_name << endl;
     }
@@ -173,6 +185,16 @@ void JetDataHandler::SetBranchAddress(TChain* intree, std::string brName, std::v
 }
 
 
+float 
+JetDataHandler::getSF(float jetEta,  float jetPt,  float jetDeepCSV, int jetHadronFlavour){ 
+  if(fabs(jetHadronFlavour) == 5){
+    return m_btagCalibrationTool->eval_auto_bounds("central", BTagEntry::FLAV_B, fabs(jetEta), jetPt, jetDeepCSV);
+  }else if(fabs(jetHadronFlavour) == 4){
+    return m_btagCalibrationTool->eval_auto_bounds("central", BTagEntry::FLAV_C, fabs(jetEta), jetPt, jetDeepCSV);
+  }
+
+  return m_btagCalibrationTool->eval_auto_bounds("central", BTagEntry::FLAV_UDSG, fabs(jetEta), jetPt, jetDeepCSV);
+}
 
 
 vector<JetData> 
@@ -181,9 +203,10 @@ JetDataHandler::GetJetsAll(){
   vector<JetData> outputJets;
   for(int iJet = 0; iJet < m_num[0]; ++iJet){
     float SF = 1.0;
-    if(m_isMC && m_btagCalibrationTool)
-      SF = m_btagCalibrationTool->eval_auto_bounds("central", BTagEntry::FLAV_B, m_eta[iJet], m_pt[iJet], m_deepcsv[iJet]);
-	
+    if(m_isMC && m_btagCalibrationTool){
+      SF = getSF(m_eta[iJet], m_pt[iJet], m_deepcsv[iJet], m_hadronFlavour[iJet]);
+    }
+
     outputJets.push_back(  JetData(m_pt[iJet], 
 				   m_eta[iJet],
 				   m_phi[iJet],
@@ -283,9 +306,9 @@ JetDataHandler::GetJetsNoTrks(){
   vector<JetData> outputJets;
   for(int iJet = 0; iJet < m_num[0]; ++iJet){
     float SF = 1.0;
-    if(m_isMC && m_btagCalibrationTool)
-      SF = m_btagCalibrationTool->eval_auto_bounds("central", BTagEntry::FLAV_B, m_eta[iJet], m_pt[iJet], m_deepcsv[iJet]);
-
+    if(m_isMC && m_btagCalibrationTool){
+      SF = getSF(m_eta[iJet], m_pt[iJet], m_deepcsv[iJet], m_hadronFlavour[iJet]);
+    }
     outputJets.push_back(  JetData(m_pt[iJet], 
 				   m_eta[iJet],
 				   m_phi[iJet],

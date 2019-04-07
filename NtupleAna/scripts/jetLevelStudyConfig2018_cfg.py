@@ -38,4 +38,3 @@ process.jetLevelStudy = cms.PSet(
     LoadTrkLevel = cms.bool(False),    
     offJetName = cms.string("offJets"), # offCleanJets
 )
-

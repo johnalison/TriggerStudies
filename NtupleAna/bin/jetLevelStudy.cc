@@ -1,3 +1,4 @@
+
 #include <iostream>
 #include <TROOT.h>
 #include <TFile.h>
@@ -115,8 +116,8 @@ int main(int argc, char * argv[]){
   //if( branch.GetName() == "TheBranchIWant" ):
   //  DoSomeAnalysis()
   //cout << tree->Print() << endl;
-  //tree->Print("HLT*");
-
+  //tree->Print("*");
+  //return 0;
 
   bool isMC = bool(tree->FindBranch("pu"));
   cout << " \t isMC set to: " << isMC << endl;
@@ -181,9 +182,13 @@ int main(int argc, char * argv[]){
   JetHists offJetHists_C = JetHists("offJets_C",fs, true);
   JetHists offJetHists_L = JetHists("offJets_L",fs, true);
 
+  JetHists tagJetHists   = JetHists("tagJets",  fs, true);
+  JetHists tagJetHists_B = JetHists("tagJets_B",fs, true);
+  JetHists tagJetHists_C = JetHists("tagJets_C",fs, true);
+  JetHists tagJetHists_L = JetHists("tagJets_L",fs, true);
 
-  JetHists offJetHists_matchedPF               = JetHists("offJets_matchedPF",               fs, loadTrkLevel);
-  JetHists offJetHists_matchedPFJet            = JetHists("offJets_matchedPFJet",            fs, loadTrkLevel);
+  JetHists offJetHists_matchedPF               = JetHists("offJets_matchedPF",               fs, !loadTrkLevel);
+  JetHists offJetHists_matchedPFJet            = JetHists("offJets_matchedPFJet",            fs, !loadTrkLevel);
   JetHists offJetHists_matchedPFcsvTag         = JetHists("offJets_matchedPFcsvTag",         fs, true);
   JetHists offJetHists_matchedPFcsvTagJet      = JetHists("offJets_matchedPFcsvTagJet",      fs, true);
   JetHists offJetHists_matchedPFDeepcsvTag     = JetHists("offJets_matchedPFDeepcsvTag",     fs, true);
@@ -343,11 +348,6 @@ int main(int argc, char * argv[]){
     }
     
     //
-    // cut on number of clean jets
-    //
-    // Sum$(offCleanJets_pt > 30 && abs(offCleanJets_eta) < 2.4) >= 2"
-
-    //
     // Cut on CSV Selection
     //
     unsigned int nOffJets = 0;
@@ -399,6 +399,7 @@ int main(int argc, char * argv[]){
       offJetHistsPreOLap.Fill(offJet, eventWeight);
 
       if(!offJet.m_passesTightLeptVetoID) continue;
+      if(offJet.m_lepOverlap04Tight != 0) continue;
       if(NtupleAna::failOverlap(offJet,elecs)) continue;
       if(NtupleAna::failOverlap(offJet,muons)) continue;
 
@@ -406,17 +407,20 @@ int main(int argc, char * argv[]){
       // Check if Prob
       //
       unsigned int nTags = 0;
-      for(JetData& offJetOther : offJets){
+      const JetData* tagJet = nullptr;
+      for(const JetData& offJetOther : offJets){
 	if(offJetOther.m_deepcsv       < OfflineDeepCSVTightCut)   continue;	
 	if(offJet.m_vec.DeltaR(offJetOther.m_vec) < 0.4) continue;
 
 	if(offJetOther.m_pt       < 30)   continue;	
 	if(fabs(offJetOther.m_eta) > 2.4) continue;
 	if(!offJetOther.m_passesTightLeptVetoID) continue;
+	if(offJetOther.m_lepOverlap04Tight != 0) continue;
 	if(NtupleAna::failOverlap(offJetOther,elecs)) continue;
 	if(NtupleAna::failOverlap(offJetOther,muons)) continue;
 
 	++nTags;
+	tagJet = &offJetOther;
       }
       
 
@@ -434,6 +438,17 @@ int main(int argc, char * argv[]){
       }	else if(offJet.m_hadronFlavour == 0){
 	offJetHists_L.Fill(offJet, eventWeight);
       }
+
+      // Fill tagJetHists
+      tagJetHists.Fill(*tagJet, eventWeight);
+      if(tagJet->m_hadronFlavour == 5){
+	tagJetHists_B.Fill(*tagJet, eventWeight);
+      }	else if(tagJet->m_hadronFlavour == 4){
+	tagJetHists_C.Fill(*tagJet, eventWeight);
+      }	else if(tagJet->m_hadronFlavour == 0){
+	tagJetHists_L.Fill(*tagJet, eventWeight);
+      }
+
 
       //
       // Match offline to PF

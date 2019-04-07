@@ -120,6 +120,7 @@ namespace NtupleAna {
 
     BTagCalibrationReader* m_btagCalibrationTool = nullptr;
     
+    float getSF(float jetEta,  float jetPt,  float jetDeepCSV, int jetHadronFlavour);
 
   public:
 
