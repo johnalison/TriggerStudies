@@ -1,0 +1,71 @@
+import ROOT as r
+r.gROOT.SetBatch(1)
+class Plotter:
+
+    def __init__(self,var,effsOrFakes,graphs,jetsOrTracks):
+        #first bool is True if efficiency, False if fakes; 2nd is True
+        #if Jets, False if Tracks
+        self.var,self.effs,self.jets, = var,effsOrFakes,jetsOrTracks
+        self.canvas = r.TCanvas('c','canvas',1000,1000)
+   #     print('created canvas')
+        self.graphs = graphs
+        if len(self.graphs)==3:
+            self.p1 = r.TPad('p1','p1',0.02,0.38,0.98,0.98)
+        
+            self.p2 = r.TPad('p2','p2',0.02,0.0,0.98,0.42)
+        else: self.p1 = r.TPad('p1','p1',0.0,0.0,0.95,0.95)
+  #      print('here')
+
+    def plot(self):
+        r.gStyle.SetOptStat(0)
+        r.gStyle.SetOptTitle(0)
+        self.canvas.cd()
+        self.p1.Draw()
+        self.p1.cd()
+        self.graphs[0].SetLineColor(2)
+     #   self.graphs[0].Draw("E")
+        if len(self.graphs)>1:
+            self.graphs[1].SetLineColor(3)
+            self.graphs[1].GetYaxis().SetTitleOffset(1.5)
+            self.graphs[1].GetYaxis().SetRangeUser(0,1.1*self.graphs[1].GetBinContent(self.graphs[1].GetMaximumBin()))
+            self.graphs[1].Draw("E")
+            self.graphs[0].Draw("SAME")
+            self.p1.Update()
+        if len(self.graphs)==3:
+            self.canvas.cd()
+            self.p2.Draw()
+            self.p2.cd()
+            ratTitle = "Efficiency" if self.effs else "Fake Rate"
+            self.graphs[2].GetYaxis().SetTitle(ratTitle)
+            self.graphs[2].GetYaxis().SetTitleOffset(1.5)
+            self.graphs[2].GetYaxis().SetRangeUser(0,1.2)
+            self.graphs[2].SetMarkerColor(r.kRed)
+            self.graphs[2].SetFillColor(r.kRed)
+            self.graphs[2].SetLineColor(r.kRed)
+#self.graphs[2].SetMarkerStyle(20)
+            self.graphs[2].Draw("E")
+            # draw line at 1 on ratio plot for comparison
+            line = r.TLine(self.graphs[2].GetBinLowEdge(1),1,self.graphs[2].GetBinWidth(self.graphs[2].GetNbinsX()) +
+                           self.graphs[2].GetBinLowEdge(self.graphs[2].GetNbinsX()),1) 
+            line.SetLineColor(1)
+            line.SetLineWidth(2)
+            line.SetLineStyle(9)
+            line.Draw("SAME")
+            l = r.TLegend(0.7,0.83,0.98,0.98)
+            l.SetHeader(self.var)
+            numTitle = "Fakes" if not self.effs else "Matched"
+            l.AddEntry(self.graphs[0],numTitle)
+            l.AddEntry(self.graphs[1],"Total")
+            self.canvas.cd()
+            l.Draw()
+            self.p2.Update()
+
+        self.canvas.Modified()
+        self.canvas.Update()
+        self.canvas.Show()
+        folder = "Jets" if self.jets else "Tracks"
+        self.canvas.SaveAs("PDFs/%s/%s_%s.pdf" % (folder,self.var,numTitle))
+        self.canvas.SaveAs("PNGs/%s/%s_%s.png" % (folder,self.var,numTitle))
+        self.p1.Close()
+        self.p2.Close()
+        return None

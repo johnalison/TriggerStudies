@@ -10,9 +10,7 @@
 <use   name="PhysicsTools/SelectorUtils"/>
 <use   name="TriggerStudies/NtupleAna"/>
 <environment>
-  <bin   file="procNtupleExample.cc"></bin>
-  <bin   file="jetLevelStudy.cc"></bin>
-  <!--<bin   file="FWLiteHistograms.cc"></bin>       -->
-  <!--<bin   file="FWLiteWithPythonConfig.cc"></bin> -->
-  <!--<bin   file="FWLiteWithSelectorUtils.cc"></bin>-->
+<bin   file="procNtupleExample.cc"></bin>
+<bin   file="jetLevelStudy.cc"></bin>
+<bin   file="procNtupleExample.cc"></bin>
 </environment>

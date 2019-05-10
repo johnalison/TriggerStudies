@@ -26,6 +26,7 @@
 #include "TriggerStudies/NtupleAna/interface/JetHists.h"
 #include "TriggerStudies/NtupleAna/interface/EventHists.h"
 #include "TriggerStudies/NtupleAna/interface/Helpers.h"
+#include "TriggerStudies/NtupleAna/interface/TrackDeltaHists.h"
 
 using namespace NtupleAna;
 using std::cout; 
@@ -203,6 +204,8 @@ int main(int argc, char * argv[]){
   JetHists offJetHists_offline70_B_matched_online90 = JetHists("offJets_offline70_B_matched_online90",  fs);
   JetHists offJetHists_offline70_L_matched_online90 = JetHists("offJets_offline70_L_matched_online90",  fs);
 
+  TrackDeltaHists trkDeltaHists                     = TrackDeltaHists("Track_Deltas", fs);
+
   //
   //  Event Displays
   //
@@ -334,6 +337,8 @@ int main(int argc, char * argv[]){
 	  offTrack.m_matchedTrack->m_nMatches += 1;
 	  offTrackHists_matched.Fill(offTrack);
 	  pfTrackHists_matched .Fill(*offTrack.m_matchedTrack);
+	  
+	  trkDeltaHists        .Fill(offTrack,*matchedTrack);
 	}
 
 	for(const TrackData& pfTrack: offJet.m_matchedJet->m_tracks){
