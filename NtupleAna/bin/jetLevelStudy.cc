@@ -84,6 +84,7 @@ int main(int argc, char * argv[]){
   bool loadTrkLevel = ana.getParameter<bool>("LoadTrkLevel");
   bool debug = ana.getParameter<bool>("debug");
   string offJetName = ana.getParameter<string>("offJetName");
+  string SFName = ana.getParameter<string>("SFName");
   
   //
   //  Inint Tree
@@ -136,13 +137,13 @@ int main(int argc, char * argv[]){
   JetDataHandler caloJetsDB = JetDataHandler("caloJets",loadTrkLevel);
   caloJetsDB.SetBranchAddress(tree);
 
-  JetDataHandler offJetsDB = JetDataHandler(offJetName,loadTrkLevel, isMC, "2017");
+  JetDataHandler offJetsDB = JetDataHandler(offJetName,loadTrkLevel, isMC, SFName);
   offJetsDB.SetBranchAddress(tree);
 
-  LeptonDataHandler muonDB = LeptonDataHandler("offTightMuons", "2017", isMC);
+  LeptonDataHandler muonDB = LeptonDataHandler("offTightMuons", SFName, isMC);
   muonDB.SetBranchAddress(tree);
 
-  LeptonDataHandler elecDB = LeptonDataHandler("offTightElectrons", "2017", isMC);
+  LeptonDataHandler elecDB = LeptonDataHandler("offTightElectrons", SFName, isMC);
   elecDB.SetBranchAddress(tree);
 
   //

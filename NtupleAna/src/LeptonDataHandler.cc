@@ -21,9 +21,26 @@ LeptonDataHandler::LeptonDataHandler(std::string name, std::string year, bool is
       m_SFFile2 = new TFile("TriggerStudies/NtupleAna/data/MuonSF2017/RunBCDEF_SF_ISO.root","READ");
       m_SFHist2 = (TH2D*)m_SFFile2->Get("NUM_TightRelIso_DEN_TightIDandIPCut_pt_abseta");
 
+    }else if(!m_isElectrons && m_year == "2018"){
+
+      m_SFFile1 = new TFile("TriggerStudies/NtupleAna/data/MuonSF2018/RunABCD_SF_ID.root","READ");
+      m_SFHist1 = (TH2D*)m_SFFile1->Get("NUM_TightID_DEN_TrackerMuons_pt_abseta");
+      
+      m_SFFile2 = new TFile("TriggerStudies/NtupleAna/data/MuonSF2018/RunABCD_SF_ISO.root","READ");
+      m_SFHist2 = (TH2D*)m_SFFile2->Get("NUM_TightRelIso_DEN_TightIDandIPCut_pt_abseta");
+
+
     }else if(m_isElectrons && m_year == "2017"){
 
       m_SFFile1 = new TFile("TriggerStudies/NtupleAna/data/ElecSF2017/egammaEffi.txt_EGM2D_runBCDEF_passingTight94X.root","READ");
+      m_SFHist1 = (TH2D*)m_SFFile1->Get("EGamma_SF2D");
+      
+      m_SFFile2 = new TFile("TriggerStudies/NtupleAna/data/ElecSF2017/egammaEffi.txt_EGM2D_runBCDEF_passingRECO.root","READ");
+      m_SFHist2 = (TH2D*)m_SFFile2->Get("EGamma_SF2D");
+
+    }else if(m_isElectrons && m_year == "2018"){
+
+      m_SFFile1 = new TFile("TriggerStudies/NtupleAna/data/ElecSF2017/2018_ElectronTight.root","READ");
       m_SFHist1 = (TH2D*)m_SFFile1->Get("EGamma_SF2D");
       
       m_SFFile2 = new TFile("TriggerStudies/NtupleAna/data/ElecSF2017/egammaEffi.txt_EGM2D_runBCDEF_passingRECO.root","READ");

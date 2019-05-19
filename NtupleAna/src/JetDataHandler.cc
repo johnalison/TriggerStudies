@@ -1,3 +1,4 @@
+
 #include "TChain.h"
 #include <iostream>
 #include "TriggerStudies/NtupleAna/interface/JetDataHandler.h"
@@ -38,6 +39,31 @@ JetDataHandler::JetDataHandler(std::string name, bool loadTrkLevel, bool isMC, s
 				  );
 
 
+    }else if(SFName == "2018"){
+
+      BTagCalibration calib = BTagCalibration("deepcsv", "TriggerStudies/NtupleAna/data/BTagSF2018/DeepCSV_102XSF_V1.csv");
+      
+      m_btagCalibrationTool = new BTagCalibrationReader(BTagEntry::OP_RESHAPING,              // 0 is for loose op, 1: medium, 2: tight, 3: discr. reshaping
+							"central"      // central systematic type
+							);
+
+      m_btagCalibrationTool->load(calib, 
+				  BTagEntry::FLAV_B,   // 0 is for b flavour, 1: FLAV_C, 2: FLAV_UDSG
+				  "iterativefit"      // measurement type
+				  );
+
+      m_btagCalibrationTool->load(calib, 
+				  BTagEntry::FLAV_C,   // 0 is for b flavour, 1: FLAV_C, 2: FLAV_UDSG
+				  "iterativefit"      // measurement type
+				  );
+
+
+      m_btagCalibrationTool->load(calib, 
+				  BTagEntry::FLAV_UDSG,   // 0 is for b flavour, 1: FLAV_C, 2: FLAV_UDSG
+				  "iterativefit"      // measurement type
+				  );
+
+      
     }else{
       cout << "JetDataHandler::Warning no scale factors for " << m_name << endl;
     }
