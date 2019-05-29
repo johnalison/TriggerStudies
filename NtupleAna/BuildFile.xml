@@ -6,6 +6,7 @@
 <use   name="DataFormats/MuonReco"/>
 <use   name="CondFormats/BTauObjects"/>
 <use   name="CondTools/BTau"/>
+<use   name="nTupleAnalysis/baseClasses"/>
 <export>
   <lib   name="1"/>
 </export>

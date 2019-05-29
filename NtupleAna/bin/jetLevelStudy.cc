@@ -34,10 +34,25 @@ using std::endl;
 using std::string; 
 using optutl::CommandLineParser;
 
+// 2017 
+const float OfflineDeepCSVTightCut2017  = 0.8001;
+const float OfflineDeepCSVMediumCut2017 = 0.4941;
+const float OfflineDeepCSVLooseCut2017  = 0.1522;
 
-float OfflineDeepCSVTightCut  = 0.8001;
-float OfflineDeepCSVMediumCut = 0.4941;
-float OfflineDeepCSVLooseCut  = 0.1522;
+const float OfflineCSVTightCut2017  = 0.9693;
+const float OfflineCSVMediumCut2017 = 0.8838;
+const float OfflineCSVLooseCut2017  = 0.5803;
+
+const float OnlineDeepCSVCut2017  = 0.6324;
+const float OnlineCSVCut2017      = 0.8484;
+
+// 2018
+const float OfflineDeepCSVTightCut2018  = 0.7527;
+const float OfflineDeepCSVMediumCut2018 = 0.4184;
+const float OfflineDeepCSVLooseCut2018  = 0.1241;
+
+const float OnlineDeepCSVCut2018  = 0.6324;
+const float OnlineCSVCut2018      = 0.8484;
 
 int main(int argc, char * argv[]){
   std::cout << " ======== jetLevelStudy ========== " << std::endl;
@@ -85,6 +100,7 @@ int main(int argc, char * argv[]){
   bool debug = ana.getParameter<bool>("debug");
   string offJetName = ana.getParameter<string>("offJetName");
   string SFName = ana.getParameter<string>("SFName");
+  string year = ana.getParameter<string>("year");
   
   //
   //  Inint Tree
@@ -237,6 +253,21 @@ int main(int argc, char * argv[]){
   //float pfCSV = 0.8484;
   //float caloCSV = 0.8484;
 
+  //
+  //  Configure Selection
+  // 
+  float OfflineDeepCSVTightCut  = OfflineDeepCSVTightCut2017  ;
+  float OfflineDeepCSVMediumCut = OfflineDeepCSVMediumCut2017 ;
+  float OfflineDeepCSVLooseCut  = OfflineDeepCSVLooseCut2017  ;
+  float OnlineCSVCut            = OnlineCSVCut2017;
+  float OnlineDeepCSVCut        = OnlineDeepCSVCut2017;
+  if(year == "2018"){
+    OfflineDeepCSVTightCut  = OfflineDeepCSVTightCut2018  ;
+    OfflineDeepCSVMediumCut = OfflineDeepCSVMediumCut2018 ;
+    OfflineDeepCSVLooseCut  = OfflineDeepCSVLooseCut2018 ;
+    OnlineCSVCut            = OnlineCSVCut2018;
+    OnlineDeepCSVCut        = OnlineDeepCSVCut2018;
+  }
 
   int nEventThisFile = tree->GetEntries();
   int maxEvents = parser.integerValue("maxEvents");
@@ -500,7 +531,7 @@ int main(int argc, char * argv[]){
 	// 
 	// If pass CVS working point
 	//
-	if(matchedJetPF->m_csv >= 0.8484){
+	if(matchedJetPF->m_csv >= OnlineCSVCut){
 	  offJetHists_matchedPFcsvTag.Fill(offJet, eventWeight);
 	  offJetHists_matchedPFcsvTagJet.Fill(*matchedJetPF, eventWeight);
 	}
@@ -509,7 +540,7 @@ int main(int argc, char * argv[]){
 	// 
 	// If pass DeepCVS working point
 	//
-	if(matchedJetPF->m_deepcsv >= 0.6324){
+	if(matchedJetPF->m_deepcsv >= OnlineDeepCSVCut){
 	  offJetHists_matchedPFDeepcsvTag.Fill(offJet, eventWeight);
 	  offJetHists_matchedPFDeepcsvTagJet.Fill(*matchedJetPF, eventWeight);
 	}
@@ -565,7 +596,7 @@ int main(int argc, char * argv[]){
 	// 
 	// If pass CVS working point
 	//
-	if(matchedJetCalo->m_csv >= 0.8484){
+	if(matchedJetCalo->m_csv >= OnlineCSVCut){
 	  offJetHists_matchedCalocsvTag.Fill(offJet, eventWeight);
 	  offJetHists_matchedCalocsvTagJet.Fill(*matchedJetCalo, eventWeight);
 	}
@@ -573,7 +604,7 @@ int main(int argc, char * argv[]){
 	// 
 	// If pass DeepCVS working point
 	//
-	if(matchedJetCalo->m_deepcsv >= 0.6324){
+	if(matchedJetCalo->m_deepcsv >= OnlineDeepCSVCut){
 	  offJetHists_matchedCaloDeepcsvTag.Fill(offJet, eventWeight);
 	  offJetHists_matchedCaloDeepcsvTagJet.Fill(*matchedJetCalo, eventWeight);
 	}

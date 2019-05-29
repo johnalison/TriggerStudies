@@ -38,4 +38,5 @@ process.jetLevelStudy = cms.PSet(
     LoadTrkLevel = cms.bool(False),    
     offJetName = cms.string("offJets"), # offCleanJets
     SFName     = cms.string("2018"), 
+    year       = cms.string("2018"), 
 )
