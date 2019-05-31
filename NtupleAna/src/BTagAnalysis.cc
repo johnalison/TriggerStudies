@@ -58,12 +58,12 @@ BTagAnalysis::BTagAnalysis(TChain* _eventsRAW, TChain* _eventsAOD, fwlite::TFile
   hPfTracks_matched    = new nTupleAnalysis::trackHists("pfTracks_matched",fs, "");
   hPfTracks_unmatched  = new nTupleAnalysis::trackHists("pfTracks_unmatched",fs, "");
 
-//  if(histogramming >= 4) allEvents     = new eventHists("allEvents",     fs);
-//  if(histogramming >= 3) passPreSel    = new   tagHists("passPreSel",    fs, true, isMC, blind);
-//  if(histogramming >= 2) passDijetMass = new   tagHists("passDijetMass", fs, true, isMC, blind);
-//  if(histogramming >= 1) passMDRs      = new   tagHists("passMDRs",      fs, true, isMC, blind);
-//  //if(histogramming > 1        ) passMDCs     = new   tagHists("passMDCs",   fs, true, isMC, blind);
-//  //if(histogramming > 0        ) passDEtaBB   = new   tagHists("passDEtaBB", fs, true, isMC, blind);
+  //  if(histogramming >= 4) allEvents     = new eventHists("allEvents",     fs);
+  //  if(histogramming >= 3) passPreSel    = new   tagHists("passPreSel",    fs, true, isMC, blind);
+  //  if(histogramming >= 2) passDijetMass = new   tagHists("passDijetMass", fs, true, isMC, blind);
+  //  if(histogramming >= 1) passMDRs      = new   tagHists("passMDRs",      fs, true, isMC, blind);
+  //  //if(histogramming > 1        ) passMDCs     = new   tagHists("passMDCs",   fs, true, isMC, blind);
+  //  //if(histogramming > 0        ) passDEtaBB   = new   tagHists("passDEtaBB", fs, true, isMC, blind);
 } 
 
 
@@ -80,10 +80,10 @@ void BTagAnalysis::monitor(long int e){
   //print status and flush stdout so that status bar only uses one line
   if(isMC){
     fprintf(stdout, "\rProcessed: %8li of %li ( %2li%% | %.0f events/s | done in %02i:%02i | memory usage: %li MB)       ", 
-	                          e+1, nEvents, percent,   eventRate,    minutes, seconds,                usageMB);
+	    e+1, nEvents, percent,   eventRate,    minutes, seconds,                usageMB);
   }else{
     fprintf(stdout, "\rProcessed: %8li of %li ( %2li%% | %.0f events/s | done in %02i:%02i | memory usage: %li MB | LumiBlocks %i  )       ", 
- 	                          e+1, nEvents, percent,   eventRate,    minutes, seconds,                usageMB,            nls );    
+	    e+1, nEvents, percent,   eventRate,    minutes, seconds,                usageMB,            nls );    
   }
   fflush(stdout);
 }
@@ -106,8 +106,9 @@ int BTagAnalysis::eventLoop(int maxEvents){
       monitor(e);
 
   }
-
+  
   std::cout << std::endl;
+  std::cout << "BTagAnalysis::End of Event Loop" << std::endl;
   if(!isMC) std::cout << "Runs " << firstRun << "-" << lastRun << std::endl;
 
   minutes = static_cast<int>(duration/60);
@@ -162,7 +163,7 @@ int BTagAnalysis::processEvent(){
   unsigned int nOffJets         = 0;
   unsigned int nOffJets_matched = 0;
 
-  for(nTupleAnalysis::jetPtr offJet : event->offJets){
+  for(const nTupleAnalysis::jetPtr& offJet : event->offJets){
 
     if(fabs(offJet->eta) > 2.4) continue;
     if(offJet->pt       < 35)   continue;
@@ -174,11 +175,11 @@ int BTagAnalysis::processEvent(){
     if(nTupleAnalysis::failOverlap(offJet->p,event->elecs,0.4)) continue;
     if(nTupleAnalysis::failOverlap(offJet->p,event->muons,0.4)) continue;
 
-
     // Match offline to online
     float dR = 1e6;
     nTupleAnalysis::jetPtr matchedJet = nullptr;
-    for(nTupleAnalysis::jetPtr& pfJet : event->pfJets){
+
+    for(const nTupleAnalysis::jetPtr& pfJet : event->pfJets){
       float this_dR = pfJet->p.DeltaR(offJet->p);
       if (this_dR < dR){
 	dR = this_dR;
@@ -193,166 +194,170 @@ int BTagAnalysis::processEvent(){
       offJet->match_dR       = dR;
     }
 
-      // match tracks if we matched jets
-      if(offJet->matchedJet){
+    // endComment with leak
 
-	for(nTupleAnalysis::trackPtr& offTrack: offJet->tracks){
-	  //need to check that the track (with matching resolution cone r=0.01) is in region where R=0.3 circles inside the two jets overlap!
-	  //if offTrack.dR > 0.29 - offJet.match_dR: continue
-	  if(offTrack->dR                              > 0.29) continue; // offTrack is not in cone of offJet
-	  if(offTrack->p.DeltaR(offJet->matchedJet->p) > 0.29) continue; // offTrack is not in cone of pfJet
-	  hOffTracks->Fill(offTrack, weight);
+    // match tracks if we matched jets
+    const nTupleAnalysis::jetPtr offJetMatchedJet = offJet->matchedJet.lock();
+    if(offJetMatchedJet){
 
-	  float dR = 1e6;
-	  float dR2 = 1e6;
-	  nTupleAnalysis::trackPtr matchedTrack  = nullptr;
-	  nTupleAnalysis::trackPtr secondClosest = nullptr;
+      for(const nTupleAnalysis::trackPtr& offTrack: offJet->tracks){
+	//need to check that the track (with matching resolution cone r=0.01) is in region where R=0.3 circles inside the two jets overlap!
+	//if offTrack.dR > 0.29 - offJet.match_dR: continue
+	if(offTrack->dR                              > 0.29) continue; // offTrack is not in cone of offJet
+	if(offTrack->p.DeltaR(offJetMatchedJet->p) > 0.29) continue; // offTrack is not in cone of pfJet
+	hOffTracks->Fill(offTrack, weight);
 
-	  for(nTupleAnalysis::trackPtr& pfTrack: offJet->matchedJet->tracks){
-	    //need to check that the track (with matching resolution cone r=0.01) is in region where R=0.3 circles inside the two jets overlap!
-	    if(pfTrack->dR                  > 0.29) continue; // pfTrack is not in cone of pfJet
-	    if(pfTrack->p.DeltaR(offJet->p) > 0.29) continue; // pfTrack is not in cone of offJet
+	float dR = 1e6;
+	float dR2 = 1e6;
+	nTupleAnalysis::trackPtr matchedTrack  = nullptr;
+	nTupleAnalysis::trackPtr secondClosest = nullptr;
 
-	    float this_dR = offTrack->p.DeltaR(pfTrack->p);
-	    if(this_dR > dR && this_dR < dR2){
-	      dR2 = this_dR;
-	      secondClosest = pfTrack;
-	    }
-
-	    if(this_dR < dR){
-	      dR2 = dR;
-	      secondClosest = matchedTrack;
-	      
-	      dR  = this_dR;
-	      matchedTrack = pfTrack;
-	    }
-	  }// matched pf tracks
-	
-	  if( dR > 0.01){
-	    //if dR > 1e5:
-	    hOffTracks_unmatched->Fill(offTrack, weight);
-	    continue;
-	  }
-
-	  matchedTrack->matchedTrack = offTrack;
-	  offTrack->matchedTrack     = matchedTrack;
-	  offTrack->secondClosest    = secondClosest;
-	  offTrack->nMatches              += 1;
-	  offTrack->matchedTrack->nMatches += 1;
-	  hOffTracks_matched    ->Fill(offTrack, weight);
-	  hPfTracks_matched ->Fill(offTrack->matchedTrack,weight);
-	}//off Tracks
-      
-
-	for(nTupleAnalysis::trackPtr& pfTrack: offJet->matchedJet->tracks){
+	for(const nTupleAnalysis::trackPtr& pfTrack: offJetMatchedJet->tracks){
 	  //need to check that the track (with matching resolution cone r=0.01) is in region where R=0.3 circles inside the two jets overlap!
 	  if(pfTrack->dR                  > 0.29) continue; // pfTrack is not in cone of pfJet
 	  if(pfTrack->p.DeltaR(offJet->p) > 0.29) continue; // pfTrack is not in cone of offJet
-
-	  hPfTracks->Fill(pfTrack, weight); //all pftracks in matched jets
-	  hPfTracks->FillMatchStats(pfTrack, weight); //check how often we match pfTracks to more than one offTrack
-	  if(!pfTrack->nMatches){
-	    hPfTracks_unmatched->Fill(pfTrack, weight); //all unmatched pftracks
-	    hPfTracks_unmatched->FillMatchStats(pfTrack, weight);
-	  }else{
-	    hPfTracks_matched->FillMatchStats(pfTrack, weight);
+	  
+	  float this_dR = offTrack->p.DeltaR(pfTrack->p);
+	  if(this_dR > dR && this_dR < dR2){
+	    dR2 = this_dR;
+	    secondClosest = pfTrack;
 	  }
+
+	  if(this_dR < dR){
+	    dR2 = dR;
+	    secondClosest = matchedTrack;
+	    
+	    dR  = this_dR;
+	    matchedTrack = pfTrack;
+	  }
+	}// matched pf tracks
+	
+	if( dR > 0.01){
+	  //if dR > 1e5:
+	  hOffTracks_unmatched->Fill(offTrack, weight);
+	  continue;
 	}
-      }//offJet has match
+	
+	matchedTrack->matchedTrack = offTrack;
+	offTrack->matchedTrack     = matchedTrack;
+	offTrack->secondClosest    = secondClosest;
+	offTrack->nMatches              += 1;
+	matchedTrack->nMatches += 1;
+	hOffTracks_matched    ->Fill(offTrack, weight);
+	const nTupleAnalysis::trackPtr offTrackMatchedTrack = offTrack->matchedTrack.lock();
+	hPfTracks_matched ->Fill(offTrackMatchedTrack,weight);
+      }//off Tracks
+      
 
-      // Fill offJetHists
-      // offJets_ROC
-      //  wp60 DeepCSV > 0.76 (actual efficiency = 0.604992842829)
-      //  wp70 DeepCSV > 0.56 (actual efficiency = 0.717503578586)
-      //  wp80 DeepCSV > 0.36 (actual efficiency = 0.808474091039)
-      //  wp90 DeepCSV > 0.12 (actual efficiency = 0.912533638706)
-      ++nOffJets;
-      hOffJets->Fill(offJet,weight);
-///      if(offJet.m_deepcsv > 0.56) offJetHists_offline70.Fill(offJet);
-///      if(offJet.m_hadronFlavour == 5){
-///	offJetHists_B.Fill(offJet);
-///	if(offJet.m_deepcsv > 0.56) offJetHists_offline70_B.Fill(offJet);
-///      }else{
-///	offJetHists_L.Fill(offJet);
-///	if(offJet.m_deepcsv > 0.56) offJetHists_offline70_L.Fill(offJet);
-///      }
-
-      if(offJet->matchedJet){
-	++nOffJets_matched;
-	hOffJets_matched->Fill(offJet,weight);
-	hOffJets_matchedJet->Fill(offJet->matchedJet,weight);
-///	if( offJet.m_deepcsv > 0.56) offJetHists_offline70_matched.Fill(offJet);
-///
-///	if(offJet.m_hadronFlavour == 5){
-///	  offJetHists_B_matched.Fill(offJet);
-///	  if(offJet.m_deepcsv > 0.56) offJetHists_offline70_B_matched.Fill(offJet);
-///	}else{
-///	  offJetHists_L_matched.Fill(offJet);
-///	  if(offJet.m_deepcsv > 0.56) offJetHists_offline70_L_matched.Fill(offJet);
-///	}
-///
-///        // pfJets_matched_ROC
-///	//  wp60 DeepCSV > 0.64 (actual efficiency = 0.610276798066)
-///	//  wp70 DeepCSV > 0.48 (actual efficiency = 0.708732661175)
-///	//  wp80 DeepCSV > 0.28 (actual efficiency = 0.814155211306)
-///	//  wp90 DeepCSV > 0.08 (actual efficiency = 0.924525480128)
-///	if(offJet.m_matchedJet->m_deepcsv > 0.64){ //approximate 60% Online WP
-///	  offJetHists_matched_online60.Fill(offJet);
-///	  if( offJet.m_deepcsv > 0.56) offJetHists_offline70_matched_online60.Fill(offJet);
-///	  if(offJet.m_hadronFlavour == 5){
-///	    offJetHists_B_matched_online60.Fill(offJet);
-///	    if(offJet.m_deepcsv > 0.56) offJetHists_offline70_B_matched_online60.Fill(offJet);
-///	  }else{
-///	    offJetHists_L_matched_online60.Fill(offJet);
-///	    if(offJet.m_deepcsv > 0.56) offJetHists_offline70_L_matched_online60.Fill(offJet);
-///	  }
-///	}
-///
-///	if(offJet.m_matchedJet->m_deepcsv > 0.48){ //approximate 70% Online WP
-///	  offJetHists_matched_online70.Fill(offJet);
-///	  if(offJet.m_deepcsv > 0.56) offJetHists_offline70_matched_online70.Fill(offJet);
-///	  if(offJet.m_hadronFlavour == 5){
-///	    offJetHists_B_matched_online70.Fill(offJet);
-///	    if(offJet.m_deepcsv > 0.56) offJetHists_offline70_B_matched_online70.Fill(offJet);
-///	  }else{
-///	    offJetHists_L_matched_online70.Fill(offJet);
-///	    if(offJet.m_deepcsv > 0.56) offJetHists_offline70_L_matched_online70.Fill(offJet);
-///	  }
-///	}
-///	
-///	if(offJet.m_matchedJet->m_deepcsv > 0.28){ //approximate 80% Online WP
-///	  offJetHists_matched_online80.Fill(offJet);
-///	  if(offJet.m_deepcsv > 0.56) offJetHists_offline70_matched_online80.Fill(offJet);
-///	  if(offJet.m_hadronFlavour == 5){
-///	    offJetHists_B_matched_online80.Fill(offJet);
-///	    if(offJet.m_deepcsv > 0.56) offJetHists_offline70_B_matched_online80.Fill(offJet);
-///	  }else{
-///	    offJetHists_L_matched_online80.Fill(offJet);
-///	    if(offJet.m_deepcsv > 0.56) offJetHists_offline70_L_matched_online80.Fill(offJet);
-///	  }
-///	}
-///      
-///	if(offJet.m_matchedJet->m_deepcsv > 0.08){ //approximate 90% Online WP
-///	  offJetHists_matched_online90.Fill(offJet);
-///	  if(offJet.m_deepcsv > 0.56) offJetHists_offline70_matched_online90.Fill(offJet);
-///	  if(offJet.m_hadronFlavour == 5){
-///	    offJetHists_B_matched_online90.Fill(offJet);
-///	    if(offJet.m_deepcsv > 0.56) offJetHists_offline70_B_matched_online90.Fill(offJet);
-///	  }else{
-///	    offJetHists_L_matched_online90.Fill(offJet);
-///	    if(offJet.m_deepcsv > 0.56) offJetHists_offline70_L_matched_online90.Fill(offJet);
-///	  }
-///	}
-      }//m_matchedJet
-
-      // Match offline to online
-      for(nTupleAnalysis::jetPtr& caloJet : event->caloJets){
-	float deltaR = caloJet->p.DeltaR(offJet->p);
-	if( deltaR < 0.4){
-	  caloJet->matchedJet = offJet;
-	  break;
+      for(const nTupleAnalysis::trackPtr& pfTrack: offJetMatchedJet->tracks){
+	//need to check that the track (with matching resolution cone r=0.01) is in region where R=0.3 circles inside the two jets overlap!
+	if(pfTrack->dR                  > 0.29) continue; // pfTrack is not in cone of pfJet
+	if(pfTrack->p.DeltaR(offJet->p) > 0.29) continue; // pfTrack is not in cone of offJet
+	
+	hPfTracks->Fill(pfTrack, weight); //all pftracks in matched jets
+	hPfTracks->FillMatchStats(pfTrack, weight); //check how often we match pfTracks to more than one offTrack
+	if(!pfTrack->nMatches){
+	  hPfTracks_unmatched->Fill(pfTrack, weight); //all unmatched pftracks
+	  hPfTracks_unmatched->FillMatchStats(pfTrack, weight);
+	}else{
+	  hPfTracks_matched->FillMatchStats(pfTrack, weight);
 	}
       }
+    }//offJet has match
+
+    // Fill offJetHists
+    // offJets_ROC
+    //  wp60 DeepCSV > 0.76 (actual efficiency = 0.604992842829)
+    //  wp70 DeepCSV > 0.56 (actual efficiency = 0.717503578586)
+    //  wp80 DeepCSV > 0.36 (actual efficiency = 0.808474091039)
+    //  wp90 DeepCSV > 0.12 (actual efficiency = 0.912533638706)
+    ++nOffJets;
+    hOffJets->Fill(offJet,weight);
+    ///      if(offJet.m_deepcsv > 0.56) offJetHists_offline70.Fill(offJet);
+    ///      if(offJet.m_hadronFlavour == 5){
+    ///	offJetHists_B.Fill(offJet);
+    ///	if(offJet.m_deepcsv > 0.56) offJetHists_offline70_B.Fill(offJet);
+    ///      }else{
+    ///	offJetHists_L.Fill(offJet);
+    ///	if(offJet.m_deepcsv > 0.56) offJetHists_offline70_L.Fill(offJet);
+    ///      }
+    
+    if(offJetMatchedJet){
+      ++nOffJets_matched;
+      hOffJets_matched->Fill(offJet,weight);
+      hOffJets_matchedJet->Fill(offJetMatchedJet,weight);
+      ///	if( offJet.m_deepcsv > 0.56) offJetHists_offline70_matched.Fill(offJet);
+      ///
+      ///	if(offJet.m_hadronFlavour == 5){
+      ///	  offJetHists_B_matched.Fill(offJet);
+      ///	  if(offJet.m_deepcsv > 0.56) offJetHists_offline70_B_matched.Fill(offJet);
+      ///	}else{
+      ///	  offJetHists_L_matched.Fill(offJet);
+      ///	  if(offJet.m_deepcsv > 0.56) offJetHists_offline70_L_matched.Fill(offJet);
+      ///	}
+      ///
+      ///        // pfJets_matched_ROC
+      ///	//  wp60 DeepCSV > 0.64 (actual efficiency = 0.610276798066)
+      ///	//  wp70 DeepCSV > 0.48 (actual efficiency = 0.708732661175)
+      ///	//  wp80 DeepCSV > 0.28 (actual efficiency = 0.814155211306)
+      ///	//  wp90 DeepCSV > 0.08 (actual efficiency = 0.924525480128)
+      ///	if(offJet.m_matchedJet->m_deepcsv > 0.64){ //approximate 60% Online WP
+      ///	  offJetHists_matched_online60.Fill(offJet);
+      ///	  if( offJet.m_deepcsv > 0.56) offJetHists_offline70_matched_online60.Fill(offJet);
+      ///	  if(offJet.m_hadronFlavour == 5){
+      ///	    offJetHists_B_matched_online60.Fill(offJet);
+      ///	    if(offJet.m_deepcsv > 0.56) offJetHists_offline70_B_matched_online60.Fill(offJet);
+      ///	  }else{
+      ///	    offJetHists_L_matched_online60.Fill(offJet);
+      ///	    if(offJet.m_deepcsv > 0.56) offJetHists_offline70_L_matched_online60.Fill(offJet);
+      ///	  }
+      ///	}
+      ///
+      ///	if(offJet.m_matchedJet->m_deepcsv > 0.48){ //approximate 70% Online WP
+      ///	  offJetHists_matched_online70.Fill(offJet);
+      ///	  if(offJet.m_deepcsv > 0.56) offJetHists_offline70_matched_online70.Fill(offJet);
+      ///	  if(offJet.m_hadronFlavour == 5){
+      ///	    offJetHists_B_matched_online70.Fill(offJet);
+      ///	    if(offJet.m_deepcsv > 0.56) offJetHists_offline70_B_matched_online70.Fill(offJet);
+      ///	  }else{
+      ///	    offJetHists_L_matched_online70.Fill(offJet);
+      ///	    if(offJet.m_deepcsv > 0.56) offJetHists_offline70_L_matched_online70.Fill(offJet);
+      ///	  }
+      ///	}
+      ///	
+      ///	if(offJet.m_matchedJet->m_deepcsv > 0.28){ //approximate 80% Online WP
+      ///	  offJetHists_matched_online80.Fill(offJet);
+      ///	  if(offJet.m_deepcsv > 0.56) offJetHists_offline70_matched_online80.Fill(offJet);
+      ///	  if(offJet.m_hadronFlavour == 5){
+      ///	    offJetHists_B_matched_online80.Fill(offJet);
+      ///	    if(offJet.m_deepcsv > 0.56) offJetHists_offline70_B_matched_online80.Fill(offJet);
+      ///	  }else{
+      ///	    offJetHists_L_matched_online80.Fill(offJet);
+      ///	    if(offJet.m_deepcsv > 0.56) offJetHists_offline70_L_matched_online80.Fill(offJet);
+      ///	  }
+      ///	}
+      ///      
+      ///	if(offJet.m_matchedJet->m_deepcsv > 0.08){ //approximate 90% Online WP
+      ///	  offJetHists_matched_online90.Fill(offJet);
+      ///	  if(offJet.m_deepcsv > 0.56) offJetHists_offline70_matched_online90.Fill(offJet);
+      ///	  if(offJet.m_hadronFlavour == 5){
+      ///	    offJetHists_B_matched_online90.Fill(offJet);
+      ///	    if(offJet.m_deepcsv > 0.56) offJetHists_offline70_B_matched_online90.Fill(offJet);
+      ///	  }else{
+      ///	    offJetHists_L_matched_online90.Fill(offJet);
+      ///	    if(offJet.m_deepcsv > 0.56) offJetHists_offline70_L_matched_online90.Fill(offJet);
+      ///	  }
+      ///	}
+    }//m_matchedJet
+
+    // Match offline to online
+    for(const nTupleAnalysis::jetPtr& caloJet : event->caloJets){
+      float deltaR = caloJet->p.DeltaR(offJet->p);
+      if( deltaR < 0.4){
+	caloJet->matchedJet = offJet;
+	break;
+      }
+    }
 
   }//offJets
 
@@ -367,43 +372,45 @@ int BTagAnalysis::processEvent(){
   //
   //  pf Jets
   //
-  for(nTupleAnalysis::jetPtr& pfJet : event->pfJets){
-      if(fabs(pfJet->eta) > 2.5) continue;
-      if(pfJet->pt       < 35)   continue;
-
-      //pfJetHistsPreOLap.Fill(pfJet);
-
-      if(nTupleAnalysis::failOverlap(pfJet->p,event->elecs, 0.4)) continue;
-      if(nTupleAnalysis::failOverlap(pfJet->p,event->muons, 0.4)) continue;
-
-      hPfJets->Fill(pfJet, weight);
-
-      if(pfJet->matchedJet){
-	hPfJets_matched->Fill(pfJet, weight);
-
-	//if( pfJet->matchedJet->m_hadronFlavour == 5)
-	//  pfJetHists_matchedB.Fill(pfJet);
-	//else
-	//  pfJetHists_matchedL.Fill(pfJet);
-      }
+  for(const nTupleAnalysis::jetPtr& pfJet : event->pfJets){
+    if(fabs(pfJet->eta) > 2.5) continue;
+    if(pfJet->pt       < 35)   continue;
+  
+    //pfJetHistsPreOLap.Fill(pfJet);
+  
+    if(nTupleAnalysis::failOverlap(pfJet->p,event->elecs, 0.4)) continue;
+    if(nTupleAnalysis::failOverlap(pfJet->p,event->muons, 0.4)) continue;
+  
+    hPfJets->Fill(pfJet, weight);
+  
+    const nTupleAnalysis::jetPtr pfJetMatchedJet = pfJet->matchedJet.lock();
+    if(pfJetMatchedJet){
+      hPfJets_matched->Fill(pfJet, weight);
+  
+      //if( pfJet->matchedJet->m_hadronFlavour == 5)
+      //  pfJetHists_matchedB.Fill(pfJet);
+      //else
+      //  pfJetHists_matchedL.Fill(pfJet);
     }
-
+  }
+  
   //
   //  calo Jets
   //
-  for(nTupleAnalysis::jetPtr& caloJet : event->caloJets){
+  for(const nTupleAnalysis::jetPtr& caloJet : event->caloJets){
     if(fabs(caloJet->eta) > 2.5) continue;
     if(caloJet->pt       < 35)   continue;
-
+  
     //caloJetHistsPreOLap.Fill(caloJet);
     if(nTupleAnalysis::failOverlap(caloJet->p,event->elecs, 0.4)) continue;
     if(nTupleAnalysis::failOverlap(caloJet->p,event->muons, 0.4)) continue;
-
+  
     hCaloJets->Fill(caloJet, weight);
 
-    if(caloJet->matchedJet){
+    const nTupleAnalysis::jetPtr caloJetMatchedJet = caloJet->matchedJet.lock();  
+    if(caloJetMatchedJet){
       hCaloJets_matched->Fill(caloJet, weight);
-
+  
       //if(caloJet->m_matchedJet->m_hadronFlavour == 5)
       //	caloJetHists_matchedB.Fill(caloJet);
       //	else
@@ -463,5 +470,7 @@ bool BTagAnalysis::passLumiMask(){
 
 
 
-BTagAnalysis::~BTagAnalysis(){} 
+BTagAnalysis::~BTagAnalysis(){
+  std::cout << "BTagAnalysis::destroyed" << std::endl;
+} 
 

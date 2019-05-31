@@ -107,6 +107,7 @@ int main(int argc, char * argv[]){
   
   int maxEvents = inputHandler.maxEvents();
   a.eventLoop(maxEvents);
-  
+  std::cout << std::endl;
+  std::cout << "Done Event Loop" << std::endl;
   return 0;
 }

@@ -131,6 +131,11 @@ int main(int argc, char * argv[]){
   // 
   fwlite::TFileService fs = fwlite::TFileService(outputFileName);
 
+  TFileDirectory cutFlowDir = fs.mkdir("CutFlow");
+  TH1F* hCutFlowHist = cutFlowDir.make<TH1F>("cutflow", "cutflow", 1, 1, 2);
+  hCutFlowHist->SetCanExtend(TH1::kAllAxes);
+  int cf_bin_all  = hCutFlowHist->GetXaxis()->FindBin("All");
+  int cf_bin_trig = hCutFlowHist->GetXaxis()->FindBin("PassTrigger");
   EventHists eventHists     = EventHists("AllEvents", fs);
 
   TrackHists pfTrackHists            = TrackHists("pfTracks", fs);
@@ -223,6 +228,7 @@ int main(int argc, char * argv[]){
     if( (maxEvents > 0) && (entry > maxEvents))
       break;
 
+    hCutFlowHist ->Fill( cf_bin_all, 1 );
     tree->GetEntry( entry );
 
     eventData.SetEvent();
@@ -236,6 +242,7 @@ int main(int argc, char * argv[]){
     // Fill All events
     //
     eventHists.Fill(eventData);
+    hCutFlowHist ->Fill( cf_bin_trig, 1 );
 
     // Converting from "row-level" info to "column-level" info
     std::vector<NtupleAna::LeptonData> elecs  = elecDB.GetLeps(30);
@@ -248,7 +255,7 @@ int main(int argc, char * argv[]){
 
     for(JetData& offJet : offJets){
 
-      if(fabs(offJet.m_eta) > 2.5) continue;
+      if(fabs(offJet.m_eta) > 2.4) continue;
       if(offJet.m_pt       < 35)   continue;
       
       offJetHistsPreOLap.Fill(offJet);

@@ -92,5 +92,7 @@ void eventData::dump(){
   return;
 }
 
-eventData::~eventData(){} 
+eventData::~eventData(){
+  std::cout << "eventData::destroyed" << std::endl;
+} 
 
