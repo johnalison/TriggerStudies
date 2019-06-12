@@ -1,0 +1,11 @@
+root://cmsxrootd.fnal.gov//store/user/jda102/HLT_Ntuple_BTagging_DiLepton_v10AddTrks2/MuonEG/HLT_Ntuple_BTagging_DiLepton_v10/190309_220417/0000/tree_1.root,
+root://cmsxrootd.fnal.gov//store/user/jda102/HLT_Ntuple_BTagging_DiLepton_v10AddTrks2/MuonEG/HLT_Ntuple_BTagging_DiLepton_v10/190309_220417/0000/tree_2.root,
+root://cmsxrootd.fnal.gov//store/user/jda102/HLT_Ntuple_BTagging_DiLepton_v10AddTrks2/MuonEG/HLT_Ntuple_BTagging_DiLepton_v10/190309_220417/0000/tree_3.root,
+root://cmsxrootd.fnal.gov//store/user/jda102/HLT_Ntuple_BTagging_DiLepton_v10AddTrks2/MuonEG/HLT_Ntuple_BTagging_DiLepton_v10/190309_220417/0000/tree_4.root,
+root://cmsxrootd.fnal.gov//store/user/jda102/HLT_Ntuple_BTagging_DiLepton_v10AddTrks2/MuonEG/HLT_Ntuple_BTagging_DiLepton_v10/190309_220417/0000/tree_5.root,
+root://cmsxrootd.fnal.gov//store/user/jda102/HLT_Ntuple_BTagging_DiLepton_v10AddTrks2/MuonEG/HLT_Ntuple_BTagging_DiLepton_v10/190309_220417/0000/tree_6.root,
+root://cmsxrootd.fnal.gov//store/user/jda102/HLT_Ntuple_BTagging_DiLepton_v10AddTrks2/MuonEG/HLT_Ntuple_BTagging_DiLepton_v10/190309_220417/0000/tree_7.root,
+root://cmsxrootd.fnal.gov//store/user/jda102/HLT_Ntuple_BTagging_DiLepton_v10AddTrks2/MuonEG/HLT_Ntuple_BTagging_DiLepton_v10/190309_220417/0000/tree_8.root,
+root://cmsxrootd.fnal.gov//store/user/jda102/HLT_Ntuple_BTagging_DiLepton_v10AddTrks2/MuonEG/HLT_Ntuple_BTagging_DiLepton_v10/190309_220417/0000/tree_9.root,
+root://cmsxrootd.fnal.gov//store/user/jda102/HLT_Ntuple_BTagging_DiLepton_v10AddTrks2/MuonEG/HLT_Ntuple_BTagging_DiLepton_v10/190309_220417/0000/tree_10.root
+

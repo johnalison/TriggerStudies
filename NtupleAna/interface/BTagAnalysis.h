@@ -47,8 +47,18 @@ namespace TriggerStudies {
     nTupleAnalysis::jetHists* hOffJets_matched;
     nTupleAnalysis::jetHists* hOffJets_matchedJet;
 
+    nTupleAnalysis::jetHists*  hOffJets_L   ;
+    nTupleAnalysis::jetHists*  hOffJets_matched_L   ;
+    nTupleAnalysis::jetHists*  hOffJets_matchedJet_L;
+    nTupleAnalysis::jetHists*  hOffJets_B   ;
+    nTupleAnalysis::jetHists*  hOffJets_matched_B   ;
+    nTupleAnalysis::jetHists*  hOffJets_matchedJet_B;
+
+
     nTupleAnalysis::jetHists* hPfJets;
     nTupleAnalysis::jetHists* hPfJets_matched;
+    nTupleAnalysis::jetHists* hPfJets_matched_L;
+    nTupleAnalysis::jetHists* hPfJets_matched_B;
 
     nTupleAnalysis::jetHists* hCaloJets;
     nTupleAnalysis::jetHists* hCaloJets_matched;
@@ -59,6 +69,24 @@ namespace TriggerStudies {
     nTupleAnalysis::trackHists* hPfTracks;
     nTupleAnalysis::trackHists* hPfTracks_matched;
     nTupleAnalysis::trackHists* hPfTracks_unmatched;
+    nTupleAnalysis::trackHists* hPfTracks_noV0;
+
+    nTupleAnalysis::trackHists* hOffTracks_noV0;
+    nTupleAnalysis::trackHists* hOffTracks_matched_noV0;
+
+    nTupleAnalysis::btaggingHists* hOffBTags;
+    nTupleAnalysis::btaggingHists* hOffBTags_matched;
+    nTupleAnalysis::btaggingHists* hOffBTags_noV0;
+    nTupleAnalysis::btaggingHists* hOffBTags_matched_noV0;
+
+    nTupleAnalysis::btaggingHists* hPfBTags;
+
+    TH1F*   hmttOff          ;
+    TH1F*   hmttOff_isFromV0 ;
+    TH1F*   hmttPf           ;
+    TH1F*   hmttPf_isFromV0  ;
+
+
     //eventHists* allEvents   = NULL;
     //tagHists* passPreSel    = NULL;
     
