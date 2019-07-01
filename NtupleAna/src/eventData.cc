@@ -1,3 +1,4 @@
+
 #include "TriggerStudies/NtupleAna/interface/eventData.h"
 #include <TTreeIndex.h>
 using namespace TriggerStudies;
@@ -53,11 +54,15 @@ eventData::eventData(TChain* _treeRAW, TChain* _treeAOD, bool mc, std::string y,
 } 
 
 void eventData::update(int e){
-  //if(e>2546040) debug = true;
   if(debug){
     std::cout<<"Get Entry "<<e<<std::endl;
     std::cout<<treeRAW->GetCurrentFile()->GetName()<<std::endl;
     treeRAW->Show(e);
+
+    std::cout<<"Get Entry (AOD) "<<e<<std::endl;
+    std::cout<<treeAOD->GetCurrentFile()->GetName()<<std::endl;
+    treeAOD->Show(e);
+
   }
   Long64_t loadStatus = treeRAW->LoadTree(e);
   if(loadStatus<0){
@@ -66,13 +71,34 @@ void eventData::update(int e){
   }
 
 
+//  Long64_t loadStatusAOD = treeAOD->LoadTree(e);
+//  if(loadStatusAOD<0){
+//    std::cout << "Error "<<loadStatus<<" getting AOD event "<<e<<std::endl; 
+//    return;
+//  }
+
+
   treeRAW->GetEntry(e);
+  // treeAOD->GetEntry(e);
   if(debug) std::cout<<"Got Entry "<<e<<std::endl;
 
+  if((run != runAOD) || (event != eventAOD)){
+    std::cout << "Run: " << run << " vs " << runAOD  << "  Evt: " << event << " vs " << eventAOD << std::endl;  
+  }
+
+  if(run != runAOD){
+    if(debug) std::cout << "run: " << run << " vs " << runAOD << std::endl;
+    return;
+  }
+
+  if(event != eventAOD){
+    if(debug) std::cout << "evt: " << event << " vs " << eventAOD << std::endl;  
+    return;
+  }
 
   offJets  = offTreeJets->getJets(30,1e6,2.4);
   pfJets   = pfTreeJets ->getJets(30,1e6,2.4);
-  caloJets = pfTreeJets ->getJets(30,1e6,2.4);
+  caloJets = caloTreeJets ->getJets(30,1e6,2.4);
   muons    = treeMuons  ->getMuons(20, 2.4);
   elecs    = treeElecs  ->getElecs(30, 2.4);
 

@@ -10,6 +10,23 @@
 
 using namespace TriggerStudies;
 
+// 2018
+const float OfflineDeepCSVTightCut2018  = 0.7527;
+const float OfflineDeepCSVMediumCut2018 = 0.4184;
+const float OfflineDeepCSVLooseCut2018  = 0.1241;
+
+const float OnlineDeepCSVCut2018  = 0.6324;
+const float OnlineCSVCut2018      = 0.8484;
+
+// 2017 
+const float OfflineDeepCSVTightCut2017  = 0.8001;
+const float OfflineDeepCSVMediumCut2017 = 0.4941;
+const float OfflineDeepCSVLooseCut2017  = 0.1522;
+
+const float OnlineDeepCSVCut2017  = 0.6324;
+const float OnlineCSVCut2017      = 0.8484;
+
+
 BTagAnalysis::BTagAnalysis(TChain* _eventsRAW, TChain* _eventsAOD, fwlite::TFileService& fs, bool _isMC, std::string _year, int _histogramming, bool _debug){
   if(_debug) std::cout<<"In BTagAnalysis constructor"<<std::endl;
   debug      = _debug;
@@ -30,47 +47,93 @@ BTagAnalysis::BTagAnalysis(TChain* _eventsRAW, TChain* _eventsAOD, fwlite::TFile
   cutflow    = new nTupleAnalysis::cutflowHists("cutflow", fs);
   cutflow->AddCut("all");
   cutflow->AddCut("foundMatch");
+  cutflow->AddCut("passMuonCut");  
+  cutflow->AddCut("passElecCut");  
   cutflow->AddCut("passLeptonCut");
+  cutflow->AddCut("passNJetCut");
+  cutflow->AddCut("passNBJetCut");
+
+  //
+  //  Jets
+  //
+  cutflowJets    = new nTupleAnalysis::cutflowHists("cutflowJets", fs);
+  cutflowJets->AddCut("all");
+  cutflowJets->AddCut("eta");
+  cutflowJets->AddCut("pt");
+  cutflowJets->AddCut("muonOlap");  
+  cutflowJets->AddCut("elecOlap");  
+  cutflowJets->AddCut("isProbe");
+  cutflowJets->AddCut("hasHLTMatchPF");
+  cutflowJets->AddCut("hasHLTMatchCalo");
+
 
   //
   // hists
   //
   dir = fs.mkdir("BTagAnalysis");
 
-  hMuons = new nTupleAnalysis::muonHists("muons", fs, "All Muons");
-  hElecs = new nTupleAnalysis::elecHists("elecs", fs, "All Elecs");
+  hAllMuons = new nTupleAnalysis::muonHists("AllMuons", fs, "All Muons");
+  hAllElecs = new nTupleAnalysis::elecHists("AllElecs", fs, "All Elecs");
+  hMuons    = new nTupleAnalysis::muonHists("Muons", fs, "Muons");
+  hElecs    = new nTupleAnalysis::elecHists("Elecs", fs, "Elecs");
 
-  hOffJetsPreOLap      = new nTupleAnalysis::jetHists("offJetsPreOLap",    fs, "Pre Overlap");
-  hOffJets             = new nTupleAnalysis::jetHists("offJets",           fs, "");
-  hOffJets_matched     = new nTupleAnalysis::jetHists("offJets_matched",   fs, "");
-  hOffJets_matchedJet  = new nTupleAnalysis::jetHists("offJets_matchedJet",fs, "");
+  hOffJetsPreOLap         = new nTupleAnalysis::jetHists("offJetsPreOLap",        fs, "Pre Overlap");
+  hOffJets                = new nTupleAnalysis::jetHists("offJets",               fs, "");
+  hOffJets_matched        = new nTupleAnalysis::jetHists("offJets_matched",       fs, "");
+  hOffJets_matchedJet     = new nTupleAnalysis::jetHists("offJets_matchedJet",    fs, "");
+  hOffJets_matchedCalo    = new nTupleAnalysis::jetHists("offJets_matchedCalo",   fs, "");
+  hOffJets_matchedCaloJet = new nTupleAnalysis::jetHists("offJets_matchedCaloJet",fs, "");
 
-  hOffJets_L     = new nTupleAnalysis::jetHists("offJets_L",   fs, "");
-  hOffJets_matched_L     = new nTupleAnalysis::jetHists("offJets_matched_L",   fs, "");
-  hOffJets_matchedJet_L  = new nTupleAnalysis::jetHists("offJets_matchedJet_L",fs, "");
-  hOffJets_matched_B     = new nTupleAnalysis::jetHists("offJets_matched_B",   fs, "");
-  hOffJets_B     = new nTupleAnalysis::jetHists("offJets_B",   fs, "");
-  hOffJets_matchedJet_B  = new nTupleAnalysis::jetHists("offJets_matchedJet_B",fs, "");
+  if(isMC){
+    hOffJets_matched_L        = new nTupleAnalysis::jetHists("offJets_matched_L",   fs, "");
+    hOffJets_matchedJet_L     = new nTupleAnalysis::jetHists("offJets_matchedJet_L",fs, "");
+    hOffJets_matchedCalo_L    = new nTupleAnalysis::jetHists("offJets_matchedCalo_L",fs, "");
+    hOffJets_matchedCaloJet_L = new nTupleAnalysis::jetHists("offJets_matchedCaloJet_L",fs, "");
 
+    hOffJets_matched_B        = new nTupleAnalysis::jetHists("offJets_matched_B",   fs, "");
+    hOffJets_matchedJet_B     = new nTupleAnalysis::jetHists("offJets_matchedJet_B",fs, "");
+    hOffJets_matchedCalo_B    = new nTupleAnalysis::jetHists("offJets_matchedCalo_B",fs, "");
+    hOffJets_matchedCaloJet_B = new nTupleAnalysis::jetHists("offJets_matchedCaloJet_B",fs, "");
+  }
 
   hPfJets          = new nTupleAnalysis::jetHists("pfJets",           fs, "");
   hPfJets_matched  = new nTupleAnalysis::jetHists("pfJets_matched",           fs, "");
-  hPfJets_matched_B  = new nTupleAnalysis::jetHists("pfJets_matched_B",           fs, "");
-  hPfJets_matched_L  = new nTupleAnalysis::jetHists("pfJets_matched_L",           fs, "");
 
-  hCaloJets          = new nTupleAnalysis::jetHists("caloJets",           fs, "");
-  hCaloJets_matched  = new nTupleAnalysis::jetHists("caloJets_matched",           fs, "");
+
+  if(isMC){
+    hPfJets_matched_B  = new nTupleAnalysis::jetHists("pfJets_matched_B",           fs, "");
+    hPfJets_matched_L  = new nTupleAnalysis::jetHists("pfJets_matched_L",           fs, "");
+  }
+
+  hCaloJets            = new nTupleAnalysis::jetHists("caloJets",           fs, "");
+  hCaloJets_matched    = new nTupleAnalysis::jetHists("caloJets_matched",           fs, "");
+
+  if(isMC){
+    hCaloJets_matched_B  = new nTupleAnalysis::jetHists("caloJets_matched_B",           fs, "");
+    hCaloJets_matched_L  = new nTupleAnalysis::jetHists("caloJets_matched_L",           fs, "");
+  }
 
   hOffTracks           = new nTupleAnalysis::trackHists("offTracks",fs, "");
   hOffTracks_unmatched = new nTupleAnalysis::trackHists("offTracks_unmatched",fs, "");
   hOffTracks_matched   = new nTupleAnalysis::trackHists("offTracks_matched",fs, "");
+  hOffTracks_noV0           = new nTupleAnalysis::trackHists("offTracks_noV0",fs, "");
+  hOffTracks_matched_noV0   = new nTupleAnalysis::trackHists("offTracks_matched_noV0",fs, "");
+
   hPfTracks            = new nTupleAnalysis::trackHists("pfTracks",fs, "");
   hPfTracks_noV0       = new nTupleAnalysis::trackHists("pfTracks_noV0",fs, "");
   hPfTracks_matched    = new nTupleAnalysis::trackHists("pfTracks_matched",fs, "");
   hPfTracks_unmatched  = new nTupleAnalysis::trackHists("pfTracks_unmatched",fs, "");
 
-  hOffTracks_noV0           = new nTupleAnalysis::trackHists("offTracks_noV0",fs, "");
-  hOffTracks_matched_noV0   = new nTupleAnalysis::trackHists("offTracks_matched_noV0",fs, "");
+  hOffTracksCalo                = new nTupleAnalysis::trackHists("offTracksCalo",fs, "");
+  hOffTracksCalo_unmatched      = new nTupleAnalysis::trackHists("offTracksCalo_unmatched",fs, "");
+  hOffTracksCalo_matched        = new nTupleAnalysis::trackHists("offTracksCalo_matched",fs, "");
+  hOffTracksCalo_noV0           = new nTupleAnalysis::trackHists("offTracksCalo_noV0",fs, "");
+  hOffTracksCalo_matched_noV0   = new nTupleAnalysis::trackHists("offTracksCalo_matched_noV0",fs, "");
+
+  hCaloTracks            = new nTupleAnalysis::trackHists("caloTracks",fs, "");
+  hCaloTracks_noV0       = new nTupleAnalysis::trackHists("caloTracks_noV0",fs, "");
+  hCaloTracks_matched    = new nTupleAnalysis::trackHists("caloTracks_matched",fs, "");
+  hCaloTracks_unmatched  = new nTupleAnalysis::trackHists("caloTracks_unmatched",fs, "");
 
   hOffBTags           = new nTupleAnalysis::btaggingHists("offBTags",fs, "");
   hOffBTags_matched   = new nTupleAnalysis::btaggingHists("offBTags_matched",fs, "");
@@ -83,6 +146,26 @@ BTagAnalysis::BTagAnalysis(TChain* _eventsRAW, TChain* _eventsAOD, fwlite::TFile
   hmttOff_isFromV0  = dir.make<TH1F>("mtt_off_isFromV0",   "BTagAnalysis/mtt_off_isFromV0;    mtt;   Entries", 100,-0.01, 2);
   hmttPf            = dir.make<TH1F>("mtt_pf",             "BTagAnalysis/mtt_pf;              mtt;   Entries", 100,-0.01, 2);
   hmttPf_isFromV0   = dir.make<TH1F>("mtt_pf_isFromV0",    "BTagAnalysis/mtt_pf_isFromV0;     mtt;   Entries", 100,-0.01, 2);
+  hmttCalo            = dir.make<TH1F>("mtt_calo",             "BTagAnalysis/mtt_calo;              mtt;   Entries", 100,-0.01, 2);
+  hmttCalo_isFromV0   = dir.make<TH1F>("mtt_calo_isFromV0",    "BTagAnalysis/mtt_calo_isFromV0;     mtt;   Entries", 100,-0.01, 2);
+
+
+  //
+  //  Configure Selection
+  // 
+  OfflineDeepCSVTightCut  = OfflineDeepCSVTightCut2017  ;
+  OfflineDeepCSVMediumCut = OfflineDeepCSVMediumCut2017 ;
+  OfflineDeepCSVLooseCut  = OfflineDeepCSVLooseCut2017  ;
+  OnlineCSVCut            = OnlineCSVCut2017;
+  OnlineDeepCSVCut        = OnlineDeepCSVCut2017;
+  if(_year == "2018"){
+    OfflineDeepCSVTightCut  = OfflineDeepCSVTightCut2018  ;
+    OfflineDeepCSVMediumCut = OfflineDeepCSVMediumCut2018 ;
+    OfflineDeepCSVLooseCut  = OfflineDeepCSVLooseCut2018 ;
+    OnlineCSVCut            = OnlineCSVCut2018;
+    OnlineDeepCSVCut        = OnlineDeepCSVCut2018;
+  }
+
 
 
   //  if(histogramming >= 4) allEvents     = new eventHists("allEvents",     fs);
@@ -98,21 +181,28 @@ void BTagAnalysis::monitor(long int e){
   //Monitor progress
   percent        = (e+1)*100/nEvents;
   duration       = ( std::clock() - start ) / (double) CLOCKS_PER_SEC;
-  eventRate      = (e+1)/duration;
-  timeRemaining  = (nEvents-e)/eventRate;
+  eventRateAVE      = (e+1)/duration;
+  timeRemaining  = (nEvents-e)/eventRateAVE;
   minutes = static_cast<int>(timeRemaining/60);
   seconds = static_cast<int>(timeRemaining - minutes*60);
   getrusage(who, &usage);
   usageMB = usage.ru_maxrss/1024;
+  
+  
+  timeStep = (std::clock() - lastTime) / (double) CLOCKS_PER_SEC;
+  eventStep = e - lastEvent;
+  eventRate = eventStep/timeStep;
   //print status and flush stdout so that status bar only uses one line
   if(isMC){
-    fprintf(stdout, "\rProcessed: %8li of %li ( %2li%% | %.0f events/s | done in %02i:%02i | memory usage: %li MB)       ", 
-	    e+1, nEvents, percent,   eventRate,    minutes, seconds,                usageMB);
+    fprintf(stdout, "\rProcessed: %8li of %li ( %2li%% | %.0f events/s AVE | %.0f events/s  | done in %02i:%02i | memory usage: %li MB)       ", 
+	    e+1, nEvents, percent,   eventRateAVE,    eventRate, minutes, seconds,                usageMB);
   }else{
-    fprintf(stdout, "\rProcessed: %8li of %li ( %2li%% | %.0f events/s | done in %02i:%02i | memory usage: %li MB | LumiBlocks %i  )       ", 
-	    e+1, nEvents, percent,   eventRate,    minutes, seconds,                usageMB,            nls );    
+    fprintf(stdout, "\rProcessed: %8li of %li ( %2li%% | %.0f events/s AVE | %.0f events/s | done in %02i:%02i | memory usage: %li MB | LumiBlocks %i  )       ", 
+	    e+1, nEvents, percent,   eventRateAVE,    eventRate, minutes, seconds,                usageMB,            nls );    
   }
   fflush(stdout);
+  lastTime = std::clock();
+  lastEvent = e+1;
 }
 
 int BTagAnalysis::eventLoop(int maxEvents){
@@ -122,6 +212,8 @@ int BTagAnalysis::eventLoop(int maxEvents){
   std::cout << "\nProcess " << nEvents << " of " << treeEvents << " events.\n";
 
   start = std::clock();//2546000 //2546043
+  lastTime = std::clock();
+  lastEvent = 0;
   for(long int e = 0; e < nEvents; e++){
 
     event->update(e);    
@@ -129,6 +221,7 @@ int BTagAnalysis::eventLoop(int maxEvents){
     if(debug) event->dump();
 
     //periodically update status
+    //if( (e+1)%1 == 0 || e+1==nEvents || debug) 
     if( (e+1)%10000 == 0 || e+1==nEvents || debug) 
       monitor(e);
 
@@ -162,6 +255,66 @@ int BTagAnalysis::processEvent(){
 
   cutflow->Fill("foundMatch", weight);
 
+  hAllMuons->nMuons->Fill(event->muons.size());
+  for(auto muon: event->muons)
+    hAllMuons->Fill(muon,weight);
+
+  hAllElecs->nElecs->Fill(event->elecs.size());
+  for(auto elec: event->elecs)
+    hAllElecs->Fill(elec,weight);
+
+  if(event->muons.size() == 1)
+    cutflow->Fill("passMuonCut", weight);
+
+  if(event->elecs.size() == 1)
+    cutflow->Fill("passElecCut", weight);
+
+  if(event->muons.size() != 1){
+    if(debug) std::cout << "Fail Muon Cut" << std::endl;
+    return 0;
+  }
+
+  if(event->elecs.size() != 1){
+    if(debug) std::cout << "Fail Elec Cut" << std::endl;
+    return 0;
+  }
+  cutflow->Fill("passLeptonCut", weight);
+
+  //
+  //  Offline BTags
+  //
+  unsigned int nOffJetsForCut = 0;
+  unsigned int nOffJetsTaggedForCut = 0;
+  float totalsSFWeight = 1.0;
+  for(const nTupleAnalysis::jetPtr& offJet : event->offJets){
+    if(fabs(offJet->eta) > 2.4) continue;
+    if(offJet->pt       < 35)   continue;
+
+    if(nTupleAnalysis::failOverlap(offJet->p,event->elecs,0.4)) continue;
+    if(nTupleAnalysis::failOverlap(offJet->p,event->muons,0.4)) continue;
+    
+    ++nOffJetsForCut;
+    if(offJet->DeepCSV > OfflineDeepCSVTightCut) ++nOffJetsTaggedForCut;
+    
+    //if(isMC)
+    //totalsSFWeight *= offJet.m_SF;
+  }
+
+  if(nOffJetsForCut < 2      ){
+    if(debug) std::cout << "Fail NJet Cut" << std::endl;
+    return 0;
+  }
+  cutflow->Fill("passNJetCut", weight);
+
+  if(nOffJetsTaggedForCut < 1) {
+    if(debug) std::cout << "Fail NBJet Cut" << std::endl;
+    return 0;
+  }
+  cutflow->Fill("passNBJetCut", weight);
+  //if(isMC)
+  //eventWeight*= totalsSFWeight;
+
+
   hMuons->nMuons->Fill(event->muons.size());
   for(auto muon: event->muons)
     hMuons->Fill(muon,weight);
@@ -171,12 +324,6 @@ int BTagAnalysis::processEvent(){
     hElecs->Fill(elec,weight);
 
 
-  if((event->muons.size()+event->elecs.size()) < 2)  {
-    if(debug) std::cout << "Fail Lepton Cut" << std::endl;
-    return 0;
-  }
-  cutflow->Fill("passLeptonCut", weight);
-
   //
   // Fill All events
   //
@@ -185,22 +332,70 @@ int BTagAnalysis::processEvent(){
   //
   //
   //
-  unsigned int nOffJetsPreOLap  = 0;
-  unsigned int nOffJets         = 0;
-  unsigned int nOffJets_matched = 0;
+  unsigned int nOffJetsPreOLap      = 0;
+  unsigned int nOffJets             = 0;
+  unsigned int nOffJets_matched     = 0;
+  unsigned int nOffJets_matchedCalo = 0;
 
   for(const nTupleAnalysis::jetPtr& offJet : event->offJets){
+    cutflowJets->Fill("all", weight);    
 
     if(fabs(offJet->eta) > 2.4) continue;
+    cutflowJets->Fill("eta", weight);    
+
     if(offJet->pt       < 35)   continue;
+    cutflowJets->Fill("pt", weight);    
 
     ++nOffJetsPreOLap;
     hOffJetsPreOLap->Fill(offJet, weight);
 
 
-    if(nTupleAnalysis::failOverlap(offJet->p,event->elecs,0.4)) continue;
     if(nTupleAnalysis::failOverlap(offJet->p,event->muons,0.4)) continue;
+    cutflowJets->Fill("muonOlap", weight);    
 
+    if(nTupleAnalysis::failOverlap(offJet->p,event->elecs,0.4)) continue;
+    cutflowJets->Fill("elecOlap", weight);    
+
+
+
+    //
+    // Check if jet is a Probe
+    //
+    unsigned int nOtherTags = 0;
+    //const JetData* tagJet = nullptr;
+    for(const nTupleAnalysis::jetPtr& offJetOther : event->offJets){
+      if(offJetOther == offJet) continue;
+      if(offJetOther->DeepCSV       < OfflineDeepCSVTightCut)   continue;	
+
+      if(offJetOther->pt       < 34)   continue;	
+      if(fabs(offJetOther->eta) > 2.4) continue;
+      if(nTupleAnalysis::failOverlap(offJetOther->p,event->elecs,0.4)) continue;
+      if(nTupleAnalysis::failOverlap(offJetOther->p,event->muons,0.4)) continue;
+
+      ++nOtherTags;
+      //tagJet = &offJetOther;
+    }
+    
+    // Require that there only be one other probe
+    //    Note: this will suppress LF
+    if(nOtherTags != 1) continue;
+    cutflowJets->Fill("isProbe", weight);    
+
+    //
+    //  Offline Jets
+    //
+    ++nOffJets;
+    hOffJets->Fill(offJet,weight);
+
+    if(offJet->DeepCSV > 1)
+      std::cout << "Error " << "Offline" << " DeepCSV is " << offJet->DeepCSV << std::endl; 
+			       
+    if(offJet->DeepCSVb > 1)   
+      std::cout << "Error " << "Offline" << " DeepCSVb is " << offJet->DeepCSVb << std::endl; 
+			       
+    if(offJet->DeepCSVbb > 1)  
+      std::cout << "Error " << "Offline" << " DeepCSVbb is " << offJet->DeepCSVbb << std::endl; 
+        
     // Match offline to online
     float dR = 1e6;
     nTupleAnalysis::jetPtr matchedJet = nullptr;
@@ -213,252 +408,43 @@ int BTagAnalysis::processEvent(){
       }
     }
 
+    // 
+    //  Have PF Match
+    //
     if( dR < 0.4){
-      matchedJet->matchedJet = offJet;
-      matchedJet->match_dR   = dR;
-      offJet->matchedJet     = matchedJet;
-      offJet->match_dR       = dR;
-    }
-
-    // match tracks if we matched jets
-    const nTupleAnalysis::jetPtr offJetMatchedJet = offJet->matchedJet.lock();
-    if(offJetMatchedJet){
-
-      //
-      //  Off tracks
-      //
-      unsigned int nOffTracks = 0;
-      unsigned int nOffTracks_matched = 0;
-      unsigned int nOffTracks_noV0 = 0;
-      unsigned int nOffTracks_matched_noV0 = 0;
-
-      for(const nTupleAnalysis::trackPtr& offTrack: offJet->tracks){
-	
-	//
-	//  track mass calculation
-	//
-	for(const nTupleAnalysis::trackPtr& offTrack_pair: offJet->tracks){
-	  if(offTrack == offTrack_pair) continue;
-	  float thisMass = (offTrack->p + offTrack_pair->p).M();
-	  
-	  hmttOff->Fill(thisMass , weight);
-	  if(offTrack->isfromV0)
-	    hmttOff_isFromV0->Fill(thisMass , weight);
-	  
-	}
-
-	//need to check that the track (with matching resolution cone r=0.01) is in region where R=0.3 circles inside the two jets overlap!
-	//if offTrack.dR > 0.29 - offJet.match_dR: continue
-	if(offTrack->dR                              > 0.29) continue; // offTrack is not in cone of offJet
-	if(offTrack->p.DeltaR(offJetMatchedJet->p) > 0.29) continue; // offTrack is not in cone of pfJet
-	
-	
-	hOffTracks->Fill(offTrack, weight);
-	++nOffTracks;
-	if(!offTrack->isfromV0){
-	  hOffTracks_noV0->Fill(offTrack, weight);	  
-	  ++nOffTracks_noV0;
-	}
-
-	float dR = 1e6;
-	float dR2 = 1e6;
-	float dR_noV0 = 1e6;
-	nTupleAnalysis::trackPtr matchedTrack  = nullptr;
-	nTupleAnalysis::trackPtr secondClosest = nullptr;
-
-	for(const nTupleAnalysis::trackPtr& pfTrack: offJetMatchedJet->tracks){
-	  //need to check that the track (with matching resolution cone r=0.01) is in region where R=0.3 circles inside the two jets overlap!
-	  if(pfTrack->dR                  > 0.29) continue; // pfTrack is not in cone of pfJet
-	  if(pfTrack->p.DeltaR(offJet->p) > 0.29) continue; // pfTrack is not in cone of offJet
-
-	  float this_dR = offTrack->p.DeltaR(pfTrack->p);
-	  if(this_dR > dR && this_dR < dR2){
-	    dR2 = this_dR;
-	    secondClosest = pfTrack;
-	  }
-
-	  if(this_dR < dR){
-	    dR2 = dR;
-	    secondClosest = matchedTrack;
-	    
-	    dR  = this_dR;
-	    matchedTrack = pfTrack;
-	  }
-	  
-	  if(!pfTrack->isfromV0 && this_dR < dR_noV0){
-	    dR_noV0 = this_dR;
-	  }
-	  
-	}// matched pf tracks
-	
-	if( dR > 0.01){
-	  //if dR > 1e5:
-	  hOffTracks_unmatched->Fill(offTrack, weight);
-	  continue;
-	}
-	
-	if(!offTrack->isfromV0 && (dR_noV0 < 0.01)){
-	  hOffTracks_matched_noV0->Fill(offTrack, weight);
-	  ++nOffTracks_matched_noV0;
-	}
-
-	++nOffTracks_matched;
-	matchedTrack->matchedTrack = offTrack;
-	offTrack->matchedTrack     = matchedTrack;
-	offTrack->secondClosest    = secondClosest;
-	offTrack->nMatches              += 1;
-	matchedTrack->nMatches += 1;
-	hOffTracks_matched    ->Fill(offTrack, weight);
-	const nTupleAnalysis::trackPtr offTrackMatchedTrack = offTrack->matchedTrack.lock();
-	hPfTracks_matched ->Fill(offTrackMatchedTrack,weight);
-      }//off Tracks
       
-      hOffTracks             ->nTracks->Fill(nOffTracks, weight);
-      hOffTracks_matched     ->nTracks->Fill(nOffTracks_matched, weight);
-      hOffTracks_noV0        ->nTracks->Fill(nOffTracks_noV0, weight);
-      hOffTracks_matched_noV0->nTracks->Fill(nOffTracks_matched_noV0, weight);
-
-
-      //
-      //  Off BTags
-      //
-      unsigned int nTrkTags = 0;
-      unsigned int nTrkTags_matched = 0;
-      unsigned int nTrkTags_noV0 = 0;
-      unsigned int nTrkTags_matched_noV0 = 0;
-
-      for(const nTupleAnalysis::trkTagVarPtr& offTrkTag: offJet->trkTagVars){
-	//need to check that the track (with matching resolution cone r=0.01) is in region where R=0.3 circles inside the two jets overlap!
-	//if offTrack.dR > 0.29 - offJet.match_dR: continue
-	if(offTrkTag->trackDeltaR                              > 0.29) continue; // offTrack is not in cone of offJet
-	if(offTrkTag->p.DeltaR(offJetMatchedJet->p) > 0.29) continue; // offTrack is not in cone of pfJet
-
-
-	hOffBTags->FillTrkTagVarHists(offTrkTag, weight);
-	++nTrkTags;
-
-	if(!offTrkTag->matchIsFromV0){
-	  hOffBTags_noV0->FillTrkTagVarHists(offTrkTag, weight);	  
-	  ++nTrkTags_noV0;
-	}
-
-	float dR = 1e6;
-	float dR_noV0 = 1e6;
-	nTupleAnalysis::trkTagVarPtr matchedTrkTag  = nullptr;
-	for(const nTupleAnalysis::trkTagVarPtr& pfTrkTag: offJetMatchedJet->trkTagVars){
-	  if(pfTrkTag->trackDeltaR                  > 0.29) continue; // pfTrack is not in cone of pfJet
-	  if(pfTrkTag->p.DeltaR(offJet->p) > 0.29) continue; // pfTrack is not in cone of offJet
-
-	  float this_dR = offTrkTag->p.DeltaR(pfTrkTag->p);
-	  if(this_dR < dR){
-	    dR  = this_dR;
-	    matchedTrkTag = pfTrkTag;
-	  }
-
-	  if(!pfTrkTag->matchIsFromV0 && this_dR < dR_noV0){
-	    dR_noV0 = this_dR;
-	  }
-
-	}
-	
-
-	if( dR > 0.01){
-	  //if dR > 1e5:
-	  //hOffBTags_unmatched->Fill(offTrack, weight);
-	  continue;
-	}
-
-	if(!offTrkTag->matchIsFromV0 && (dR_noV0 < 0.01)){
-	  hOffBTags_matched_noV0->FillTrkTagVarHists(offTrkTag, weight);
-	  ++nTrkTags_matched_noV0;
-	}
-
-	++nTrkTags_matched;
-	matchedTrkTag->matchedTrkTagVar = offTrkTag;
-	offTrkTag->matchedTrkTagVar     = matchedTrkTag;
-	hOffBTags_matched    ->FillTrkTagVarHists(offTrkTag, weight);
-	//const nTupleAnalysis::trackPtr offTrackMatchedTrkTag = offTrkTag->matchedTrkTagVar.lock();
-	//hPfTracks_matched ->FillTrkTagVarHists(offTrackMatchedTrkTag,weight);
-
-
-      }//OffTrkTag
-
-      hOffBTags             ->trkTag_nTracks->Fill(nTrkTags, weight);
-      hOffBTags_matched     ->trkTag_nTracks->Fill(nTrkTags_matched, weight);
-      hOffBTags_noV0        ->trkTag_nTracks->Fill(nTrkTags_noV0, weight);
-      hOffBTags_matched_noV0->trkTag_nTracks->Fill(nTrkTags_matched_noV0, weight);
-
-      //
-      // PF Tracks
-      //
-      unsigned int nPfTracks = 0;
-      unsigned int nPfTracks_matched = 0;
-      unsigned int nPfTracks_noV0 = 0;
-      for(const nTupleAnalysis::trackPtr& pfTrack: offJetMatchedJet->tracks){
-
-	//
-	//  track mass calculation
-	//
-	for(const nTupleAnalysis::trackPtr& pfTrack_pair: offJetMatchedJet->tracks){
-	  if(pfTrack == pfTrack_pair) continue;
-	  float thisMass = (pfTrack->p + pfTrack_pair->p).M();
-	  
-	  hmttPf->Fill(thisMass , weight);
-	  if(pfTrack->isfromV0)
-	    hmttPf_isFromV0->Fill(thisMass , weight);
-	  
-	}
-
-	//need to check that the track (with matching resolution cone r=0.01) is in region where R=0.3 circles inside the two jets overlap!
-	if(pfTrack->dR                  > 0.29) continue; // pfTrack is not in cone of pfJet
-	if(pfTrack->p.DeltaR(offJet->p) > 0.29) continue; // pfTrack is not in cone of offJet
-	
-	hPfTracks->Fill(pfTrack, weight); //all pftracks in matched jets
-	hPfTracks->FillMatchStats(pfTrack, weight); //check how often we match pfTracks to more than one offTrack
-	++nPfTracks;
-
-	if(!pfTrack->isfromV0){
-	  hPfTracks_noV0->Fill(pfTrack, weight); //all pftracks in matched jets
-	  ++nPfTracks_noV0;
-	}
-
-	if(!pfTrack->nMatches){
-	  hPfTracks_unmatched->Fill(pfTrack, weight); //all unmatched pftracks
-	  hPfTracks_unmatched->FillMatchStats(pfTrack, weight);
-	}else{
-	  hPfTracks_matched->FillMatchStats(pfTrack, weight);
-	  ++nPfTracks_matched;
-	}
-      }// pfTracks
-
-      hPfTracks              ->nTracks->Fill(nPfTracks, weight);
-      hPfTracks_matched      ->nTracks->Fill(nPfTracks_matched, weight);
-      hPfTracks_noV0         ->nTracks->Fill(nPfTracks_noV0, weight);
-      //hOffTracks_matched_noV0->nTracks->Fill(nOffTracks_matched_noV0, weight);
-
-
-      //
-      //  PF BTags
-      //
-      unsigned int nPfTrkTags = 0;
-
-      for(const nTupleAnalysis::trkTagVarPtr& pfTrkTag: offJetMatchedJet->trkTagVars){
-	//need to check that the track (with matching resolution cone r=0.01) is in region where R=0.3 circles inside the two jets overlap!
-	//if offTrack.dR > 0.29 - offJet.match_dR: continue
-	if(pfTrkTag->trackDeltaR                              > 0.29) continue; // offTrack is not in cone of offJet
-	if(pfTrkTag->p.DeltaR(offJet->p) > 0.29) continue; // offTrack is not in cone of pfJet
-
-
-	hPfBTags->FillTrkTagVarHists(pfTrkTag, weight);
-	++nPfTrkTags;
-
-      }//OffTrkTag
-
-      hPfBTags             ->trkTag_nTracks->Fill(nPfTrkTags, weight);
-
-
+      cutflowJets->Fill("hasHLTMatchPF", weight);    
+      
+      PFJetAnalysis(offJet,matchedJet,weight);
+      
+      ++nOffJets_matched;
 
     }//offJet has match
+
+
+    //
+    //  Calo Jets
+    //
+    float dRCalo = 1e6;
+    nTupleAnalysis::jetPtr matchedCaloJet = nullptr;
+
+    for(const nTupleAnalysis::jetPtr& caloJet : event->caloJets){
+      float this_dR = caloJet->p.DeltaR(offJet->p);
+      if (this_dR < dRCalo){
+    	dRCalo = this_dR;
+    	matchedCaloJet = caloJet;
+      }
+    }
+    
+    if( dRCalo < 0.4){
+
+      cutflowJets->Fill("hasHLTMatchCalo", weight);    
+
+      CaloJetAnalysis(offJet,matchedCaloJet,weight);
+      
+      ++nOffJets_matchedCalo;
+    }
+
 
     // Fill offJetHists
     // offJets_ROC
@@ -466,28 +452,8 @@ int BTagAnalysis::processEvent(){
     //  wp70 DeepCSV > 0.56 (actual efficiency = 0.717503578586)
     //  wp80 DeepCSV > 0.36 (actual efficiency = 0.808474091039)
     //  wp90 DeepCSV > 0.12 (actual efficiency = 0.912533638706)
-    ++nOffJets;
-    hOffJets->Fill(offJet,weight);
-    if(offJet->hadronFlavour == 5){
-      hOffJets_B->Fill(offJet,weight);
-    }else if(offJet->hadronFlavour == 0){
-      hOffJets_L->Fill(offJet,weight);
-    }
       
-    if(offJetMatchedJet){
-      ++nOffJets_matched;
-      hOffJets_matched->Fill(offJet,weight);
-      hOffJets_matchedJet->Fill(offJetMatchedJet,weight);
-
-      ///	if( offJet.m_deepcsv > 0.56) offJetHists_offline70_matched.Fill(offJet);
-
-      if(offJet->hadronFlavour == 5){
-	hOffJets_matched_B->Fill(offJet, weight);
-	hOffJets_matchedJet_B->Fill(offJetMatchedJet, weight);
-      }else if(offJet->hadronFlavour == 0){
-	hOffJets_matched_L->Fill(offJet, weight);
-	hOffJets_matchedJet_L->Fill(offJetMatchedJet, weight);
-      }
+    //if(offJetMatchedJet){
 
       ///        // pfJets_matched_ROC
       ///	//  wp60 DeepCSV > 0.64 (actual efficiency = 0.610276798066)
@@ -541,16 +507,8 @@ int BTagAnalysis::processEvent(){
       ///	    if(offJet.m_deepcsv > 0.56) offJetHists_offline70_L_matched_online90.Fill(offJet);
       ///	  }
       ///	}
-    }//m_matchedJet
+    //    }//m_matchedJet
 
-    // Match offline to online
-    for(const nTupleAnalysis::jetPtr& caloJet : event->caloJets){
-      float deltaR = caloJet->p.DeltaR(offJet->p);
-      if( deltaR < 0.4){
-	caloJet->matchedJet = offJet;
-	break;
-      }
-    }
 
   }//offJets
 
@@ -558,7 +516,9 @@ int BTagAnalysis::processEvent(){
   hOffJetsPreOLap    ->nJets->Fill(nOffJetsPreOLap ,weight);
   hOffJets           ->nJets->Fill(nOffJets        ,weight);
   hOffJets_matched   ->nJets->Fill(nOffJets_matched,weight);
-  hOffJets_matchedJet->nJets->Fill(nOffJets_matched,weight);
+
+  hOffJets_matchedCalo->nJets->Fill(nOffJets_matchedCalo,weight);
+  hOffJets_matchedCaloJet->nJets->Fill(nOffJets_matchedCalo,weight);
 
 
 
@@ -580,10 +540,12 @@ int BTagAnalysis::processEvent(){
     if(pfJetMatchedJet){
       hPfJets_matched->Fill(pfJet, weight);
   
-      if( pfJetMatchedJet->hadronFlavour == 5){
-        hPfJets_matched_B->Fill(pfJet, weight);
-      }else if( pfJetMatchedJet->hadronFlavour == 0){
-        hPfJets_matched_L->Fill(pfJet, weight);
+      if(isMC){
+	if( pfJetMatchedJet->hadronFlavour == 5){
+	  hPfJets_matched_B->Fill(pfJet, weight);
+	}else if( pfJetMatchedJet->hadronFlavour == 0){
+	  hPfJets_matched_L->Fill(pfJet, weight);
+	}
       }
     }
   }
@@ -600,6 +562,16 @@ int BTagAnalysis::processEvent(){
     if(nTupleAnalysis::failOverlap(caloJet->p,event->muons, 0.4)) continue;
   
     hCaloJets->Fill(caloJet, weight);
+
+    if(caloJet->DeepCSV > 1)
+      std::cout << "Error " << "Offline" << " DeepCSV is " << caloJet->DeepCSV << std::endl; 
+			       
+    if(caloJet->DeepCSVb > 1)   
+      std::cout << "Error " << "Offline" << " DeepCSVb is " << caloJet->DeepCSVb << std::endl; 
+			       
+    if(caloJet->DeepCSVbb > 1)  
+      std::cout << "Error " << "Offline" << " DeepCSVbb is " << caloJet->DeepCSVbb << std::endl; 
+
 
     const nTupleAnalysis::jetPtr caloJetMatchedJet = caloJet->matchedJet.lock();  
     if(caloJetMatchedJet){
@@ -668,3 +640,412 @@ BTagAnalysis::~BTagAnalysis(){
   std::cout << "BTagAnalysis::destroyed" << std::endl;
 } 
 
+
+void BTagAnalysis::PFJetAnalysis(const nTupleAnalysis::jetPtr& offJet,const nTupleAnalysis::jetPtr& hltJet, float weight){
+
+  //
+  // Jet info
+  //
+  hOffJets_matched->Fill(offJet,weight);
+  hOffJets_matchedJet->Fill(hltJet,weight);
+  
+  if(isMC){
+    if(offJet->hadronFlavour == 5){
+      hOffJets_matched_B->Fill(offJet, weight);
+      hOffJets_matchedJet_B->Fill(hltJet, weight);
+    }else if(offJet->hadronFlavour == 0){
+      hOffJets_matched_L->Fill(offJet, weight);
+      hOffJets_matchedJet_L->Fill(hltJet, weight);
+    }
+  }
+
+  //
+  //  Off tracks
+  //
+  unsigned int nOffTracks = 0;
+  unsigned int nOffTracks_matched = 0;
+  unsigned int nOffTracks_noV0 = 0;
+  unsigned int nOffTracks_matched_noV0 = 0;
+
+
+  for(const nTupleAnalysis::trackPtr& offTrack: offJet->tracks){
+	
+    //
+    //  track mass calculation
+    //
+    for(const nTupleAnalysis::trackPtr& offTrack_pair: offJet->tracks){
+      if(offTrack == offTrack_pair) continue;
+      float thisMass = (offTrack->p + offTrack_pair->p).M();
+	  
+      hmttOff->Fill(thisMass , weight);
+      if(offTrack->isfromV0)
+	hmttOff_isFromV0->Fill(thisMass , weight);
+	  
+    }
+
+    //need to check that the track (with matching resolution cone r=0.01) is in region where R=0.3 circles inside the two jets overlap!
+    //if offTrack.dR > 0.29 - offJet.match_dR: continue
+    if(offTrack->dR                              > 0.29) continue; // offTrack is not in cone of offJet
+    if(offTrack->p.DeltaR(hltJet->p) > 0.29) continue; // offTrack is not in cone of pfJet
+	
+	
+    hOffTracks->Fill(offTrack, weight);
+    ++nOffTracks;
+    if(!offTrack->isfromV0){
+      hOffTracks_noV0->Fill(offTrack, weight);	  
+      ++nOffTracks_noV0;
+    }
+
+    float dR = 1e6;
+    float dR2 = 1e6;
+    float dR_noV0 = 1e6;
+    nTupleAnalysis::trackPtr matchedTrack  = nullptr;
+    nTupleAnalysis::trackPtr secondClosest = nullptr;
+
+    for(const nTupleAnalysis::trackPtr& pfTrack: hltJet->tracks){
+      //need to check that the track (with matching resolution cone r=0.01) is in region where R=0.3 circles inside the two jets overlap!
+      if(pfTrack->dR                  > 0.29) continue; // pfTrack is not in cone of pfJet
+      if(pfTrack->p.DeltaR(offJet->p) > 0.29) continue; // pfTrack is not in cone of offJet
+
+      float this_dR = offTrack->p.DeltaR(pfTrack->p);
+      if(this_dR > dR && this_dR < dR2){
+	dR2 = this_dR;
+	secondClosest = pfTrack;
+      }
+
+      if(this_dR < dR){
+	dR2 = dR;
+	secondClosest = matchedTrack;
+	    
+	dR  = this_dR;
+	matchedTrack = pfTrack;
+      }
+	  
+      if(!pfTrack->isfromV0 && this_dR < dR_noV0){
+	dR_noV0 = this_dR;
+      }
+	  
+    }// matched pf tracks
+	
+    if( dR > 0.01){
+      //if dR > 1e5:
+      hOffTracks_unmatched->Fill(offTrack, weight);
+      continue;
+    }
+	
+    if(!offTrack->isfromV0 && (dR_noV0 < 0.01)){
+      hOffTracks_matched_noV0->Fill(offTrack, weight);
+      ++nOffTracks_matched_noV0;
+    }
+
+    ++nOffTracks_matched;
+    matchedTrack->matchedTrack = offTrack;
+    offTrack->matchedTrack     = matchedTrack;
+    offTrack->secondClosest    = secondClosest;
+    offTrack->nMatches              += 1;
+    matchedTrack->nMatches += 1;
+    hOffTracks_matched    ->Fill(offTrack, weight);
+    const nTupleAnalysis::trackPtr offTrackMatchedTrack = offTrack->matchedTrack.lock();
+    hPfTracks_matched ->Fill(offTrackMatchedTrack,weight);
+  }//off Tracks
+      
+  hOffTracks             ->nTracks->Fill(nOffTracks, weight);
+  hOffTracks_matched     ->nTracks->Fill(nOffTracks_matched, weight);
+  hOffTracks_noV0        ->nTracks->Fill(nOffTracks_noV0, weight);
+  hOffTracks_matched_noV0->nTracks->Fill(nOffTracks_matched_noV0, weight);
+
+
+  //
+  //  Off BTags
+  //
+  unsigned int nTrkTags = 0;
+  unsigned int nTrkTags_matched = 0;
+  unsigned int nTrkTags_noV0 = 0;
+  unsigned int nTrkTags_matched_noV0 = 0;
+
+  for(const nTupleAnalysis::trkTagVarPtr& offTrkTag: offJet->trkTagVars){
+    //need to check that the track (with matching resolution cone r=0.01) is in region where R=0.3 circles inside the two jets overlap!
+    //if offTrack.dR > 0.29 - offJet.match_dR: continue
+    if(offTrkTag->trackDeltaR                              > 0.29) continue; // offTrack is not in cone of offJet
+    if(offTrkTag->p.DeltaR(hltJet->p) > 0.29) continue; // offTrack is not in cone of pfJet
+
+
+    hOffBTags->FillTrkTagVarHists(offTrkTag, weight);
+    ++nTrkTags;
+
+    if(!offTrkTag->matchIsFromV0){
+      hOffBTags_noV0->FillTrkTagVarHists(offTrkTag, weight);	  
+      ++nTrkTags_noV0;
+    }
+
+    float dR = 1e6;
+    float dR_noV0 = 1e6;
+    nTupleAnalysis::trkTagVarPtr matchedTrkTag  = nullptr;
+    for(const nTupleAnalysis::trkTagVarPtr& pfTrkTag: hltJet->trkTagVars){
+      if(pfTrkTag->trackDeltaR                  > 0.29) continue; // pfTrack is not in cone of pfJet
+      if(pfTrkTag->p.DeltaR(offJet->p) > 0.29) continue; // pfTrack is not in cone of offJet
+
+      float this_dR = offTrkTag->p.DeltaR(pfTrkTag->p);
+      if(this_dR < dR){
+	dR  = this_dR;
+	matchedTrkTag = pfTrkTag;
+      }
+
+      if(!pfTrkTag->matchIsFromV0 && this_dR < dR_noV0){
+	dR_noV0 = this_dR;
+      }
+
+    }
+	
+
+    if( dR > 0.01){
+      //if dR > 1e5:
+      //hOffBTags_unmatched->Fill(offTrack, weight);
+      continue;
+    }
+
+    if(!offTrkTag->matchIsFromV0 && (dR_noV0 < 0.01)){
+      hOffBTags_matched_noV0->FillTrkTagVarHists(offTrkTag, weight);
+      ++nTrkTags_matched_noV0;
+    }
+
+    ++nTrkTags_matched;
+    matchedTrkTag->matchedTrkTagVar = offTrkTag;
+    offTrkTag->matchedTrkTagVar     = matchedTrkTag;
+    hOffBTags_matched    ->FillTrkTagVarHists(offTrkTag, weight);
+    //const nTupleAnalysis::trackPtr offTrackMatchedTrkTag = offTrkTag->matchedTrkTagVar.lock();
+    //hPfTracks_matched ->FillTrkTagVarHists(offTrackMatchedTrkTag,weight);
+
+
+  }//OffTrkTag
+
+  hOffBTags             ->trkTag_nTracks->Fill(nTrkTags, weight);
+  hOffBTags_matched     ->trkTag_nTracks->Fill(nTrkTags_matched, weight);
+  hOffBTags_noV0        ->trkTag_nTracks->Fill(nTrkTags_noV0, weight);
+  hOffBTags_matched_noV0->trkTag_nTracks->Fill(nTrkTags_matched_noV0, weight);
+
+
+  //
+  // PF Tracks
+  //
+  unsigned int nPfTracks = 0;
+  unsigned int nPfTracks_matched = 0;
+  unsigned int nPfTracks_noV0 = 0;
+  for(const nTupleAnalysis::trackPtr& pfTrack: hltJet->tracks){
+
+    //
+    //  track mass calculation
+    //
+    for(const nTupleAnalysis::trackPtr& pfTrack_pair: hltJet->tracks){
+      if(pfTrack == pfTrack_pair) continue;
+      float thisMass = (pfTrack->p + pfTrack_pair->p).M();
+	  
+      hmttPf->Fill(thisMass , weight);
+      if(pfTrack->isfromV0)
+	hmttPf_isFromV0->Fill(thisMass , weight);
+	  
+    }
+
+    //need to check that the track (with matching resolution cone r=0.01) is in region where R=0.3 circles inside the two jets overlap!
+    if(pfTrack->dR                  > 0.29) continue; // pfTrack is not in cone of pfJet
+    if(pfTrack->p.DeltaR(offJet->p) > 0.29) continue; // pfTrack is not in cone of offJet
+	
+    hPfTracks->Fill(pfTrack, weight); //all pftracks in matched jets
+    hPfTracks->FillMatchStats(pfTrack, weight); //check how often we match pfTracks to more than one offTrack
+    ++nPfTracks;
+
+    if(!pfTrack->isfromV0){
+      hPfTracks_noV0->Fill(pfTrack, weight); //all pftracks in matched jets
+      ++nPfTracks_noV0;
+    }
+
+    if(!pfTrack->nMatches){
+      hPfTracks_unmatched->Fill(pfTrack, weight); //all unmatched pftracks
+      hPfTracks_unmatched->FillMatchStats(pfTrack, weight);
+    }else{
+      hPfTracks_matched->FillMatchStats(pfTrack, weight);
+      ++nPfTracks_matched;
+    }
+  }// pfTracks
+
+  hPfTracks              ->nTracks->Fill(nPfTracks, weight);
+  hPfTracks_matched      ->nTracks->Fill(nPfTracks_matched, weight);
+  hPfTracks_noV0         ->nTracks->Fill(nPfTracks_noV0, weight);
+  //hOffTracks_matched_noV0->nTracks->Fill(nOffTracks_matched_noV0, weight);
+
+
+  //
+  //  PF BTags
+  //
+  unsigned int nPfTrkTags = 0;
+
+  for(const nTupleAnalysis::trkTagVarPtr& pfTrkTag: hltJet->trkTagVars){
+    //need to check that the track (with matching resolution cone r=0.01) is in region where R=0.3 circles inside the two jets overlap!
+    //if offTrack.dR > 0.29 - offJet.match_dR: continue
+    if(pfTrkTag->trackDeltaR                              > 0.29) continue; // offTrack is not in cone of offJet
+    if(pfTrkTag->p.DeltaR(offJet->p) > 0.29) continue; // offTrack is not in cone of pfJet
+
+
+    hPfBTags->FillTrkTagVarHists(pfTrkTag, weight);
+    ++nPfTrkTags;
+
+  }//OffTrkTag
+
+  hPfBTags             ->trkTag_nTracks->Fill(nPfTrkTags, weight);
+
+
+  return;
+}
+
+
+void BTagAnalysis::CaloJetAnalysis(const nTupleAnalysis::jetPtr& offJet,const nTupleAnalysis::jetPtr& hltJet, float weight){
+
+  //
+  // Jet info
+  //
+  hOffJets_matchedCalo   ->Fill(offJet,weight);
+  hOffJets_matchedCaloJet->Fill(hltJet,weight);
+  
+  if(isMC){
+    if(offJet->hadronFlavour == 5){
+      hOffJets_matchedCalo_B->Fill(offJet, weight);
+      hOffJets_matchedCaloJet_B->Fill(hltJet, weight);
+    }else if(offJet->hadronFlavour == 0){
+      hOffJets_matchedCalo_L->Fill(offJet, weight);
+      hOffJets_matchedCaloJet_L->Fill(hltJet, weight);
+    }
+  }
+
+  //
+  //  Off tracks
+  //
+  unsigned int nOffTracks = 0;
+  unsigned int nOffTracks_matched = 0;
+  unsigned int nOffTracks_noV0 = 0;
+  unsigned int nOffTracks_matched_noV0 = 0;
+
+
+  for(const nTupleAnalysis::trackPtr& offTrack: offJet->tracks){
+
+    //need to check that the track (with matching resolution cone r=0.01) is in region where R=0.3 circles inside the two jets overlap!
+    //if offTrack.dR > 0.29 - offJet.match_dR: continue
+    if(offTrack->dR                  > 0.29) continue; // offTrack is not in cone of offJet
+    if(offTrack->p.DeltaR(hltJet->p) > 0.29) continue; // offTrack is not in cone of caloJet
+	
+	
+    hOffTracksCalo->Fill(offTrack, weight);
+    ++nOffTracks;
+    if(!offTrack->isfromV0){
+      hOffTracksCalo_noV0->Fill(offTrack, weight);	  
+      ++nOffTracks_noV0;
+    }
+
+    float dR = 1e6;
+    float dR2 = 1e6;
+    float dR_noV0 = 1e6;
+    nTupleAnalysis::trackPtr matchedTrack  = nullptr;
+    nTupleAnalysis::trackPtr secondClosest = nullptr;
+
+    for(const nTupleAnalysis::trackPtr& caloTrack: hltJet->tracks){
+      //need to check that the track (with matching resolution cone r=0.01) is in region where R=0.3 circles inside the two jets overlap!
+      if(caloTrack->dR                  > 0.29) continue; // caloTrack is not in cone of caloJet
+      if(caloTrack->p.DeltaR(offJet->p) > 0.29) continue; // caloTrack is not in cone of offJet
+
+      float this_dR = offTrack->p.DeltaR(caloTrack->p);
+      if(this_dR > dR && this_dR < dR2){
+	dR2 = this_dR;
+	secondClosest = caloTrack;
+      }
+
+      if(this_dR < dR){
+	dR2 = dR;
+	secondClosest = matchedTrack;
+	    
+	dR  = this_dR;
+	matchedTrack = caloTrack;
+      }
+	  
+      if(!caloTrack->isfromV0 && this_dR < dR_noV0){
+	dR_noV0 = this_dR;
+      }
+	  
+    }// matched calo tracks
+	
+    if( dR > 0.01){
+      //if dR > 1e5:
+      hOffTracksCalo_unmatched->Fill(offTrack, weight);
+      continue;
+    }
+	
+    if(!offTrack->isfromV0 && (dR_noV0 < 0.01)){
+      hOffTracksCalo_matched_noV0->Fill(offTrack, weight);
+      ++nOffTracks_matched_noV0;
+    }
+
+    ++nOffTracks_matched;
+    matchedTrack->matchedTrack = offTrack;
+    offTrack->matchedTrack     = matchedTrack;
+    offTrack->secondClosest    = secondClosest;
+    offTrack->nMatches              += 1;
+    matchedTrack->nMatches += 1;
+    hOffTracksCalo_matched    ->Fill(offTrack, weight);
+    const nTupleAnalysis::trackPtr offTrackMatchedTrack = offTrack->matchedTrack.lock();
+    hCaloTracks_matched ->Fill(offTrackMatchedTrack,weight);
+  }//off Tracks
+      
+  hOffTracksCalo             ->nTracks->Fill(nOffTracks, weight);
+  hOffTracksCalo_matched     ->nTracks->Fill(nOffTracks_matched, weight);
+  hOffTracksCalo_noV0        ->nTracks->Fill(nOffTracks_noV0, weight);
+  hOffTracksCalo_matched_noV0->nTracks->Fill(nOffTracks_matched_noV0, weight);
+
+
+  //
+  // Calo Tracks
+  //
+  unsigned int nCaloTracks = 0;
+  unsigned int nCaloTracks_matched = 0;
+  unsigned int nCaloTracks_noV0 = 0;
+  for(const nTupleAnalysis::trackPtr& caloTrack: hltJet->tracks){
+
+    //
+    //  track mass calculation
+    //
+    for(const nTupleAnalysis::trackPtr& caloTrack_pair: hltJet->tracks){
+      if(caloTrack == caloTrack_pair) continue;
+      float thisMass = (caloTrack->p + caloTrack_pair->p).M();
+	  
+      hmttCalo->Fill(thisMass , weight);
+      if(caloTrack->isfromV0)
+	hmttCalo_isFromV0->Fill(thisMass , weight);
+	  
+    }
+
+    //need to check that the track (with matching resolution cone r=0.01) is in region where R=0.3 circles inside the two jets overlap!
+    if(caloTrack->dR                  > 0.29) continue; // caloTrack is not in cone of caloJet
+    if(caloTrack->p.DeltaR(offJet->p) > 0.29) continue; // caloTrack is not in cone of offJet
+	
+    hCaloTracks->Fill(caloTrack, weight); //all calotracks in matched jets
+    hCaloTracks->FillMatchStats(caloTrack, weight); //check how often we match caloTracks to more than one offTrack
+    ++nCaloTracks;
+
+    if(!caloTrack->isfromV0){
+      hCaloTracks_noV0->Fill(caloTrack, weight); //all calotracks in matched jets
+      ++nCaloTracks_noV0;
+    }
+
+    if(!caloTrack->nMatches){
+      hCaloTracks_unmatched->Fill(caloTrack, weight); //all unmatched pftracks
+      hCaloTracks_unmatched->FillMatchStats(caloTrack, weight);
+    }else{
+      hCaloTracks_matched->FillMatchStats(caloTrack, weight);
+      ++nCaloTracks_matched;
+    }
+  }// caloTracks
+
+  hCaloTracks              ->nTracks->Fill(nCaloTracks, weight);
+  hCaloTracks_matched      ->nTracks->Fill(nCaloTracks_matched, weight);
+  hCaloTracks_noV0         ->nTracks->Fill(nCaloTracks_noV0, weight);
+  //hOffTracks_matched_noV0->nTracks->Fill(nOffTracks_matched_noV0, weight);
+
+  return;
+}

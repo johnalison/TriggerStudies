@@ -39,20 +39,27 @@ namespace TriggerStudies {
     eventData* event;
 
     nTupleAnalysis::cutflowHists* cutflow;
+    nTupleAnalysis::cutflowHists* cutflowJets;
     nTupleAnalysis::muonHists* hMuons;
     nTupleAnalysis::elecHists* hElecs;
+    nTupleAnalysis::muonHists* hAllMuons;
+    nTupleAnalysis::elecHists* hAllElecs;
 
     nTupleAnalysis::jetHists* hOffJetsPreOLap;
     nTupleAnalysis::jetHists* hOffJets;
     nTupleAnalysis::jetHists* hOffJets_matched;
     nTupleAnalysis::jetHists* hOffJets_matchedJet;
+    nTupleAnalysis::jetHists* hOffJets_matchedCalo;
+    nTupleAnalysis::jetHists* hOffJets_matchedCaloJet;
 
-    nTupleAnalysis::jetHists*  hOffJets_L   ;
     nTupleAnalysis::jetHists*  hOffJets_matched_L   ;
     nTupleAnalysis::jetHists*  hOffJets_matchedJet_L;
-    nTupleAnalysis::jetHists*  hOffJets_B   ;
+    nTupleAnalysis::jetHists*  hOffJets_matchedCalo_L;
+    nTupleAnalysis::jetHists*  hOffJets_matchedCaloJet_L;
     nTupleAnalysis::jetHists*  hOffJets_matched_B   ;
     nTupleAnalysis::jetHists*  hOffJets_matchedJet_B;
+    nTupleAnalysis::jetHists*  hOffJets_matchedCalo_B;
+    nTupleAnalysis::jetHists*  hOffJets_matchedCaloJet_B;
 
 
     nTupleAnalysis::jetHists* hPfJets;
@@ -62,17 +69,34 @@ namespace TriggerStudies {
 
     nTupleAnalysis::jetHists* hCaloJets;
     nTupleAnalysis::jetHists* hCaloJets_matched;
+    nTupleAnalysis::jetHists* hCaloJets_matched_L;
+    nTupleAnalysis::jetHists* hCaloJets_matched_B;
 
     nTupleAnalysis::trackHists* hOffTracks;
     nTupleAnalysis::trackHists* hOffTracks_unmatched;
     nTupleAnalysis::trackHists* hOffTracks_matched;
+
+    nTupleAnalysis::trackHists* hOffTracksCalo;
+    nTupleAnalysis::trackHists* hOffTracksCalo_unmatched;
+    nTupleAnalysis::trackHists* hOffTracksCalo_matched;
+
+
     nTupleAnalysis::trackHists* hPfTracks;
     nTupleAnalysis::trackHists* hPfTracks_matched;
     nTupleAnalysis::trackHists* hPfTracks_unmatched;
     nTupleAnalysis::trackHists* hPfTracks_noV0;
 
+    nTupleAnalysis::trackHists* hCaloTracks;
+    nTupleAnalysis::trackHists* hCaloTracks_matched;
+    nTupleAnalysis::trackHists* hCaloTracks_unmatched;
+    nTupleAnalysis::trackHists* hCaloTracks_noV0;
+
+
     nTupleAnalysis::trackHists* hOffTracks_noV0;
     nTupleAnalysis::trackHists* hOffTracks_matched_noV0;
+
+    nTupleAnalysis::trackHists* hOffTracksCalo_noV0;
+    nTupleAnalysis::trackHists* hOffTracksCalo_matched_noV0;
 
     nTupleAnalysis::btaggingHists* hOffBTags;
     nTupleAnalysis::btaggingHists* hOffBTags_matched;
@@ -81,10 +105,19 @@ namespace TriggerStudies {
 
     nTupleAnalysis::btaggingHists* hPfBTags;
 
+    float OfflineDeepCSVTightCut  = -99;
+    float OfflineDeepCSVMediumCut = -99;
+    float OfflineDeepCSVLooseCut  = -99;
+    float OnlineCSVCut            = -99;
+    float OnlineDeepCSVCut        = -99;
+  
+
     TH1F*   hmttOff          ;
     TH1F*   hmttOff_isFromV0 ;
     TH1F*   hmttPf           ;
     TH1F*   hmttPf_isFromV0  ;
+    TH1F*   hmttCalo           ;
+    TH1F*   hmttCalo_isFromV0  ;
 
 
     //eventHists* allEvents   = NULL;
@@ -102,8 +135,13 @@ namespace TriggerStudies {
     //Monitoring Variables
     long int percent;
     std::clock_t start;
+    std::clock_t lastTime;
     double duration;
+    double timeStep;
+    double eventRateAVE;
     double eventRate;
+    long int    eventStep;
+    long int    lastEvent;
     double timeRemaining;
     int minutes;
     int seconds;
@@ -119,6 +157,9 @@ namespace TriggerStudies {
     std::map<edm::LuminosityBlockID, float> lumiData;
     void getLumiData(std::string);
     ~BTagAnalysis();
+
+    void PFJetAnalysis(const nTupleAnalysis::jetPtr& offJet,const nTupleAnalysis::jetPtr& hltJet, float weight);
+    void CaloJetAnalysis(const nTupleAnalysis::jetPtr& offJet,const nTupleAnalysis::jetPtr& hltJet, float weight);
 
   };
 

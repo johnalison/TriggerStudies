@@ -27,12 +27,12 @@ outputBase = o.outputBase + ("/" if o.outputBase[-1] != "/" else "") # make sure
 isData     = not o.isMC
 JSONfiles  = {'2015':'',
               '2016':'ZZ4b/lumiMasks/Cert_271036-284044_13TeV_PromptReco_Collisions16_JSON.txt', #Final, unlikely to change
-              '2017':'',
+              '2017':'ZZ4b/lumiMasks/Cert_294927-306462_13TeV_PromptReco_Collisions17_JSON.txt',
               '2018':'ZZ4b/lumiMasks/Cert_314472-325175_13TeV_PromptReco_Collisions18_JSON.txt'} #Not Final, should be updated at some point
 # Calculated lumi per lumiBlock from brilcalc. See README
 lumiData   = {'2015':'',
               '2016':'ZZ4b/lumiMasks/', 
-              '2017':'',
+              '2017':'ZZ4b/lumiMasks/brilcalc_2017_NoTrigger.csv',
               '2018':'ZZ4b/lumiMasks/brilcalc_2018_HLT_PFHT330PT30_QuadPFJet_75_60_45_40_TriplePFBTagDeepCSV_4p5.csv'} 
 
 # for MC we need to normalize the sample to the recommended cross section * BR times the target luminosity
