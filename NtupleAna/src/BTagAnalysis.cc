@@ -75,6 +75,8 @@ BTagAnalysis::BTagAnalysis(TChain* _eventsRAW, TChain* _eventsAOD, fwlite::TFile
 
   hAllMuons = new nTupleAnalysis::muonHists("AllMuons", fs, "All Muons");
   hAllElecs = new nTupleAnalysis::elecHists("AllElecs", fs, "All Elecs");
+  hSelMuons = new nTupleAnalysis::muonHists("SelMuons", fs, "Sel Muons");
+  hSelElecs = new nTupleAnalysis::elecHists("SelElecs", fs, "Sel Elecs");
   hMuons    = new nTupleAnalysis::muonHists("Muons", fs, "Muons");
   hElecs    = new nTupleAnalysis::elecHists("Elecs", fs, "Elecs");
 
@@ -255,27 +257,42 @@ int BTagAnalysis::processEvent(){
     return 0;
 
   cutflow->Fill("foundMatch", weight);
-
-  hAllMuons->nMuons->Fill(event->muons.size());
-  for(auto muon: event->muons)
+  
+  unsigned int nSelMuons = 0;
+  for(auto muon: event->muons){
     hAllMuons->Fill(muon,weight);
+    if(muon->tightId && muon->isolation_corrected < 0.2){
+      hSelMuons->Fill(muon,weight);
+      ++nSelMuons;
+    }
+  }
+  hAllMuons->nMuons->Fill(event->muons.size());
+  hSelMuons->nMuons->Fill(nSelMuons);
 
-  hAllElecs->nElecs->Fill(event->elecs.size());
-  for(auto elec: event->elecs)
+  
+  unsigned int nSelElecs = 0;
+  for(auto elec: event->elecs){
     hAllElecs->Fill(elec,weight);
+    if(elec->tightId && elec->isolation_corrected < 0.2){
+      hSelElecs->Fill(elec,weight);
+      ++nSelElecs;
+    }
+  }
+  hAllElecs->nElecs->Fill(event->elecs.size());
+  hSelElecs->nElecs->Fill(nSelElecs);
 
-  if(event->muons.size() == 1)
+  if(nSelMuons == 1)
     cutflow->Fill("passMuonCut", weight);
 
-  if(event->elecs.size() == 1)
+  if(nSelElecs == 1)
     cutflow->Fill("passElecCut", weight);
 
-  if(event->muons.size() != 1){
+  if(nSelMuons != 1){
     if(debug) std::cout << "Fail Muon Cut" << std::endl;
     return 0;
   }
 
-  if(event->elecs.size() != 1){
+  if(nSelElecs != 1){
     if(debug) std::cout << "Fail Elec Cut" << std::endl;
     return 0;
   }
@@ -315,7 +332,6 @@ int BTagAnalysis::processEvent(){
   //if(isMC)
   //eventWeight*= totalsSFWeight;
 
-
   hMuons->nMuons->Fill(event->muons.size());
   for(auto muon: event->muons)
     hMuons->Fill(muon,weight);
@@ -343,7 +359,7 @@ int BTagAnalysis::processEvent(){
 
     if(fabs(offJet->eta) > 2.4) continue;
     cutflowJets->Fill("eta", weight);    
-
+    {
     if(offJet->pt       < 35)   continue;
     cutflowJets->Fill("pt", weight);    
 

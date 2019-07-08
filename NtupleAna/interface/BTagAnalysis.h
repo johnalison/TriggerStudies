@@ -44,6 +44,8 @@ namespace TriggerStudies {
     nTupleAnalysis::elecHists* hElecs;
     nTupleAnalysis::muonHists* hAllMuons;
     nTupleAnalysis::elecHists* hAllElecs;
+    nTupleAnalysis::muonHists* hSelMuons;
+    nTupleAnalysis::elecHists* hSelElecs;
 
     nTupleAnalysis::jetHists* hOffJetsPreOLap;
     nTupleAnalysis::jetHists* hOffJets;

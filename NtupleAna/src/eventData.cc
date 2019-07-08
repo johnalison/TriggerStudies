@@ -49,8 +49,10 @@ eventData::eventData(TChain* _treeRAW, TChain* _treeAOD, bool mc, std::string y,
   pfTreeJets   = new nTupleAnalysis::jetData( "Jet",  treeRAW, "PFJet.");
   caloTreeJets = new nTupleAnalysis::jetData( "Jet",  treeRAW, "CaloJet.");
 
-  treeMuons    = new nTupleAnalysis::muonData("PFMuon",     treeRAW);
-  treeElecs    = new nTupleAnalysis::elecData("PFElectron", treeRAW);
+  //treeMuons    = new nTupleAnalysis::muonData("PFMuon",     treeRAW);
+  //treeElecs    = new nTupleAnalysis::elecData("PFElectron", treeRAW);
+  treeMuons    = new nTupleAnalysis::muonData("PatMuon",     treeRAW);
+  treeElecs    = new nTupleAnalysis::elecData("PatElec",     treeRAW);
 } 
 
 void eventData::update(int e){
@@ -102,6 +104,7 @@ void eventData::update(int e){
   caloJets = caloTreeJets ->getJets(30,1e6,2.4);
   muons    = treeMuons  ->getMuons(20, 2.4);
   elecs    = treeElecs  ->getElecs(30, 2.4);
+  
 
   if(debug) std::cout<<"eventData updated\n";
   return;
