@@ -18,6 +18,7 @@
 #include "PhysicsTools/FWLite/interface/TFileService.h"
 
 #include "TriggerStudies/NtupleAna/interface/BTagAnalysis.h"
+#include "TriggerStudies/NtupleAna/interface/TrigTurnOnStudy.h"
 
 using namespace TriggerStudies;
 
@@ -47,6 +48,7 @@ int main(int argc, char * argv[]){
   const edm::ParameterSet& parameters = process.getParameter<edm::ParameterSet>("BTagAnalyzer");
   bool debug = parameters.getParameter<bool>("debug");
   bool isMC  = parameters.getParameter<bool>("isMC");
+  bool isTurnOnStudy  = parameters.getParameter<bool>("isTurnOnStudy");
   int histogramming = parameters.getParameter<int>("histogramming");
   std::string year = parameters.getParameter<std::string>("year");
   std::vector<std::string> filesAOD = parameters.getParameter<std::vector<std::string> >("fileNamesAOD");
@@ -97,16 +99,27 @@ int main(int argc, char * argv[]){
   //
   // Define analysis and run event loop
   //
-  std::cout << "Initialize analysis" << std::endl;
-  BTagAnalysis a = BTagAnalysis(treeRAW, treeAOD, fsh, isMC, year, histogramming, debug);
-  //if(!isMC){
-  //  a.lumiMask = lumiMask;
-  //  std::string lumiData = parameters.getParameter<std::string>("lumiData");
-  //  a.getLumiData(lumiData);
-  //}
-  
-  int maxEvents = inputHandler.maxEvents();
-  a.eventLoop(maxEvents);
+  std::cout << "Initialize analysis: ";
+  if(isTurnOnStudy){
+    std::cout << "TurnOnStudy " << std::endl;
+    TrigTurnOnStudy a = TrigTurnOnStudy(treeRAW, treeAOD, fsh, isMC, year, histogramming, debug);
+
+    int maxEvents = inputHandler.maxEvents();
+    a.eventLoop(maxEvents);
+
+  } else{
+    std::cout << "BTagAnalysis " << std::endl;
+    BTagAnalysis a = BTagAnalysis(treeRAW, treeAOD, fsh, isMC, year, histogramming, debug);
+    //if(!isMC){
+    //  a.lumiMask = lumiMask;
+    //  std::string lumiData = parameters.getParameter<std::string>("lumiData");
+    //  a.getLumiData(lumiData);
+    //}
+    
+    int maxEvents = inputHandler.maxEvents();
+    a.eventLoop(maxEvents);
+  }
+
   std::cout << std::endl;
   std::cout << "Done Event Loop" << std::endl;
   return 0;

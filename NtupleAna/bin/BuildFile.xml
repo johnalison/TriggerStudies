@@ -13,6 +13,7 @@
   <bin   file="procNtupleExample.cc"></bin>
   <bin   file="jetLevelStudy.cc"></bin>
   <bin   file="BTagAnalyzer.cc"></bin>
+  <!--<bin   file="TrunOnStudy.cc"></bin>-->
   <!--<bin   file="FWLiteHistograms.cc"></bin>       -->
   <!--<bin   file="FWLiteWithPythonConfig.cc"></bin> -->
   <!--<bin   file="FWLiteWithSelectorUtils.cc"></bin>-->

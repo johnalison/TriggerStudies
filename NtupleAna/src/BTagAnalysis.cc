@@ -4,9 +4,10 @@
 #include <cstdio>
 #include <TROOT.h>
 #include <boost/bind.hpp>
-#include "nTupleAnalysis/baseClasses/interface/helpers.h"
+
 
 #include "TriggerStudies/NtupleAna/interface/BTagAnalysis.h"
+#include "nTupleAnalysis/baseClasses/interface/helpers.h"
 
 using namespace TriggerStudies;
 
@@ -367,7 +368,7 @@ int BTagAnalysis::processEvent(){
       if(offJetOther == offJet) continue;
       if(offJetOther->DeepCSV       < OfflineDeepCSVTightCut)   continue;	
 
-      if(offJetOther->pt       < 34)   continue;	
+      if(offJetOther->pt       < 35)   continue;	
       if(fabs(offJetOther->eta) > 2.4) continue;
       if(nTupleAnalysis::failOverlap(offJetOther->p,event->elecs,0.4)) continue;
       if(nTupleAnalysis::failOverlap(offJetOther->p,event->muons,0.4)) continue;

@@ -96,8 +96,9 @@ void eventData::update(int e){
     return;
   }
 
-  offJets  = offTreeJets->getJets(30,1e6,2.4);
-  pfJets   = pfTreeJets ->getJets(30,1e6,2.4);
+
+  offJets  = offTreeJets->getJets(20,1e6,2.4);
+  pfJets   = pfTreeJets ->getJets(20,1e6,2.4);
   caloJets = caloTreeJets ->getJets(30,1e6,2.4);
   muons    = treeMuons  ->getMuons(20, 2.4);
   elecs    = treeElecs  ->getElecs(30, 2.4);

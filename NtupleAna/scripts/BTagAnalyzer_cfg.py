@@ -9,6 +9,7 @@ import FWCore.ParameterSet.Types as CfgTypes
 parser = optparse.OptionParser()
 parser.add_option('-d', '--debug',                dest="debug",         action="store_true", default=False, help="debug")
 parser.add_option('-m', '--isMC',                 dest="isMC",          action="store_true", default=False, help="isMC")
+parser.add_option('--isTurnOnStudy',              action="store_true",  default=False, help="doTurn On Study")
 parser.add_option('-y', '--year',                 dest="year",          default="2016", help="Year specifies trigger (and lumiMask for data)")
 #parser.add_option('-l', '--lumi', type="float",   dest="lumi",          default=1.0,    help="Luminosity for MC normalization: units [pb]")
 parser.add_option( '--inputAOD',                dest="inputAOD",         default="ZZ4b/fileLists/data2016H.txt", help="Input file(s). If it ends in .txt, will treat it as a list of input files.")
@@ -113,6 +114,7 @@ process.BTagAnalyzer = cms.PSet(
     debug   = cms.bool(o.debug),
     fileNamesAOD   = cms.vstring(fileNamesAOD),
     isMC    = cms.bool(o.isMC),
+    isTurnOnStudy    = cms.bool(o.isTurnOnStudy),
     year    = cms.string(o.year),
     lumiData= cms.string(lumiData[o.year]),
     histogramming = cms.int32(int(o.histogramming)),
