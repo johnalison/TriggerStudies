@@ -247,63 +247,71 @@ int BTagAnalysis::eventLoop(int maxEvents){
 
 int BTagAnalysis::processEvent(){
   if(debug) std::cout << "processEvent start" << std::endl;
-  float weight = 1.0;
 
-  cutflow->Fill("all", weight);
+  cutflow->Fill("all", 1.0);
   if(event->run != event->runAOD)
     return 0;
 
   if(event->event != event->eventAOD)
     return 0;
 
-  cutflow->Fill("foundMatch", weight);
-  
-  unsigned int nSelMuons = 0;
-  for(auto muon: event->muons){
-    hAllMuons->Fill(muon,weight);
+  cutflow->Fill("foundMatch", 1.0);
+
+  std::vector<nTupleAnalysis::muonPtr> selMuons;
+  for(nTupleAnalysis::muonPtr& muon: event->muons){
+    hAllMuons->Fill(muon,1.0);
     if(muon->tightId && muon->isolation_corrected < 0.2){
-      hSelMuons->Fill(muon,weight);
-      ++nSelMuons;
+      hSelMuons->Fill(muon,1.0);
+      selMuons.push_back(muon);
     }
   }
   hAllMuons->nMuons->Fill(event->muons.size());
-  hSelMuons->nMuons->Fill(nSelMuons);
+  hSelMuons->nMuons->Fill(selMuons.size());
 
   
-  unsigned int nSelElecs = 0;
-  for(auto elec: event->elecs){
-    hAllElecs->Fill(elec,weight);
+  std::vector<nTupleAnalysis::elecPtr> selElecs;
+  for(nTupleAnalysis::elecPtr& elec: event->elecs){
+    hAllElecs->Fill(elec,1.0);
     if(elec->tightId && elec->isolation_corrected < 0.2){
-      hSelElecs->Fill(elec,weight);
-      ++nSelElecs;
+      hSelElecs->Fill(elec,1.0);
+      selElecs.push_back(elec);
     }
   }
   hAllElecs->nElecs->Fill(event->elecs.size());
-  hSelElecs->nElecs->Fill(nSelElecs);
+  hSelElecs->nElecs->Fill(selElecs.size());
 
-  if(nSelMuons == 1)
-    cutflow->Fill("passMuonCut", weight);
+  if(selMuons.size() == 1)
+    cutflow->Fill("passMuonCut", 1.0);
 
-  if(nSelElecs == 1)
-    cutflow->Fill("passElecCut", weight);
+  if(selElecs.size() == 1)
+    cutflow->Fill("passElecCut", 1.0);
 
-  if(nSelMuons != 1){
+  if(selMuons.size() != 1){
     if(debug) std::cout << "Fail Muon Cut" << std::endl;
     return 0;
   }
 
-  if(nSelElecs != 1){
+  if(selElecs.size() != 1){
     if(debug) std::cout << "Fail Elec Cut" << std::endl;
     return 0;
   }
-  cutflow->Fill("passLeptonCut", weight);
+  cutflow->Fill("passLeptonCut", 1.0);
+
+
+  float eventWeight = 1.0;
+  float puWeight    = 1.0;
+  if(isMC){
+    puWeight = 1.0; //pileUpTool.getWeight(eventData.nPV);
+    eventWeight =  puWeight * selElecs.at(0)->SF * selMuons.at(0)->SF;
+  }
+
 
   //
   //  Offline BTags
   //
   unsigned int nOffJetsForCut = 0;
   unsigned int nOffJetsTaggedForCut = 0;
-  float totalsSFWeight = 1.0;
+  float totalSFWeight = 1.0;
   for(const nTupleAnalysis::jetPtr& offJet : event->offJets){
     if(fabs(offJet->eta) > 2.4) continue;
     if(offJet->pt       < 35)   continue;
@@ -314,31 +322,32 @@ int BTagAnalysis::processEvent(){
     ++nOffJetsForCut;
     if(offJet->DeepCSV > OfflineDeepCSVTightCut) ++nOffJetsTaggedForCut;
     
-    //if(isMC)
-    //totalsSFWeight *= offJet.m_SF;
+    if(isMC)
+      totalSFWeight *= offJet->SF;
   }
 
   if(nOffJetsForCut < 2      ){
     if(debug) std::cout << "Fail NJet Cut" << std::endl;
     return 0;
   }
-  cutflow->Fill("passNJetCut", weight);
+  cutflow->Fill("passNJetCut", eventWeight);
 
   if(nOffJetsTaggedForCut < 1) {
     if(debug) std::cout << "Fail NBJet Cut" << std::endl;
     return 0;
   }
-  cutflow->Fill("passNBJetCut", weight);
-  //if(isMC)
-  //eventWeight*= totalsSFWeight;
+  cutflow->Fill("passNBJetCut", eventWeight);
+
+  if(isMC)
+    eventWeight *= totalSFWeight;
 
   hMuons->nMuons->Fill(event->muons.size());
   for(auto muon: event->muons)
-    hMuons->Fill(muon,weight);
+    hMuons->Fill(muon,eventWeight);
 
   hElecs->nElecs->Fill(event->elecs.size());
   for(auto elec: event->elecs)
-    hElecs->Fill(elec,weight);
+    hElecs->Fill(elec,eventWeight);
 
 
   //
@@ -355,23 +364,23 @@ int BTagAnalysis::processEvent(){
   unsigned int nOffJets_matchedCalo = 0;
 
   for(const nTupleAnalysis::jetPtr& offJet : event->offJets){
-    cutflowJets->Fill("all", weight);    
+    cutflowJets->Fill("all", eventWeight);    
 
     if(fabs(offJet->eta) > 2.4) continue;
-    cutflowJets->Fill("eta", weight);    
-    {
+    cutflowJets->Fill("eta", eventWeight);    
+    
     if(offJet->pt       < 35)   continue;
-    cutflowJets->Fill("pt", weight);    
+    cutflowJets->Fill("pt", eventWeight);    
 
     ++nOffJetsPreOLap;
-    hOffJetsPreOLap->Fill(offJet, weight);
+    hOffJetsPreOLap->Fill(offJet, eventWeight);
 
 
     if(nTupleAnalysis::failOverlap(offJet->p,event->muons,0.4)) continue;
-    cutflowJets->Fill("muonOlap", weight);    
+    cutflowJets->Fill("muonOlap", eventWeight);    
 
     if(nTupleAnalysis::failOverlap(offJet->p,event->elecs,0.4)) continue;
-    cutflowJets->Fill("elecOlap", weight);    
+    cutflowJets->Fill("elecOlap", eventWeight);    
 
 
 
@@ -396,13 +405,13 @@ int BTagAnalysis::processEvent(){
     // Require that there only be one other probe
     //    Note: this will suppress LF
     if(nOtherTags != 1) continue;
-    cutflowJets->Fill("isProbe", weight);    
+    cutflowJets->Fill("isProbe", eventWeight);    
 
     //
     //  Offline Jets
     //
     ++nOffJets;
-    hOffJets->Fill(offJet,weight);
+    hOffJets->Fill(offJet,eventWeight);
 
     if(offJet->DeepCSV > 1)
       std::cout << "Error " << "Offline" << " DeepCSV is " << offJet->DeepCSV << std::endl; 
@@ -430,9 +439,9 @@ int BTagAnalysis::processEvent(){
     //
     if( dR < 0.4){
       
-      cutflowJets->Fill("hasHLTMatchPF", weight);    
+      cutflowJets->Fill("hasHLTMatchPF", eventWeight);    
       
-      PFJetAnalysis(offJet,matchedJet,weight);
+      PFJetAnalysis(offJet,matchedJet,eventWeight);
       
       ++nOffJets_matched;
 
@@ -455,9 +464,9 @@ int BTagAnalysis::processEvent(){
     
     if( dRCalo < 0.4){
 
-      cutflowJets->Fill("hasHLTMatchCalo", weight);    
+      cutflowJets->Fill("hasHLTMatchCalo", eventWeight);    
 
-      CaloJetAnalysis(offJet,matchedCaloJet,weight);
+      CaloJetAnalysis(offJet,matchedCaloJet,eventWeight);
       
       ++nOffJets_matchedCalo;
     }
@@ -530,12 +539,12 @@ int BTagAnalysis::processEvent(){
   }//offJets
 
 
-  hOffJetsPreOLap    ->nJets->Fill(nOffJetsPreOLap ,weight);
-  hOffJets           ->nJets->Fill(nOffJets        ,weight);
-  hOffJets_matched   ->nJets->Fill(nOffJets_matched,weight);
+  hOffJetsPreOLap    ->nJets->Fill(nOffJetsPreOLap ,eventWeight);
+  hOffJets           ->nJets->Fill(nOffJets        ,eventWeight);
+  hOffJets_matched   ->nJets->Fill(nOffJets_matched,eventWeight);
 
-  hOffJets_matchedCalo->nJets->Fill(nOffJets_matchedCalo,weight);
-  hOffJets_matchedCaloJet->nJets->Fill(nOffJets_matchedCalo,weight);
+  hOffJets_matchedCalo->nJets->Fill(nOffJets_matchedCalo,eventWeight);
+  hOffJets_matchedCaloJet->nJets->Fill(nOffJets_matchedCalo,eventWeight);
 
 
 
@@ -551,17 +560,17 @@ int BTagAnalysis::processEvent(){
     if(nTupleAnalysis::failOverlap(pfJet->p,event->elecs, 0.4)) continue;
     if(nTupleAnalysis::failOverlap(pfJet->p,event->muons, 0.4)) continue;
   
-    hPfJets->Fill(pfJet, weight);
+    hPfJets->Fill(pfJet, eventWeight);
   
     const nTupleAnalysis::jetPtr pfJetMatchedJet = pfJet->matchedJet.lock();
     if(pfJetMatchedJet){
-      hPfJets_matched->Fill(pfJet, weight);
+      hPfJets_matched->Fill(pfJet, eventWeight);
   
       if(isMC){
 	if( pfJetMatchedJet->hadronFlavour == 5){
-	  hPfJets_matched_B->Fill(pfJet, weight);
+	  hPfJets_matched_B->Fill(pfJet, eventWeight);
 	}else if( pfJetMatchedJet->hadronFlavour == 0){
-	  hPfJets_matched_L->Fill(pfJet, weight);
+	  hPfJets_matched_L->Fill(pfJet, eventWeight);
 	}
       }
     }
@@ -578,7 +587,7 @@ int BTagAnalysis::processEvent(){
     if(nTupleAnalysis::failOverlap(caloJet->p,event->elecs, 0.4)) continue;
     if(nTupleAnalysis::failOverlap(caloJet->p,event->muons, 0.4)) continue;
   
-    hCaloJets->Fill(caloJet, weight);
+    hCaloJets->Fill(caloJet, eventWeight);
 
     if(caloJet->DeepCSV > 1)
       std::cout << "Error " << "Offline" << " DeepCSV is " << caloJet->DeepCSV << std::endl; 
@@ -592,7 +601,7 @@ int BTagAnalysis::processEvent(){
 
     const nTupleAnalysis::jetPtr caloJetMatchedJet = caloJet->matchedJet.lock();  
     if(caloJetMatchedJet){
-      hCaloJets_matched->Fill(caloJet, weight);
+      hCaloJets_matched->Fill(caloJet, eventWeight);
   
       //if(caloJet->m_matchedJet->m_hadronFlavour == 5)
       //	caloJetHists_matchedB.Fill(caloJet);

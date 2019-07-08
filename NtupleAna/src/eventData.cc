@@ -45,7 +45,7 @@ eventData::eventData(TChain* _treeRAW, TChain* _treeAOD, bool mc, std::string y,
   initBranch(treeRAW, "nPV",    nPV);
 
   std::cout << "eventData::eventData() Initialize jets and muons" << std::endl;
-  offTreeJets  = new nTupleAnalysis::jetData( "Jet",  treeRAW);
+  offTreeJets  = new nTupleAnalysis::jetData( "Jet",  treeRAW, "", isMC, year);
   pfTreeJets   = new nTupleAnalysis::jetData( "Jet",  treeRAW, "PFJet.");
   caloTreeJets = new nTupleAnalysis::jetData( "Jet",  treeRAW, "CaloJet.");
 
