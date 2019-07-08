@@ -51,8 +51,8 @@ eventData::eventData(TChain* _treeRAW, TChain* _treeAOD, bool mc, std::string y,
 
   //treeMuons    = new nTupleAnalysis::muonData("PFMuon",     treeRAW);
   //treeElecs    = new nTupleAnalysis::elecData("PFElectron", treeRAW);
-  treeMuons    = new nTupleAnalysis::muonData("PatMuon",     treeRAW);
-  treeElecs    = new nTupleAnalysis::elecData("PatElec",     treeRAW);
+  treeMuons    = new nTupleAnalysis::muonData("PatMuon",     treeRAW, isMC, year);
+  treeElecs    = new nTupleAnalysis::elecData("PatElec",     treeRAW, isMC, year);
 } 
 
 void eventData::update(int e){
