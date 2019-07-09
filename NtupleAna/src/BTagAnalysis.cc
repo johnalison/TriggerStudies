@@ -310,7 +310,7 @@ int BTagAnalysis::processEvent(){
   float eventWeight = 1.0;
   float puWeight    = 1.0;
   if(isMC){
-    puWeight = pileUpTool->getWeight(event->nPV);
+    puWeight = pileUpTool->getWeight(event->nPVAOD);
     eventWeight =  puWeight * selElecs.at(0)->SF * selMuons.at(0)->SF;
   }
 
