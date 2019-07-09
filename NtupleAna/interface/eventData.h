@@ -42,6 +42,7 @@ namespace TriggerStudies {
     // Testing
     //
     Int_t    nPV       =  0;
+    Int_t    nPVAOD    =  0;
 
     nTupleAnalysis::jetData* offTreeJets;
     std::vector<nTupleAnalysis::jetPtr> offJets;

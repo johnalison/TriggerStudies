@@ -26,7 +26,7 @@
 #include "TriggerStudies/NtupleAna/interface/LeptonHists.h"
 #include "TriggerStudies/NtupleAna/interface/EventHists.h"
 #include "TriggerStudies/NtupleAna/interface/Helpers.h"
-#include "TriggerStudies/NtupleAna/interface/PileUpWeightTool.h"
+#include "nTupleAnalysis/baseClasses/interface/pileUpWeightTool.h"
 //#include "../../../HLTBTagging/measurements/modules/functions.h"
 
 using namespace NtupleAna;
@@ -248,7 +248,7 @@ int main(int argc, char * argv[]){
   //
   //  Init the pile-up function
   //
-  PileUpWeightTool pileUpTool = PileUpWeightTool(puFile);
+  nTupleAnalysis::pileUpWeightTool pileUpTool = nTupleAnalysis::pileUpWeightTool(puFile);
 
   //float pfDeepCSV = 0.6324;
   //float pfCSV = 0.8484;

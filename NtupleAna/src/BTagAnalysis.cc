@@ -28,7 +28,7 @@ const float OnlineDeepCSVCut2017  = 0.6324;
 const float OnlineCSVCut2017      = 0.8484;
 
 
-BTagAnalysis::BTagAnalysis(TChain* _eventsRAW, TChain* _eventsAOD, fwlite::TFileService& fs, bool _isMC, std::string _year, int _histogramming, bool _debug){
+BTagAnalysis::BTagAnalysis(TChain* _eventsRAW, TChain* _eventsAOD, fwlite::TFileService& fs, bool _isMC, std::string _year, int _histogramming, bool _debug, std::string PUFileName){
   if(_debug) std::cout<<"In BTagAnalysis constructor"<<std::endl;
   debug      = _debug;
   isMC       = _isMC;
@@ -79,6 +79,9 @@ BTagAnalysis::BTagAnalysis(TChain* _eventsRAW, TChain* _eventsAOD, fwlite::TFile
   hSelElecs = new nTupleAnalysis::elecHists("SelElecs", fs, "Sel Elecs");
   hMuons    = new nTupleAnalysis::muonHists("Muons", fs, "Muons");
   hElecs    = new nTupleAnalysis::elecHists("Elecs", fs, "Elecs");
+
+  hEvents                 = new nTupleAnalysis::eventHists("Events", fs);
+  hEventsNoPUWeight       = new nTupleAnalysis::eventHists("EventsNoPUWeight", fs);
 
   hOffJetsPreOLap         = new nTupleAnalysis::jetHists("offJetsPreOLap",        fs, "Pre Overlap");
   hOffJets                = new nTupleAnalysis::jetHists("offJets",               fs, "");
@@ -169,6 +172,12 @@ BTagAnalysis::BTagAnalysis(TChain* _eventsRAW, TChain* _eventsAOD, fwlite::TFile
     OnlineDeepCSVCut        = OnlineDeepCSVCut2018;
   }
 
+
+
+  //
+  //  Init the pile-up function
+  //
+  pileUpTool = new nTupleAnalysis::pileUpWeightTool(PUFileName);
 
 
   //  if(histogramming >= 4) allEvents     = new eventHists("allEvents",     fs);
@@ -301,7 +310,7 @@ int BTagAnalysis::processEvent(){
   float eventWeight = 1.0;
   float puWeight    = 1.0;
   if(isMC){
-    puWeight = 1.0; //pileUpTool.getWeight(eventData.nPV);
+    puWeight = pileUpTool->getWeight(event->nPV);
     eventWeight =  puWeight * selElecs.at(0)->SF * selMuons.at(0)->SF;
   }
 
@@ -353,7 +362,9 @@ int BTagAnalysis::processEvent(){
   //
   // Fill All events
   //
-  //eventHists.Fill(eventData);
+  hEvents->Fill(event->nPVAOD,  0.0, eventWeight);
+  if(puWeight)
+    hEventsNoPUWeight->Fill(event->nPVAOD,  0.0, eventWeight/puWeight);
 
   //
   //

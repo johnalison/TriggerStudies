@@ -18,8 +18,8 @@
 #include "nTupleAnalysis/baseClasses/interface/elecHists.h"
 #include "nTupleAnalysis/baseClasses/interface/jetHists.h"
 #include "nTupleAnalysis/baseClasses/interface/trackHists.h"
-//#include "ZZ4b/nTupleAnalysis/interface/eventHists.h"
-//#include "ZZ4b/nTupleAnalysis/interface/tagHists.h"
+#include "nTupleAnalysis/baseClasses/interface/eventHists.h"
+#include "nTupleAnalysis/baseClasses/interface/pileUpWeightTool.h"
 
 namespace TriggerStudies {
 
@@ -37,6 +37,9 @@ namespace TriggerStudies {
     int histogramming = 1e6;
     int treeEvents;
     eventData* event;
+
+    nTupleAnalysis::eventHists* hEvents;
+    nTupleAnalysis::eventHists* hEventsNoPUWeight;
 
     nTupleAnalysis::cutflowHists* cutflow;
     nTupleAnalysis::cutflowHists* cutflowJets;
@@ -151,7 +154,7 @@ namespace TriggerStudies {
     struct rusage usage;
     long int usageMB;
 
-    BTagAnalysis(TChain*, TChain*, fwlite::TFileService&, bool, std::string, int, bool);
+    BTagAnalysis(TChain*, TChain*, fwlite::TFileService&, bool, std::string, int, bool, std::string);
     void monitor(long int);
     int eventLoop(int);
     int processEvent();
@@ -162,6 +165,8 @@ namespace TriggerStudies {
 
     void PFJetAnalysis(const nTupleAnalysis::jetPtr& offJet,const nTupleAnalysis::jetPtr& hltJet, float weight);
     void CaloJetAnalysis(const nTupleAnalysis::jetPtr& offJet,const nTupleAnalysis::jetPtr& hltJet, float weight);
+
+    nTupleAnalysis::pileUpWeightTool* pileUpTool;
 
   };
 
