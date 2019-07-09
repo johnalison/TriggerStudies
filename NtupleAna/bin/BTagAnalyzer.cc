@@ -52,7 +52,7 @@ int main(int argc, char * argv[]){
   int histogramming = parameters.getParameter<int>("histogramming");
   std::string year = parameters.getParameter<std::string>("year");
   std::vector<std::string> filesAOD = parameters.getParameter<std::vector<std::string> >("fileNamesAOD");
-  std::string PUFileName = parameters.getParameter<std::string>("year");
+  std::string PUFileName = parameters.getParameter<std::string>("puFile");
 
   //
   //lumiMask

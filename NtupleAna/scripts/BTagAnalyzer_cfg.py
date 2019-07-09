@@ -117,6 +117,7 @@ process.BTagAnalyzer = cms.PSet(
     isMC    = cms.bool(o.isMC),
     isTurnOnStudy    = cms.bool(o.isTurnOnStudy),
     year    = cms.string(o.year),
+    puFile    = cms.string(o.puFile),
     lumiData= cms.string(lumiData[o.year]),
     histogramming = cms.int32(int(o.histogramming)),
     )
