@@ -60,7 +60,7 @@ namespace TriggerStudies {
     std::vector<nTupleAnalysis::elecPtr> elecs;
 
     // Constructors and member functions
-    eventData(TChain*, TChain*, bool, std::string, bool); 
+    eventData(TChain*, TChain*, bool, std::string, bool, std::string); 
     void update(int);
 
     void dump();

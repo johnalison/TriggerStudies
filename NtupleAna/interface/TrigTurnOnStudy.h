@@ -101,7 +101,7 @@ namespace TriggerStudies {
     
   };
 
-    std::vector<float> trigThresolds = {0.,15.,30.,40.,45.,50.,60.,75.,80.,90.,100.,110.,140.,200.,260.,320.,400.,450.,500.,550.};
+    std::vector<float> trigThresolds = {0.,15.,30.,40.,45.,50.,60.,75.,80.,90.,100.,105.,110.,120.,140.,200.,260.,320.,400.,450.,500.,550.};
     std::map<float, turnOnHists*> turnOns;
     std::map<float, turnOnHists*> turnOns_L;
     std::map<float, turnOnHists*> turnOns_B;

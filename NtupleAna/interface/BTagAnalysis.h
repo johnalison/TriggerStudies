@@ -34,6 +34,8 @@ namespace TriggerStudies {
     bool isMC  = false;
     TFileDirectory dir;
 
+    bool doTracks = true;
+
     int histogramming = 1e6;
     int treeEvents;
     eventData* event;
@@ -57,6 +59,25 @@ namespace TriggerStudies {
     nTupleAnalysis::jetHists* hOffJets_matchedCalo;
     nTupleAnalysis::jetHists* hOffJets_matchedCaloJet;
 
+
+    nTupleAnalysis::jetHists*    hOffJet_matchedPFcsvTag         ;
+    nTupleAnalysis::jetHists*    hOffJet_matchedPFcsvTagJet      ;
+    nTupleAnalysis::jetHists*    hOffJet_matchedPFDeepcsvTag     ;
+    nTupleAnalysis::jetHists*    hOffJet_matchedPFDeepcsvTagJet  ;
+    nTupleAnalysis::jetHists*    hOffJetTight_matchedPFJet       ;
+    nTupleAnalysis::jetHists*    hOffJetMedium_matchedPFJet      ;
+    nTupleAnalysis::jetHists*    hOffJetLoose_matchedPFJet       ;
+
+
+    nTupleAnalysis::jetHists*    hOffJet_matchedCalocsvTag         ;
+    nTupleAnalysis::jetHists*    hOffJet_matchedCalocsvTagJet      ;
+    nTupleAnalysis::jetHists*    hOffJet_matchedCaloDeepcsvTag     ;
+    nTupleAnalysis::jetHists*    hOffJet_matchedCaloDeepcsvTagJet  ;
+    nTupleAnalysis::jetHists*    hOffJetTight_matchedCaloJet       ;
+    nTupleAnalysis::jetHists*    hOffJetMedium_matchedCaloJet      ;
+    nTupleAnalysis::jetHists*    hOffJetLoose_matchedCaloJet       ;
+
+
     nTupleAnalysis::jetHists*  hOffJets_matched_L   ;
     nTupleAnalysis::jetHists*  hOffJets_matchedJet_L;
     nTupleAnalysis::jetHists*  hOffJets_matchedCalo_L;
@@ -65,17 +86,23 @@ namespace TriggerStudies {
     nTupleAnalysis::jetHists*  hOffJets_matchedJet_B;
     nTupleAnalysis::jetHists*  hOffJets_matchedCalo_B;
     nTupleAnalysis::jetHists*  hOffJets_matchedCaloJet_B;
+    nTupleAnalysis::jetHists*  hOffJets_matched_C   ;
+    nTupleAnalysis::jetHists*  hOffJets_matchedJet_C;
+    nTupleAnalysis::jetHists*  hOffJets_matchedCalo_C;
+    nTupleAnalysis::jetHists*  hOffJets_matchedCaloJet_C;
 
 
     nTupleAnalysis::jetHists* hPfJets;
     nTupleAnalysis::jetHists* hPfJets_matched;
     nTupleAnalysis::jetHists* hPfJets_matched_L;
     nTupleAnalysis::jetHists* hPfJets_matched_B;
+    nTupleAnalysis::jetHists* hPfJets_matched_C;
 
     nTupleAnalysis::jetHists* hCaloJets;
     nTupleAnalysis::jetHists* hCaloJets_matched;
     nTupleAnalysis::jetHists* hCaloJets_matched_L;
     nTupleAnalysis::jetHists* hCaloJets_matched_B;
+    nTupleAnalysis::jetHists* hCaloJets_matched_C;
 
     nTupleAnalysis::trackHists* hOffTracks;
     nTupleAnalysis::trackHists* hOffTracks_unmatched;
@@ -154,7 +181,7 @@ namespace TriggerStudies {
     struct rusage usage;
     long int usageMB;
 
-    BTagAnalysis(TChain*, TChain*, fwlite::TFileService&, bool, std::string, int, bool, std::string);
+    BTagAnalysis(TChain*, TChain*, fwlite::TFileService&, bool, std::string, int, bool, std::string, std::string);
     void monitor(long int);
     int eventLoop(int);
     int processEvent();

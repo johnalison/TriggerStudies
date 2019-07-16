@@ -4,7 +4,7 @@
 using namespace TriggerStudies;
 
 
-eventData::eventData(TChain* _treeRAW, TChain* _treeAOD, bool mc, std::string y, bool d){
+eventData::eventData(TChain* _treeRAW, TChain* _treeAOD, bool mc, std::string y, bool d, std::string jetDetailLevel){
   std::cout << "eventData::eventData()" << std::endl;
   treeRAW  = _treeRAW;
   treeAOD  = _treeAOD;
@@ -46,9 +46,9 @@ eventData::eventData(TChain* _treeRAW, TChain* _treeAOD, bool mc, std::string y,
   initBranch(treeAOD, "nPV",    nPVAOD);
 
   std::cout << "eventData::eventData() Initialize jets and muons" << std::endl;
-  offTreeJets  = new nTupleAnalysis::jetData( "Jet",  treeRAW, "", isMC, year);
-  pfTreeJets   = new nTupleAnalysis::jetData( "Jet",  treeRAW, "PFJet.");
-  caloTreeJets = new nTupleAnalysis::jetData( "Jet",  treeRAW, "CaloJet.");
+  offTreeJets  = new nTupleAnalysis::jetData( "Jet",  treeRAW, jetDetailLevel, "",      isMC, year );
+  pfTreeJets   = new nTupleAnalysis::jetData( "Jet",  treeRAW, jetDetailLevel, "PFJet."       );
+  caloTreeJets = new nTupleAnalysis::jetData( "Jet",  treeRAW, jetDetailLevel, "CaloJet."     );
 
   //treeMuons    = new nTupleAnalysis::muonData("PFMuon",     treeRAW);
   //treeElecs    = new nTupleAnalysis::elecData("PFElectron", treeRAW);
@@ -86,7 +86,7 @@ void eventData::update(int e){
   if(debug) std::cout<<"Got Entry "<<e<<std::endl;
 
   if((run != runAOD) || (event != eventAOD)){
-    std::cout << "Run: " << run << " vs " << runAOD  << "  Evt: " << event << " vs " << eventAOD << std::endl;  
+    if(debug) std::cout << "Run: " << run << " vs " << runAOD  << "  Evt: " << event << " vs " << eventAOD << std::endl;  
   }
 
   if(run != runAOD){

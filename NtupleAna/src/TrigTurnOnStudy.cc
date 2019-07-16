@@ -1,4 +1,5 @@
 
+
 #include <iostream>
 #include <iomanip>
 #include <cstdio>
@@ -42,7 +43,8 @@ TrigTurnOnStudy::TrigTurnOnStudy(TChain* _eventsRAW, TChain* _eventsAOD, fwlite:
 
   histogramming = _histogramming;
 
-  event      = new eventData(eventsRAW, eventsAOD, isMC, year, debug);
+  //event      = new eventData(eventsRAW, eventsAOD, isMC, year, debug, "Tracks.btagInputs");
+  event      = new eventData(eventsRAW, eventsAOD, isMC, year, debug, "");
   treeEvents = eventsRAW->GetEntries();
 
   cutflow    = new nTupleAnalysis::cutflowHists("cutflow", fs);

@@ -1,3 +1,4 @@
+
 import sys, os
 import optparse
 import FWCore.ParameterSet.Config as cms
@@ -10,12 +11,13 @@ parser = optparse.OptionParser()
 parser.add_option('-d', '--debug',                dest="debug",         action="store_true", default=False, help="debug")
 parser.add_option('-m', '--isMC',                 dest="isMC",          action="store_true", default=False, help="isMC")
 parser.add_option('--isTurnOnStudy',              action="store_true",  default=False, help="doTurn On Study")
+parser.add_option('--doTracks',                   action="store_true",  default=False, help="doTurn On Study")
 parser.add_option('-y', '--year',                 dest="year",          default="2016", help="Year specifies trigger (and lumiMask for data)")
 #parser.add_option('-l', '--lumi', type="float",   dest="lumi",          default=1.0,    help="Luminosity for MC normalization: units [pb]")
 parser.add_option( '--inputAOD',                dest="inputAOD",         default="ZZ4b/fileLists/data2016H.txt", help="Input file(s). If it ends in .txt, will treat it as a list of input files.")
 parser.add_option( '--inputRAW',                dest="inputRAW",         default="ZZ4b/fileLists/data2016H.txt", help="Input file(s). If it ends in .txt, will treat it as a list of input files.")
 parser.add_option('-o', '--outputBase',           dest="outputBase",    default="/uscms/home/bryantp/nobackup/ZZ4b/", help="Base path for storing output histograms and picoAOD")
-parser.add_option('--puFile',                     dest="puFile",       help="PUFileName")
+parser.add_option('--puFile',                     dest="puFile",       default="", help="PUFileName")
 parser.add_option('-n', '--nevents',              dest="nevents",       default="-1", help="Number of events to process. Default -1 for no limit.")
 parser.add_option(      '--histogramming',        dest="histogramming", default="1e6", help="Histogramming level. 0 to make no kinematic histograms. 1: only make histograms for full event selection, larger numbers add hists in reverse cutflow order.")
 parser.add_option(      '--histFile',             dest="histFile",      default="hists.root", help="name of ouptut histogram file")
@@ -110,6 +112,13 @@ process.fwliteOutput = cms.PSet(
     fileName  = cms.string(histOut),
     )
 
+
+if o.doTracks: 
+    jetDetailString = "Tracks.btagInputs"
+else:
+    jetDetailString = ""
+
+
 #Setup event loop object
 process.BTagAnalyzer = cms.PSet(
     debug   = cms.bool(o.debug),
@@ -118,6 +127,7 @@ process.BTagAnalyzer = cms.PSet(
     isTurnOnStudy    = cms.bool(o.isTurnOnStudy),
     year    = cms.string(o.year),
     puFile    = cms.string(o.puFile),
+    jetDetailString    = cms.string(jetDetailString),
     lumiData= cms.string(lumiData[o.year]),
     histogramming = cms.int32(int(o.histogramming)),
     )

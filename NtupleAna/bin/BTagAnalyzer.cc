@@ -53,6 +53,7 @@ int main(int argc, char * argv[]){
   std::string year = parameters.getParameter<std::string>("year");
   std::vector<std::string> filesAOD = parameters.getParameter<std::vector<std::string> >("fileNamesAOD");
   std::string PUFileName = parameters.getParameter<std::string>("puFile");
+  std::string jetDetailString = parameters.getParameter<std::string>("jetDetailString");
 
   //
   //lumiMask
@@ -110,7 +111,7 @@ int main(int argc, char * argv[]){
 
   } else{
     std::cout << "BTagAnalysis " << std::endl;
-    BTagAnalysis a = BTagAnalysis(treeRAW, treeAOD, fsh, isMC, year, histogramming, debug, PUFileName);
+    BTagAnalysis a = BTagAnalysis(treeRAW, treeAOD, fsh, isMC, year, histogramming, debug, PUFileName, jetDetailString);
     //if(!isMC){
     //  a.lumiMask = lumiMask;
     //  std::string lumiData = parameters.getParameter<std::string>("lumiData");
