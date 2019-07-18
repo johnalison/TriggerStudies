@@ -248,16 +248,18 @@ void BTagAnalysis::monitor(long int e){
   lastEvent = e+1;
 }
 
-int BTagAnalysis::eventLoop(int maxEvents){
+int BTagAnalysis::eventLoop(int maxEvents, int nSkipEvents){
   //Set Number of events to process. Take manual maxEvents if maxEvents is > 0 and less than the total number of events in the input files. 
   nEvents = (maxEvents > 0 && maxEvents < treeEvents) ? maxEvents : treeEvents;
-  
+
   std::cout << "\nProcess " << nEvents << " of " << treeEvents << " events.\n";
 
   start = std::clock();//2546000 //2546043
   lastTime = std::clock();
   lastEvent = 0;
   for(long int e = 0; e < nEvents; e++){
+
+    if(e < nSkipEvents) continue;
 
     event->update(e);    
     processEvent();
@@ -482,7 +484,8 @@ int BTagAnalysis::processEvent(){
     if( dR < 0.4){
       
       cutflowJets->Fill("hasHLTMatchPF", eventWeight);    
-      
+      offJet->matchedJet = matchedJet;
+
       PFJetAnalysis(offJet,matchedJet,eventWeight);
       
       ++nOffJets_matched;

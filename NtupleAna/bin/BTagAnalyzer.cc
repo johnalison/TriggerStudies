@@ -50,6 +50,7 @@ int main(int argc, char * argv[]){
   bool isMC  = parameters.getParameter<bool>("isMC");
   bool isTurnOnStudy  = parameters.getParameter<bool>("isTurnOnStudy");
   int histogramming = parameters.getParameter<int>("histogramming");
+  int skipEvents = parameters.getParameter<int>("skipEvents");
   std::string year = parameters.getParameter<std::string>("year");
   std::vector<std::string> filesAOD = parameters.getParameter<std::vector<std::string> >("fileNamesAOD");
   std::string PUFileName = parameters.getParameter<std::string>("puFile");
@@ -119,7 +120,7 @@ int main(int argc, char * argv[]){
     //}
     
     int maxEvents = inputHandler.maxEvents();
-    a.eventLoop(maxEvents);
+    a.eventLoop(maxEvents, skipEvents);
   }
 
   std::cout << std::endl;

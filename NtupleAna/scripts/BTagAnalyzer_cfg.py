@@ -20,6 +20,7 @@ parser.add_option('-o', '--outputBase',           dest="outputBase",    default=
 parser.add_option('--puFile',                     dest="puFile",       default="", help="PUFileName")
 parser.add_option('-n', '--nevents',              dest="nevents",       default="-1", help="Number of events to process. Default -1 for no limit.")
 parser.add_option(      '--histogramming',        dest="histogramming", default="1e6", help="Histogramming level. 0 to make no kinematic histograms. 1: only make histograms for full event selection, larger numbers add hists in reverse cutflow order.")
+parser.add_option(      '--skipEvents',        dest="skipEvents", default="0", help="")
 parser.add_option(      '--histFile',             dest="histFile",      default="hists.root", help="name of ouptut histogram file")
 o, a = parser.parse_args()
 
@@ -130,5 +131,6 @@ process.BTagAnalyzer = cms.PSet(
     jetDetailString    = cms.string(jetDetailString),
     lumiData= cms.string(lumiData[o.year]),
     histogramming = cms.int32(int(o.histogramming)),
+    skipEvents = cms.int32(int(o.skipEvents)),
     )
 

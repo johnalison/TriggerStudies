@@ -183,7 +183,7 @@ namespace TriggerStudies {
 
     BTagAnalysis(TChain*, TChain*, fwlite::TFileService&, bool, std::string, int, bool, std::string, std::string);
     void monitor(long int);
-    int eventLoop(int);
+    int eventLoop(int, int nSkipEvents = 0);
     int processEvent();
     bool passLumiMask();
     std::map<edm::LuminosityBlockID, float> lumiData;

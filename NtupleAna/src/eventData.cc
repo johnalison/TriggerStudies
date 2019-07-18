@@ -60,11 +60,11 @@ void eventData::update(int e){
   if(debug){
     std::cout<<"Get Entry "<<e<<std::endl;
     std::cout<<treeRAW->GetCurrentFile()->GetName()<<std::endl;
-    treeRAW->Show(e);
+    treeRAW->Show();
 
     std::cout<<"Get Entry (AOD) "<<e<<std::endl;
     std::cout<<treeAOD->GetCurrentFile()->GetName()<<std::endl;
-    treeAOD->Show(e);
+    treeAOD->Show();
 
   }
   Long64_t loadStatus = treeRAW->LoadTree(e);
@@ -82,7 +82,6 @@ void eventData::update(int e){
 
 
   treeRAW->GetEntry(e);
-  // treeAOD->GetEntry(e);
   if(debug) std::cout<<"Got Entry "<<e<<std::endl;
 
   if((run != runAOD) || (event != eventAOD)){
