@@ -12,6 +12,8 @@
 
 using namespace TriggerStudies;
 
+using std::cout; using std::endl;
+
 // 2018
 const float OfflineDeepCSVTightCut2018  = 0.7527;
 const float OfflineDeepCSVMediumCut2018 = 0.4184;
@@ -85,6 +87,11 @@ TrigTurnOnStudy::TrigTurnOnStudy(TChain* _eventsRAW, TChain* _eventsAOD, fwlite:
   hAllOffJets             = new nTupleAnalysis::jetHists("allOffJets",               fs, "");
   hOffJets_matched        = new nTupleAnalysis::jetHists("offJets_matched",       fs, "");
   hOffJets_matchedJet     = new nTupleAnalysis::jetHists("offJets_matchedJet",    fs, "");
+
+  hdR_all =  dir.make<TH1F>("dR_all",      "TrigTurnOnStudy/dR_all      ;#DeltaR(Online,Offline);;Entries"   ,100, 0,0.45);
+  hdR_2nd_all =  dir.make<TH1F>("dR_2nd_all",      "TrigTurnOnStudy/dR_2nd_all      ;#DeltaR(Online,Offline);;Entries"   ,100, 0,3);
+  hdR_misMatchPt =  dir.make<TH1F>("dR_misMatchPt",      "/TrigTurnOnStudy/dR_misMatchPt      ;#DeltaR(Online,Offline);;Entries"  ,100, 0,0.45);
+  hdR_2nd_misMatchPt =  dir.make<TH1F>("dR_2nd_misMatchPt",      "/TrigTurnOnStudy/dR_2nd_misMatchPt      ;#DeltaR(Online,Offline);;Entries"  ,100, 0,3);
 
   for(float pt : trigThresolds){
     std::stringstream ss; 
@@ -262,8 +269,6 @@ int TrigTurnOnStudy::processEvent(){
   if(debug) std::cout << "Got HT " << std::endl;
 
 
-  
-
   //
   // Fill All events
   //
@@ -275,20 +280,34 @@ int TrigTurnOnStudy::processEvent(){
 
     // Match offline to online
     float dR = 1e6;
+    float dR_2nd = 1e6;
     nTupleAnalysis::jetPtr matchedJet = nullptr;
 
     for(const nTupleAnalysis::jetPtr& pfJet : event->pfJets){
       float this_dR = pfJet->p.DeltaR(offJet->p);
       if (this_dR < dR){
+	dR_2nd = dR;
 	dR = this_dR;
 	matchedJet = pfJet;
+      }else if(this_dR < dR_2nd){
+	dR_2nd = this_dR;
       }
+      
+      
     }
 
     // 
     //  Have PF Match
     //
-    if( dR < 0.4){
+    if( dR < 0.1){
+      
+      hdR_all->Fill(dR);
+      hdR_2nd_all->Fill(dR_2nd);
+      if(matchedJet->pt > 60 && offJet->pt < 30){
+	hdR_misMatchPt->Fill(dR);
+	hdR_2nd_misMatchPt->Fill(dR_2nd);
+      }
+      //cout << matchedJet->pt << " vs " << offJet->pt  << " dR is " << dR  << endl;
 
       for(float pt : trigThresolds){
 	if(matchedJet->pt > pt){
@@ -481,11 +500,14 @@ int TrigTurnOnStudy::processEvent(){
     // 
     //  Have PF Match
     //
-    if( dR < 0.4){
+    if( dR < 0.1){
       
       cutflowJets->Fill("hasHLTMatchPF", weight);    
       
       ++nOffJets_matched;
+      offJet->matchedJet = matchedJet;
+      hOffJets_matched  ->  Fill(offJet,weight);
+      hOffJets_matchedJet->  Fill(matchedJet,weight);
 
       for(float pt : trigThresolds){
 	if(matchedJet->pt > pt){

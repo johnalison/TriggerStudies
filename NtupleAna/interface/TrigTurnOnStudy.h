@@ -30,7 +30,7 @@ namespace TriggerStudies {
 
     TChain* eventsAOD;
     TChain* eventsRAW;
-
+ 
     bool debug = false;
     std::string year;
     bool isMC  = false;
@@ -51,6 +51,11 @@ namespace TriggerStudies {
     nTupleAnalysis::jetHists* hOffJets;
     nTupleAnalysis::jetHists* hOffJets_matched;
     nTupleAnalysis::jetHists* hOffJets_matchedJet;
+
+    TH1F* hdR_all = nullptr;
+    TH1F* hdR_2nd_all = nullptr;
+    TH1F* hdR_misMatchPt = nullptr;
+    TH1F* hdR_2nd_misMatchPt = nullptr;
 
     nTupleAnalysis::jetHists* hAllOffJets;
 
@@ -178,7 +183,7 @@ namespace TriggerStudies {
     };
 
 
-    std::vector<float> htThresolds = {0.,180.,250.,370.,430.,510.,590.,680.,780.,890.,1050.};
+    std::vector<float> htThresolds = {0.,180.,330.,250.,370.,430.,510.,590.,680.,780.,890.,1050.};
     std::map<float, hTTurnOnHists*> hTTurnOns;
     std::map<float, hTTurnOnHists*> hTTurnOnsAll;
 

@@ -12,48 +12,115 @@ eventData::eventData(TChain* _treeRAW, TChain* _treeAOD, bool mc, std::string y,
   year  = y;
   debug = d;
 
+  treeEventsAOD = treeAOD->GetEntries();
+
+  bool checkEventDiffs = false;
+  if(checkEventDiffs){
+
+    //
+    // Get All events in AOD
+    //
+    initBranch(treeAOD, "Run",             runAOD);
+    initBranch(treeAOD, "Evt",           eventAOD);
+    
+    for(long int eAOD = 0; eAOD < treeEventsAOD; eAOD++){
+      treeAOD->GetEntry(eAOD);
+      AODEvents.push_back(std::make_pair(runAOD, eventAOD));
+    }
+
+    //
+    // Get All events in RAW
+    //
+    initBranch(treeRAW, "Run",             run);
+    initBranch(treeRAW, "Evt",           event);
+    int treeEventsRAW = treeRAW->GetEntries();
+
+    RunEventMap RAWEvents;
+    for(long int eRAW = 0; eRAW < treeEventsRAW; eRAW++){
+      treeRAW->GetEntry(eRAW);
+      RAWEvents.push_back(std::make_pair(run, event));
+    }
+
+    //
+    // Events in AOD but not in RAW
+    //
+    std::cout << "Events in AOD but not in RAW"  << std::endl;
+    for (auto AODPair : AODEvents) {
+      bool inRAW = false;
+      for (auto RAWPair : RAWEvents ){
+	if(AODPair.first  != RAWPair.first) continue;
+	if(AODPair.second != RAWPair.second) continue;
+	inRAW = true;
+      }
+      if(!inRAW) {
+	std::cout << "\t" << AODPair.first << "\t" << AODPair.second << std::endl;
+      }
+    }
+
+
+    //
+    // Events in RAW but not in AOD
+    //
+    std::cout << "Events in RAW but not in AOD"  << std::endl;
+    for (auto RAWPair : RAWEvents ){
+      bool inAOD = false;
+      for (auto AODPair : AODEvents) {
+	if(AODPair.first  != RAWPair.first) continue;
+	if(AODPair.second != RAWPair.second) continue;
+	inAOD = true;
+      }
+      if(!inAOD) {
+	std::cout << "\t" << RAWPair.first << "\t" << RAWPair.second << std::endl;
+      }
+    }
+
+
+
+  }
+
   treeAOD->SetBranchStatus("Run", 1);  
   treeAOD->SetBranchStatus("Evt", 1);  
   //treeAOD->BuildIndex("Run","Evt");
   TTreeIndex *index = new TTreeIndex(treeAOD,"Run", "Evt"); 
   treeAOD->SetTreeIndex(index);
-
-
+    
+    
   treeRAW->SetBranchStatus("Run", 1);  
   treeRAW->SetBranchStatus("Evt", 1);  
   //treeRAW->BuildIndex("Run","Evt");
   //TTreeIndex *indexRaw = new TTreeIndex(treeRAW,"Run", "Evt"); 
   //treeRAW->SetTreeIndex(indexRaw);
-
-
-  treeRAW->AddFriend(treeAOD);
-
     
+    
+  treeRAW->AddFriend(treeAOD);
+    
+        
   //std::cout << "eventData::eventData() tree->Lookup(true)" << std::endl;
   ///tree->Lookup(true);
   //std::cout << "eventData::eventData() tree->LoadTree(0)" << std::endl;
-  treeRAW->LoadTree(0);
-  
+  //treeRAW->LoadTree(0);
+      
   initBranch(treeRAW, "Run",             run);
   //initBranch(tree, "luminosityBlock", lumiBlock);
   initBranch(treeRAW, "Evt",           event);
+        
     
-
   initBranch(treeAOD, "Run",             runAOD);
   //initBranch(tree, "luminosityBlock", lumiBlock);
   initBranch(treeAOD, "Evt",           eventAOD);
   initBranch(treeRAW, "nPV",    nPV);
   initBranch(treeAOD, "nPV",    nPVAOD);
-
+    
   std::cout << "eventData::eventData() Initialize jets and muons" << std::endl;
   offTreeJets  = new nTupleAnalysis::jetData( "Jet",  treeRAW, jetDetailLevel, "",      isMC, year );
   pfTreeJets   = new nTupleAnalysis::jetData( "Jet",  treeRAW, jetDetailLevel, "PFJet."       );
   caloTreeJets = new nTupleAnalysis::jetData( "Jet",  treeRAW, jetDetailLevel, "CaloJet."     );
-
+    
   //treeMuons    = new nTupleAnalysis::muonData("PFMuon",     treeRAW);
   //treeElecs    = new nTupleAnalysis::elecData("PFElectron", treeRAW);
   treeMuons    = new nTupleAnalysis::muonData("PatMuon",     treeRAW, isMC, year);
   treeElecs    = new nTupleAnalysis::elecData("PatElec",     treeRAW, isMC, year);
+
 } 
 
 void eventData::update(int e){
@@ -85,8 +152,33 @@ void eventData::update(int e){
   if(debug) std::cout<<"Got Entry "<<e<<std::endl;
 
   if((run != runAOD) || (event != eventAOD)){
-    if(debug) std::cout << "Run: " << run << " vs " << runAOD  << "  Evt: " << event << " vs " << eventAOD << std::endl;  
+    std::cout << "Run: " << run << " vs " << runAOD  << "  Evt: " << event << " vs " << eventAOD << std::endl;  
+    //std::cout << "Tryuing with inedex " << treeAOD->GetEntryWithIndex(run,event)  << std::endl;
   }
+
+  //if((run != runAOD) || (event != eventAOD)){
+  //  if(debug) std::cout << "Run: " << run << " vs " << runAOD  << "  Evt: " << event << " vs " << eventAOD << std::endl;  
+  //  std::cout << "Run: " << run << " vs " << runAOD  << "  Evt: " << event << " vs " << eventAOD << std::endl;  
+  //  
+  //  std::cout << "Try manual lookup" << std::endl;
+  //  Int_t runToPrint = -99;
+  //  treeAOD->GetEntries();
+  //  for(long int eAOD = 0; eAOD < treeEventsAOD; eAOD++){
+  //    treeAOD->GetEntry(eAOD);
+  //    if(runAOD != runToPrint){
+  //	std::cout << " \t now! " << runAOD << " " << eventAOD << std::endl;
+  //	runToPrint = runAOD;
+  //    }
+  //
+  //    if(run != runAOD) continue;
+  //    std::cout << " \t now! " << runAOD << " " << eventAOD << std::endl;
+  //    if(event != eventAOD) continue;
+  //    std::cout << " Found match! " << std::endl;
+  //    break;
+  //  }
+  //
+  //
+  //}
 
   if(run != runAOD){
     if(debug) std::cout << "run: " << run << " vs " << runAOD << std::endl;

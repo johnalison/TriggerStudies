@@ -26,6 +26,10 @@ namespace TriggerStudies {
     TChain* treeRAW;
     TChain* treeAOD;
 
+    typedef std::vector<std::pair<Int_t, Int_t> > RunEventMap;
+    RunEventMap AODEvents;
+    int treeEventsAOD;
+
     bool isMC;
     std::string year;
     bool debug;

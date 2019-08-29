@@ -8,7 +8,7 @@ BTagAnalyzer TriggerStudies/NtupleAna/scripts/BTagAnalyzer_cfg.py \
     --histFile hists_STMC_wAntiT_${RunPeriod}.root \
     --puFile TriggerStudies/NtupleAna/data/PUWeights_${RunPeriod}.root \
     --isMC \
-    --nevents 10000
+    --nevents -1
 
     # --debug \
 

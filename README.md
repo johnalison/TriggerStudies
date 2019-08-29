@@ -64,3 +64,5 @@ and then submit a pull request. When it’s been merged, you can run:
 
 > python TriggerStudies/NtupleAna/scripts/makeInputFiles.py  -i /store/user/jda102//BTagNTuples/2017RAW/crab_projects_v4/MuonEG/Run2017B-v1/190531_114955  -o inputFiles_2017B_RAW -n 500 -t 5
 
+# Add -r to actually run the command
+
