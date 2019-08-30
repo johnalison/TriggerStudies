@@ -1,8 +1,12 @@
 import ROOT
 import math
 
-from   ROOTCore.Utils         import do_variable_rebinning, makeCanvas
-from   ROOTCore.Plotting      import makeRatio, makeBayesRatio
+import sys
+sys.path.insert(0, '../../')
+
+
+from   ROOTHelp.Utils         import do_variable_rebinning, makeCanvas
+from   ROOTHelp.Plotting      import makeRatio, makeBayesRatio
 
 def getLegend(entries,xStart,xWidth,yStart,yWidth):
     leg = ROOT.TLegend(xStart,yStart, (xStart+xWidth), (yStart+yWidth))
