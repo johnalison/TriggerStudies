@@ -4,7 +4,8 @@ import ROOT
 
 ROOT.gROOT.SetBatch(True)
 
-import OfficialAtlasStyle
+
+import FancyROOTStyle
 
 from optparse import OptionParser
 p = OptionParser()
