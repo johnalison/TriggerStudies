@@ -41,3 +41,9 @@
 #  Compare histrograms from two samples (uses track info)
 #
 > python ../plotting/BJetTrigValidationFileComp.py [Histograms from Sample 1] [Histograms from Sample 2]   --model BasicComp --out [Output DirName] --labName [Sample Label 1,Sample Label 2]
+
+
+#
+#  Make plots overlaying Offline and HLT and B-Q vs L-Q
+#
+> python ../plotting/HLTvsOff_BvL.py --input [Histograms with tracks MC]  --out [Output Name]

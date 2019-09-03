@@ -2,8 +2,8 @@ import ROOT
 
 ROOT.gROOT.SetBatch(True)
 
-import sys
-sys.path.insert(0, '../../')
+#import sys
+#sys.path.insert(0, '../../')
 import ROOTHelp.FancyROOTStyle
 
 from optparse import OptionParser

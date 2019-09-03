@@ -3,7 +3,7 @@ import ROOT
 
 ROOT.gROOT.SetBatch(True)
 
-import OfficialAtlasStyle
+import ROOTHelp.FancyROOTStyle
 
 from optparse import OptionParser
 p = OptionParser()
@@ -14,11 +14,11 @@ p.add_option('--doCaloJets',  action="store_true",help = 'output dir' )
 
 
 
-from   ROOTCore.Utils         import do_variable_rebinning, makeCanvas
-from   ROOTCore.Plotting      import makeRatio
+from   ROOTHelp.Utils         import do_variable_rebinning, makeCanvas
+from   ROOTHelp.Plotting      import makeRatio
 #from rocCurveUtils            import drawWaterMarks
 #import rebinning
-from Rebinning import rebinningDB
+#from Rebinning import rebinningDB
 
 from JetLevelPlotUtils import getCMSText
 
@@ -372,10 +372,10 @@ for v in ["tracks/ip3d_sig",
           ]:
 
     vName = v.split("/")[-1]
-    if vName in rebinningDB:
-        binning = rebinningDB[vName]
-    else:
-        binning = 1
+    #if vName in rebinningDB:
+    #    binning = rebinningDB[vName]
+    #else:
+    binning = 1
 
     doVarRatio(v,
           xTitle = v,
