@@ -9,6 +9,8 @@
 >  TriggerStudies
 >  ROOTHelp
 
+# Setup the ROOT Help 
+# sourse ROOTHelp/setup.sh
 
 # The plot making is then done in a subdir of TriggerStudies
 # eg 
@@ -33,3 +35,9 @@
 #
 
 > python ../plotting/MakeTrackEffsComp.py  --input1 [Histograms with Trks Sample 1] --name1 [Name 1]  --input2 [Histograms with Trks Sample 2] --name2 [Name 2] --out [Output Directory Name]
+
+
+#
+#  Compare histrograms from two samples (uses track info)
+#
+> python ../plotting/BJetTrigValidationFileComp.py [Histograms from Sample 1] [Histograms from Sample 2]   --model BasicComp --out [Output DirName] --labName [Sample Label 1,Sample Label 2]

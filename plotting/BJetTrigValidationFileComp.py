@@ -7,7 +7,7 @@
 
 
 from iUtils import getPM, setBatch, plot
-from Rebinning import rebinningDB
+#from Rebinning import rebinningDB
 setBatch()
 
 from iUtils import parseOpts as parseOpts
@@ -76,10 +76,10 @@ for v in ["tracks/ip3d_sig",
           ]:
 
     vName = v.split("/")[-1]
-    if vName in rebinningDB:
-        binning = rebinningDB[vName]
-    else:
-        binning = 1
+    #if vName in rebinningDB:
+    #    binning = rebinningDB[vName]
+    #else:
+    binning = 1
 
     for d in plotDirs: 
         plot(v,d,       binning=1,doratio=1,rMin=0.5,rMax=1.5,logy=1,labels=labName,norm=options.norm)
