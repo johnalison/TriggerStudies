@@ -47,3 +47,8 @@
 #  Make plots overlaying Offline and HLT and B-Q vs L-Q
 #
 > python ../plotting/HLTvsOff_BvL.py --input [Histograms with tracks MC]  --out [Output Name]
+
+#
+# To make plots of pt and eta efficienies for the different tracking algos (note need AODs for the algo enum)
+#
+python ../plotting/PlotAlgoStudy.py [Histograms with track algo info filled] --out [Output Name]
