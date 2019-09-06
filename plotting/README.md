@@ -42,6 +42,10 @@
 #
 > python ../plotting/BJetTrigValidationFileComp.py [Histograms from Sample 1] [Histograms from Sample 2]   --model BasicComp --out [Output DirName] --labName [Sample Label 1,Sample Label 2]
 
+#
+#  To Make Roc Curves
+#
+python ../plotting/makeRocCurves.py --in [Input MC File] --out [Output Directory]
 
 #
 #  Make plots overlaying Offline and HLT and B-Q vs L-Q
