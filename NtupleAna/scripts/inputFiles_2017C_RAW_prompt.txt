@@ -1,0 +1,3 @@
+root://cmsxrootd.fnal.gov//store/user/jda102//BTagNTuples//2018_v3/crab_projects_v4/MuonEG/Run2018C-v1/190531_004239/inputFiles_2018C_RAW_All.root
+root://cmsxrootd.fnal.gov//store/user/jda102//BTagNTuples//2018/crab_projects/MuonEG/Run2018C-PromptReco-v2/190611_154214/inputFiles_2018C_MiniAOD_All.root
+root://cmsxrootd.fnal.gov//store/user/jda102/BTagNTuples/2018RAW/crab_projects_v5/MuonEG/Run2018C-v1/190617_185449/inputFiles_2018C_RAW_HLT_v7_All.root

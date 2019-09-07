@@ -20,8 +20,8 @@ eventData::eventData(TChain* _treeRAW, TChain* _treeAOD, bool mc, std::string y,
     //
     // Get All events in AOD
     //
-    initBranch(treeAOD, "Run",             runAOD);
-    initBranch(treeAOD, "Evt",           eventAOD);
+    inputBranch(treeAOD, "Run",             runAOD);
+    inputBranch(treeAOD, "Evt",           eventAOD);
     
     for(long int eAOD = 0; eAOD < treeEventsAOD; eAOD++){
       treeAOD->GetEntry(eAOD);
@@ -31,8 +31,8 @@ eventData::eventData(TChain* _treeRAW, TChain* _treeAOD, bool mc, std::string y,
     //
     // Get All events in RAW
     //
-    initBranch(treeRAW, "Run",             run);
-    initBranch(treeRAW, "Evt",           event);
+    inputBranch(treeRAW, "Run",             run);
+    inputBranch(treeRAW, "Evt",           event);
     int treeEventsRAW = treeRAW->GetEntries();
 
     RunEventMap RAWEvents;
@@ -100,25 +100,28 @@ eventData::eventData(TChain* _treeRAW, TChain* _treeAOD, bool mc, std::string y,
   //std::cout << "eventData::eventData() tree->LoadTree(0)" << std::endl;
   //treeRAW->LoadTree(0);
       
-  initBranch(treeRAW, "Run",             run);
-  //initBranch(tree, "luminosityBlock", lumiBlock);
-  initBranch(treeRAW, "Evt",           event);
+  inputBranch(treeRAW, "Run",             run);
+  //inputBranch(tree, "luminosityBlock", lumiBlock);
+  inputBranch(treeRAW, "Evt",           event);
         
     
-  initBranch(treeAOD, "Run",             runAOD);
-  //initBranch(tree, "luminosityBlock", lumiBlock);
-  initBranch(treeAOD, "Evt",           eventAOD);
-  initBranch(treeRAW, "nPV",    nPV);
-  initBranch(treeAOD, "nPV",    nPVAOD);
+  inputBranch(treeAOD, "Run",             runAOD);
+  //inputBranch(tree, "luminosityBlock", lumiBlock);
+  inputBranch(treeAOD, "Evt",           eventAOD);
+  inputBranch(treeRAW, "nPV",    nPV);
+  inputBranch(treeAOD, "nPV",    nPVAOD);
     
   std::cout << "eventData::eventData() Initialize jets and muons" << std::endl;
-  offTreeJets  = new nTupleAnalysis::jetData( "Jet",  treeRAW, jetDetailLevel, "",      isMC, year );
-  pfTreeJets   = new nTupleAnalysis::jetData( "Jet",  treeRAW, jetDetailLevel, "PFJet."       );
-  caloTreeJets = new nTupleAnalysis::jetData( "Jet",  treeRAW, jetDetailLevel, "CaloJet."     );
+  std::string jetSFName = year;
+  if(jetSFName == "2018") jetSFName = "deepcsv2018";
+
+  offTreeJets  = new nTupleAnalysis::jetData( "Jet",  treeRAW, true, isMC,  jetDetailLevel, "",      jetSFName );
+  pfTreeJets   = new nTupleAnalysis::jetData( "Jet",  treeRAW, true, false, jetDetailLevel, "PFJet."       );
+  caloTreeJets = new nTupleAnalysis::jetData( "Jet",  treeRAW, true, false, jetDetailLevel, "CaloJet."     );
     
   //treeMuons    = new nTupleAnalysis::muonData("PFMuon",     treeRAW);
   //treeElecs    = new nTupleAnalysis::elecData("PFElectron", treeRAW);
-  treeMuons    = new nTupleAnalysis::muonData("PatMuon",     treeRAW, isMC, year);
+  treeMuons    = new nTupleAnalysis::muonData("PatMuon",     treeRAW, true, isMC, year);
   treeElecs    = new nTupleAnalysis::elecData("PatElec",     treeRAW, isMC, year);
 
 } 
