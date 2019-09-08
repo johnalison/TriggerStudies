@@ -7,7 +7,7 @@
 
 
 from iUtils import getPM, setBatch, plot
-#from Rebinning import rebinningDB
+from Rebinning import rebinningDB
 setBatch()
 
 from iUtils import parseOpts as parseOpts
@@ -76,13 +76,14 @@ for v in ["tracks/ip3d_sig",
           ]:
 
     vName = v.split("/")[-1]
-    #if vName in rebinningDB:
-    #    binning = rebinningDB[vName]
-    #else:
-    binning = 1
+    if vName in rebinningDB:
+        binning = rebinningDB[vName]
+    else:
+        binning = 2
 
+        
     for d in plotDirs: 
-        plot(v,d,       binning=1,doratio=1,rMin=0.5,rMax=1.5,logy=1,labels=labName,norm=options.norm)
+        plot(v,d,       binning=binning,doratio=1,rMin=0.5,rMax=1.5,logy=1,labels=labName,norm=options.norm)
 
     #doVarRatio(v,
     #      xTitle = v,
@@ -128,10 +129,6 @@ for v in [        "tracks/eta",
 
 
         "tracks/JetDistVal"     ,
-        "tracks/HasInnerPixHit",
-        "tracks/NPixelHits",
-        "tracks/NTotalHits",
-        "tracks/NStripHits",
 
         "tracks/eta"            ,
         "tracks/phi"            ,
@@ -139,10 +136,6 @@ for v in [        "tracks/eta",
         "tracks/DeltaR"         ,
         #"trackEtaRel"         ,
 
-        "btags/sv_nSVs",
-        #"jetNSelectedTracks",
-        "tracks/nTracks",
-                  "btags_noV0/nTracks",
         #"mult",
         #"nTrk",
         #"jetNTracksEtaRel",
@@ -159,8 +152,6 @@ for v in [        "tracks/eta",
 
 
         #"vertexCategory",
-        "btags/sv_NTracks",
-                  #"ip2d",
 
           "tracks/Chi2",
 
@@ -179,8 +170,14 @@ for v in [        "tracks/eta",
 #              "btags/totalMultiplicity",
 #              ]:
 #        continue
+    vName = v.split("/")[-1]
+    if vName in rebinningDB:
+        binning = rebinningDB[vName]
+    else:
+        binning = 2
+
     for d in plotDirs: 
-        plot(v,d,       binning=1,doratio=1,rMin=0.5,rMax=1.5,logy=0,labels=labName, norm=options.norm)
+        plot(v,d,       binning=binning,doratio=1,rMin=0.5,rMax=1.5,logy=0,labels=labName, norm=options.norm)
                     
 
 
@@ -193,6 +190,18 @@ for v in [
 "btags/neutralEmEnergyFraction",
 "btags/neutralHadronEnergyFraction",
 "btags/photonEnergyFraction",
+        "btags/sv_nSVs",
+        #"jetNSelectedTracks",
+        "tracks/HasInnerPixHit",
+        "tracks/NPixelHits",
+        "tracks/NTotalHits",
+        "tracks/NStripHits",
+
+        "tracks/nTracks",
+                  "btags_noV0/nTracks",
+
+        "btags/sv_NTracks",
+                  #"ip2d",
 
 
           "tracks/IsFromV0",

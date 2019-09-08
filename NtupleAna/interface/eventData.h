@@ -1,76 +1,118 @@
 // -*- C++ -*-
 
-#if !defined(eventData_H)
-#define eventData_H
+#if !defined(EventData_H)
+#define EventData_H
 
-#include <iostream>
-#include <TChain.h>
-#include <TFile.h>
-#include <TLorentzVector.h>
-#include "nTupleAnalysis/baseClasses/interface/initBranch.h"
-#include "nTupleAnalysis/baseClasses/interface/jetData.h"
-#include "nTupleAnalysis/baseClasses/interface/muonData.h"
-#include "nTupleAnalysis/baseClasses/interface/elecData.h"
+namespace NtupleAna {
 
-// for jet pseudoTag calculations
-#include <TRandom3.h>
-#include <numeric> 
-#include <boost/math/special_functions/binomial.hpp> 
 
-namespace TriggerStudies {
-
-  class eventData {
+  class EventData {
 
   public:
-    // Member variables
-    TChain* treeRAW;
-    TChain* treeAOD;
+    float runNumber         =  0;
+    float eventNumber       =  0;
+    float FastPrimaryVertex =  0;
+    float FPVPixelVertices  =  0;
+    float PixelVertices     =  0;
+    float VerticesPF        =  0;
+    float VerticesL3        =  0;
+    float VerticesOff       =  0;
+    float nPV               =  0;
+    float pu                =  0;
+    float trueVertex        =  0;
+    bool HLT_Mu12_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL = false;
+    bool HLT_Mu12_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_DZ = false;
 
-    typedef std::vector<std::pair<Int_t, Int_t> > RunEventMap;
-    RunEventMap AODEvents;
-    int treeEventsAOD;
+    bool HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL    = false;
+    bool HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_DZ = false;
 
-    bool isMC;
-    std::string year;
-    bool debug;
-    Int_t    run       =  0;
-    UInt_t    lumiBlock =  0;
-    Int_t    event     =  0;
-    Int_t    runAOD       =  0;
-    UInt_t    lumiBlockAOD =  0;
-    Int_t eventAOD     =  0;
-    //Int_t     nPVs = 0;
-    //Int_t     nPVsGood = 0;
+    // 2017A
+    bool HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_DZ = false;
 
-    //
-    // Testing
-    //
-    Int_t    nPV       =  0;
-    Int_t    nPVAOD    =  0;
 
-    nTupleAnalysis::jetData* offTreeJets;
-    std::vector<nTupleAnalysis::jetPtr> offJets;
+  private:
 
-    nTupleAnalysis::jetData* pfTreeJets;
-    std::vector<nTupleAnalysis::jetPtr> pfJets;
+    float runNumber_arr         [1] = {0};
+    float eventNumber_arr       [1] = {0};
+    float FastPrimaryVertex_arr [1] = {0};
+    float FPVPixelVertices_arr  [1] = {0};
+    float PixelVertices_arr     [1] = {0};
+    float VerticesPF_arr        [1] = {0};
+    float VerticesL3_arr        [1] = {0};
+    float VerticesOff_arr       [1] = {0};
+    float nPV_arr               [1] = {0};
+    float pu_arr                [1] = {0};
+    float trueVertex_arr        [1] = {0};
+    bool HLT_Mu12_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_v4_arr [1] = {false};
+    bool HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_v4_arr [1] = {false};
+    bool HLT_Mu12_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_DZ_v15_arr [1] = {false};
+    bool HLT_Mu12_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_v7_arr     [1] = {false};
+    bool HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_v7_arr     [1] = {false};
+    bool HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_DZ_v15_arr [1] = {false};
 
-    nTupleAnalysis::jetData* caloTreeJets;
-    std::vector<nTupleAnalysis::jetPtr> caloJets;
+    bool HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_DZ_v6_arr[1] = {false};
+    bool HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_DZ_v5_arr[1] = {false};
+    bool HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_DZ_v8_arr[1] = {false};
+    
+    bool HLT_Mu12_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_DZ_v5_arr[1] = {false};
+    bool HLT_Mu12_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_DZ_v6_arr[1] = {false};
+    bool HLT_Mu12_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_DZ_v8_arr[1] = {false};
+    
+    bool HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_DZ_v4_arr[1]  = {false};
+    bool HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_DZ_v6_arr[1]  = {false};
 
-    nTupleAnalysis::muonData* treeMuons;
-    std::vector<nTupleAnalysis::muonPtr> muons;
+    // 2017B
+    bool HLT_Mu12_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_v1_arr[1]  = {false};
+    bool HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_v1_arr[1]  = {false};
+    bool HLT_Mu12_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_v2_arr[1]  = {false};
+    bool HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_v2_arr[1]  = {false};
+    bool HLT_Mu12_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_v3_arr[1]  = {false};
+    bool HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_v3_arr[1]  = {false};
+    //bool HLT_Mu12_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_v4_arr[1]  = {false};
+    //bool HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_v4_arr[1]  = {false};
+    bool HLT_Mu12_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_v12_arr[1]  = {false};
+    bool HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_v12_arr[1]  = {false};
+    bool HLT_Mu12_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_DZ_v9_arr[1]  = {false};
+    bool HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_DZ_v9_arr[1]  = {false};
+    bool HLT_Mu12_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_DZ_v10_arr[1]  = {false};
+    bool HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_DZ_v10_arr[1]  = {false};
+    bool HLT_Mu12_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_DZ_v11_arr[1]  = {false};
+    bool HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_DZ_v11_arr[1]  = {false};
+    bool HLT_Mu12_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_DZ_v12_arr[1]  = {false};
+    bool HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_DZ_v12_arr[1]  = {false};
 
-    nTupleAnalysis::elecData* treeElecs;
-    std::vector<nTupleAnalysis::elecPtr> elecs;
 
-    // Constructors and member functions
-    eventData(TChain*, TChain*, bool, std::string, bool, std::string); 
-    void update(int);
+  public:
 
-    void dump();
-    ~eventData(); 
+    EventData(); 
 
+    ~EventData(); 
+
+    void SetBranchAddress (TChain* intree);
+
+    void SetEvent();
+
+    void SetBranchAddress(TChain* intree, std::string brName, bool* Trigger_arr);
+    void SetBranchAddress(TChain* intree, std::string brName, float* float_arr);
+
+    bool passTrigger() {
+      //if(HLT_Mu12_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL ||
+      //	 HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL ||
+      //	 HLT_Mu12_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_DZ || 
+      //	 HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_DZ ){
+      //	return true;
+      //}
+
+      if(HLT_Mu12_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_DZ || 
+	 HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_DZ ){
+	return true;
+      }
+
+
+      return false;
+    };
+    
   };
 
 }
-#endif // eventData_H
+#endif // EventData_H

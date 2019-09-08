@@ -242,6 +242,19 @@ def main():
                  rocType = rocType
                  )
 
+        plotSame("Off_vs_HLTDeepCSV_"+rocType,
+                 [off_deepcsv_roc[i], calo_deepcsv_roc[i], pf_deepcsv_roc[i]], 
+                 [ROOT.kBlack,       ROOT.kRed  ,      ROOT.kBlue],
+                 [ROOT.kSolid,      ROOT.kSolid,      ROOT.kSolid],
+                 plotCaloJet = True,
+                 plotPFJet = True,
+                 plotOffJet = True,
+                 plotCSV = False,
+                 plotDeepCSV = True,
+                 rocType = rocType
+                 )
+
+
     
 
 #    vars = ["MV2c10_l","SV1_normdist", "IP3D", "IP2D"]

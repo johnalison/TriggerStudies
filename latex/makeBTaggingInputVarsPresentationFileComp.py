@@ -4,8 +4,10 @@ parser.add_option('-n', '--name',              dest="name",            help="Run
 parser.add_option('-p', '--prefix',            dest="prefix",          help="Run in loop mode")
 #parser.add_option(      '--period',            dest="period",          help="Run in loop mode")
 parser.add_option('--rocPlot',                  dest="rocPlot",          help="Run in loop mode")
-parser.add_option('--inputPlotDir',              help="Run in loop mode")
+parser.add_option('--fileCompDir',              help="Run in loop mode")
+parser.add_option('--jetLevelPlotDir',          help="Run in loop mode")
 parser.add_option('--effDir',                   help="Run in loop mode")
+parser.add_option('--flavPlotDir',              help="Run in loop mode")
 parser.add_option('--algoDir',                   help="Run in loop mode")
 parser.add_option('--name1',                   help="Run in loop mode")
 parser.add_option('--name2',                   help="Run in loop mode")
@@ -277,86 +279,115 @@ def makePresentation():
                 yText = [0.1],
                 )
 
-    plotDirs = ["offJets_matched_","offJets_matchedJet_",  "offJets_matchedCaloJet_"]
-    dirNames = ["\\textcolor{black}{\\textit{Offline Jets}}",
-                "\\textcolor{myblue}{\\textit{PF Jets}}",
-                "\\textcolor{myred}{\\textit{Calo Jets}}",
-                ]
-    
-
-    for slideConfig in [("Jet Kinematics",          ["eta","pt_m"],             ["Jet $\eta$","Jet $p_{T}$"]),
-                        ("BTagging Discriminant",   ["CSVv2_l","DeepCSV_l"],             ["CSV","DeepCSV"]),
-                        ]:
-
-        for iDir in range(len(plotDirs)):
-            text = slideConfig[2] + [dirNames[iDir]]
+    if o.jetLevelPlotDir:
+        #plotDirs = ["offJet_","offJets_matchedJet_",  "offJets_matchedCaloJet_"]
+        dirNames = ["\\textcolor{black}{\\textit{Offline Jets}}",
+                    "\\textcolor{myblue}{\\textit{PF Jets}}",
+                    "\\textcolor{myred}{\\textit{Calo Jets}}",
+                    "\\textcolor{myred}{\\textit{}}",
+                    ]
+        
+        
+        for slideConfig in [("Jet Kinematics",          ["OffJet_Pt","OffJet_Eta"],             ["Jet $p_{T}$","Jet $\eta$"], dirNames[0]),
+                            ("BTagging Discriminant",   ["OffJet_CSV","OffJet_DeepCSV"],             ["CSV","DeepCSV"], dirNames[0]),
+                            ("BTagging Discriminant",   ["PF_CSV_FlavorComp","PF_DeepCSV_FlavorComp"],             ["CSV","DeepCSV"], dirNames[1]),
+                            ("BTagging Discriminant",   ["Calo_CSV_FlavorComp","Calo_DeepCSV_FlavorComp"],             ["CSV","DeepCSV"], dirNames[2]),
+                            ("Turn On Curves",          ["Eff_PFDeepCSV_DataVSMC","Eff_CaloDeepCSV_DataVSMC"], ["PF Jets","Calo Jets"], dirNames[3]),
+                            ("Efficiencies wrt Offline",["PFDeepCSVEffwrtOff_All","CaloDeepCSVEffwrtOff_All"], ["PF Jets","Calo Jets"], dirNames[3]),
+                            ("Reverse Turn Ons",        ["RevEff_PFDeepCSV_All","RevEff_CaloDeepCSV_All"], ["PF Jets","Calo Jets"], dirNames[3]),
+                            ]:
+        
+            #for iDir in range(len(plotDirs)):
+            text = slideConfig[2] + [slideConfig[3]]
             make1x2(outFile,slideConfig[0],
-                    files = [o.inputPlotDir+"/"+plotDirs[iDir]+slideConfig[1][0],
-                             o.inputPlotDir+"/"+plotDirs[iDir]+slideConfig[1][1]],
+                    files = [o.jetLevelPlotDir+"/"+slideConfig[1][0],
+                             o.jetLevelPlotDir+"/"+slideConfig[1][1]],
                     text = text,
                     xText = [0, 6.5 , 0.3],
                     yText = [6.7,6.7, 0.3],
                     )
 
-    makeTransition(outFile,"Track-Parameters")
-
-
-    for slideConfig in [("Track Parameters",   ["tracks_eta","tracks_pt_s"],             ["Track $\eta$","Track $p_{T}$"]),
-                        ("Track Multiplicity", ["tracks_nTracks", "btags_noV0_nTracks"],["N Tracks","N Selected Tracks"]),
-                        ("Hit Multiplicity",   ["tracks_NTotalHits","tracks_NPixelHits"],["N Total Hits","N Pixel Hits"]),
-                        ("Impact Parameters",  ["tracks_ip2d","tracks_ip3d"],            ["IP2D","IP3D"]),
-                        ("Impact Parameters",  ["tracks_ip2d_l","tracks_ip3d_l"],        ["IP2D","IP3D"]),
-                        ("Impact Parameters",  ["tracks_ip2d_sig",  "tracks_ip3d_sig"],            ["IP2D Significance","IP3D Significance"]),
-                        ("Impact Parameters",  ["tracks_ip2d_sig_l","tracks_ip3d_sig_l"],        ["IP2D Significance","IP3D Significance"]),
-                        ("Track Category",     ["tracks_IsFromSV","tracks_IsFromV0"],        ["Is From SV","Is From V0"]),
-                        ("Track Parameters",   ["tracks_DeltaR","tracks_JetDistVal"],        ["Track $\Delta$ R ","Track Jet Dist"]),
-                        ("Impact Parameters",  ["tracks_ip2d_err","tracks_ip3d_err"],        ["IP2D Uncertianty","IP3D Uncertianty"]),
-                        ]:
-
-        for iDir in range(len(plotDirs)):
-            text = slideConfig[2] + [dirNames[iDir]]
-            make1x2(outFile,slideConfig[0] ,
-                    files = [o.inputPlotDir+"/"+plotDirs[iDir]+slideConfig[1][0],
-                             o.inputPlotDir+"/"+plotDirs[iDir]+slideConfig[1][1],],
-                    text = text,
-                    xText = [0, 6.5 , 0.3],
-                    yText = [6.7,6.7, 0.3],
-                    )
-
-    makeTransition(outFile,"Secondary Vertices")
 
 
 
-    for slideConfig in [("Vertices",   ["btags_sv_nSVs","btags_sv_NTracks"],             ["Number Vertices","Number Vertex Tracks"]),
-                        ("Vertices",   ["btags_sv_Eta","btags_sv_Phi"],             ["Secondary Vertex $\eta$","Secondary Vertex $\phi$"]),
-                        ("Vertices",   ["btags_sv_Flight2D","btags_sv_Flight"],             ["Flight Distance 2D","Flight Distance 3D"]),
-                        ("Vertices",   ["btags_sv_FlightSig2D","btags_sv_FlightSig"],             ["Flight Significance 2D","Flight Significance 3D"]),
-                        ("Vetex Fractions",   ["btags_sv_EnergyRatio","btags_sv_Chi2"],             ["Vertex Energy Fraction","Vertex Chi2"]),
-                        ("Vetex Mass/$\Delta$R",   ["btags_sv_Mass","btags_sv_JetDeltaR"],             ["Vertex Mass","Vertex-Jet $\Delta$R"]),
-                        ]:
-      
 
-
-        for iDir in range(len(plotDirs)):
-            text = slideConfig[2] + [dirNames[iDir]]
-            make1x2(outFile,slideConfig[0] ,
-                    files = [o.inputPlotDir+"/"+plotDirs[iDir]+slideConfig[1][0],
-                             o.inputPlotDir+"/"+plotDirs[iDir]+slideConfig[1][1],],
-                    text = text,
-                    xText = [0, 6.5 , 0.3],
-                    yText = [6.7,6.7, 0.3],
-                    )
-
-                         
-
-
-
-    
+        
+    if o.fileCompDir:
+        plotDirs = ["offJets_matched_","offJets_matchedJet_",  "offJets_matchedCaloJet_"]
+        dirNames = ["\\textcolor{black}{\\textit{Offline Jets}}",
+                    "\\textcolor{myblue}{\\textit{PF Jets}}",
+                    "\\textcolor{myred}{\\textit{Calo Jets}}",
+                    ]
+        
+        
+        for slideConfig in [("Jet Kinematics",          ["eta","pt_m"],             ["Jet $\eta$","Jet $p_{T}$"]),
+                            ("BTagging Discriminant",   ["CSVv2_l","DeepCSV_l"],             ["CSV","DeepCSV"]),
+                            ]:
+        
+            for iDir in range(len(plotDirs)):
+                text = slideConfig[2] + [dirNames[iDir]]
+                make1x2(outFile,slideConfig[0],
+                        files = [o.fileCompDir+"/"+plotDirs[iDir]+slideConfig[1][0],
+                                 o.fileCompDir+"/"+plotDirs[iDir]+slideConfig[1][1]],
+                        text = text,
+                        xText = [0, 6.5 , 0.3],
+                        yText = [6.7,6.7, 0.3],
+                        )
+        
+        makeTransition(outFile,"Track-Parameters")
+        
+        
+        for slideConfig in [("Track Parameters",   ["tracks_eta","tracks_pt_s"],             ["Track $\eta$","Track $p_{T}$"]),
+                            ("Track Multiplicity", ["tracks_nTracks", "btags_noV0_nTracks"],["N Tracks","N Selected Tracks"]),
+                            ("Hit Multiplicity",   ["tracks_NTotalHits","tracks_NPixelHits"],["N Total Hits","N Pixel Hits"]),
+                            ("Impact Parameters",  ["tracks_ip2d","tracks_ip3d"],            ["IP2D","IP3D"]),
+                            ("Impact Parameters",  ["tracks_ip2d_l","tracks_ip3d_l"],        ["IP2D","IP3D"]),
+                            ("Impact Parameters",  ["tracks_ip2d_sig",  "tracks_ip3d_sig"],            ["IP2D Significance","IP3D Significance"]),
+                            ("Impact Parameters",  ["tracks_ip2d_sig_l","tracks_ip3d_sig_l"],        ["IP2D Significance","IP3D Significance"]),
+                            ("Track Category",     ["tracks_IsFromSV","tracks_IsFromV0"],        ["Is From SV","Is From V0"]),
+                            ("Track Parameters",   ["tracks_DeltaR","tracks_JetDistVal"],        ["Track $\Delta$ R ","Track Jet Dist"]),
+                            ("Impact Parameters",  ["tracks_ip2d_err","tracks_ip3d_err"],        ["IP2D Uncertianty","IP3D Uncertianty"]),
+                            ]:
+        
+            for iDir in range(len(plotDirs)):
+                text = slideConfig[2] + [dirNames[iDir]]
+                make1x2(outFile,slideConfig[0] ,
+                        files = [o.fileCompDir+"/"+plotDirs[iDir]+slideConfig[1][0],
+                                 o.fileCompDir+"/"+plotDirs[iDir]+slideConfig[1][1],],
+                        text = text,
+                        xText = [0, 6.5 , 0.3],
+                        yText = [6.7,6.7, 0.3],
+                        )
+        
+        makeTransition(outFile,"Secondary Vertices")
+        
+        
+        
+        for slideConfig in [("Vertices",   ["btags_sv_nSVs","btags_sv_NTracks"],             ["Number Vertices","Number Vertex Tracks"]),
+                            ("Vertices",   ["btags_sv_Eta","btags_sv_Phi"],             ["Secondary Vertex $\eta$","Secondary Vertex $\phi$"]),
+                            ("Vertices",   ["btags_sv_Flight2D","btags_sv_Flight"],             ["Flight Distance 2D","Flight Distance 3D"]),
+                            ("Vertices",   ["btags_sv_FlightSig2D","btags_sv_FlightSig"],             ["Flight Significance 2D","Flight Significance 3D"]),
+                            ("Vetex Fractions",   ["btags_sv_EnergyRatio","btags_sv_Chi2"],             ["Vertex Energy Fraction","Vertex Chi2"]),
+                            ("Vetex Mass/$\Delta$R",   ["btags_sv_Mass","btags_sv_JetDeltaR"],             ["Vertex Mass","Vertex-Jet $\Delta$R"]),
+                            ]:
+          
+        
+        
+            for iDir in range(len(plotDirs)):
+                text = slideConfig[2] + [dirNames[iDir]]
+                make1x2(outFile,slideConfig[0] ,
+                        files = [o.fileCompDir+"/"+plotDirs[iDir]+slideConfig[1][0],
+                                 o.fileCompDir+"/"+plotDirs[iDir]+slideConfig[1][1],],
+                        text = text,
+                        xText = [0, 6.5 , 0.3],
+                        yText = [6.7,6.7, 0.3],
+                        )
 
 
     if o.effDir:
         makeTransition(outFile,"Efficiencies / Fake Rates")
 
+        makeWholeSlide(outFile,"./TrackMatchingSlide.pdf")
 
         for slideConfig in [ ("Eff_Eta","Eff_Momentum","Eff_DeltaR","Eff_phi"),
                              ("Eff_HasInnerPixHit", "Eff_NPixelHits", "Eff_NStripHits","Eff_NTotalHits",),
@@ -408,6 +439,51 @@ def makePresentation():
                     )
     
 
+    if o.flavPlotDir:
+        makeTransition(outFile,"MC BTagging Inputs (By Truth Label)", doHuge=False)
+    
+    
+        for slideConfig in [("Track Parameters",   ["track_eta","track_pt_s"],             ["Track $\eta$","Track $p_{T}$"]),
+                            ("Track Multiplicity", ["track_nTracks", "btag_noV0_nTracks"],["N Tracks","N Selected Tracks"]),
+                            ("Hit Multiplicity",   ["track_NTotalHits","track_NPixelHits"],["N Total Hits","N Pixel Hits"]),
+                            ("Impact Parameters",  ["track_ip2d","track_ip3d"],            ["IP2D","IP3D"]),
+                            ("Impact Parameters",  ["track_ip2d_l","track_ip3d_l"],        ["IP2D","IP3D"]),
+                            ("Impact Parameters",  ["track_ip2d_sig",  "track_ip3d_sig"],            ["IP2D Significance","IP3D Significance"]),
+                            ("Impact Parameters",  ["track_ip2d_sig_l","track_ip3d_sig_l"],        ["IP2D Significance","IP3D Significance"]),
+                            ("Track Category",     ["track_IsFromSV","track_IsFromV0"],        ["Is From SV","Is From V0"]),
+                            ("Track Parameters",   ["track_DeltaR","track_JetDistVal"],        ["Track $\Delta$ R ","Track Jet Dist"]),
+                            ("Impact Parameters",  ["track_ip2d_err","track_ip3d_err"],        ["IP2D Uncertianty","IP3D Uncertianty"]),
+                            ]:
+           
+            make1x2(outFile,slideConfig[0],
+                    files = [o.flavPlotDir+"/"+slideConfig[1][0],o.flavPlotDir+"/"+slideConfig[1][1]],
+                    text = slideConfig[2],
+                    xText = [0, 6.5],
+                    yText = [6.7,6.7],
+                    addLeg = True
+                    )
+    
+        makeTransition(outFile,"Secondary Vertices")
+    
+    
+    
+        for slideConfig in [("Vertices",   ["btag_sv_nSVs","btag_sv_NTracks"],             ["Number Vertices","Number Vertex Tracks"]),
+                            ("Vertices",   ["btag_sv_Eta","btag_sv_Phi"],             ["Secondary Vertex $\eta$","Secondary Vertex $\phi$"]),
+                            ("Vertices",   ["btag_sv_Flight2D","btag_sv_Flight"],             ["Flight Distance 2D","Flight Distance 3D"]),
+                            ("Vertices",   ["btag_sv_FlightSig2D","btag_sv_FlightSig"],             ["Flight Significance 2D","Flight Significance 3D"]),
+                            ("Vetex Fractions",   ["btag_sv_EnergyRatio","btag_sv_Chi2"],             ["Vertex Energy Fraction","Vertex Chi2"]),
+                            ("Vetex Mass/$\Delta$R",   ["btag_sv_Mass","btag_sv_JetDeltaR"],             ["Vertex Mass","Vertex-Jet $\Delta$R"]),
+                            ]:
+           
+            make1x2(outFile,slideConfig[0],
+                    files = [o.flavPlotDir+"/"+slideConfig[1][0],o.flavPlotDir+"/"+slideConfig[1][1]],
+                    text = slideConfig[2],
+                    xText = [0, 6.5],
+                    yText = [6.7,6.7],
+                    addLeg = True
+                    )
+    
+
 
     makeTransition(outFile,"Back-up")
 
@@ -428,6 +504,8 @@ def makePresentation():
                           o.algoDir+"/"+effPrefix+"_Pt_forAlgo" +str(algoPair[1])]
     
             make2x3(outFile,"Efficiencies (MC)",files = files)
+
+
     
                 
 

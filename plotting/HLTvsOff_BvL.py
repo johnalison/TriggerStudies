@@ -18,7 +18,7 @@ from   ROOTHelp.Utils         import do_variable_rebinning, makeCanvas
 from   ROOTHelp.Plotting      import makeRatio
 #from rocCurveUtils            import drawWaterMarks
 #import rebinning
-#from Rebinning import rebinningDB
+from Rebinning import rebinningDB
 
 from JetLevelPlotUtils import getCMSText
 
@@ -372,10 +372,10 @@ for v in ["tracks/ip3d_sig",
           ]:
 
     vName = v.split("/")[-1]
-    #if vName in rebinningDB:
-    #    binning = rebinningDB[vName]
-    #else:
-    binning = 1
+    if vName in rebinningDB:
+        binning = rebinningDB[vName]
+    else:
+        binning = 2
 
     doVarRatio(v,
           xTitle = v,
@@ -393,19 +393,9 @@ for v in [        "tracks/eta",
         "tracks/ip2d_err_l",
         "tracks/ip3d_err",
         "tracks/ip3d_err_l",
-
-
-
-
 #        "neMult",
         "phi",
-
-
-
-
-
                   "btags/sv_BoostOverSqrtJetPt",
-
         "btags/sv_EnergyRatio",
         "btags/sv_Eta",
         "btags/sv_NDF",
@@ -414,27 +404,14 @@ for v in [        "tracks/eta",
         "btags/sv_Z",
                   "btags/sv_massVertexEnergyFraction",
                   "btags/sv_Chi2",
-
         "btags/sv_JetDeltaR",
         "btags/sv_DistJetAxis",
-
-
         "tracks/JetDistVal"     ,
-        "tracks/HasInnerPixHit",
-        "tracks/NPixelHits",
-        "tracks/NTotalHits",
-        "tracks/NStripHits",
-
         "tracks/eta"            ,
         "tracks/phi"            ,
-
         "tracks/DeltaR"         ,
         #"trackEtaRel"         ,
-
-        "btags/sv_nSVs",
         #"jetNSelectedTracks",
-        "tracks/nTracks",
-                  "btags_noV0/nTracks",
         #"mult",
         #"nTrk",
         #"jetNTracksEtaRel",
@@ -448,17 +425,9 @@ for v in [        "tracks/eta",
                   "btags/photonMultiplicity",
                   "btags/totalMultiplicity",
 
-
-
         #"vertexCategory",
-        "btags/sv_NTracks",
                   #"ip2d",
-
           "tracks/Chi2",
-
-
-
-
                   ]:
 
     if o.doCaloJets:
@@ -472,6 +441,33 @@ for v in [        "tracks/eta",
                   "btags/totalMultiplicity",
                   ]:
             continue
+        
+    vName = v.split("/")[-1]
+    if vName in rebinningDB:
+        binning = rebinningDB[vName]
+    else:
+        binning = 2
+
+
+    doVarRatio(v,
+          xTitle = v,
+          binning = binning,
+          setLogy = 0,
+          )
+
+
+
+
+for v in [
+        "tracks/HasInnerPixHit",
+        "tracks/NPixelHits",
+        "tracks/NTotalHits",
+        "tracks/NStripHits",
+        "btags/sv_nSVs",
+        "tracks/nTracks",
+        "btags_noV0/nTracks",
+        "btags/sv_NTracks",
+        ]:
 
     doVarRatio(v,
           xTitle = v,
