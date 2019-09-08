@@ -87,10 +87,10 @@ BTagAnalysis::BTagAnalysis(TChain* _eventsRAW, TChain* _eventsAOD, fwlite::TFile
 
   hOffJetsPreOLap         = new nTupleAnalysis::jetHists("offJetsPreOLap",        fs, "Pre Overlap");
   hOffJets                = new nTupleAnalysis::jetHists("offJets",               fs, "");
-  hOffJets_matched        = new nTupleAnalysis::jetHists("offJets_matched",       fs, "");
-  hOffJets_matchedJet     = new nTupleAnalysis::jetHists("offJets_matchedJet",    fs, "");
-  hOffJets_matchedCalo    = new nTupleAnalysis::jetHists("offJets_matchedCalo",   fs, "");
-  hOffJets_matchedCaloJet = new nTupleAnalysis::jetHists("offJets_matchedCaloJet",fs, "");
+  hOffJets_matched        = new nTupleAnalysis::jetHists("offJets_matched",       fs, "", jetDetailString);
+  hOffJets_matchedJet     = new nTupleAnalysis::jetHists("offJets_matchedJet",    fs, "", jetDetailString);
+  hOffJets_matchedCalo    = new nTupleAnalysis::jetHists("offJets_matchedCalo",   fs, "", jetDetailString);
+  hOffJets_matchedCaloJet = new nTupleAnalysis::jetHists("offJets_matchedCaloJet",fs, "", jetDetailString);
 
   hOffJet_matchedPFcsvTag         = new nTupleAnalysis::jetHists("offJets_matchedPFcsvTag",         fs, "");
   hOffJet_matchedPFcsvTagJet      = new nTupleAnalysis::jetHists("offJets_matchedPFcsvTagJet",      fs, "");
@@ -113,19 +113,19 @@ BTagAnalysis::BTagAnalysis(TChain* _eventsRAW, TChain* _eventsAOD, fwlite::TFile
 
 
   if(isMC){
-    hOffJets_matched_L        = new nTupleAnalysis::jetHists("offJets_matched_L",   fs, "");
-    hOffJets_matchedJet_L     = new nTupleAnalysis::jetHists("offJets_matchedJet_L",fs, "");
-    hOffJets_matchedCalo_L    = new nTupleAnalysis::jetHists("offJets_matchedCalo_L",fs, "");
-    hOffJets_matchedCaloJet_L = new nTupleAnalysis::jetHists("offJets_matchedCaloJet_L",fs, "");
+    hOffJets_matched_L        = new nTupleAnalysis::jetHists("offJets_matched_L",       fs, "", jetDetailString);
+    hOffJets_matchedJet_L     = new nTupleAnalysis::jetHists("offJets_matchedJet_L",    fs, "", jetDetailString);
+    hOffJets_matchedCalo_L    = new nTupleAnalysis::jetHists("offJets_matchedCalo_L",   fs, "", jetDetailString);
+    hOffJets_matchedCaloJet_L = new nTupleAnalysis::jetHists("offJets_matchedCaloJet_L",fs, "", jetDetailString);
 
-    hOffJets_matched_B        = new nTupleAnalysis::jetHists("offJets_matched_B",   fs, "");
-    hOffJets_matchedJet_B     = new nTupleAnalysis::jetHists("offJets_matchedJet_B",fs, "");
-    hOffJets_matchedCalo_B    = new nTupleAnalysis::jetHists("offJets_matchedCalo_B",fs, "");
-    hOffJets_matchedCaloJet_B = new nTupleAnalysis::jetHists("offJets_matchedCaloJet_B",fs, "");
+    hOffJets_matched_B        = new nTupleAnalysis::jetHists("offJets_matched_B",       fs, "", jetDetailString );
+    hOffJets_matchedJet_B     = new nTupleAnalysis::jetHists("offJets_matchedJet_B",    fs, "", jetDetailString );
+    hOffJets_matchedCalo_B    = new nTupleAnalysis::jetHists("offJets_matchedCalo_B",   fs, "", jetDetailString );
+    hOffJets_matchedCaloJet_B = new nTupleAnalysis::jetHists("offJets_matchedCaloJet_B",fs, "", jetDetailString );
 
-    hOffJets_matched_C        = new nTupleAnalysis::jetHists("offJets_matched_C",   fs, "");
-    hOffJets_matchedJet_C     = new nTupleAnalysis::jetHists("offJets_matchedJet_C",fs, "");
-    hOffJets_matchedCalo_C    = new nTupleAnalysis::jetHists("offJets_matchedCalo_C",fs, "");
+    hOffJets_matched_C        = new nTupleAnalysis::jetHists("offJets_matched_C",       fs, "");
+    hOffJets_matchedJet_C     = new nTupleAnalysis::jetHists("offJets_matchedJet_C",    fs, "");
+    hOffJets_matchedCalo_C    = new nTupleAnalysis::jetHists("offJets_matchedCalo_C",   fs, "");
     hOffJets_matchedCaloJet_C = new nTupleAnalysis::jetHists("offJets_matchedCaloJet_C",fs, "");
   }
 
@@ -133,20 +133,20 @@ BTagAnalysis::BTagAnalysis(TChain* _eventsRAW, TChain* _eventsAOD, fwlite::TFile
   hPfJets_matched  = new nTupleAnalysis::jetHists("pfJets_matched",           fs, "");
 
 
-  if(isMC){
-    hPfJets_matched_L  = new nTupleAnalysis::jetHists("pfJets_matched_L",           fs, "");
-    hPfJets_matched_B  = new nTupleAnalysis::jetHists("pfJets_matched_B",           fs, "");
-    hPfJets_matched_C  = new nTupleAnalysis::jetHists("pfJets_matched_C",           fs, "");
-  }
+  //if(isMC){
+  //  hPfJets_matched_L  = new nTupleAnalysis::jetHists("pfJets_matched_L",           fs, "");
+  //  hPfJets_matched_B  = new nTupleAnalysis::jetHists("pfJets_matched_B",           fs, "");
+  //  hPfJets_matched_C  = new nTupleAnalysis::jetHists("pfJets_matched_C",           fs, "");
+  //}
 
   hCaloJets            = new nTupleAnalysis::jetHists("caloJets",           fs, "");
   hCaloJets_matched    = new nTupleAnalysis::jetHists("caloJets_matched",           fs, "");
 
-  if(isMC){
-    hCaloJets_matched_L  = new nTupleAnalysis::jetHists("caloJets_matched_L",           fs, "");
-    hCaloJets_matched_B  = new nTupleAnalysis::jetHists("caloJets_matched_B",           fs, "");
-    hCaloJets_matched_C  = new nTupleAnalysis::jetHists("caloJets_matched_C",           fs, "");
-  }
+  //if(isMC){
+  //  hCaloJets_matched_L  = new nTupleAnalysis::jetHists("caloJets_matched_L",           fs, "");
+  //  hCaloJets_matched_B  = new nTupleAnalysis::jetHists("caloJets_matched_B",           fs, "");
+  //  hCaloJets_matched_C  = new nTupleAnalysis::jetHists("caloJets_matched_C",           fs, "");
+  //}
 
   if(doTracks){
     hOffTracks           = new nTupleAnalysis::trackHists("offTracks",fs, "");
@@ -611,15 +611,15 @@ int BTagAnalysis::processEvent(){
     if(pfJetMatchedJet){
       hPfJets_matched->Fill(pfJet, eventWeight);
   
-      if(isMC){
-	if( pfJetMatchedJet->hadronFlavour == 5){
-	  hPfJets_matched_B->Fill(pfJet, eventWeight);
-	}else if( pfJetMatchedJet->hadronFlavour == 4){
-	  hPfJets_matched_C->Fill(pfJet, eventWeight);
-	}else if( pfJetMatchedJet->hadronFlavour == 0){
-	  hPfJets_matched_L->Fill(pfJet, eventWeight);
-	}
-      }
+      //if(isMC){
+      //	if( pfJetMatchedJet->hadronFlavour == 5){
+      //	  hPfJets_matched_B->Fill(pfJet, eventWeight);
+      //	}else if( pfJetMatchedJet->hadronFlavour == 4){
+      //	  hPfJets_matched_C->Fill(pfJet, eventWeight);
+      //	}else if( pfJetMatchedJet->hadronFlavour == 0){
+      //	  hPfJets_matched_L->Fill(pfJet, eventWeight);
+      //	}
+      //}
     }
   }
   

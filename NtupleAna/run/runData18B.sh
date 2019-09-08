@@ -5,6 +5,7 @@ BTagAnalyzer TriggerStudies/NtupleAna/scripts/BTagAnalyzer_cfg.py \
     -y 2018 \
     --histogramming 1 \
     --histFile hists_Data18B.root \
+    --doTracks \
     --nevents -1
 
 

@@ -8,6 +8,7 @@ BTagAnalyzer TriggerStudies/NtupleAna/scripts/BTagAnalyzer_cfg.py \
     --histFile hists_ttbarMC_2018_${RunPeriod}.root \
     --puFile TriggerStudies/NtupleAna/data/PUWeights_${RunPeriod}.root \
     --isMC \
+    --doTracks \
     --nevents -1
 
 

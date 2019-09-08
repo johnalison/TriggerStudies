@@ -94,15 +94,15 @@ namespace TriggerStudies {
 
     nTupleAnalysis::jetHists* hPfJets;
     nTupleAnalysis::jetHists* hPfJets_matched;
-    nTupleAnalysis::jetHists* hPfJets_matched_L;
-    nTupleAnalysis::jetHists* hPfJets_matched_B;
-    nTupleAnalysis::jetHists* hPfJets_matched_C;
+    //nTupleAnalysis::jetHists* hPfJets_matched_L;
+    //nTupleAnalysis::jetHists* hPfJets_matched_B;
+    //nTupleAnalysis::jetHists* hPfJets_matched_C;
 
     nTupleAnalysis::jetHists* hCaloJets;
     nTupleAnalysis::jetHists* hCaloJets_matched;
-    nTupleAnalysis::jetHists* hCaloJets_matched_L;
-    nTupleAnalysis::jetHists* hCaloJets_matched_B;
-    nTupleAnalysis::jetHists* hCaloJets_matched_C;
+    //nTupleAnalysis::jetHists* hCaloJets_matched_L;
+    //nTupleAnalysis::jetHists* hCaloJets_matched_B;
+    //nTupleAnalysis::jetHists* hCaloJets_matched_C;
 
     nTupleAnalysis::trackHists* hOffTracks;
     nTupleAnalysis::trackHists* hOffTracks_unmatched;

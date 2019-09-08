@@ -5,7 +5,8 @@ BTagAnalyzer TriggerStudies/NtupleAna/scripts/BTagAnalyzer_cfg.py \
     -y 2018 \
     --histogramming 1 \
     --histFile hists_Data18C_New.root \
+    --doTracks \
     --nevents -1
 
 
-    --inputAOD root://cmsxrootd.fnal.gov//store/user/jda102//BTagNTuples/2018/crab_projects_v8/MuonEG/Run2018C-PromptReco-v2/190628_182052/inputFiles_2018C_MINIAOD_All.root \
+#    --inputAOD root://cmsxrootd.fnal.gov//store/user/jda102//BTagNTuples/2018/crab_projects_v8/MuonEG/Run2018C-PromptReco-v2/190628_182052/inputFiles_2018C_MINIAOD_All.root \
