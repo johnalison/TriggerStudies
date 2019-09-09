@@ -16,7 +16,7 @@
 
 #include "PhysicsTools/FWLite/interface/TFileService.h"
 
-#include "TriggerStudies/NtupleAna/interface/EventData.h"
+#include "TriggerStudies/NtupleAna/interface/EventDataOLD.h"
 #include "TriggerStudies/NtupleAna/interface/JetDataHandler.h"
 #include "TriggerStudies/NtupleAna/interface/LeptonDataHandler.h"
 #include "TriggerStudies/NtupleAna/interface/EventDisplayData.h"
@@ -108,7 +108,7 @@ int main(int argc, char * argv[]){
   //
   // Input Data
   //
-  EventData eventData = EventData();
+  EventDataOLD eventData = EventDataOLD();
   eventData.SetBranchAddress(tree);
 
   JetDataHandler pfJetsDB = JetDataHandler("pfJets",loadTrkLevel);

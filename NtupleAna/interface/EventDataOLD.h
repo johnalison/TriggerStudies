@@ -1,12 +1,12 @@
 // -*- C++ -*-
 
-#if !defined(EventData_H)
-#define EventData_H
+#if !defined(EventDataOLD_H)
+#define EventDataOLD_H
 
 namespace NtupleAna {
 
 
-  class EventData {
+  class EventDataOLD {
 
   public:
     float runNumber         =  0;
@@ -84,9 +84,9 @@ namespace NtupleAna {
 
   public:
 
-    EventData(); 
+    EventDataOLD(); 
 
-    ~EventData(); 
+    ~EventDataOLD(); 
 
     void SetBranchAddress (TChain* intree);
 
@@ -115,4 +115,4 @@ namespace NtupleAna {
   };
 
 }
-#endif // EventData_H
+#endif // EventDataOLD_H

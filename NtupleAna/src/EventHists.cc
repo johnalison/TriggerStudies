@@ -25,7 +25,7 @@ EventHists::~EventHists() {}
 
 
 void
-EventHists::Fill (const EventData& eventData, float eventWeight){
+EventHists::Fill (const EventDataOLD& eventData, float eventWeight){
 
   m_PVzDiff_offVsTrue  ->Fill(eventData.VerticesOff - eventData.trueVertex       , eventWeight);
   m_PVzDiff_FastVsOff  ->Fill(eventData.FastPrimaryVertex - eventData.VerticesOff, eventWeight);

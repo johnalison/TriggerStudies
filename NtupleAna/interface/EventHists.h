@@ -6,7 +6,7 @@
 #include <iostream>
 #include <TH1F.h>
 #include "PhysicsTools/FWLite/interface/TFileService.h"
-#include "TriggerStudies/NtupleAna/interface/EventData.h"
+#include "TriggerStudies/NtupleAna/interface/EventDataOLD.h"
 
 namespace NtupleAna {
 
@@ -57,7 +57,7 @@ namespace NtupleAna {
 
     ~EventHists(); 
 
-    void Fill (const EventData& eventData, float eventWeight = 1.0);
+    void Fill (const EventDataOLD& eventData, float eventWeight = 1.0);
     
   };
 

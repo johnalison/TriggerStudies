@@ -8,7 +8,7 @@
 #include "PhysicsTools/FWLite/interface/TFileService.h"
 #include "TriggerStudies/NtupleAna/interface/TrackHists.h"
 #include "TriggerStudies/NtupleAna/interface/JetData.h"
-#include "TriggerStudies/NtupleAna/interface/EventData.h"
+#include "TriggerStudies/NtupleAna/interface/EventDataOLD.h"
 
 
 namespace NtupleAna {
@@ -110,7 +110,7 @@ namespace NtupleAna {
     ~JetHists(); 
     
     //void Fill (const JetData* jetPtr);
-    void Fill (const JetData& jetPtr, float eventWeight = 1.0, const EventData* eventDataPtr = nullptr);
+    void Fill (const JetData& jetPtr, float eventWeight = 1.0, const EventDataOLD* eventDataPtr = nullptr);
     
   };
 

@@ -1,18 +1,18 @@
 #include "TChain.h"
 
-#include "TriggerStudies/NtupleAna/interface/EventData.h"
+#include "TriggerStudies/NtupleAna/interface/EventDataOLD.h"
 
 using namespace std;
 using namespace NtupleAna;
 
 
-EventData::EventData() {} 
+EventDataOLD::EventDataOLD() {} 
 
-EventData::~EventData() {} 
+EventDataOLD::~EventDataOLD() {} 
 
 
 void
-EventData::SetBranchAddress (TChain* intree){
+EventDataOLD::SetBranchAddress (TChain* intree){
   
   SetBranchAddress(intree,"run",       runNumber_arr);
   SetBranchAddress(intree,"evt",       eventNumber_arr);
@@ -77,7 +77,7 @@ EventData::SetBranchAddress (TChain* intree){
   return;
 }
 
-void EventData::SetBranchAddress(TChain* intree, std::string brName, bool* Trigger_arr){
+void EventDataOLD::SetBranchAddress(TChain* intree, std::string brName, bool* Trigger_arr){
   if(intree->FindBranch(brName.c_str())){
     intree->SetBranchStatus(brName.c_str(), 1);
     intree->SetBranchAddress(brName.c_str(), Trigger_arr);
@@ -86,7 +86,7 @@ void EventData::SetBranchAddress(TChain* intree, std::string brName, bool* Trigg
   return;
 }
 
-void EventData::SetBranchAddress(TChain* intree, std::string brName, float* float_arr){
+void EventDataOLD::SetBranchAddress(TChain* intree, std::string brName, float* float_arr){
   if(intree->FindBranch(brName.c_str())){
     intree->SetBranchStatus(brName.c_str(), 1);
     intree->SetBranchAddress(brName.c_str(), float_arr);
@@ -97,7 +97,7 @@ void EventData::SetBranchAddress(TChain* intree, std::string brName, float* floa
 
 
 void
-EventData::SetEvent (){
+EventDataOLD::SetEvent (){
 
   runNumber          = runNumber_arr        [0];         
   eventNumber        = eventNumber_arr      [0];

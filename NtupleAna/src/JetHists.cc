@@ -111,7 +111,7 @@ JetHists::~JetHists() {}
 void
 //JetHists::Fill (const JetData* jetPtr){
 //  const JetData& jetInfo = (*jetPtr);
-JetHists::Fill (const JetData& jetInfo, float eventWeight, const EventData* eventData){
+JetHists::Fill (const JetData& jetInfo, float eventWeight, const EventDataOLD* eventData){
 
   m_pt      ->Fill(jetInfo.m_pt      , eventWeight);
   m_pt_l    ->Fill(jetInfo.m_pt      , eventWeight);
