@@ -254,7 +254,7 @@ def makePresentation():
 
     prefix = o.prefix 
 
-    text = ["\\textcolor{cmured}{\large Looking at HLT Btagging in 2017 ttbar MC and Data 2018D}\\\\"]
+    text = ["\\textcolor{cmured}{\large Looking at HLT Btagging in 2018 ttbar MC and Data 2018 BCD}\\\\"]
 
     text += ["\\vspace*{0.2in}",
              "\\textcolor{myblue}{\large Event Selection:}",
@@ -266,7 +266,7 @@ def makePresentation():
              "\\begin{itemize}",
              "\\item[\\textcolor{myblack}{-}]Overlap removal with tight leptons\\\\"
              "\\item[\\textcolor{myblack}{-}]$|\eta| < 2.5 / P_T > 35$ GeV \\\\"
-             "\\item[\\textcolor{myblack}{-}]Study tracks in jets used for btagging:\\\\ \\textit{focus on offline/online differences}  \\\\"
+             #"\\item[\\textcolor{myblack}{-}]Study tracks in jets used for btagging:\\\\ \\textit{focus on offline/online differences}  \\\\"
              "\\end{itemize}"]
 
     makeText(outFile,text,title="Introduction")
