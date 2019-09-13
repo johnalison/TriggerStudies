@@ -64,18 +64,24 @@ namespace TriggerStudies {
     nTupleAnalysis::jetHists*    hOffJet_matchedPFcsvTagJet      ;
     nTupleAnalysis::jetHists*    hOffJet_matchedPFDeepcsvTag     ;
     nTupleAnalysis::jetHists*    hOffJet_matchedPFDeepcsvTagJet  ;
-    nTupleAnalysis::jetHists*    hOffJetTight_matchedPFJet       ;
-    nTupleAnalysis::jetHists*    hOffJetMedium_matchedPFJet      ;
-    nTupleAnalysis::jetHists*    hOffJetLoose_matchedPFJet       ;
+    nTupleAnalysis::jetHists*    hOffJetTightDeepCSV_matchedPFJet       ;
+    nTupleAnalysis::jetHists*    hOffJetMediumDeepCSV_matchedPFJet      ;
+    nTupleAnalysis::jetHists*    hOffJetLooseDeepCSV_matchedPFJet       ;
+    nTupleAnalysis::jetHists*    hOffJetMedDeepFlav_matchedPFJet      ;
+    nTupleAnalysis::jetHists*    hOffJetMedDeepFlav_matchedPFDeepCSV  ;
+    nTupleAnalysis::jetHists*    hOffJetMedDeepFlav_matchedPFCSV      ;
 
 
     nTupleAnalysis::jetHists*    hOffJet_matchedCalocsvTag         ;
     nTupleAnalysis::jetHists*    hOffJet_matchedCalocsvTagJet      ;
     nTupleAnalysis::jetHists*    hOffJet_matchedCaloDeepcsvTag     ;
     nTupleAnalysis::jetHists*    hOffJet_matchedCaloDeepcsvTagJet  ;
-    nTupleAnalysis::jetHists*    hOffJetTight_matchedCaloJet       ;
-    nTupleAnalysis::jetHists*    hOffJetMedium_matchedCaloJet      ;
-    nTupleAnalysis::jetHists*    hOffJetLoose_matchedCaloJet       ;
+    nTupleAnalysis::jetHists*    hOffJetTightDeepCSV_matchedCaloJet       ;
+    nTupleAnalysis::jetHists*    hOffJetMediumDeepCSV_matchedCaloJet      ;
+    nTupleAnalysis::jetHists*    hOffJetLooseDeepCSV_matchedCaloJet       ;
+    nTupleAnalysis::jetHists*    hOffJetMedDeepFlav_matchedCaloJet      ;
+    nTupleAnalysis::jetHists*    hOffJetMedDeepFlav_matchedCaloDeepCSV  ;
+    nTupleAnalysis::jetHists*    hOffJetMedDeepFlav_matchedCaloCSV      ;
 
 
     nTupleAnalysis::jetHists*  hOffJets_matched_L   ;
@@ -140,6 +146,7 @@ namespace TriggerStudies {
     float OfflineDeepCSVTightCut  = -99;
     float OfflineDeepCSVMediumCut = -99;
     float OfflineDeepCSVLooseCut  = -99;
+    float OfflineDeepFlavourMediumCut = -99;
     float OnlineCSVCut            = -99;
     float OnlineDeepCSVCut        = -99;
   

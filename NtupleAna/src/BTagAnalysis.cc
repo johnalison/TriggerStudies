@@ -12,20 +12,34 @@
 using namespace TriggerStudies;
 
 // 2018
+// https://twiki.cern.ch/twiki/bin/viewauth/CMS/BtagRecommendation102X
 const float OfflineDeepCSVTightCut2018  = 0.7527;
 const float OfflineDeepCSVMediumCut2018 = 0.4184;
 const float OfflineDeepCSVLooseCut2018  = 0.1241;
 
-const float OnlineDeepCSVCut2018  = 0.6324;
-const float OnlineCSVCut2018      = 0.8484;
+
+const float OfflineDeepFlavourTightCut2018   = 0.7264;
+const float OfflineDeepFlavourMediumCut2018  = 0.2770;
+const float OfflineDeepFlavourLooseCut2018   = 0.0494;
+
+// https://cmswbm.cern.ch/cmsdb/servlet/HLTPath?PATHID=2117358
+// https://cmswbm.cern.ch/cmsdb/servlet/HLTPath?PATHID=2090546
+const float OnlineDeepCSVCutPF    = 0.24; 
+const float OnlineDeepCSVCutCalo  = 0.17; 
+const float OnlineCSVCutPF        = 0.7;
+const float OnlineCSVCutCalo      = 0.5; 
+
 
 // 2017 
+// https://twiki.cern.ch/twiki/bin/viewauth/CMS/BtagRecommendation94X
 const float OfflineDeepCSVTightCut2017  = 0.8001;
 const float OfflineDeepCSVMediumCut2017 = 0.4941;
 const float OfflineDeepCSVLooseCut2017  = 0.1522;
 
-const float OnlineDeepCSVCut2017  = 0.6324;
-const float OnlineCSVCut2017      = 0.8484;
+const float OfflineDeepFlavourTightCut2017   = 0.7489;
+const float OfflineDeepFlavourMediumCut2017  = 0.3033;
+const float OfflineDeepFlavourLooseCut2017   = 0.0521;
+
 
 
 BTagAnalysis::BTagAnalysis(TChain* _eventsRAW, TChain* _eventsAOD, fwlite::TFileService& fs, bool _isMC, std::string _year, int _histogramming, bool _debug, std::string PUFileName, std::string jetDetailString){
@@ -97,20 +111,26 @@ BTagAnalysis::BTagAnalysis(TChain* _eventsRAW, TChain* _eventsAOD, fwlite::TFile
   hOffJet_matchedPFDeepcsvTag     = new nTupleAnalysis::jetHists("offJets_matchedPFDeepcsvTag",     fs, "");
   hOffJet_matchedPFDeepcsvTagJet  = new nTupleAnalysis::jetHists("offJets_matchedPFDeepcsvTagJet",  fs, "");
 
-  hOffJetTight_matchedPFJet       = new nTupleAnalysis::jetHists("offJetsTight_matchedPFJet",       fs, "");
-  hOffJetMedium_matchedPFJet      = new nTupleAnalysis::jetHists("offJetsMedium_matchedPFJet",      fs, "");
-  hOffJetLoose_matchedPFJet       = new nTupleAnalysis::jetHists("offJetsLoose_matchedPFJet",       fs, "");
+  hOffJetTightDeepCSV_matchedPFJet       = new nTupleAnalysis::jetHists("offJetsTight_matchedPFJet",       fs, "");
+  hOffJetMediumDeepCSV_matchedPFJet      = new nTupleAnalysis::jetHists("offJetsMedium_matchedPFJet",      fs, "");
+  hOffJetLooseDeepCSV_matchedPFJet       = new nTupleAnalysis::jetHists("offJetsLoose_matchedPFJet",       fs, "");
 
+  hOffJetMedDeepFlav_matchedPFJet      = new nTupleAnalysis::jetHists("offJetsMedDeepFlav_matchedPFJet",          fs, "");
+  hOffJetMedDeepFlav_matchedPFDeepCSV  = new nTupleAnalysis::jetHists("offJetsMedDeepFlav_matchedPFDeepCSV",      fs, "");
+  hOffJetMedDeepFlav_matchedPFCSV      = new nTupleAnalysis::jetHists("offJetsMedDeepFlav_matchedPFCSV",          fs, "");
 
   hOffJet_matchedCalocsvTag         = new nTupleAnalysis::jetHists("offJets_matchedCalocsvTag",         fs, "");
   hOffJet_matchedCalocsvTagJet      = new nTupleAnalysis::jetHists("offJets_matchedCalocsvTagJet",      fs, "");
   hOffJet_matchedCaloDeepcsvTag     = new nTupleAnalysis::jetHists("offJets_matchedCaloDeepcsvTag",     fs, "");
   hOffJet_matchedCaloDeepcsvTagJet  = new nTupleAnalysis::jetHists("offJets_matchedCaloDeepcsvTagJet",  fs, "");
 
-  hOffJetTight_matchedCaloJet       = new nTupleAnalysis::jetHists("offJetsTight_matchedCaloJet",       fs, "");
-  hOffJetMedium_matchedCaloJet      = new nTupleAnalysis::jetHists("offJetsMedium_matchedCaloJet",      fs, "");
-  hOffJetLoose_matchedCaloJet       = new nTupleAnalysis::jetHists("offJetsLoose_matchedCaloJet",       fs, "");
+  hOffJetTightDeepCSV_matchedCaloJet       = new nTupleAnalysis::jetHists("offJetsTight_matchedCaloJet",       fs, "");
+  hOffJetMediumDeepCSV_matchedCaloJet      = new nTupleAnalysis::jetHists("offJetsMedium_matchedCaloJet",      fs, "");
+  hOffJetLooseDeepCSV_matchedCaloJet       = new nTupleAnalysis::jetHists("offJetsLoose_matchedCaloJet",       fs, "");
 
+  hOffJetMedDeepFlav_matchedCaloJet      = new nTupleAnalysis::jetHists("offJetsMedDeepFlav_matchedCaloJet",      fs, "");
+  hOffJetMedDeepFlav_matchedCaloDeepCSV  = new nTupleAnalysis::jetHists("offJetsMedDeepFlav_matchedCaloDeepCSV",  fs, "");
+  hOffJetMedDeepFlav_matchedCaloCSV      = new nTupleAnalysis::jetHists("offJetsMedDeepFlav_matchedCaloCSV",      fs, "");
 
   if(isMC){
     hOffJets_matched_L        = new nTupleAnalysis::jetHists("offJets_matched_L",       fs, "", jetDetailString);
@@ -133,20 +153,10 @@ BTagAnalysis::BTagAnalysis(TChain* _eventsRAW, TChain* _eventsAOD, fwlite::TFile
   hPfJets_matched  = new nTupleAnalysis::jetHists("pfJets_matched",           fs, "");
 
 
-  //if(isMC){
-  //  hPfJets_matched_L  = new nTupleAnalysis::jetHists("pfJets_matched_L",           fs, "");
-  //  hPfJets_matched_B  = new nTupleAnalysis::jetHists("pfJets_matched_B",           fs, "");
-  //  hPfJets_matched_C  = new nTupleAnalysis::jetHists("pfJets_matched_C",           fs, "");
-  //}
 
   hCaloJets            = new nTupleAnalysis::jetHists("caloJets",           fs, "");
   hCaloJets_matched    = new nTupleAnalysis::jetHists("caloJets_matched",           fs, "");
 
-  //if(isMC){
-  //  hCaloJets_matched_L  = new nTupleAnalysis::jetHists("caloJets_matched_L",           fs, "");
-  //  hCaloJets_matched_B  = new nTupleAnalysis::jetHists("caloJets_matched_B",           fs, "");
-  //  hCaloJets_matched_C  = new nTupleAnalysis::jetHists("caloJets_matched_C",           fs, "");
-  //}
 
   if(doTracks){
     hOffTracks           = new nTupleAnalysis::trackHists("offTracks",fs, "");
@@ -192,14 +202,12 @@ BTagAnalysis::BTagAnalysis(TChain* _eventsRAW, TChain* _eventsAOD, fwlite::TFile
   OfflineDeepCSVTightCut  = OfflineDeepCSVTightCut2017  ;
   OfflineDeepCSVMediumCut = OfflineDeepCSVMediumCut2017 ;
   OfflineDeepCSVLooseCut  = OfflineDeepCSVLooseCut2017  ;
-  OnlineCSVCut            = OnlineCSVCut2017;
-  OnlineDeepCSVCut        = OnlineDeepCSVCut2017;
+  OfflineDeepFlavourMediumCut = OfflineDeepFlavourMediumCut2017 ;
   if(_year == "2018"){
     OfflineDeepCSVTightCut  = OfflineDeepCSVTightCut2018  ;
     OfflineDeepCSVMediumCut = OfflineDeepCSVMediumCut2018 ;
     OfflineDeepCSVLooseCut  = OfflineDeepCSVLooseCut2018 ;
-    OnlineCSVCut            = OnlineCSVCut2018;
-    OnlineDeepCSVCut        = OnlineDeepCSVCut2018;
+    OfflineDeepFlavourMediumCut = OfflineDeepFlavourMediumCut2018 ;
   }
 
 
@@ -726,16 +734,22 @@ void BTagAnalysis::PFJetAnalysis(const nTupleAnalysis::jetPtr& offJet,const nTup
   // Offline Btaggs
   //
   if((offJet->DeepCSV > OfflineDeepCSVTightCut))
-    hOffJetTight_matchedPFJet->Fill(hltJet, weight);	  
+    hOffJetTightDeepCSV_matchedPFJet->Fill(hltJet, weight);	  
   if((offJet->DeepCSV > OfflineDeepCSVMediumCut))
-    hOffJetMedium_matchedPFJet->Fill(hltJet, weight);	  
+    hOffJetMediumDeepCSV_matchedPFJet->Fill(hltJet, weight);	  
   if((offJet->DeepCSV > OfflineDeepCSVLooseCut))
-    hOffJetLoose_matchedPFJet->Fill(hltJet, weight);	  
+    hOffJetLooseDeepCSV_matchedPFJet->Fill(hltJet, weight);	  
+
+  if(offJet->deepFlavB > OfflineDeepFlavourMediumCut){
+    hOffJetMedDeepFlav_matchedPFJet ->Fill(offJet, weight);	  
+    if(hltJet->CSVv2   > OnlineCSVCutPF)     hOffJetMedDeepFlav_matchedPFCSV    ->Fill(offJet, weight);    
+    if(hltJet->DeepCSV > OnlineDeepCSVCutPF) hOffJetMedDeepFlav_matchedPFDeepCSV->Fill(offJet, weight);    
+  }
 
   // 
   // If pass CVS working point
   //
-  if(hltJet->CSVv2 >= OnlineCSVCut){
+  if(hltJet->CSVv2 >= OnlineCSVCutPF){
     hOffJet_matchedPFcsvTag   ->Fill(offJet, weight);
     hOffJet_matchedPFcsvTagJet->Fill(hltJet, weight);
   }
@@ -744,7 +758,7 @@ void BTagAnalysis::PFJetAnalysis(const nTupleAnalysis::jetPtr& offJet,const nTup
   // 
   // If pass DeepCVS working point
   //
-  if(hltJet->DeepCSV >= OnlineDeepCSVCut){
+  if(hltJet->DeepCSV >= OnlineDeepCSVCutPF){
     hOffJet_matchedPFDeepcsvTag   ->Fill(offJet, weight);
     hOffJet_matchedPFDeepcsvTagJet->Fill(hltJet, weight);
   }
@@ -1017,16 +1031,23 @@ void BTagAnalysis::CaloJetAnalysis(const nTupleAnalysis::jetPtr& offJet,const nT
   // Offline Btaggs
   //
   if((offJet->DeepCSV > OfflineDeepCSVTightCut))
-    hOffJetTight_matchedCaloJet->Fill(hltJet, weight);	  
+    hOffJetTightDeepCSV_matchedCaloJet->Fill(hltJet, weight);	  
   if((offJet->DeepCSV > OfflineDeepCSVMediumCut))
-    hOffJetMedium_matchedCaloJet->Fill(hltJet, weight);	  
+    hOffJetMediumDeepCSV_matchedCaloJet->Fill(hltJet, weight);	  
   if((offJet->DeepCSV > OfflineDeepCSVLooseCut))
-    hOffJetLoose_matchedCaloJet->Fill(hltJet, weight);	  
+    hOffJetLooseDeepCSV_matchedCaloJet->Fill(hltJet, weight);	  
+
+  if(offJet->deepFlavB > OfflineDeepFlavourMediumCut){
+    hOffJetMedDeepFlav_matchedCaloJet ->Fill(offJet, weight);	  
+    if(hltJet->CSVv2   > OnlineCSVCutCalo)     hOffJetMedDeepFlav_matchedCaloCSV    ->Fill(offJet, weight);    
+    if(hltJet->DeepCSV > OnlineDeepCSVCutCalo) hOffJetMedDeepFlav_matchedCaloDeepCSV->Fill(offJet, weight);    
+  }
+
 
   // 
   // If pass CVS working point
   //
-  if(hltJet->CSVv2 >= OnlineCSVCut){
+  if(hltJet->CSVv2 >= OnlineCSVCutCalo){
     hOffJet_matchedCalocsvTag   ->Fill(offJet, weight);
     hOffJet_matchedCalocsvTagJet->Fill(hltJet, weight);
   }
@@ -1035,7 +1056,7 @@ void BTagAnalysis::CaloJetAnalysis(const nTupleAnalysis::jetPtr& offJet,const nT
   // 
   // If pass DeepCVS working point
   //
-  if(hltJet->DeepCSV >= OnlineDeepCSVCut){
+  if(hltJet->DeepCSV >= OnlineDeepCSVCutCalo){
     hOffJet_matchedCaloDeepcsvTag   ->Fill(offJet, weight);
     hOffJet_matchedCaloDeepcsvTagJet->Fill(hltJet, weight);
   }
