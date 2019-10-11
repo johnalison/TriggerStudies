@@ -9,6 +9,7 @@ from optparse import OptionParser
 p = OptionParser()
 p.add_option('--input',  type = 'string', default = "outBTag.FTKBtagging.ttbar.mwt2.All.root", dest = 'inFile', help = 'intput File' )
 p.add_option('--output', type = 'string', default = "makeRocCurves", dest = 'outDir', help = 'output dir' )
+p.add_option('--cmsText', type = 'string', default = "Work in Progress",  help = '' )
 (o,a) = p.parse_args()
 
 inFile  = ROOT.TFile(o.inFile,  "READ")
@@ -104,7 +105,7 @@ def plotSame(name,graphs,colors,styles, plotCaloJet=False, plotPFJet=False, plot
 
         g_wrkPts.Draw("P")
 
-    cmsLine1, cmsLine2 = getCMSText(xStart=0.2,yStart=0.875)
+    cmsLine1, cmsLine2 = getCMSText(xStart=0.2,yStart=0.875,subtext=o.cmsText)
     cmsLine1.Draw("same")
     cmsLine2.Draw("same")
         
@@ -138,12 +139,18 @@ def plotSame(name,graphs,colors,styles, plotCaloJet=False, plotPFJet=False, plot
     
 
     if plotDeepCSV:
-        deepCSVText   = getText("DeepCSV (solid)  ",xStart=xStart,yStart=yStart,size=0.03,color=ROOT.kBlack)    
+        if plotCSV:
+            deepCSVText   = getText("DeepCSV (solid)  ",xStart=xStart,yStart=yStart,size=0.03,color=ROOT.kBlack)    
+        else:
+            deepCSVText   = getText("DeepCSV",xStart=xStart,yStart=yStart,size=0.03,color=ROOT.kBlack)    
         deepCSVText.Draw("same")
         yStart = yStart - 0.04
 
     if plotCSV:
-        CSVText   = getText("CSV      (dashed)  ",xStart=xStart,yStart=yStart,size=0.03,color=ROOT.kBlack)    
+        if plotDeepCSV:
+            CSVText   = getText("CSV      (dashed)  ",xStart=xStart,yStart=yStart,size=0.03,color=ROOT.kBlack)    
+        else:
+            CSVText   = getText("CSV",xStart=xStart,yStart=yStart,size=0.03,color=ROOT.kBlack)    
         CSVText.Draw("same")
 
 

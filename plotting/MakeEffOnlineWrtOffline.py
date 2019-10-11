@@ -16,6 +16,8 @@ p.add_option('--name1',  help = 'intput File' )
 p.add_option('--input2', help = 'intput File' )
 p.add_option('--name2',  help = 'intput File' )
 p.add_option('--output', type = 'string', default = "jetLevelPlots", dest = 'outDir', help = 'output dir' )
+p.add_option('--cmsText', type = 'string', default = "Work in Progress",  help = '' )
+p.add_option('--lumiText', default = "",  help = '' )
 (o,a) = p.parse_args()
 
 #from rocCurveUtils            import drawWaterMarks
@@ -84,7 +86,9 @@ for v in vars:
                            ]
                  ,yTitle="Online BTag Efficiency Relative to Offline",xTitle=eff_Matched_1.GetXaxis().GetTitle(),outDir=o.outDir,yMax=1.2,yLeg=yLeg,xLeg=xLeg,
                  xMax=eff_Matched_1.GetXaxis().GetXmax(),
-                 xMin=eff_Matched_1.GetXaxis().GetXmin()
+                 xMin=eff_Matched_1.GetXaxis().GetXmin(),
+                 cmsText = o.cmsText,
+                 lumiText = o.lumiText,
                  )
 
 

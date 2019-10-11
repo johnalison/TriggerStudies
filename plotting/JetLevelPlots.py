@@ -11,7 +11,10 @@ p = OptionParser()
 p.add_option('--inputData',  type = 'string', dest = 'inFileData', help = 'intput File' )
 p.add_option('--inputMC',  type = 'string', dest = 'inFileMC', help = 'intput File' )
 p.add_option('--output', type = 'string', default = "jetLevelPlots", dest = 'outDir', help = 'output dir' )
+p.add_option('--cmsText', type = 'string', default = "Work in Progress",  help = '' )
+p.add_option('--lumiText', default = "",  help = '' )
 (o,a) = p.parse_args()
+
 
 #from rocCurveUtils            import drawWaterMarks
 #import rebinning
@@ -73,12 +76,12 @@ for jetType in ["Calo","PF"]:
     drawComp("RevEff_"+jetType+"CSV_MC",[(reveff_CSV_MC[jetType]["Loose"], "Loose",ROOT.kBlue),
                                          (reveff_CSV_MC[jetType]["Medium"],"Medium",ROOT.kGreen),
                                          (reveff_CSV_MC[jetType]["Tight"], "Tight",ROOT.kRed),]
-             ,yTitle="Efficiency",xTitle="CSV Value of Jets", otherText=""+jetType+" Jets (MC)",outDir=o.outDir)
+             ,yTitle="Efficiency",xTitle="CSV Value of Jets", otherText=""+jetType+" Jets (MC)",outDir=o.outDir,cmsText=o.cmsText,lumiText=o.lumiText)
     
     drawComp("RevEff_"+jetType+"CSV_Data",[(reveff_CSV_Data[jetType]["Loose"], "Loose",ROOT.kBlue),
                                            (reveff_CSV_Data[jetType]["Medium"],"Medium",ROOT.kGreen),
                                            (reveff_CSV_Data[jetType]["Tight"], "Tight",ROOT.kRed),]
-             ,yTitle="Efficiency",xTitle="CSV Value of Jets", otherText=""+jetType+" Jets (Data)",outDir=o.outDir)
+             ,yTitle="Efficiency",xTitle="CSV Value of Jets", otherText=""+jetType+" Jets (Data)",outDir=o.outDir,cmsText=o.cmsText,lumiText=o.lumiText)
 
 
     drawComp("RevEff_"+jetType+"CSV_All",[(reveff_CSV_Data[jetType]["Loose"], "Loose (Data)",ROOT.kBlue),
@@ -88,7 +91,7 @@ for jetType in ["Calo","PF"]:
                                           (reveff_CSV_Data[jetType]["Tight"], "Tight (Data)",ROOT.kRed),
                                           (reveff_CSV_MC[jetType]["Tight"], "Tight (MC)",ROOT.kRed,24),
                                           ]
-             ,yTitle="Efficiency",xTitle="Online ("+jetType+"-Jet) CSV Value", otherText="",outDir=o.outDir,leg="special")
+             ,yTitle="Efficiency",xTitle="Online ("+jetType+"-Jet) CSV Value", otherText="",outDir=o.outDir,yMax=1.2,leg="special",cmsText=o.cmsText,lumiText=o.lumiText)
 
     drawComp("RevEff_"+jetType+"DeepCSV_All",[(reveff_DeepCSV_Data[jetType]["Loose"], "Loose (Data)",ROOT.kBlue),
                                               (reveff_DeepCSV_MC[jetType]["Loose"], "Loose (MC)",ROOT.kBlue,24),
@@ -97,47 +100,47 @@ for jetType in ["Calo","PF"]:
                                               (reveff_DeepCSV_Data[jetType]["Tight"], "Tight (Data)",ROOT.kRed),
                                               (reveff_DeepCSV_MC[jetType]["Tight"], "Tight (MC)",ROOT.kRed,24),
                                               ]
-             ,yTitle="Efficiency",xTitle="Online ("+jetType+"-Jet) DeepCSV Value", otherText="",outDir=o.outDir,leg="special")
+             ,yTitle="Efficiency",xTitle="Online ("+jetType+"-Jet) DeepCSV Value", otherText="",outDir=o.outDir,yMax=1.2,leg="special",cmsText=o.cmsText,lumiText=o.lumiText)
 
 
 
 
 #   Data vs MC 
 drawComp("Eff_CaloCSV_DataVSMC",[(eff_CaloCSV_Data,"Data",ROOT.kBlue),(eff_CaloCSV_MC,"MC",ROOT.kRed)]
-         ,yTitle="Efficiency",xTitle="CSV Value of Jets", otherText="Online WP: CSV > 0.8484",outDir=o.outDir)
+         ,yTitle="Efficiency",xTitle="CSV Value of Jets", otherText="Online WP: CSV > 0.5",outDir=o.outDir,cmsText=o.cmsText,lumiText=o.lumiText)
 drawComp("Eff_PFCSV_DataVSMC",[(eff_PFCSV_Data,"Data",ROOT.kBlue),(eff_PFCSV_MC,"MC",ROOT.kRed)]
-         ,yTitle="Efficiency",xTitle="CSV Value of Jets", otherText="Online WP: CSV > 0.8484",outDir=o.outDir)
+         ,yTitle="Efficiency",xTitle="CSV Value of Jets", otherText="Online WP: CSV > 0.7",outDir=o.outDir,cmsText=o.cmsText,lumiText=o.lumiText)
 
 drawComp("Eff_CaloCSVvsDeepCSV_DataVSMC",[(eff_CaloCSVvsDeepCSV_Data,"Data",ROOT.kBlue),(eff_CaloCSVvsDeepCSV_MC,"MC",ROOT.kRed)]
-         ,yTitle="Efficiency",xTitle="DeepCSV Value of Jets", otherText="Online WP: CSV > 0.8484",outDir=o.outDir)
+         ,yTitle="Efficiency",xTitle="DeepCSV Value of Jets", otherText="Online WP: CSV > 0.5",outDir=o.outDir,cmsText=o.cmsText,lumiText=o.lumiText)
 drawComp("Eff_PFCSVvsDeepCSV_DataVSMC",[(eff_PFCSVvsDeepCSV_Data,"Data",ROOT.kBlue),(eff_PFCSVvsDeepCSV_MC,"MC",ROOT.kRed)]
-         ,yTitle="Efficiency",xTitle="DeepCSV Value of Jets", otherText="Online WP: CSV > 0.8484",outDir=o.outDir)
+         ,yTitle="Efficiency",xTitle="DeepCSV Value of Jets", otherText="Online WP: CSV > 0.7",outDir=o.outDir,cmsText=o.cmsText,lumiText=o.lumiText)
 
 
 drawComp("Eff_CaloDeepCSV_DataVSMC",[(eff_CaloDeepCSV_Data,"Data",ROOT.kBlue),(eff_CaloDeepCSV_MC,"MC",ROOT.kRed)]
-         ,yTitle="Efficiency",xTitle="DeepCSV Value of Jets", otherText="Online WP: DeepCSV > 0.6324",outDir=o.outDir)
+         ,yTitle="Efficiency",xTitle="DeepCSV Value of Jets", otherText="Online WP: DeepCSV > 0.17",outDir=o.outDir,cmsText=o.cmsText,lumiText=o.lumiText)
 drawComp("Eff_PFDeepCSV_DataVSMC",[(eff_PFDeepCSV_Data,"Data",ROOT.kBlue),(eff_PFDeepCSV_MC,"MC",ROOT.kRed)]
-         ,yTitle="Efficiency",xTitle="DeepCSV Value of Jets", otherText="Online WP: DeepCSV > 0.6324",outDir=o.outDir)
+         ,yTitle="Efficiency",xTitle="DeepCSV Value of Jets", otherText="Online WP: DeepCSV > 0.24",outDir=o.outDir,cmsText=o.cmsText,lumiText=o.lumiText)
 
 
 #
 #   Calo vs PF
 #
 drawComp("Eff_CaloVsPF_CSV_Data",[(eff_CaloCSV_Data,"Calo (Data)",ROOT.kBlue),(eff_PFCSV_Data,"PF (Data)",ROOT.kRed)]
-         ,yTitle="Efficiency",xTitle="CSV Value of Jets", otherText="Online WP: CSV > 0.8484",outDir=o.outDir)
+         ,yTitle="Efficiency",xTitle="CSV Value of Jets", otherText=["Online Calo WP: CSV > 0.5","Online PF WP: CSV > 0.7"],outDir=o.outDir,xStartOther=0.3,cmsText=o.cmsText,lumiText=o.lumiText)
 drawComp("Eff_CaloVsPF_CSV_MC",[(eff_CaloCSV_MC,"Calo (MC)",ROOT.kBlue),(eff_PFCSV_MC,"PF (MC)",ROOT.kRed)]
-         ,yTitle="Efficiency",xTitle="CSV Value of Jets", otherText="Online WP: CSV > 0.8484",outDir=o.outDir)
+         ,yTitle="Efficiency",xTitle="CSV Value of Jets", otherText=["Online Calo WP: CSV > 0.5","Online PF WP: CSV > 0.7"],outDir=o.outDir,xStartOther=0.3,cmsText=o.cmsText,lumiText=o.lumiText)
 
 drawComp("Eff_CaloVsPF_CSVvsDeepCSV_Data",[(eff_CaloCSVvsDeepCSV_Data,"Calo (Data)",ROOT.kBlue),(eff_PFCSVvsDeepCSV_Data,"PF (Data)",ROOT.kRed)]
-         ,yTitle="Efficiency",xTitle="DeepCSV Value of Jets", otherText="Online WP: CSV > 0.8484",outDir=o.outDir)
+         ,yTitle="Efficiency",xTitle="DeepCSV Value of Jets", otherText=["Online Calo WP: CSV > 0.5","Online PF WP: CSV > 0.7"],outDir=o.outDir,xStartOther=0.3,cmsText=o.cmsText,lumiText=o.lumiText)
 drawComp("Eff_CaloVsPF_CSVvsDeepCSV_MC",[(eff_CaloCSVvsDeepCSV_MC,"Calo (MC)",ROOT.kBlue),(eff_PFCSVvsDeepCSV_MC,"PF (MC)",ROOT.kRed)]
-         ,yTitle="Efficiency",xTitle="DeepCSV Value of Jets", otherText="Online WP: CSV > 0.8484",outDir=o.outDir)
+         ,yTitle="Efficiency",xTitle="DeepCSV Value of Jets", otherText=["Online Calo WP: CSV > 0.5","Online PF WP: CSV > 0.7"],outDir=o.outDir,xStartOther=0.3,cmsText=o.cmsText,lumiText=o.lumiText)
 
 
 drawComp("Eff_CaloVsPF_DeepCSV_Data",[(eff_CaloDeepCSV_Data,"Calo (Data)",ROOT.kBlue),(eff_PFDeepCSV_Data,"PF (Data)",ROOT.kRed)]
-         ,yTitle="Efficiency",xTitle="DeepCSV Value of Jets", otherText="Online WP: DeepCSV > 0.6324",outDir=o.outDir)
+         ,yTitle="Efficiency",xTitle="DeepCSV Value of Jets", otherText=["Online Calo WP: DeepCSV > 0.17","Online PF WP: DeepCSV > 0.24"],outDir=o.outDir,xStartOther=0.4,yStartOther=0.15,cmsText=o.cmsText,lumiText=o.lumiText)
 drawComp("Eff_CaloVsPF_DeepCSV_MC",[(eff_CaloDeepCSV_MC,"Calo (MC)",ROOT.kBlue),(eff_PFDeepCSV_MC,"PF (MC)",ROOT.kRed)]
-         ,yTitle="Efficiency",xTitle="DeepCSV Value of Jets", otherText="Online WP: DeepCSV > 0.6324",outDir=o.outDir)
+         ,yTitle="Efficiency",xTitle="DeepCSV Value of Jets", otherText=["Online Calo WP: DeepCSV > 0.17","Online PF WP: DeepCSV > 0.24"],outDir=o.outDir,xStartOther=0.4,yStartOther=0.15,cmsText=o.cmsText,lumiText=o.lumiText)
 
 
 #   (Calo vs PF) x (Data vs MC )
@@ -147,7 +150,8 @@ drawComp("Eff_CaloVsPF_CSV_DataVsMC",
           (eff_PFCSV_Data,  "PF-Jet   (Data)",ROOT.kRed),
           (eff_PFCSV_MC,    "PF-Jet   (MC)  ",ROOT.kRed, 24),
           ]
-         ,yTitle="Efficiency",xTitle="Offline CSV Value", otherText="Online WP: CSV > 0.8484",outDir=o.outDir)
+         ,yTitle="Efficiency",xTitle="Offline CSV Value", otherText=["Online Calo WP: CSV > 0.5","Online PF WP: CSV > 0.7"],outDir=o.outDir,xStartOther=0.3,cmsText=o.cmsText,lumiText=o.lumiText)
+
 
 drawComp("Eff_CaloVsPF_CSVvsDeepCSV_DataVsMC",
          [(eff_CaloCSVvsDeepCSV_Data,"Calo-Jet (Data)",ROOT.kBlue),
@@ -155,7 +159,7 @@ drawComp("Eff_CaloVsPF_CSVvsDeepCSV_DataVsMC",
           (eff_PFCSVvsDeepCSV_Data,  "PF-Jet   (Data)",ROOT.kRed),
           (eff_PFCSVvsDeepCSV_MC,    "PF-Jet   (MC)  ",ROOT.kRed, 24),
           ]
-         ,yTitle="Efficiency",xTitle="Offline DeepCSV Value", otherText="Online WP: CSV > 0.8484",outDir=o.outDir)
+         ,yTitle="Efficiency",xTitle="Offline DeepCSV Value", otherText=["Online Calo WP: CSV > 0.5","Online PF WP: CSV > 0.7"],outDir=o.outDir,xStartOther=0.3,cmsText=o.cmsText,lumiText=o.lumiText)
 
 drawComp("Eff_CaloVsPF_DeepCSVvsDeepCSV_DataVsMC",
          [(eff_CaloDeepCSV_Data,"Calo-Jet (Data)",ROOT.kBlue),
@@ -163,7 +167,8 @@ drawComp("Eff_CaloVsPF_DeepCSVvsDeepCSV_DataVsMC",
           (eff_PFDeepCSV_Data,  "PF-Jet   (Data)",ROOT.kRed),
           (eff_PFDeepCSV_MC,    "PF-Jet   (MC)  ",ROOT.kRed, 24),
           ]
-         ,yTitle="Efficiency",xTitle="Offline DeepCSV Value", otherText="Online WP: DeepCSV > 0.63",outDir=o.outDir)
+         ,yTitle="Efficiency",xTitle="Offline DeepCSV Value", otherText=["Online Calo WP: DeepCSV > 0.17","Online PF WP: DeepCSV > 0.24"],outDir=o.outDir,xStartOther=0.4,yStartOther=0.15,cmsText=o.cmsText,lumiText=o.lumiText)
+#otherText="Online WP: DeepCSV > 0.63",outDir=o.outDir)
 
 
 
@@ -253,50 +258,50 @@ drawStackCompRatio("Calo_CSV_FlavorComp",(caloCSV,"Data"),
                    [(caloCSV_L_MC,"Light Flavor",ROOT.kAzure-9),
                     (caloCSV_C_MC,"Charm Jets",ROOT.kGreen+1),
                     (caloCSV_B_MC,"B Jets",ROOT.kYellow)]
-                   ,yTitle="Normalized",xTitle="Online (Calo-Jet) CSV",rTitle="Data/MC",setLogy=0,outDir=o.outDir)
+                   ,yTitle="Normalized",xTitle="Online (Calo-Jet) CSV",rTitle="Data/MC",setLogy=0,outDir=o.outDir,cmsText=o.cmsText,lumiText=o.lumiText)
 
 drawStackCompRatio("Calo_DeepCSV_FlavorComp",(caloDeepCSV,"Data"),
                    [(caloDeepCSV_L_MC,"Light Flavor",ROOT.kAzure-9),
                     (caloDeepCSV_C_MC,"Charm Jets",ROOT.kGreen+1),
                     (caloDeepCSV_B_MC,"B Jets",ROOT.kYellow)]
-                   ,yTitle="Normalized",xTitle="Online (Calo-Jet) DeepCSV",rTitle="Data/MC",setLogy=0,outDir=o.outDir)
+                   ,yTitle="Normalized",xTitle="Online (Calo-Jet) DeepCSV",rTitle="Data/MC",setLogy=0,outDir=o.outDir,cmsText=o.cmsText,lumiText=o.lumiText)
 
 
 drawStackCompRatio("PF_CSV_FlavorComp",(pfCSV,"Data"),
                    [(pfCSV_L_MC,"Light Flavor",ROOT.kAzure-9),
                     (pfCSV_C_MC,"Charm Jets",ROOT.kGreen+1),
                     (pfCSV_B_MC,"B Jets",ROOT.kYellow)]
-                   ,yTitle="Normalized",xTitle="Online (PF-Jet) CSV",rTitle="Data/MC",setLogy=0,outDir=o.outDir)
+                   ,yTitle="Normalized",xTitle="Online (PF-Jet) CSV",rTitle="Data/MC",setLogy=0,outDir=o.outDir,cmsText=o.cmsText,lumiText=o.lumiText)
 
 drawStackCompRatio("PF_DeepCSV_FlavorComp",(pfDeepCSV,"Data"),
                    [(pfDeepCSV_L_MC,"Light Flavor",ROOT.kAzure-9),
                     (pfDeepCSV_C_MC,"Charm Jets",ROOT.kGreen+1),
                     (pfDeepCSV_B_MC,"B Jets",ROOT.kYellow)]
-                   ,yTitle="Normalized",xTitle="Online (PF-Jet) DeepCSV",rTitle="Data/MC",setLogy=0,outDir=o.outDir)
+                   ,yTitle="Normalized",xTitle="Online (PF-Jet) DeepCSV",rTitle="Data/MC",setLogy=0,outDir=o.outDir,cmsText=o.cmsText,lumiText=o.lumiText)
 
 
 drawStackCompRatio("Off_CSV_FlavorComp",(offCSV_PF,"Data"),
                    [(offCSV_L_PF_MC,"Light Flavor",ROOT.kAzure-9),
                     (offCSV_C_PF_MC,"Charm Jets",ROOT.kGreen+1),
                     (offCSV_B_PF_MC,"B Jets",ROOT.kYellow)]
-                   ,yTitle="Normalized",xTitle="Offline CSV",rTitle="Data/MC",setLogy=0,outDir=o.outDir)
+                   ,yTitle="Normalized",xTitle="Offline CSV",rTitle="Data/MC",setLogy=0,outDir=o.outDir,cmsText=o.cmsText,lumiText=o.lumiText)
 
 drawStackCompRatio("Off_DeepCSV_FlavorComp",(offDeepCSV_PF,"Data"),
                    [(offDeepCSV_L_PF_MC,"Light Flavor",ROOT.kAzure-9),
                     (offDeepCSV_C_PF_MC,"Charm Jets",ROOT.kGreen+1),
                     (offDeepCSV_B_PF_MC,"B Jets",ROOT.kYellow)]
-                   ,yTitle="Normalized",xTitle="Offline DeepCSV",rTitle="Data/MC",setLogy=0,outDir=o.outDir)
+                   ,yTitle="Normalized",xTitle="Offline DeepCSV",rTitle="Data/MC",setLogy=0,outDir=o.outDir,cmsText=o.cmsText,lumiText=o.lumiText)
 
 
 
 #plot("pt","offJets",norm=1,logy=1)offJets_matched
 
 
-makeStack("OffJet_Pt",     "pt_m",     "offJets_matched_X",binning=2,xTitle="Offline Jet Pt", rTitle="Data/MC",logy=1,inFileData=inFileData,inFileMC=inFileMC,outDir=o.outDir,min=20)
-makeStack("OffJet_Eta",    "eta",      "offJets_matched_X",binning=2,xTitle="Offline Jet Eta",rTitle="Data/MC",logy=0,inFileData=inFileData,inFileMC=inFileMC,outDir=o.outDir)
-makeStack("OffJet_Phi",    "phi",      "offJets_matched_X",binning=2,xTitle="Offline Jet Phi",rTitle="Data/MC",logy=0,inFileData=inFileData,inFileMC=inFileMC,outDir=o.outDir)
-makeStack("OffJet_DeepCSV","DeepCSV_l","offJets_matched_X",binning=csvBinning,xTitle="Offline Jet DeepCSV",rTitle="Data/MC",logy=0,inFileData=inFileData,inFileMC=inFileMC,outDir=o.outDir)
-makeStack("OffJet_CSV",    "CSVv2_l",    "offJets_matched_X",binning=csvBinning,xTitle="Offline Jet CSV",rTitle="Data/MC",logy=0,inFileData=inFileData,inFileMC=inFileMC,outDir=o.outDir)
+makeStack("OffJet_Pt",     "pt_m",     "offJets_matched_X",binning=2,xTitle="Offline Jet Pt", rTitle="Data/MC",logy=1,inFileData=inFileData,inFileMC=inFileMC,outDir=o.outDir,min=20,cmsText=o.cmsText,lumiText=o.lumiText)
+makeStack("OffJet_Eta",    "eta",      "offJets_matched_X",binning=1,xTitle="Offline Jet Eta",rTitle="Data/MC",logy=0,inFileData=inFileData,inFileMC=inFileMC,outDir=o.outDir,x_min=-3,x_max=3,cmsText=o.cmsText,lumiText=o.lumiText)
+makeStack("OffJet_Phi",    "phi",      "offJets_matched_X",binning=2,xTitle="Offline Jet Phi",rTitle="Data/MC",logy=0,inFileData=inFileData,inFileMC=inFileMC,outDir=o.outDir,cmsText=o.cmsText,lumiText=o.lumiText)
+makeStack("OffJet_DeepCSV","DeepCSV_l","offJets_matched_X",binning=csvBinning,xTitle="Offline Jet DeepCSV",rTitle="Data/MC",logy=0,inFileData=inFileData,inFileMC=inFileMC,outDir=o.outDir,cmsText=o.cmsText,lumiText=o.lumiText)
+makeStack("OffJet_CSV",    "CSVv2_l",    "offJets_matched_X",binning=csvBinning,xTitle="Offline Jet CSV",rTitle="Data/MC",logy=0,inFileData=inFileData,inFileMC=inFileMC,outDir=o.outDir,cmsText=o.cmsText,lumiText=o.lumiText)
 
 
 
@@ -329,25 +334,25 @@ ROOT.gStyle.SetPadRightMargin(0.2)
 ROOT.gStyle.SetPadRightMargin(oldMargin)
 
 
-makeInverseTurnOn("CaloCSVEffwrtOff_MC",   "CSVv2_l","offJetsWORKINGPOINT_matchedCaloJet", inFileMC,  binning=1, otherText="Online Calo CSV Eff wrt Offline (MC)",outDir=o.outDir)
-makeInverseTurnOn("CaloCSVEffwrtOff_Data", "CSVv2_l","offJetsWORKINGPOINT_matchedCaloJet", inFileData,binning=1, otherText="Online Calo CSV Eff wrt Offline (Data)",outDir=o.outDir)
-makeInverseTurnOnAll("CaloCSVEffwrtOff_All", "CSVv2_l","offJetsWORKINGPOINT_matchedCaloJet", inFileData,"Data",inFileMC,"MC",binning=1, otherText="Online Calo CSV Eff wrt Offline",outDir=o.outDir)
-makeInverseTurnOnAll("CaloDeepCSVEffwrtOff_All", "DeepCSV_l","offJetsWORKINGPOINT_matchedCaloJet", inFileData,"Data",inFileMC,"MC",binning=1, otherText="Online Calo DeepCSV Eff wrt Offline",outDir=o.outDir)
+makeInverseTurnOn("CaloCSVEffwrtOff_MC",   "CSVv2_l","offJetsWORKINGPOINT_matchedCaloJet", inFileMC,  binning=1, otherText="Online Calo CSV Eff wrt Offline (MC)",outDir=o.outDir,cmsText=o.cmsText,lumiText=o.lumiText)
+makeInverseTurnOn("CaloCSVEffwrtOff_Data", "CSVv2_l","offJetsWORKINGPOINT_matchedCaloJet", inFileData,binning=1, otherText="Online Calo CSV Eff wrt Offline (Data)",outDir=o.outDir,cmsText=o.cmsText,lumiText=o.lumiText)
+makeInverseTurnOnAll("CaloCSVEffwrtOff_All", "CSVv2_l","offJetsWORKINGPOINT_matchedCaloJet", inFileData,"Data",inFileMC,"MC",binning=1, otherText="Online Calo CSV Eff wrt Offline",outDir=o.outDir,cmsText=o.cmsText,lumiText=o.lumiText)
+makeInverseTurnOnAll("CaloDeepCSVEffwrtOff_All", "DeepCSV_l","offJetsWORKINGPOINT_matchedCaloJet", inFileData,"Data",inFileMC,"MC",binning=1, otherText="Online Calo DeepCSV Eff wrt Offline",outDir=o.outDir,cmsText=o.cmsText,lumiText=o.lumiText)
 
 
-makeInverseTurnOn("PFCSVEffwrtOff_MC",   "CSVv2_l","offJetsWORKINGPOINT_matchedPFJet", inFileMC,  binning=1, otherText="Online PF CSV Eff wrt Offline (MC)",outDir=o.outDir)
-makeInverseTurnOn("PFCSVEffwrtOff_Data", "CSVv2_l","offJetsWORKINGPOINT_matchedPFJet", inFileData,binning=1, otherText="Online PF CSV Eff wrt Offline (Data)",outDir=o.outDir)
-makeInverseTurnOnAll("PFCSVEffwrtOff_All", "CSVv2_l","offJetsWORKINGPOINT_matchedPFJet", inFileData,"Data",inFileMC,"MC",binning=1, otherText="Online PF CSV Eff wrt Offline",outDir=o.outDir)
-makeInverseTurnOnAll("PFDeepCSVEffwrtOff_All", "DeepCSV_l","offJetsWORKINGPOINT_matchedPFJet", inFileData,"Data",inFileMC,"MC",binning=1, otherText="Online PF DeepCSV Eff wrt Offline",outDir=o.outDir)
+makeInverseTurnOn("PFCSVEffwrtOff_MC",   "CSVv2_l","offJetsWORKINGPOINT_matchedPFJet", inFileMC,  binning=1, otherText="Online PF CSV Eff wrt Offline (MC)",outDir=o.outDir,cmsText=o.cmsText,lumiText=o.lumiText)
+makeInverseTurnOn("PFCSVEffwrtOff_Data", "CSVv2_l","offJetsWORKINGPOINT_matchedPFJet", inFileData,binning=1, otherText="Online PF CSV Eff wrt Offline (Data)",outDir=o.outDir,cmsText=o.cmsText,lumiText=o.lumiText)
+makeInverseTurnOnAll("PFCSVEffwrtOff_All", "CSVv2_l","offJetsWORKINGPOINT_matchedPFJet", inFileData,"Data",inFileMC,"MC",binning=1, otherText="Online PF CSV Eff wrt Offline",outDir=o.outDir,cmsText=o.cmsText,lumiText=o.lumiText)
+makeInverseTurnOnAll("PFDeepCSVEffwrtOff_All", "DeepCSV_l","offJetsWORKINGPOINT_matchedPFJet", inFileData,"Data",inFileMC,"MC",binning=1, otherText="Online PF DeepCSV Eff wrt Offline",outDir=o.outDir,cmsText=o.cmsText,lumiText=o.lumiText)
 
 
 for op in ["Loose","Medium","Tight"]:
     makeInverseTurnOnAll("CaloCSVEffwrtOff_"+op, "CSVv2_l","offJetsWORKINGPOINT_matchedCaloJet", inFileData,"Data",inFileMC,"MC",binning=1, otherText="Online Calo CSV Eff wrt Offline",outDir=o.outDir,
-                         wps=[op])
+                         wps=[op],cmsText=o.cmsText,lumiText=o.lumiText)
 
 
     makeInverseTurnOnAll("PFCSVEffwrtOff_"+op, "CSVv2_l","offJetsWORKINGPOINT_matchedPFJet", inFileData,"Data",inFileMC,"MC",binning=1, otherText="Online PF CSV Eff wrt Offline",outDir=o.outDir,
-                         wps=[op])
+                         wps=[op],cmsText=o.cmsText,lumiText=o.lumiText)
 
 
 
