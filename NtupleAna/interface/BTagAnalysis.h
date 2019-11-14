@@ -66,6 +66,9 @@ namespace TriggerStudies {
     nTupleAnalysis::jetHists*    hOffJet_matchedPFDeepcsvTagJet  ;
     nTupleAnalysis::jetHists*    hOffJetTightDeepCSV_matchedPFJet       ;
     nTupleAnalysis::jetHists*    hOffJetMediumDeepCSV_matchedPFJet      ;
+    nTupleAnalysis::jetHists*    hOffJetMedDeepCSV_matchedPFJet      ;
+    nTupleAnalysis::jetHists*    hOffJetMedDeepCSV_matchedPFDeepCSV  ;
+    nTupleAnalysis::jetHists*    hOffJetMedDeepCSV_matchedPFCSV      ;
     nTupleAnalysis::jetHists*    hOffJetLooseDeepCSV_matchedPFJet       ;
     nTupleAnalysis::jetHists*    hOffJetMedDeepFlav_matchedPFJet      ;
     nTupleAnalysis::jetHists*    hOffJetMedDeepFlav_matchedPFDeepCSV  ;
@@ -78,6 +81,9 @@ namespace TriggerStudies {
     nTupleAnalysis::jetHists*    hOffJet_matchedCaloDeepcsvTagJet  ;
     nTupleAnalysis::jetHists*    hOffJetTightDeepCSV_matchedCaloJet       ;
     nTupleAnalysis::jetHists*    hOffJetMediumDeepCSV_matchedCaloJet      ;
+    nTupleAnalysis::jetHists*    hOffJetMedDeepCSV_matchedCaloJet      ;
+    nTupleAnalysis::jetHists*    hOffJetMedDeepCSV_matchedCaloDeepCSV  ;
+    nTupleAnalysis::jetHists*    hOffJetMedDeepCSV_matchedCaloCSV      ;
     nTupleAnalysis::jetHists*    hOffJetLooseDeepCSV_matchedCaloJet       ;
     nTupleAnalysis::jetHists*    hOffJetMedDeepFlav_matchedCaloJet      ;
     nTupleAnalysis::jetHists*    hOffJetMedDeepFlav_matchedCaloDeepCSV  ;
