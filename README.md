@@ -25,6 +25,10 @@
 
 > source TriggerStudies/NtupleAna/run/runData18B.sh
 
+#
+# The following is OLD
+#
+
 
 # Run
 > procNtupleExample TriggerStudies/NtupleAna/scripts/procNtupleExampleConfig_cfg.py
@@ -36,9 +40,6 @@
 > source TriggerStudies/NtupleAna/run/runAll.sh runE
 
 
-#
-# OLD
-#
 > mkdir run
 > cd run
 
