@@ -1,12 +1,25 @@
-
-
-
 # TriggerStudies
 
-# In C++
+# Setup  (From CMSSW/src release area)
+
+# Eg: (Only do this once)
+> cmsrel CMSSW_10_1_7
+
+
+# Then on next logon.
+
+> cd CMSSW_10_1_7/src/
+> cmsenv
+
+> git clone git@github.com:patrickbryant/nTupleAnalysis.git
+> git clone git@github.com:johnalison/TriggerStudies.git
 
 # Compile
 > scram b -j 6
+
+
+
+
 
 # Run
 > procNtupleExample TriggerStudies/NtupleAna/scripts/procNtupleExampleConfig_cfg.py
@@ -17,8 +30,13 @@
 # To Run all MC for eg runE
 > source TriggerStudies/NtupleAna/run/runAll.sh runE
 
+
+#
+# OLD
+#
 > mkdir run
 > cd run
+
 
 > python ../python/procNtupleExample.py -i ../tree_Oct3_20kEvents.root -o TestFile.root
 
