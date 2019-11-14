@@ -1,24 +1,29 @@
 # TriggerStudies
 
-# Setup  (From CMSSW/src release area)
+## Setup  (From CMSSW/src release area)
 
-# Eg: (Only do this once)
+## Eg: (Only do this once)
 > cmsrel CMSSW_10_1_7
 
 
-# Then on next logon.
+## Then on next logon.
 
 > cd CMSSW_10_1_7/src/
+
 > cmsenv
 
 > git clone git@github.com:patrickbryant/nTupleAnalysis.git
+
 > git clone git@github.com:johnalison/TriggerStudies.git
 
-# Compile
+## Compile
+
 > scram b -j 6
 
 
+## Assuming that goes well and example that runs on data is
 
+> source TriggerStudies/NtupleAna/run/runData18B.sh
 
 
 # Run
