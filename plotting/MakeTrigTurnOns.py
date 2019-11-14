@@ -118,6 +118,19 @@ if o.mc:
                 ["offJetPtAll450_L_3vl","offJetPtAll0_L_3vl"],
                 ["offJetPtAll500_L_3vl","offJetPtAll0_L_3vl"],
                 ["offJetPtAll550_L_4vl","offJetPtAll0_L_4vl"],
+
+                ["offHtAll180","offHtAll0"],
+                ["offHtAll250","offHtAll0"],
+                ["offHtAll330_l","offHtAll0_l"],
+                ["offHtAll370_l","offHtAll0_l"],
+                ["offHtAll430_l","offHtAll0_l"],
+                ["offHtAll510_l","offHtAll0_l"],
+                ["offHtAll590_l","offHtAll0_l"],
+                ["offHtAll680_vl","offHtAll0_vl"],
+                ["offHtAll780_vl","offHtAll0_vl"],
+                ["offHtAll890_vl","offHtAll0_vl"],
+                ["offHtAll1050_2vl","offHtAll0_2vl"],
+
                 ]    
 
 for p in effPairs:

@@ -10,6 +10,8 @@ p = OptionParser()
 p.add_option('--input',  type = 'string', default = "outBTag.FTKBtagging.ttbar.mwt2.All.root", dest = 'inFile', help = 'intput File' )
 p.add_option('--output', type = 'string', default = "makeRocCurves", dest = 'outDir', help = 'output dir' )
 p.add_option('--doCaloJets',  action="store_true",help = 'output dir' )
+p.add_option('--cmsText', type = 'string', default = "Work in Progress",  help = '' )
+#p.add_option('--lumiText', default = "",  help = '' )
 (o,a) = p.parse_args()
 
 
@@ -130,7 +132,7 @@ def doVarRatio(var,binning,xTitle,setLogy=1,minX=None,maxX=None,minY=None):
                hltLF.GetMaximum(),hltBQ.GetMaximum())
     if setLogy:
         offLF.SetMaximum(4e0*maxY)
-        offLF.SetMinimum(1e-6)
+        offLF.SetMinimum(1.01e-5)
     else:
         offLF.SetMaximum(1.2*maxY)
 
@@ -151,16 +153,17 @@ def doVarRatio(var,binning,xTitle,setLogy=1,minX=None,maxX=None,minY=None):
     LFRatio = makeRatio(num = hltLF.Clone(),  den = offLF.Clone())
     BQRatio = makeRatio(num = hltBQ.Clone(),  den = offBQ.Clone())
 
-    #xpos = 0.18
-    #ypos = 0.6
-    #xwidth = 0.3
-    #ywidth = 0.3
-    #
-    #leg = ROOT.TLegend(xpos, ypos, xpos+xwidth, ypos+ywidth)
-    #leg.AddEntry(offBQ,"Offline tracks b-quark jets","L")
-    #leg.AddEntry(hltBQ,"HLT tracks b-quark jets"    ,"PEL")
-    #leg.AddEntry(offLF,"Offline tracks light-flavor jets","L")
-    #leg.AddEntry(hltLF,"HLT tracks light-flavor jets"    ,"PEL")
+    xpos = 0.2
+    ypos = 0.07
+    xwidth = 0.7
+    ywidth = 0.1
+    
+    leg = ROOT.TLegend(xpos, ypos, xpos+xwidth, ypos+ywidth)
+    leg.SetNColumns(2)
+    leg.AddEntry(offBQ,"Offline tracks b-quark jets","L")
+    leg.AddEntry(offLF,"Offline tracks light-flavor jets","L")
+    leg.AddEntry(hltBQ,"HLT tracks b-quark jets"    ,"PEL")
+    leg.AddEntry(hltLF,"HLT tracks light-flavor jets" ,"PEL")
 
     canvas = makeCanvas(var, var, width=600, height=600)
     split=0.3
@@ -190,12 +193,17 @@ def doVarRatio(var,binning,xTitle,setLogy=1,minX=None,maxX=None,minY=None):
     #hltBQ.SetMarkerSize(0.75)
     #hltBQ.SetMarkerStyle(21)
     hltBQ.Draw("same pe")
-    #leg.Draw("same")
+    leg.Draw("same")
 
 
-    cmsLine1, cmsLine2 = getCMSText(xStart=0.2,yStart=0.85)
-    cmsLine1.Draw("same")
-    cmsLine2.Draw("same")
+
+
+
+
+    cmsLines = getCMSText(xStart=0.2,yStart=0.85,subtext=o.cmsText)
+    for cmsl in cmsLines:
+        cmsl.Draw("same")
+
 
 
     bottom_pad.cd()

@@ -6,7 +6,7 @@ sys.path.insert(0, '../../')
 
 
 from   ROOTHelp.Utils         import do_variable_rebinning, makeCanvas
-from   ROOTHelp.Plotting      import makeRatio, makeBayesRatio
+from   ROOTHelp.Plotting      import makeRatio, makeBayesRatio, makeBayesLikeRatio
 
 def getLegend(entries,xStart,xWidth,yStart,yWidth):
     leg = ROOT.TLegend(xStart,yStart, (xStart+xWidth), (yStart+yWidth))
@@ -20,13 +20,10 @@ def getLegend(entries,xStart,xWidth,yStart,yWidth):
     #leg.Draw("same")
 
 
-def getCMSText(xStart,yStart):
+def getCMSText(xStart,yStart,subtext = "Work in Progress", lumiText="",xLumiStart=0.78,yLumiStart=0.95):
 
     yStartFirstLine = yStart
     yStartSecondLine = yStart - 0.047
-
-
-    
 
     cmsScale=1.2
     textsize=0.045
@@ -43,11 +40,18 @@ def getCMSText(xStart,yStart):
     cmsfistLine.SetTextSize(textsize)
     cmsfistLine.SetNDC()
 
-    cmssecondline = ROOT.TLatex(xStart, yStartSecondLine, '#it{Work in Progress}')
+    cmssecondline = ROOT.TLatex(xStart, yStartSecondLine, '#it{'+subtext+'}')
     cmssecondline.SetTextFont(42)
     cmssecondline.SetTextSize(textsize)
     cmssecondline.SetNDC()
-    
+
+    if lumiText:
+        cmsLumi = ROOT.TLatex(xLumiStart, yLumiStart, lumiText)
+        cmsLumi.SetTextFont(42)
+        cmsLumi.SetTextSize(0.035)
+        cmsLumi.SetNDC()
+        
+        return cmsfistLine, cmssecondline, cmsLumi
 
     return cmsfistLine, cmssecondline
 
@@ -93,6 +97,19 @@ def getHist(inFile,dir,var,binning,norm=False,color=ROOT.kBlack):
 
 
 
+def makeEffFromFiles(var,dirs,inFileNum,inFileDen,binning):
+    #offLF = getHist(inFile,"caloJets_matchedL",          var,binning,ROOT.kBlack)
+    numHist = getHist(inFileNum,dirs,          var,binning,color=ROOT.kBlue)
+    denHist = getHist(inFileDen,dirs,          var,binning,color=ROOT.kBlue)
+
+    #effHist = makeBayesRatio(num = numHist.Clone(),  den = denHist.Clone())
+    #effHist = makeBayesLikeRatio(num = numHist.Clone(),  den = denHist.Clone())
+    effHist = makeRatio(num = numHist.Clone(),  den = denHist.Clone())
+    #print numHist.GetXaxis().GetTitle()
+    effHist.GetXaxis().SetTitle(numHist.GetXaxis().GetTitle())
+    return effHist
+
+
 def makeEff(var,dirs,inFile,binning):
     #offLF = getHist(inFile,"caloJets_matchedL",          var,binning,ROOT.kBlack)
     if not isinstance(var,list) and isinstance(dirs,list):
@@ -112,7 +129,9 @@ def makeEff(var,dirs,inFile,binning):
 
 
 
-def drawComp(name,inputHists,yTitle,xTitle,outDir,otherText="",setLogy=1,yMax= 1,leg="",xMax=1,xMin = -0.2,yLeg=0.76,xLeg=0.2,xStartOther=0.5, yStartOther=0.9, doFit = False):
+def drawComp(name,inputHists,yTitle,xTitle,outDir,otherText="",setLogy=1,yMax= 1,leg="",xMax=1,xMin = -0.2,yLeg=0.76,xLeg=0.2,xStartOther=0.5, yStartOther=0.9, doFit = False,cmsText="", lumiText=""):
+
+
 
     canvas = makeCanvas(name, name)#, width=800, height=600)
 
@@ -179,6 +198,30 @@ def drawComp(name,inputHists,yTitle,xTitle,outDir,otherText="",setLogy=1,yMax= 1
             else:
                 hInfo[0].Draw("same")
 
+                if doFit:
+                    xAve = (ratio_axis.GetXaxis().GetXmin() + ratio_axis.GetXaxis().GetXmax()) /2
+                    xmin = max(30,ratio_axis.GetXaxis().GetXmin())
+                    print "Setting Range",xmin, ratio_axis.GetXaxis().GetXmax()
+                    sigmoid = ROOT.TF1("func", "(1.0/(1+ TMath::Exp(-[0]*(x-[1]))))", xmin, ratio_axis.GetXaxis().GetXmax()) 
+                    sigmoid.SetParameters(0.01, xAve)
+                    inputHists[0][0].Fit(sigmoid,"q")
+                    sigmoid.SetLineStyle(ROOT.kDashed)
+                    sigmoid.SetLineColor(ROOT.kRed)
+                    sigmoid.Draw("same")
+                    
+                    print hInfo[0].GetName(),":",
+                    print sigmoid.GetParameter(0),
+                    print sigmoid.GetParameter(1)
+                    
+                    textFits = []
+                    for i in range(2):
+                        yStartFit = 0.3-0.04*i
+                        textFits.append(ROOT.TLatex(0.7, yStartFit, "p"+str(i)+" = "+str(round(sigmoid.GetParameter(i),3))))
+                        textFits[-1].SetTextFont(42)
+                        textFits[-1].SetTextSize(0.04)
+                        textFits[-1].SetNDC()
+                        textFits[-1].Draw("same")
+
 
 
             
@@ -204,7 +247,7 @@ def drawComp(name,inputHists,yTitle,xTitle,outDir,otherText="",setLogy=1,yMax= 1
         hForLeg_Data.SetMarkerColor(ROOT.kBlack)
         legInfo = []
         legInfo.append((hForLeg_Data,"#scale[0.7]]{Data}","LP"))
-        legData = getLegend(legInfo,  xStart=0.2, xWidth=0.3, yStart=0.76-0.08, yWidth=0.08)
+        legData = getLegend(legInfo,  xStart=0.175, xWidth=0.3, yStart=0.76-0.08, yWidth=0.08)
         legData.Draw("same")
 
         hForLeg_MC = inputHists[0][0].Clone("leg_MC")
@@ -213,7 +256,7 @@ def drawComp(name,inputHists,yTitle,xTitle,outDir,otherText="",setLogy=1,yMax= 1
         hForLeg_MC.SetMarkerStyle(24)
         legInfo = []
         legInfo.append((hForLeg_MC,"#scale[0.7]]{MC  }","LP"))
-        legMC = getLegend(legInfo,  xStart=0.35, xWidth=0.3, yStart=0.76-0.08, yWidth=0.08)
+        legMC = getLegend(legInfo,  xStart=0.3, xWidth=0.3, yStart=0.76-0.08, yWidth=0.08)
         legMC.Draw("same")
 
         textLoose = ROOT.TLatex(0.2, 0.77, "Loose")
@@ -241,18 +284,23 @@ def drawComp(name,inputHists,yTitle,xTitle,outDir,otherText="",setLogy=1,yMax= 1
     #
     #  CMS Text
     #
-    cmsLine1, cmsLine2 = getCMSText(xStart=0.2,yStart=0.875)
-    cmsLine1.Draw("same")
-    cmsLine2.Draw("same")
+    cmsLines = getCMSText(xStart=0.2,yStart=0.875,subtext=cmsText,lumiText=lumiText,xLumiStart=0.76,yLumiStart=0.96)
+    for cmsl in cmsLines:
+        cmsl.Draw("same")
 
 
-    if otherText:
-        
+    if type(otherText) == type(list()):
+        textsize=0.045
+        otherLabel = []
+        yStartCurrent = yStartOther
+        for ot in otherText:
+            otherLabel.append(ROOT.TLatex(xStartOther, yStartCurrent, '#scale['+str(0.7)+']{'+ot+'}'))
+            otherLabel[-1].Draw("same")
+            yStartCurrent = yStartOther - 0.05
 
-
+    elif otherText:
         textsize=0.045
         otherLabel = ROOT.TLatex(xStartOther, yStartOther, '#scale['+str(0.7)+']{'+otherText+'}')
-    
         otherLabel.Draw("same")
 
 
@@ -260,7 +308,7 @@ def drawComp(name,inputHists,yTitle,xTitle,outDir,otherText="",setLogy=1,yMax= 1
 
 
 
-def drawCompRatio(outName,histInfo,yTitle,xTitle,rTitle,outDir,setLogy=1):
+def drawCompRatio(outName,histInfo,yTitle,xTitle,rTitle,outDir,setLogy=1,cmsText="", lumiText=""):
     hist1 = histInfo[0][0].Clone()
 
 
@@ -326,9 +374,9 @@ def drawCompRatio(outName,histInfo,yTitle,xTitle,rTitle,outDir,setLogy=1):
     #hltBQ.Draw("same pe")
     leg.Draw("same")
 
-    cmsLine1, cmsLine2 = getCMSText(xStart=0.225,yStart=0.85)
-    cmsLine1.Draw("same")
-    cmsLine2.Draw("same")
+    cmsLines = getCMSText(xStart=0.225,yStart=0.85,subtext=cmsText,lumiText=lumiText)
+    for cmsl in cmsLines:
+        cmsl.Draw("same")
 
 
     bottom_pad.cd()
@@ -423,7 +471,7 @@ def plotRatio(var, dir, inFileData1, name1, inFileData2, name2, xTitle, outDir, 
                   ,yTitle="Normalized",xTitle=xTitle,rTitle=rTitle,outDir=outDir,setLogy=setLogy)
     
 
-def drawStackCompRatio(outName,dataInfo,MCInfo,yTitle,xTitle,rTitle,outDir,min=1,setLogy=1):
+def drawStackCompRatio(outName,dataInfo,MCInfo,yTitle,xTitle,rTitle,outDir,min=1,setLogy=1,x_min=None,x_max=None,cmsText="", lumiText=""):
     histData = dataInfo[0].Clone()
 
 
@@ -497,6 +545,10 @@ def drawStackCompRatio(outName,dataInfo,MCInfo,yTitle,xTitle,rTitle,outDir,min=1
         
 
     stack.Draw()
+    if x_max is not None and x_min is not None:
+        stack.GetXaxis().SetRangeUser(x_min,x_max)
+        histData.GetXaxis().SetRangeUser(x_min,x_max)
+
     stack.GetYaxis().SetTitle(yTitle)
     stack.GetXaxis().SetTitle(xTitle)
     stack.Draw("hist")
@@ -513,9 +565,10 @@ def drawStackCompRatio(outName,dataInfo,MCInfo,yTitle,xTitle,rTitle,outDir,min=1
 
     histRatio = makeRatio(num = histData.Clone(),  den = stacksum.Clone())
 
-    cmsLine1, cmsLine2 = getCMSText(xStart=0.225,yStart=0.85)
-    cmsLine1.Draw("same")
-    cmsLine2.Draw("same")
+    cmsLines = getCMSText(xStart=0.225,yStart=0.85,subtext=cmsText,lumiText=lumiText)
+    for cmsl in cmsLines:
+        cmsl.Draw("same")
+
 
 
     bottom_pad.cd()
@@ -546,7 +599,10 @@ def drawStackCompRatio(outName,dataInfo,MCInfo,yTitle,xTitle,rTitle,outDir,min=1
     histRatio.Draw("PE same")
 
     line = ROOT.TLine()
-    line.DrawLine(histData.GetXaxis().GetXmin(), 1.0, histData.GetXaxis().GetXmax(), 1.0)
+    if x_max is not None and x_min is not None:
+        line.DrawLine(x_min, 1.0, x_max, 1.0)
+    else:
+        line.DrawLine(histData.GetXaxis().GetXmin(), 1.0, histData.GetXaxis().GetXmax(), 1.0)
 
     ndivs=[505,503]
 
@@ -602,7 +658,7 @@ def drawStackCompRatio(outName,dataInfo,MCInfo,yTitle,xTitle,rTitle,outDir,min=1
 
 
 
-def makeStack(name,var,dir,binning,xTitle,rTitle,logy,inFileData,inFileMC,outDir,min=1):
+def makeStack(name,var,dir,binning,xTitle,rTitle,logy,inFileData,inFileMC,outDir,min=1,x_min=None,x_max=None,cmsText="",lumiText=""):
     hist_Data    = getHist(inFileData, dir.replace("_X_","").replace("_X",""),      var, binning=binning,norm=0)
     hist_B_MC    = getHist(inFileMC,   dir.replace("X","B"),      var, binning=binning,norm=0)
     hist_C_MC    = getHist(inFileMC,   dir.replace("X","C"),      var, binning=binning,norm=0)
@@ -614,7 +670,7 @@ def makeStack(name,var,dir,binning,xTitle,rTitle,logy,inFileData,inFileMC,outDir
                        [(hist_L_MC,"Light Flavor",ROOT.kAzure-9),
                         (hist_C_MC,"Charm Jets",  ROOT.kGreen+1),
                         (hist_B_MC,"B Jets",      ROOT.kYellow)]
-                       ,yTitle="Normalized",xTitle=xTitle,rTitle=rTitle,min=min,setLogy=logy,outDir=outDir)
+                       ,yTitle="Normalized",xTitle=xTitle,rTitle=rTitle,min=min,setLogy=logy,outDir=outDir,x_min=x_min,x_max=x_max,cmsText=cmsText,lumiText=lumiText)
 
 
 def getInverseTurnOn(name,var,dir,inFile,binning):
@@ -641,7 +697,7 @@ def getInverseTurnOn(name,var,dir,inFile,binning):
     return histEff
 
 
-def makeInverseTurnOn(name,var,dir,inFile,binning, otherText, outDir):
+def makeInverseTurnOn(name,var,dir,inFile,binning, otherText, outDir,cmsText="", lumiText=""):
     
 
     histTight  = getInverseTurnOn(name,var,dir.replace("WORKINGPOINT","Tight"), inFile,binning)
@@ -672,12 +728,14 @@ def makeInverseTurnOn(name,var,dir,inFile,binning, otherText, outDir):
     histMedium.Draw("same")
     histTight .Draw("same")
     histLoose .Draw("axis, same")
+
     #
     #  CMS Text
     #
-    cmsLine1, cmsLine2 = getCMSText(xStart=0.2,yStart=0.875)
-    cmsLine1.Draw("same")
-    cmsLine2.Draw("same")
+    cmsLines = getCMSText(xStart=0.2,yStart=0.875,subtext=cmsText,lumiText=lumiText,xLumiStart=0.76,yLumiStart=0.96)
+    for cmsl in cmsLines:
+        cmsl.Draw("same")
+
 
 
 
@@ -709,7 +767,7 @@ def makeInverseTurnOn(name,var,dir,inFile,binning, otherText, outDir):
 
 
 
-def makeInverseTurnOnAll(name,var,dir,inFile1,name1,inFile2,name2,binning, otherText, outDir, wps=["Loose","Medium","Tight"],colors=[ROOT.kRed,ROOT.kGreen,ROOT.kBlue]):
+def makeInverseTurnOnAll(name,var,dir,inFile1,name1,inFile2,name2,binning, otherText, outDir, wps=["Loose","Medium","Tight"],colors=[ROOT.kRed,ROOT.kGreen,ROOT.kBlue],cmsText="", lumiText=""):
     
     histFile1 = []
     histFile2 = []
@@ -726,7 +784,7 @@ def makeInverseTurnOnAll(name,var,dir,inFile1,name1,inFile2,name2,binning, other
 
     #hist = getHist(inFile,dir,var,binning)
     
-    histFile1[-1].GetXaxis().SetTitle("Online "+var+" Cut Value")
+    histFile1[-1].GetXaxis().SetTitle("Online "+var.replace("v2_l","").replace("_l","")+" Cut Value")
     histFile1[-1].GetYaxis().SetTitle("Efficiency Relative to Offline Working Point")
     histFile1[-1].GetXaxis().SetRangeUser(0,1)
     histFile1[-1].GetYaxis().SetRangeUser(0,1.2)
@@ -760,10 +818,9 @@ def makeInverseTurnOnAll(name,var,dir,inFile1,name1,inFile2,name2,binning, other
     #
     #  CMS Text
     #
-    cmsLine1, cmsLine2 = getCMSText(xStart=0.2,yStart=0.875)
-    cmsLine1.Draw("same")
-    cmsLine2.Draw("same")
-
+    cmsLines = getCMSText(xStart=0.2,yStart=0.875,subtext=cmsText,lumiText=lumiText,xLumiStart=0.76,yLumiStart=0.96)
+    for cmsl in cmsLines:
+        cmsl.Draw("same")
 
     #leg.AddEntry(histMedium,"wrt Offline Medium (Data)","P")
     #leg.AddEntry(histTight, "wrt Offline Tight (Data)", "P")
