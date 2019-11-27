@@ -224,7 +224,11 @@ BTagAnalysis::BTagAnalysis(TChain* _eventsRAW, TChain* _eventsAOD, fwlite::TFile
   //  Init the pile-up function
   //
   if(isMC){
-    pileUpTool = new nTupleAnalysis::pileUpWeightTool(PUFileName);
+    if( PUFileName != ""){
+      pileUpTool = new nTupleAnalysis::pileUpWeightTool(PUFileName);
+    }else{
+      std::cout << "Skipping PU reweighting" << std::endl;
+    }
   }
 
   //  if(histogramming >= 4) allEvents     = new eventHists("allEvents",     fs);
@@ -338,27 +342,29 @@ int BTagAnalysis::processEvent(){
   hAllElecs->nElecs->Fill(event->elecs.size());
   hSelElecs->nElecs->Fill(selElecs.size());
 
-  if(selMuons.size() == 1)
-    cutflow->Fill("passMuonCut", 1.0);
-
-  if(selElecs.size() == 1)
-    cutflow->Fill("passElecCut", 1.0);
-
-  if(selMuons.size() != 1){
-    if(debug) std::cout << "Fail Muon Cut" << std::endl;
-    return 0;
+  bool doLeptonCuts = true;
+  if(doLeptonCuts){
+    if(selMuons.size() == 1)
+      cutflow->Fill("passMuonCut", 1.0);
+    
+    if(selElecs.size() == 1)
+      cutflow->Fill("passElecCut", 1.0);
+    
+    if(selMuons.size() != 1){
+      if(debug) std::cout << "Fail Muon Cut" << std::endl;
+      return 0;
+    }
+    
+    if(selElecs.size() != 1){
+      if(debug) std::cout << "Fail Elec Cut" << std::endl;
+      return 0;
+    }
+    cutflow->Fill("passLeptonCut", 1.0);
   }
-
-  if(selElecs.size() != 1){
-    if(debug) std::cout << "Fail Elec Cut" << std::endl;
-    return 0;
-  }
-  cutflow->Fill("passLeptonCut", 1.0);
-
 
   float eventWeight = 1.0;
   float puWeight    = 1.0;
-  if(isMC){
+  if(isMC && pileUpTool){
     puWeight = pileUpTool->getWeight(event->nPVAOD);
     eventWeight =  puWeight * selElecs.at(0)->SF * selMuons.at(0)->SF;
   }
@@ -383,19 +389,23 @@ int BTagAnalysis::processEvent(){
     if(isMC)
       totalSFWeight *= offJet->SF;
   }
-
+  
   if(nOffJetsForCut < 2      ){
     if(debug) std::cout << "Fail NJet Cut" << std::endl;
     return 0;
   }
   cutflow->Fill("passNJetCut", eventWeight);
 
-  if(nOffJetsTaggedForCut < 1) {
-    if(debug) std::cout << "Fail NBJet Cut" << std::endl;
-    return 0;
+  bool doOfflineBTagCut = true;
+  if(doOfflineBTagCut){
+    
+    if(nOffJetsTaggedForCut < 1) {
+      if(debug) std::cout << "Fail NBJet Cut" << std::endl;
+      return 0;
+    }
+    cutflow->Fill("passNBJetCut", eventWeight);
   }
-  cutflow->Fill("passNBJetCut", eventWeight);
-
+  
   if(isMC)
     eventWeight *= totalSFWeight;
 

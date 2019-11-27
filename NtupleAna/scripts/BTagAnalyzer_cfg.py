@@ -38,7 +38,9 @@ JSONfiles  = {'2015':'',
 lumiData   = {'2015':'',
               '2016':'TriggerStudies/lumiMasks/', 
               '2017':'TriggerStudies/lumiMasks/brilcalc_2017_NoTrigger.csv',
-              '2018':'TriggerStudies/lumiMasks/brilcalc_2018_HLT_PFHT330PT30_QuadPFJet_75_60_45_40_TriplePFBTagDeepCSV_4p5.csv'} 
+              '2018':'TriggerStudies/lumiMasks/brilcalc_2018_HLT_PFHT330PT30_QuadPFJet_75_60_45_40_TriplePFBTagDeepCSV_4p5.csv',
+              'phase2' : ''
+          } 
 
 # for MC we need to normalize the sample to the recommended cross section * BR times the target luminosity
 ## ZH cross sections https://twiki.cern.ch/twiki/bin/view/LHCPhysics/CERNYellowReportPageAt13TeV#ZH_Process

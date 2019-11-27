@@ -155,7 +155,7 @@ void eventData::update(int e){
   if(debug) std::cout<<"Got Entry "<<e<<std::endl;
 
   if((run != runAOD) || (event != eventAOD)){
-    std::cout << "Run: " << run << " vs " << runAOD  << "  Evt: " << event << " vs " << eventAOD << std::endl;  
+    if(debug) std::cout << "Run: " << run << " vs " << runAOD  << "  Evt: " << event << " vs " << eventAOD << std::endl;  
     //std::cout << "Tryuing with inedex " << treeAOD->GetEntryWithIndex(run,event)  << std::endl;
   }
 
