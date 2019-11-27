@@ -206,7 +206,7 @@ namespace TriggerStudies {
     void PFJetAnalysis(const nTupleAnalysis::jetPtr& offJet,const nTupleAnalysis::jetPtr& hltJet, float weight);
     void CaloJetAnalysis(const nTupleAnalysis::jetPtr& offJet,const nTupleAnalysis::jetPtr& hltJet, float weight);
 
-    nTupleAnalysis::pileUpWeightTool* pileUpTool;
+    nTupleAnalysis::pileUpWeightTool* pileUpTool = nullptr;
 
   };
 
