@@ -47,7 +47,8 @@ def getHist(inFile,dir,var,binning,color):
     hist.SetLineColor(color)
     hist.SetMarkerColor(color)
     hist.Sumw2()
-    hist.Scale(1./hist.Integral())
+    if hist.Integral():
+        hist.Scale(1./hist.Integral())
     return hist
 
 #def doVar(var,binning,xTitle,setLogy=1):

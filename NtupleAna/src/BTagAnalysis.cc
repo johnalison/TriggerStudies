@@ -342,7 +342,7 @@ int BTagAnalysis::processEvent(){
   hAllElecs->nElecs->Fill(event->elecs.size());
   hSelElecs->nElecs->Fill(selElecs.size());
 
-  bool doLeptonCuts = true;
+  bool doLeptonCuts = false;
   if(doLeptonCuts){
     if(selMuons.size() == 1)
       cutflow->Fill("passMuonCut", 1.0);
@@ -396,7 +396,7 @@ int BTagAnalysis::processEvent(){
   }
   cutflow->Fill("passNJetCut", eventWeight);
 
-  bool doOfflineBTagCut = true;
+  bool doOfflineBTagCut = false;
   if(doOfflineBTagCut){
     
     if(nOffJetsTaggedForCut < 1) {
