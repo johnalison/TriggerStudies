@@ -3,6 +3,8 @@
 #include <TTreeIndex.h>
 using namespace TriggerStudies;
 
+using std::cout;  using std::endl;
+
 
 eventData::eventData(TChain* _treeRAW, TChain* _treeAOD, bool mc, std::string y, bool d, std::string jetDetailLevel){
   std::cout << "eventData::eventData()" << std::endl;
@@ -108,8 +110,6 @@ eventData::eventData(TChain* _treeRAW, TChain* _treeAOD, bool mc, std::string y,
   inputBranch(treeAOD, "Run",             runAOD);
   //inputBranch(tree, "luminosityBlock", lumiBlock);
   inputBranch(treeAOD, "Evt",           eventAOD);
-  inputBranch(treeRAW, "nPV",    nPV);
-  inputBranch(treeAOD, "nPV",    nPVAOD);
     
   std::cout << "eventData::eventData() Initialize jets and muons" << std::endl;
   std::string jetSFName = year;
@@ -123,6 +123,9 @@ eventData::eventData(TChain* _treeRAW, TChain* _treeAOD, bool mc, std::string y,
   //treeElecs    = new nTupleAnalysis::elecData("PFElectron", treeRAW);
   treeMuons    = new nTupleAnalysis::muonData("PatMuon",     treeRAW, true, isMC, year);
   treeElecs    = new nTupleAnalysis::elecData("PatElec",     treeRAW, isMC, year);
+
+  treePVs    = new nTupleAnalysis::vertexData("PV",     treeRAW);
+  offTreePVs = new nTupleAnalysis::vertexData("PV",     treeAOD);
 
 } 
 
@@ -199,7 +202,9 @@ void eventData::update(int e){
   caloJets = caloTreeJets ->getJets(30,1e6,2.4);
   muons    = treeMuons  ->getMuons(20, 2.4);
   elecs    = treeElecs  ->getElecs(30, 2.4);
-  
+
+  pvs    = treePVs     ->getVerticies();
+  offPVs = offTreePVs  ->getVerticies();
 
   if(debug) std::cout<<"eventData updated\n";
   return;

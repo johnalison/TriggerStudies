@@ -19,6 +19,7 @@
 #include "nTupleAnalysis/baseClasses/interface/jetHists.h"
 #include "nTupleAnalysis/baseClasses/interface/trackHists.h"
 #include "nTupleAnalysis/baseClasses/interface/eventHists.h"
+#include "nTupleAnalysis/baseClasses/interface/vertexHists.h"
 #include "nTupleAnalysis/baseClasses/interface/pileUpWeightTool.h"
 
 namespace TriggerStudies {
@@ -148,6 +149,9 @@ namespace TriggerStudies {
     nTupleAnalysis::btaggingHists* hOffBTags_matched_noV0;
 
     nTupleAnalysis::btaggingHists* hPfBTags;
+
+    nTupleAnalysis::vertexHists* hVtx;
+    nTupleAnalysis::vertexHists* hOffVtx;
 
     float OfflineDeepCSVTightCut  = -99;
     float OfflineDeepCSVMediumCut = -99;
