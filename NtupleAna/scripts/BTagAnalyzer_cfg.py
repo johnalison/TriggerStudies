@@ -7,6 +7,10 @@ import FWCore.ParameterSet.Types as CfgTypes
 #sys.path.insert(0, 'TriggerStudies/nTupleAnalysis/scripts/')
 #from cfgHelper import *
 
+print "Input command"
+print " ".join(sys.argv)
+
+
 parser = optparse.OptionParser()
 parser.add_option('-d', '--debug',                dest="debug",         action="store_true", default=False, help="debug")
 parser.add_option('-m', '--isMC',                 dest="isMC",          action="store_true", default=False, help="isMC")

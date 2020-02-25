@@ -205,6 +205,15 @@ BTagAnalysis::BTagAnalysis(TChain* _eventsRAW, TChain* _eventsAOD, fwlite::TFile
   }
 
   //
+  // Vertex Hists
+  //
+  hVtx       = new nTupleAnalysis::vertexHists("hltVtx", fs, "HLT Vtx");
+  hVtx       ->makeDiffHists("hltVtx", fs, "HLT Vtx");
+
+  hOffVtx    = new nTupleAnalysis::vertexHists("offVtx", fs, "Off Vtx");
+  
+
+  //
   //  Configure Selection
   // 
   OfflineDeepCSVTightCut  = OfflineDeepCSVTightCut2017  ;
@@ -365,9 +374,11 @@ int BTagAnalysis::processEvent(){
   float eventWeight = 1.0;
   float puWeight    = 1.0;
   if(isMC && pileUpTool){
-    puWeight = pileUpTool->getWeight(event->nPVAOD);
+    puWeight = pileUpTool->getWeight(event->offPVs.size());
     eventWeight =  puWeight * selElecs.at(0)->SF * selMuons.at(0)->SF;
   }
+
+
 
 
   //
@@ -421,9 +432,13 @@ int BTagAnalysis::processEvent(){
   //
   // Fill All events
   //
-  hEvents->Fill(event->nPVAOD,  0.0, eventWeight);
+  hEvents->Fill(event->offPVs.size(),  0.0, eventWeight);
   if(puWeight)
-    hEventsNoPUWeight->Fill(event->nPVAOD,  0.0, eventWeight/puWeight);
+    hEventsNoPUWeight->Fill(event->offPVs.size(),  0.0, eventWeight/puWeight);
+
+  hVtx      ->Fill(event->pvs, eventWeight);
+  hVtx      ->FillDiffHists(event->pvs, event->offPVs, eventWeight);
+  hOffVtx   ->Fill(event->offPVs, eventWeight);
 
   //
   //

@@ -11,6 +11,7 @@
 #include "nTupleAnalysis/baseClasses/interface/jetData.h"
 #include "nTupleAnalysis/baseClasses/interface/muonData.h"
 #include "nTupleAnalysis/baseClasses/interface/elecData.h"
+#include "nTupleAnalysis/baseClasses/interface/vertexData.h"
 
 // for jet pseudoTag calculations
 #include <TRandom3.h>
@@ -39,14 +40,7 @@ namespace TriggerStudies {
     Int_t    runAOD       =  0;
     UInt_t    lumiBlockAOD =  0;
     Int_t eventAOD     =  0;
-    //Int_t     nPVs = 0;
-    //Int_t     nPVsGood = 0;
 
-    //
-    // Testing
-    //
-    Int_t    nPV       =  0;
-    Int_t    nPVAOD    =  0;
 
     nTupleAnalysis::jetData* offTreeJets;
     std::vector<nTupleAnalysis::jetPtr> offJets;
@@ -62,6 +56,12 @@ namespace TriggerStudies {
 
     nTupleAnalysis::elecData* treeElecs;
     std::vector<nTupleAnalysis::elecPtr> elecs;
+
+    nTupleAnalysis::vertexData* treePVs;
+    std::vector<nTupleAnalysis::vertexPtr> pvs;
+
+    nTupleAnalysis::vertexData* offTreePVs;
+    std::vector<nTupleAnalysis::vertexPtr> offPVs;
 
     // Constructors and member functions
     eventData(TChain*, TChain*, bool, std::string, bool, std::string); 
