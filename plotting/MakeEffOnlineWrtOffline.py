@@ -29,7 +29,7 @@ inFile2    = ROOT.TFile(o.input2,  "READ")
 
 import os
 if not os.path.exists(o.outDir):
-    os.mkdir(o.outDir)
+    os.makedirs(o.outDir)
 
 
 from JetLevelPlotUtils import makeEff, drawComp, getHist, drawStackCompRatio, makeStack, makeInverseTurnOn, make2DComp, makeInverseTurnOnAll,plotRatio
@@ -55,11 +55,11 @@ effRatios = [
         ("offJetsMedDeepFlav_matchedCaloDeepCSV","offJetsMedDeepFlav_matchedCaloJet", "CaloDeepCSV"),
         ("offJetsMedDeepFlav_matchedCaloCSV",    "offJetsMedDeepFlav_matchedCaloJet", "CaloCSV"),
         ]
-        
+
 
 for v in vars:
     binning = 1
-    
+
     if v == "pt_m":
         binning = [0,10,20,30,40,50,60,70,80,90,100,120,140,160,200,250,300,350,400,500]
     if v == "pt_l":
@@ -95,7 +95,3 @@ for v in vars:
         outFile.cd()
         eff_Matched_1.Write()
         eff_Matched_2.Write()
-
-
-
-

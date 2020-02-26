@@ -25,7 +25,7 @@ inFileMC    = ROOT.TFile(o.inFileMC,  "READ")
 
 import os
 if not os.path.exists(o.outDir):
-    os.mkdir(o.outDir)
+    os.makedirs(o.outDir)
 
 
 from JetLevelPlotUtils import makeEff, drawComp, getHist, drawStackCompRatio, makeStack, makeInverseTurnOn, make2DComp, makeInverseTurnOnAll,plotRatio
@@ -105,7 +105,7 @@ if o.doAlgoStudy:
         vars += ["Eta_forAlgo"+str(i)]
         vars += ["Pt_forAlgo"+str(i)]
 
-    
+
 for v in vars:
     binning = 1
     if not v.find("Eta_forAlgo") == -1:
@@ -126,7 +126,7 @@ for v in vars:
     if v in ["ip2d","ip2d_l","ip2d_err","ip2d_err_l","ip2d_sig","ip2d_sig_l",
              "ip3d","ip3d_l","ip3d_err","ip3d_err_l","ip3d_sig","ip3d_sig_l",
              ]: vBtag = v
-    
+
 
     print "Doing ",vBtag
     #eff_Matched_BTag = makeEff(vBtag ,    ["offBTags_matched","offBTags"],inFileMC,binning=1)
@@ -139,7 +139,8 @@ for v in vars:
         xLeg = 0.6
 
     drawComp("Eff_"+v,[(eff_Matched,"t#bar{t} MC (All Tracks)",ROOT.kBlack),
-                       (eff_Matched_noV0,"t#bar{t} MC (After V0 veto)",ROOT.kRed),
+                       # (eff_Matched_noV0,"t#bar{t} MC (After V0 veto)",ROOT.kRed),
+                       (eff_Matched_noV0,"t#bar{t} MC (After V0/K_{S}^{0} veto)",ROOT.kRed),
                        #(eff_Matched_BTag,"t#bar{t} MC ",ROOT.kBlue),
                        #(eff_Matched_BTag_noV0,"t#bar{t} MC ",ROOT.kGreen)
                        ]
@@ -150,7 +151,8 @@ for v in vars:
 
 
     drawComp("EffCalo_"+v,[(effCalo_Matched,"t#bar{t} MC (All Tracks)",ROOT.kBlack),
-                           (effCalo_Matched_noV0,"t#bar{t} MC (After V0 veto)",ROOT.kRed),
+                           # (effCalo_Matched_noV0,"t#bar{t} MC (After V0 veto)",ROOT.kRed),
+                           (effCalo_Matched_noV0,"t#bar{t} MC (After V0/K_{S}^{0} veto)",ROOT.kRed),
                            #(eff_Matched_BTag,"t#bar{t} MC ",ROOT.kBlue),
                            #(eff_Matched_BTag_noV0,"t#bar{t} MC ",ROOT.kGreen)
                        ]
@@ -239,7 +241,7 @@ for v in vars:
 #
 #
 #
-##   Data vs MC 
+##   Data vs MC
 #drawComp("Eff_CaloCSV_DataVSMC",[(eff_CaloCSV_Data,"Data",ROOT.kBlue),(eff_CaloCSV_MC,"MC",ROOT.kRed)]
 #         ,yTitle="Efficiency",xTitle="CSV Value of Jets", otherText="Online WP: CSV > 0.8484",outDir=o.outDir)
 #drawComp("Eff_PFCSV_DataVSMC",[(eff_PFCSV_Data,"Data",ROOT.kBlue),(eff_PFCSV_MC,"MC",ROOT.kRed)]
@@ -363,7 +365,7 @@ for v in vars:
 #caloCSV_B_MC      = getHist(inFileMC,"offJets_B_matchedCaloJet",     "csv",binning=csvBinning,norm=0)
 #caloCSV_C_MC      = getHist(inFileMC,"offJets_C_matchedCaloJet",     "csv",binning=csvBinning,norm=0)
 #caloCSV_L_MC      = getHist(inFileMC,"offJets_L_matchedCaloJet",     "csv",binning=csvBinning,norm=0)
-#                                                           
+#
 #caloDeepCSV_B_MC  = getHist(inFileMC,"offJets_B_matchedCaloJet",     "deepcsv",binning=csvBinning,norm=0)
 #caloDeepCSV_C_MC  = getHist(inFileMC,"offJets_C_matchedCaloJet",     "deepcsv",binning=csvBinning,norm=0)
 #caloDeepCSV_L_MC  = getHist(inFileMC,"offJets_L_matchedCaloJet",     "deepcsv",binning=csvBinning,norm=0)
@@ -371,7 +373,7 @@ for v in vars:
 #pfCSV_B_MC        = getHist(inFileMC,"offJets_B_matchedPFJet",       "csv",binning=csvBinning,norm=0)
 #pfCSV_C_MC        = getHist(inFileMC,"offJets_C_matchedPFJet",       "csv",binning=csvBinning,norm=0)
 #pfCSV_L_MC        = getHist(inFileMC,"offJets_L_matchedPFJet",       "csv",binning=csvBinning,norm=0)
-#                                                         
+#
 #pfDeepCSV_B_MC    = getHist(inFileMC,"offJets_B_matchedPFJet",     "deepcsv",binning=csvBinning,norm=0)
 #pfDeepCSV_C_MC    = getHist(inFileMC,"offJets_C_matchedPFJet",     "deepcsv",binning=csvBinning,norm=0)
 #pfDeepCSV_L_MC    = getHist(inFileMC,"offJets_L_matchedPFJet",     "deepcsv",binning=csvBinning,norm=0)

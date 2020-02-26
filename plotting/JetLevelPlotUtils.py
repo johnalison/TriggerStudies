@@ -34,7 +34,7 @@ def getCMSText(xStart,yStart,subtext = "Work in Progress", lumiText="",xLumiStar
         firstline += " #it{Simulation}"
     elif additionaltext == "Supp":
         firstline += " #it{Supplementary}"
-                    
+
     cmsfistLine = ROOT.TLatex(xStart, yStartFirstLine, firstline)
     cmsfistLine.SetTextFont(42)
     cmsfistLine.SetTextSize(textsize)
@@ -50,7 +50,7 @@ def getCMSText(xStart,yStart,subtext = "Work in Progress", lumiText="",xLumiStar
         cmsLumi.SetTextFont(42)
         cmsLumi.SetTextSize(0.035)
         cmsLumi.SetNDC()
-        
+
         return cmsfistLine, cmssecondline, cmsLumi
 
     return cmsfistLine, cmssecondline
@@ -60,12 +60,12 @@ def getText(text,xStart,yStart,color=ROOT.kBlack,size=0.045):
 
     yStartFirstLine = yStart
     yStartSecondLine = yStart - 0.047
-    
+
 
     cmsScale=1.2
 
     firstline = '#scale['+str(cmsScale)+']{'+text+'}'
-                    
+
     cmsfistLine = ROOT.TLatex(xStart, yStartFirstLine, firstline)
     cmsfistLine.SetTextFont(42)
     cmsfistLine.SetTextSize(size)
@@ -143,12 +143,12 @@ def drawComp(name,inputHists,yTitle,xTitle,outDir,otherText="",setLogy=1,yMax= 1
     ratio_axis.GetXaxis().SetTitle(xTitle)
     ratio_axis.GetYaxis().SetNdivisions(507)
     yMin = 0
-    
+
     ratio_axis.GetYaxis().SetRangeUser(yMin, yMax)
     ratio_axis.GetXaxis().SetRangeUser(xMin, xMax)
     ratio_axis.Draw("axis")
 
-        
+
 
     for hInfoIndx, hInfo  in enumerate(inputHists):
         #hInfo[0].GetYaxis().SetRangeUser(yMin, yMax)
@@ -162,9 +162,9 @@ def drawComp(name,inputHists,yTitle,xTitle,outDir,otherText="",setLogy=1,yMax= 1
         if hInfoIndx:
             print "Draw same"
             if isinstance(inputHists[0][0],ROOT.TGraphAsymmErrors):
-                hInfo[0].Draw("PE same")    
+                hInfo[0].Draw("PE same")
             else:
-                hInfo[0].Draw("same")    
+                hInfo[0].Draw("same")
         else:
             print "Draw"
             if isinstance(inputHists[0][0],ROOT.TGraphAsymmErrors):
@@ -175,15 +175,15 @@ def drawComp(name,inputHists,yTitle,xTitle,outDir,otherText="",setLogy=1,yMax= 1
                     xAve = (ratio_axis.GetXaxis().GetXmin() + ratio_axis.GetXaxis().GetXmax()) /2
                     xmin = max(30,ratio_axis.GetXaxis().GetXmin())
                     print "Setting Range",xmin, ratio_axis.GetXaxis().GetXmax()
-                    sigmoid = ROOT.TF1("func", "(1.0/(1+ TMath::Exp(-[0]*(x-[1]))))", xmin, ratio_axis.GetXaxis().GetXmax()) 
+                    sigmoid = ROOT.TF1("func", "(1.0/(1+ TMath::Exp(-[0]*(x-[1]))))", xmin, ratio_axis.GetXaxis().GetXmax())
                     sigmoid.SetParameters(0.01, xAve)
                     inputHists[0][0].Fit(sigmoid)
                     sigmoid.Draw("same")
-                    
+
                     print hInfo[0].GetName(),":",
                     print sigmoid.GetParameter(0),
                     print sigmoid.GetParameter(1)
-                    
+
                     textFits = []
                     for i in range(2):
                         yStartFit = 0.3-0.04*i
@@ -192,7 +192,7 @@ def drawComp(name,inputHists,yTitle,xTitle,outDir,otherText="",setLogy=1,yMax= 1
                         textFits[-1].SetTextSize(0.04)
                         textFits[-1].SetNDC()
                         textFits[-1].Draw("same")
-                    
+
 
 
             else:
@@ -202,17 +202,17 @@ def drawComp(name,inputHists,yTitle,xTitle,outDir,otherText="",setLogy=1,yMax= 1
                     xAve = (ratio_axis.GetXaxis().GetXmin() + ratio_axis.GetXaxis().GetXmax()) /2
                     xmin = max(30,ratio_axis.GetXaxis().GetXmin())
                     print "Setting Range",xmin, ratio_axis.GetXaxis().GetXmax()
-                    sigmoid = ROOT.TF1("func", "(1.0/(1+ TMath::Exp(-[0]*(x-[1]))))", xmin, ratio_axis.GetXaxis().GetXmax()) 
+                    sigmoid = ROOT.TF1("func", "(1.0/(1+ TMath::Exp(-[0]*(x-[1]))))", xmin, ratio_axis.GetXaxis().GetXmax())
                     sigmoid.SetParameters(0.01, xAve)
                     inputHists[0][0].Fit(sigmoid,"q")
                     sigmoid.SetLineStyle(ROOT.kDashed)
                     sigmoid.SetLineColor(ROOT.kRed)
                     sigmoid.Draw("same")
-                    
+
                     print hInfo[0].GetName(),":",
                     print sigmoid.GetParameter(0),
                     print sigmoid.GetParameter(1)
-                    
+
                     textFits = []
                     for i in range(2):
                         yStartFit = 0.3-0.04*i
@@ -224,10 +224,10 @@ def drawComp(name,inputHists,yTitle,xTitle,outDir,otherText="",setLogy=1,yMax= 1
 
 
 
-            
+
     #effHistMC.Draw("PE same")
 
-    
+
     #
     #  legend
     #
@@ -279,7 +279,7 @@ def drawComp(name,inputHists,yTitle,xTitle,outDir,otherText="",setLogy=1,yMax= 1
         textTight.SetTextColor(ROOT.kRed)
         textTight.SetNDC()
         textTight.Draw("same")
-        
+
 
     #
     #  CMS Text
@@ -305,6 +305,7 @@ def drawComp(name,inputHists,yTitle,xTitle,outDir,otherText="",setLogy=1,yMax= 1
 
 
     canvas.SaveAs(outDir+"/"+name+".pdf")
+    canvas.SaveAs(outDir+"/"+name+".png")
 
 
 
@@ -339,7 +340,7 @@ def drawCompRatio(outName,histInfo,yTitle,xTitle,rTitle,outDir,setLogy=1,cmsText
     ypos = 0.79
     xwidth = 0.3
     ywidth = 0.1
-    
+
     leg = ROOT.TLegend(xpos, ypos, xpos+xwidth, ypos+ywidth)
     leg.AddEntry(hist1,histInfo[0][1],"PEL")
     leg.AddEntry(hist2,histInfo[1][1] ,"F")
@@ -352,7 +353,7 @@ def drawCompRatio(outName,histInfo,yTitle,xTitle,rTitle,outDir,setLogy=1,cmsText
     bottom_pad = ROOT.TPad("pad2", "The pad 20% of the height",0,0,1,split,0)
     top_pad.Draw()
     bottom_pad.Draw()
-    
+
     axissep = 0.02
     top_pad.cd()
     top_pad.SetLogy(setLogy)
@@ -362,7 +363,7 @@ def drawCompRatio(outName,histInfo,yTitle,xTitle,rTitle,outDir,setLogy=1,cmsText
     top_pad.SetLeftMargin(canvas.GetLeftMargin());
     top_pad.SetFillStyle(0) # transparent
     top_pad.SetBorderSize(0)
-        
+
 
     hist2.Draw("hist")
     #hltLF.SetMarkerSize(0.75)
@@ -417,41 +418,41 @@ def drawCompRatio(outName,histInfo,yTitle,xTitle,rTitle,outDir,setLogy=1,cmsText
 
         factor = factors[i_pad]
         ndiv   = ndivs[i_pad]
-        
+
         prims = [ p.GetName() for p in pad.GetListOfPrimitives() ]
-        
+
         #
         #  Protection for scaling hists multiple times
         #
         procedHist = []
-        
+
         for name in prims:
-            
+
             if name in procedHist: continue
             procedHist.append(name)
-        
+
             h = pad.GetPrimitive(name)
             if isinstance(h, ROOT.TH1) or isinstance(h, ROOT.THStack) or isinstance(h, ROOT.TGraph) or isinstance(h, ROOT.TGraphErrors) or isinstance(h, ROOT.TGraphAsymmErrors):
                 if isinstance(h, ROOT.TGraph) or isinstance(h, ROOT.THStack) or isinstance(h, ROOT.TGraphErrors) or isinstance(h, ROOT.TGraphAsymmErrors):
                     h = h.GetHistogram()
                 #print "factor is",factor,h.GetName(),split
-        
+
                 if i_pad == 1:
                     h.SetLabelSize(h.GetLabelSize('Y')*factor, 'Y')
                     h.SetTitleSize(h.GetTitleSize('X')*factor, 'X')
                     h.SetTitleSize(h.GetTitleSize('Y')*factor, 'Y')
                     h.SetTitleOffset(h.GetTitleOffset('Y')/factor, 'Y')
-                    
+
                 if i_pad == 1:
                     h.GetYaxis().SetNdivisions(ndiv)
-                h.GetXaxis().SetNdivisions()                
+                h.GetXaxis().SetNdivisions()
                 if i_pad == 0:
                     h.SetLabelSize(0.0, 'X')
                     h.GetXaxis().SetTitle("")
                 else:
                     h.SetLabelSize(h.GetLabelSize('X')*factor, 'X')
                     ## Trying to remove overlapping y-axis labels.  Doesn't work.
-                    # h.GetYaxis().Set(4, h.GetYaxis().GetXmin(), h.GetYaxis().GetXmax()) 
+                    # h.GetYaxis().Set(4, h.GetYaxis().GetXmin(), h.GetYaxis().GetXmax())
                     # h.GetYaxis().SetBinLabel( h.GetYaxis().GetLast(), '')
 
 
@@ -460,6 +461,7 @@ def drawCompRatio(outName,histInfo,yTitle,xTitle,rTitle,outDir,setLogy=1,cmsText
 
 
     canvas.SaveAs(outDir+"/"+outName+".pdf")
+    canvas.SaveAs(outDir+"/"+outName+".png")
 
 
 def plotRatio(var, dir, inFileData1, name1, inFileData2, name2, xTitle, outDir, rTitle="Ratio",setLogy=0,binning=1):
@@ -469,7 +471,7 @@ def plotRatio(var, dir, inFileData1, name1, inFileData2, name2, xTitle, outDir, 
 
     drawCompRatio(dir+"_"+var,[(hist_Data1,name1),(hist_Data2,name2)]
                   ,yTitle="Normalized",xTitle=xTitle,rTitle=rTitle,outDir=outDir,setLogy=setLogy)
-    
+
 
 def drawStackCompRatio(outName,dataInfo,MCInfo,yTitle,xTitle,rTitle,outDir,min=1,setLogy=1,x_min=None,x_max=None,cmsText="", lumiText=""):
     histData = dataInfo[0].Clone()
@@ -483,7 +485,7 @@ def drawStackCompRatio(outName,dataInfo,MCInfo,yTitle,xTitle,rTitle,outDir,min=1
     stacksum.Integral()
     scaleFactor = histData.Integral()/stacksum.Integral()
 
-    
+
 
     stack = ROOT.THStack("TestStack", outName)
     for hMC in MCInfo:
@@ -495,7 +497,7 @@ def drawStackCompRatio(outName,dataInfo,MCInfo,yTitle,xTitle,rTitle,outDir,min=1
 
 #    hist2 = histInfo[1][0].Clone()
 #    hist2.SetFillColor(ROOT.kYellow)
-        
+
     maxY = max(histData.GetMaximum(),stack.GetMaximum())
 
     if setLogy:
@@ -511,14 +513,14 @@ def drawStackCompRatio(outName,dataInfo,MCInfo,yTitle,xTitle,rTitle,outDir,min=1
     histData.GetYaxis().SetTitle(yTitle)
     histData.GetXaxis().SetTitle(xTitle)
 
-    
+
 
 
     xpos = 0.5
     ypos = 0.69
     xwidth = 0.3
     ywidth = 0.05*(len(MCInfo)+1)
-    
+
     leg = ROOT.TLegend(xpos, ypos, xpos+xwidth, ypos+ywidth)
     leg.AddEntry(histData,dataInfo[1],"PEL")
     for hMC in MCInfo:
@@ -532,7 +534,7 @@ def drawStackCompRatio(outName,dataInfo,MCInfo,yTitle,xTitle,rTitle,outDir,min=1
     bottom_pad = ROOT.TPad("pad2", "The pad 20% of the height",0,0,1,split,0)
     top_pad.Draw()
     bottom_pad.Draw()
-    
+
     axissep = 0.02
     top_pad.cd()
     top_pad.SetLogy(setLogy)
@@ -542,7 +544,7 @@ def drawStackCompRatio(outName,dataInfo,MCInfo,yTitle,xTitle,rTitle,outDir,min=1
     top_pad.SetLeftMargin(canvas.GetLeftMargin());
     top_pad.SetFillStyle(0) # transparent
     top_pad.SetBorderSize(0)
-        
+
 
     stack.Draw()
     if x_max is not None and x_min is not None:
@@ -612,41 +614,41 @@ def drawStackCompRatio(outName,dataInfo,MCInfo,yTitle,xTitle,rTitle,outDir,min=1
 
         factor = factors[i_pad]
         ndiv   = ndivs[i_pad]
-        
+
         prims = [ p.GetName() for p in pad.GetListOfPrimitives() ]
-        
+
         #
         #  Protection for scaling hists multiple times
         #
         procedHist = []
-        
+
         for name in prims:
-            
+
             if name in procedHist: continue
             procedHist.append(name)
-        
+
             h = pad.GetPrimitive(name)
             if isinstance(h, ROOT.TH1) or isinstance(h, ROOT.THStack) or isinstance(h, ROOT.TGraph) or isinstance(h, ROOT.TGraphErrors) or isinstance(h, ROOT.TGraphAsymmErrors):
                 if isinstance(h, ROOT.TGraph) or isinstance(h, ROOT.THStack) or isinstance(h, ROOT.TGraphErrors) or isinstance(h, ROOT.TGraphAsymmErrors):
                     h = h.GetHistogram()
                 #print "factor is",factor,h.GetName(),split
-        
+
                 if i_pad == 1:
                     h.SetLabelSize(h.GetLabelSize('Y')*factor, 'Y')
                     h.SetTitleSize(h.GetTitleSize('X')*factor, 'X')
                     h.SetTitleSize(h.GetTitleSize('Y')*factor, 'Y')
                     h.SetTitleOffset(h.GetTitleOffset('Y')/factor, 'Y')
-                    
+
                 if i_pad == 1:
                     h.GetYaxis().SetNdivisions(ndiv)
-                h.GetXaxis().SetNdivisions()                
+                h.GetXaxis().SetNdivisions()
                 if i_pad == 0:
                     h.SetLabelSize(0.0, 'X')
                     h.GetXaxis().SetTitle("")
                 else:
                     h.SetLabelSize(h.GetLabelSize('X')*factor, 'X')
                     ## Trying to remove overlapping y-axis labels.  Doesn't work.
-                    # h.GetYaxis().Set(4, h.GetYaxis().GetXmin(), h.GetYaxis().GetXmax()) 
+                    # h.GetYaxis().Set(4, h.GetYaxis().GetXmin(), h.GetYaxis().GetXmax())
                     # h.GetYaxis().SetBinLabel( h.GetYaxis().GetLast(), '')
 
 
@@ -655,6 +657,7 @@ def drawStackCompRatio(outName,dataInfo,MCInfo,yTitle,xTitle,rTitle,outDir,min=1
 
 
     canvas.SaveAs(outDir+"/"+outName+".pdf")
+    canvas.SaveAs(outDir+"/"+outName+".png")
 
 
 
@@ -674,23 +677,23 @@ def makeStack(name,var,dir,binning,xTitle,rTitle,logy,inFileData,inFileMC,outDir
 
 
 def getInverseTurnOn(name,var,dir,inFile,binning):
-    hist = getHist(inFile,dir,var,binning)    
+    hist = getHist(inFile,dir,var,binning)
 
     histEff = hist.Clone(name)
     histEff.Reset()
-    
+
     totalIntegral = hist.Integral()
     #print totalIntegral ,"vs",hist.Integral(-1,hist.GetNbinsX()+1)
-    
+
     nBinsX = hist.GetNbinsX()
     #print hist.Integral(),hist.Integral(-1,nBinsX+1)
 
     for iBin in range(nBinsX+1):
         numberFailed = hist.Integral(-1,iBin)
-        
+
         fractionFailed = (totalIntegral - numberFailed)/totalIntegral
         error = math.sqrt(fractionFailed*(1-fractionFailed)/totalIntegral)
-        
+
         histEff.SetBinContent(iBin, fractionFailed)
         histEff.SetBinError(iBin, error)
 
@@ -698,7 +701,7 @@ def getInverseTurnOn(name,var,dir,inFile,binning):
 
 
 def makeInverseTurnOn(name,var,dir,inFile,binning, otherText, outDir,cmsText="", lumiText=""):
-    
+
 
     histTight  = getInverseTurnOn(name,var,dir.replace("WORKINGPOINT","Tight"), inFile,binning)
     histTight.SetMarkerColor(ROOT.kRed)
@@ -713,7 +716,7 @@ def makeInverseTurnOn(name,var,dir,inFile,binning, otherText, outDir,cmsText="",
     histLoose.SetLineColor(ROOT.kBlue)
 
     #hist = getHist(inFile,dir,var,binning)
-    
+
     histLoose.GetXaxis().SetTitle("Online CSV Cut Value")
     histLoose.GetYaxis().SetTitle("Relative Efficiency")
     histLoose.GetXaxis().SetRangeUser(0,1)
@@ -753,25 +756,26 @@ def makeInverseTurnOn(name,var,dir,inFile,binning, otherText, outDir,cmsText="",
     leg.Draw("same")
 
     if otherText:
-        
+
         xStartOther=0.4
         yStartOther=1.1
         textsize=0.045
         otherLabel = ROOT.TLatex(xStartOther, yStartOther, '#scale['+str(0.7)+']{'+otherText+'}')
-    
+
         otherLabel.Draw("same")
 
 
 
     can.SaveAs(outDir+"/"+name+".pdf")
+    can.SaveAs(outDir+"/"+name+".png")
 
 
 
 def makeInverseTurnOnAll(name,var,dir,inFile1,name1,inFile2,name2,binning, otherText, outDir, wps=["Loose","Medium","Tight"],colors=[ROOT.kRed,ROOT.kGreen,ROOT.kBlue],cmsText="", lumiText=""):
-    
+
     histFile1 = []
     histFile2 = []
-    
+
     for i, thisWP in enumerate(wps):
         histFile1.append(getInverseTurnOn(name,var,dir.replace("WORKINGPOINT",thisWP), inFile1,binning))
         histFile1[-1].SetMarkerColor(colors[i])
@@ -783,7 +787,7 @@ def makeInverseTurnOnAll(name,var,dir,inFile1,name1,inFile2,name2,binning, other
         histFile2[-1].SetMarkerStyle(24)
 
     #hist = getHist(inFile,dir,var,binning)
-    
+
     histFile1[-1].GetXaxis().SetTitle("Online "+var.replace("v2_l","").replace("_l","")+" Cut Value")
     histFile1[-1].GetYaxis().SetTitle("Efficiency Relative to Offline Working Point")
     histFile1[-1].GetXaxis().SetRangeUser(0,1)
@@ -834,17 +838,18 @@ def makeInverseTurnOnAll(name,var,dir,inFile1,name1,inFile2,name2,binning, other
     leg2.Draw("same")
 
     if otherText:
-        
+
         xStartOther=0.4
         yStartOther=1.1
         textsize=0.045
         otherLabel = ROOT.TLatex(xStartOther, yStartOther, '#scale['+str(0.7)+']{'+otherText+'}')
-    
+
         otherLabel.Draw("same")
 
 
 
     can.SaveAs(outDir+"/"+name+".pdf")
+    can.SaveAs(outDir+"/"+name+".png")
 
 
 def make2DComp(name,inFile,dir,var,xTitle,yTitle,outDir):
@@ -868,3 +873,4 @@ def make2DComp(name,inFile,dir,var,xTitle,yTitle,outDir):
     cmsfistLine.Draw("same")
 
     can.SaveAs(outDir+"/"+name+".pdf")
+    can.SaveAs(outDir+"/"+name+".png")

@@ -25,7 +25,7 @@ inFileMC    = ROOT.TFile(o.inFileMC,  "READ")
 
 import os
 if not os.path.exists(o.outDir):
-    os.mkdir(o.outDir)
+    os.makedirs(o.outDir)
 
 
 from JetLevelPlotUtils import makeEff, drawComp, getHist, drawStackCompRatio, makeStack, makeInverseTurnOn, make2DComp, makeInverseTurnOnAll,plotRatio
@@ -65,7 +65,7 @@ for jetType in ["Calo","PF"]:
     reveff_DeepCSV_Data[jetType] = {}
     for op in ["Loose","Medium","Tight"]:
         jetTypeDen = jetType if jetType == "Calo" else ""
-        
+
         reveff_CSV_MC  [jetType][op]   = makeEff("CSVv2_l" ,    ["offJets"+op+"_matched"+jetType+"Jet",  "offJets_matched"+jetTypeDen+"Jet"]  ,inFileMC    ,binning=effBinning)
         reveff_CSV_Data[jetType][op]   = makeEff("CSVv2_l" ,    ["offJets"+op+"_matched"+jetType+"Jet",  "offJets_matched"+jetTypeDen+"Jet"]  ,inFileData  ,binning=effBinning)
 
@@ -77,7 +77,7 @@ for jetType in ["Calo","PF"]:
                                          (reveff_CSV_MC[jetType]["Medium"],"Medium",ROOT.kGreen),
                                          (reveff_CSV_MC[jetType]["Tight"], "Tight",ROOT.kRed),]
              ,yTitle="Efficiency",xTitle="CSV Value of Jets", otherText=""+jetType+" Jets (MC)",outDir=o.outDir,cmsText=o.cmsText,lumiText=o.lumiText)
-    
+
     drawComp("RevEff_"+jetType+"CSV_Data",[(reveff_CSV_Data[jetType]["Loose"], "Loose",ROOT.kBlue),
                                            (reveff_CSV_Data[jetType]["Medium"],"Medium",ROOT.kGreen),
                                            (reveff_CSV_Data[jetType]["Tight"], "Tight",ROOT.kRed),]
@@ -105,7 +105,7 @@ for jetType in ["Calo","PF"]:
 
 
 
-#   Data vs MC 
+#   Data vs MC
 drawComp("Eff_CaloCSV_DataVSMC",[(eff_CaloCSV_Data,"Data",ROOT.kBlue),(eff_CaloCSV_MC,"MC",ROOT.kRed)]
          ,yTitle="Efficiency",xTitle="CSV Value of Jets", otherText="Online WP: CSV > 0.5",outDir=o.outDir,cmsText=o.cmsText,lumiText=o.lumiText)
 drawComp("Eff_PFCSV_DataVSMC",[(eff_PFCSV_Data,"Data",ROOT.kBlue),(eff_PFCSV_MC,"MC",ROOT.kRed)]
@@ -240,7 +240,7 @@ offDeepCSV_L_Calo_MC  = getHist(inFileMC,"offJets_matchedCalo_L",     "DeepCSV_l
 caloCSV_B_MC      = getHist(inFileMC,"offJets_matchedCaloJet_B",     "CSVv2_l",binning=csvBinning,norm=0)
 caloCSV_C_MC      = getHist(inFileMC,"offJets_matchedCaloJet_C",     "CSVv2_l",binning=csvBinning,norm=0)
 caloCSV_L_MC      = getHist(inFileMC,"offJets_matchedCaloJet_L",     "CSVv2_l",binning=csvBinning,norm=0)
-                                                           
+
 caloDeepCSV_B_MC  = getHist(inFileMC,"offJets_matchedCaloJet_B",     "DeepCSV_l",binning=csvBinning,norm=0)
 caloDeepCSV_C_MC  = getHist(inFileMC,"offJets_matchedCaloJet_C",     "DeepCSV_l",binning=csvBinning,norm=0)
 caloDeepCSV_L_MC  = getHist(inFileMC,"offJets_matchedCaloJet_L",     "DeepCSV_l",binning=csvBinning,norm=0)
@@ -248,7 +248,7 @@ caloDeepCSV_L_MC  = getHist(inFileMC,"offJets_matchedCaloJet_L",     "DeepCSV_l"
 pfCSV_B_MC        = getHist(inFileMC,"offJets_matchedJet_B",       "CSVv2_l",binning=csvBinning,norm=0)
 pfCSV_C_MC        = getHist(inFileMC,"offJets_matchedJet_C",       "CSVv2_l",binning=csvBinning,norm=0)
 pfCSV_L_MC        = getHist(inFileMC,"offJets_matchedJet_L",       "CSVv2_l",binning=csvBinning,norm=0)
-                                                         
+
 pfDeepCSV_B_MC    = getHist(inFileMC,"offJets_matchedJet_B",     "DeepCSV_l",binning=csvBinning,norm=0)
 pfDeepCSV_C_MC    = getHist(inFileMC,"offJets_matchedJet_C",     "DeepCSV_l",binning=csvBinning,norm=0)
 pfDeepCSV_L_MC    = getHist(inFileMC,"offJets_matchedJet_L",     "DeepCSV_l",binning=csvBinning,norm=0)
@@ -353,6 +353,3 @@ for op in ["Loose","Medium","Tight"]:
 
     makeInverseTurnOnAll("PFCSVEffwrtOff_"+op, "CSVv2_l","offJetsWORKINGPOINT_matchedPFJet", inFileData,"Data",inFileMC,"MC",binning=1, otherText="Online PF CSV Eff wrt Offline",outDir=o.outDir,
                          wps=[op],cmsText=o.cmsText,lumiText=o.lumiText)
-
-
-

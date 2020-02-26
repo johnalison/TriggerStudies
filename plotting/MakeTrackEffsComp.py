@@ -28,7 +28,7 @@ inFile2    = ROOT.TFile(o.input2,  "READ")
 
 import os
 if not os.path.exists(o.outDir):
-    os.mkdir(o.outDir)
+    os.makedirs(o.outDir)
 
 
 from JetLevelPlotUtils import makeEff, drawComp, getHist, drawStackCompRatio, makeStack, makeInverseTurnOn, make2DComp, makeInverseTurnOnAll,plotRatio
@@ -115,7 +115,7 @@ for v in vars:
     if not v.find("Pt_forAlgo") == -1:
         binning = [0,1,2,3,4,5,6,7,8,9,10,12,14,16,18,20,25,30,40,50]
 
-        
+
     effNumName = "offTracks_matched"
     effDenName = "offTracks"
 
@@ -164,7 +164,7 @@ for v in vars:
              xMin=eff_Matched_1.GetXaxis().GetXmin()
              )
 
-    
+
     #
     #
     #
@@ -198,4 +198,3 @@ for v in vars:
              xMax=fake_Matched_1.GetXaxis().GetXmax(),
              xMin=fake_Matched_1.GetXaxis().GetXmin()
              )
-

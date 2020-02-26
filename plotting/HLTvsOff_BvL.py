@@ -28,7 +28,7 @@ inFile  = ROOT.TFile(o.inFile,  "READ")
 
 import os
 if not os.path.exists(o.outDir):
-    os.mkdir(o.outDir)
+    os.makedirs(o.outDir)
 
 
 maxDict = {"jetNSelectedTracks":20,
@@ -65,7 +65,7 @@ def getHist(inFile,dir,var,binning,color):
 #    ypos = 0.6
 #    xwidth = 0.3
 #    ywidth = 0.3
-#    
+#
 #    leg = ROOT.TLegend(xpos, ypos, xpos+xwidth, ypos+ywidth)
 #    leg.AddEntry(offBQ,"Offline tracks b-quark jets","L")
 #    leg.AddEntry(hltBQ,"HLT PF b-quark jets"    ,"PEL")
@@ -82,7 +82,7 @@ def getHist(inFile,dir,var,binning,color):
 #        offLF.SetMinimum(1e-6)
 #    else:
 #        offLF.SetMaximum(1.2*maxY)
-#        
+#
 #    offLF.GetYaxis().SetTitle("Simulated Tracks")
 #    offLF.GetXaxis().SetTitle(xTitle )
 #    offLF.Draw("hist")
@@ -99,7 +99,7 @@ def getHist(inFile,dir,var,binning,color):
 #    cmsLine1.Draw("same")
 #    cmsLine2.Draw("same")
 #
-#    
+#
 #    #xatlas, yatlas = 0.18, 0.88
 #    #atlas   = ROOT.TLatex(xatlas+0.01,   yatlas, "ATLAS")
 #    ##simulation = ROOT.TLatex(xatlas+0.11,   yatlas, "Simulation Internal")
@@ -107,7 +107,7 @@ def getHist(inFile,dir,var,binning,color):
 #    #lumi    = ROOT.TLatex(xatlas+0.01,    yatlas-0.05, "#sqrt{s}=13 TeV, t#bar{t}")
 #    #jetText = ROOT.TLatex(xatlas+0.02,   yatlas-0.1, "p_{T}^{jet} > 40 GeV, |#eta^{jet}| < 2.5" )
 #    #wm      = [atlas, simulation, lumi, jetText]
-#    
+#
 #    #watermarks = drawWaterMarks(wm)
 #
 #    varName = var.replace("tracks/","track_").replace("btags/","btag_")
@@ -158,7 +158,7 @@ def doVarRatio(var,binning,xTitle,setLogy=1,minX=None,maxX=None,minY=None):
     ypos = 0.07
     xwidth = 0.7
     ywidth = 0.1
-    
+
     leg = ROOT.TLegend(xpos, ypos, xpos+xwidth, ypos+ywidth)
     leg.SetNColumns(2)
     leg.AddEntry(offBQ,"Offline tracks b-quark jets","L")
@@ -172,7 +172,7 @@ def doVarRatio(var,binning,xTitle,setLogy=1,minX=None,maxX=None,minY=None):
     bottom_pad = ROOT.TPad("pad2", "The pad 20% of the height",0,0,1,split,0)
     top_pad.Draw()
     bottom_pad.Draw()
-    
+
     axissep = 0.02
     top_pad.cd()
     top_pad.SetLogy(setLogy)
@@ -263,41 +263,41 @@ def doVarRatio(var,binning,xTitle,setLogy=1,minX=None,maxX=None,minY=None):
 
         factor = factors[i_pad]
         ndiv   = ndivs[i_pad]
-        
+
         prims = [ p.GetName() for p in pad.GetListOfPrimitives() ]
-        
+
         #
         #  Protection for scaling hists multiple times
         #
         procedHist = []
-        
+
         for name in prims:
-            
+
             if name in procedHist: continue
             procedHist.append(name)
-        
+
             h = pad.GetPrimitive(name)
             if isinstance(h, ROOT.TH1) or isinstance(h, ROOT.THStack) or isinstance(h, ROOT.TGraph) or isinstance(h, ROOT.TGraphErrors) or isinstance(h, ROOT.TGraphAsymmErrors):
                 if isinstance(h, ROOT.TGraph) or isinstance(h, ROOT.THStack) or isinstance(h, ROOT.TGraphErrors) or isinstance(h, ROOT.TGraphAsymmErrors):
                     h = h.GetHistogram()
                 #print "factor is",factor,h.GetName(),split
-        
+
                 if i_pad == 1:
                     h.SetLabelSize(h.GetLabelSize('Y')*factor, 'Y')
                     h.SetTitleSize(h.GetTitleSize('X')*factor, 'X')
                     h.SetTitleSize(h.GetTitleSize('Y')*factor, 'Y')
                     h.SetTitleOffset(h.GetTitleOffset('Y')/factor, 'Y')
-                    
+
                 if i_pad == 1:
                     h.GetYaxis().SetNdivisions(ndiv)
-                h.GetXaxis().SetNdivisions()                
+                h.GetXaxis().SetNdivisions()
                 if i_pad == 0:
                     h.SetLabelSize(0.0, 'X')
                     h.GetXaxis().SetTitle("")
                 else:
                     h.SetLabelSize(h.GetLabelSize('X')*factor, 'X')
                     ## Trying to remove overlapping y-axis labels.  Doesn't work.
-                    # h.GetYaxis().Set(4, h.GetYaxis().GetXmin(), h.GetYaxis().GetXmax()) 
+                    # h.GetYaxis().Set(4, h.GetYaxis().GetXmin(), h.GetYaxis().GetXmax())
                     # h.GetYaxis().SetBinLabel( h.GetYaxis().GetLast(), '')
 
 
@@ -311,12 +311,13 @@ def doVarRatio(var,binning,xTitle,setLogy=1,minX=None,maxX=None,minY=None):
     ##lumi    = ROOT.TLatex(xatlas+0.01,    yatlas-0.05, "#sqrt{s}=13 TeV, t#bar{t}")
     ##jetText = ROOT.TLatex(xatlas+0.02,   yatlas-0.1, "p_{T}^{jet} > 40 GeV, |#eta^{jet}| < 2.5" )
     ##wm      = [atlas, simulation, lumi, jetText]
-    
+
     #watermarks = drawWaterMarks(wm)
 
     #varName = var.replace("tracks/","").replace("btags/","btags_")
     varName = var.replace("tracks/","track_").replace("btags/","btag_").replace("btags_noV0/","btag_noV0_")
     canvas.SaveAs(o.outDir+"/"+varName+".pdf")
+    canvas.SaveAs(o.outDir+"/"+varName+".png")
     #canvas.SaveAs(o.outDir+"/"+var+".eps")
     #canvas.SaveAs(o.outDir+"/"+var+".png")
 
@@ -366,7 +367,7 @@ for v in ["tracks/ip3d_sig",
           #"trackSip3dValAboveCharm",
           #"trackSumJetDeltaR",
           #"vertexFitProb",
-          
+
           "tracks/PtRel"          ,
           "tracks/PtRatio"        ,
           "tracks/PPar"           ,
@@ -450,7 +451,7 @@ for v in [        "tracks/eta",
                   "btags/totalMultiplicity",
                   ]:
             continue
-        
+
     vName = v.split("/")[-1]
     if vName in rebinningDB:
         binning = rebinningDB[vName]
@@ -485,7 +486,7 @@ for v in [
           )
 
 
-for v in [ 
+for v in [
 "btags/chargedEmEnergyFraction",
 "btags/chargedHadronEnergyFraction",
 "btags/elecEnergyFraction",
@@ -506,7 +507,7 @@ for v in [
           setLogy = 0,
                minY = 0,
          )
-    
+
 #
 #
 #for v in [
