@@ -63,3 +63,10 @@ python ../plotting/PlotAlgoStudy.py [Histograms with track algo info filled] --o
 #  To make plots of the online btagging eff wrt offline (and the output root file for analysis)
 #
 python TriggerStudies/plotting/MakeEffOnlineWrtOffline.py --input1  2018/hists_Data18BCD_wTrks.root --name1 Data --input2  2017/hists_ttbarMC_runBCDEF_2017.root    --name2 MC --out 2018/MakeEffOnlineWrtOfflineTest
+
+#
+#  To make plot of the PV 
+#
+python TriggerStudies/plotting/PlotPVStudy.py [input Hist] --out [Output Name]
+
+
