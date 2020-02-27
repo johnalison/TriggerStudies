@@ -14,6 +14,8 @@ eventData::eventData(TChain* _treeRAW, TChain* _treeAOD, bool mc, std::string y,
   year  = y;
   debug = d;
 
+  doCaloJets = jetDetailLevel.find("CaloJets") != std::string::npos;
+
   treeEventsAOD = treeAOD->GetEntries();
 
   bool checkEventDiffs = false;
@@ -117,7 +119,8 @@ eventData::eventData(TChain* _treeRAW, TChain* _treeAOD, bool mc, std::string y,
 
   offTreeJets  = new nTupleAnalysis::jetData( "Jet",  treeRAW, true, isMC,  jetDetailLevel, "",      jetSFName );
   pfTreeJets   = new nTupleAnalysis::jetData( "Jet",  treeRAW, true, false, jetDetailLevel, "PFJet."       );
-  caloTreeJets = new nTupleAnalysis::jetData( "Jet",  treeRAW, true, false, jetDetailLevel, "CaloJet."     );
+  if(doCaloJets)
+    caloTreeJets = new nTupleAnalysis::jetData( "Jet",  treeRAW, true, false, jetDetailLevel, "CaloJet."     );
     
   //treeMuons    = new nTupleAnalysis::muonData("PFMuon",     treeRAW);
   //treeElecs    = new nTupleAnalysis::elecData("PFElectron", treeRAW);
@@ -199,7 +202,8 @@ void eventData::update(int e){
 
   offJets  = offTreeJets->getJets(20,1e6,2.4);
   pfJets   = pfTreeJets ->getJets(20,1e6,2.4);
-  caloJets = caloTreeJets ->getJets(30,1e6,2.4);
+  if(doCaloJets)
+    caloJets = caloTreeJets ->getJets(30,1e6,2.4);
   muons    = treeMuons  ->getMuons(20, 2.4);
   elecs    = treeElecs  ->getElecs(30, 2.4);
 

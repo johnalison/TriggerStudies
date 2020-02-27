@@ -34,6 +34,7 @@ namespace TriggerStudies {
     bool isMC;
     std::string year;
     bool debug;
+    bool doCaloJets;
     Int_t    run       =  0;
     UInt_t    lumiBlock =  0;
     Int_t    event     =  0;
