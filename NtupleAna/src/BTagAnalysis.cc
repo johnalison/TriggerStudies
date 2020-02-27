@@ -210,6 +210,7 @@ BTagAnalysis::BTagAnalysis(TChain* _eventsRAW, TChain* _eventsAOD, fwlite::TFile
     hOffBTags_matched_noV0   = new nTupleAnalysis::btaggingHists("offBTags_matched_noV0",fs, "");
 
     hPfBTags           = new nTupleAnalysis::btaggingHists("pfBTags",fs, "");
+    hPfBTags_unmatched = new nTupleAnalysis::btaggingHists("pfBTags_unmatched",fs, "");
 
     hmttOff           = dir.make<TH1F>("mtt_off",            "BTagAnalysis/mtt_off;             mtt;   Entries", 100,-0.01, 2);
     hmttOff_isFromV0  = dir.make<TH1F>("mtt_off_isFromV0",   "BTagAnalysis/mtt_off_isFromV0;    mtt;   Entries", 100,-0.01, 2);
@@ -707,7 +708,7 @@ bool BTagAnalysis::passLumiMask(){
   //edm::LuminosityBlockID lumiID(event->run, event->lumiBlock);
 
   //define function that checks if a lumiID is contained in a lumiBlockRange
-  bool (*funcPtr) (edm::LuminosityBlockRange const &, edm::LuminosityBlockID const &) = &edm::contains;
+  //bool (*funcPtr) (edm::LuminosityBlockRange const &, edm::LuminosityBlockID const &) = &edm::contains;
 
   //Loop over the lumiMask and use funcPtr to check for a match
   //std::vector< edm::LuminosityBlockRange >::const_iterator iter = std::find_if (lumiMask.begin(), lumiMask.end(), boost::bind(funcPtr, _1, lumiID) );
@@ -1013,6 +1014,10 @@ void BTagAnalysis::PFJetAnalysis(const nTupleAnalysis::jetPtr& offJet,const nTup
   
   
       hPfBTags->FillTrkTagVarHists(pfTrkTag, weight);
+      const nTupleAnalysis::trkTagVarPtr pfTrkTagMatch = pfTrkTag->matchedTrkTagVar.lock();
+      if(!pfTrkTagMatch)
+	hPfBTags_unmatched->FillTrkTagVarHists(pfTrkTag, weight);
+
       ++nPfTrkTags;
   
     }//OffTrkTag
