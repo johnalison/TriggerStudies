@@ -588,7 +588,7 @@ bool TrigTurnOnStudy::passLumiMask(){
   //edm::LuminosityBlockID lumiID(event->run, event->lumiBlock);
 
   //define function that checks if a lumiID is contained in a lumiBlockRange
-  bool (*funcPtr) (edm::LuminosityBlockRange const &, edm::LuminosityBlockID const &) = &edm::contains;
+  //bool (*funcPtr) (edm::LuminosityBlockRange const &, edm::LuminosityBlockID const &) = &edm::contains;
 
   //Loop over the lumiMask and use funcPtr to check for a match
   //std::vector< edm::LuminosityBlockRange >::const_iterator iter = std::find_if (lumiMask.begin(), lumiMask.end(), boost::bind(funcPtr, _1, lumiID) );
