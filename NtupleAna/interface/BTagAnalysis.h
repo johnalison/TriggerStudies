@@ -36,6 +36,7 @@ namespace TriggerStudies {
     TFileDirectory dir;
 
     bool doTracks = true;
+    bool doCaloJets = true;
 
     int histogramming = 1e6;
     int treeEvents;
