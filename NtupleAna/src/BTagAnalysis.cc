@@ -57,6 +57,7 @@ BTagAnalysis::BTagAnalysis(TChain* _eventsRAW, TChain* _eventsAOD, fwlite::TFile
   histogramming = _histogramming;
 
   doTracks = jetDetailString.find("Tracks") != std::string::npos;
+  doCaloJets = jetDetailString.find("CaloJets") != std::string::npos;
 
   event      = new eventData(eventsRAW, eventsAOD, isMC, year, debug, jetDetailString);
   treeEvents = eventsRAW->GetEntries();
@@ -103,8 +104,10 @@ BTagAnalysis::BTagAnalysis(TChain* _eventsRAW, TChain* _eventsAOD, fwlite::TFile
   hOffJets                = new nTupleAnalysis::jetHists("offJets",               fs, "");
   hOffJets_matched        = new nTupleAnalysis::jetHists("offJets_matched",       fs, "", jetDetailString);
   hOffJets_matchedJet     = new nTupleAnalysis::jetHists("offJets_matchedJet",    fs, "", jetDetailString);
-  hOffJets_matchedCalo    = new nTupleAnalysis::jetHists("offJets_matchedCalo",   fs, "", jetDetailString);
-  hOffJets_matchedCaloJet = new nTupleAnalysis::jetHists("offJets_matchedCaloJet",fs, "", jetDetailString);
+  if(doCaloJets){
+    hOffJets_matchedCalo    = new nTupleAnalysis::jetHists("offJets_matchedCalo",   fs, "", jetDetailString);
+    hOffJets_matchedCaloJet = new nTupleAnalysis::jetHists("offJets_matchedCaloJet",fs, "", jetDetailString);
+  }
 
   hOffJet_matchedPFcsvTag         = new nTupleAnalysis::jetHists("offJets_matchedPFcsvTag",         fs, "");
   hOffJet_matchedPFcsvTagJet      = new nTupleAnalysis::jetHists("offJets_matchedPFcsvTagJet",      fs, "");
@@ -123,47 +126,57 @@ BTagAnalysis::BTagAnalysis(TChain* _eventsRAW, TChain* _eventsAOD, fwlite::TFile
   hOffJetMedDeepFlav_matchedPFDeepCSV  = new nTupleAnalysis::jetHists("offJetsMedDeepFlav_matchedPFDeepCSV",      fs, "", "matchedBJet");
   hOffJetMedDeepFlav_matchedPFCSV      = new nTupleAnalysis::jetHists("offJetsMedDeepFlav_matchedPFCSV",          fs, "", "matchedBJet");
 
-  hOffJet_matchedCalocsvTag         = new nTupleAnalysis::jetHists("offJets_matchedCalocsvTag",         fs, "");
-  hOffJet_matchedCalocsvTagJet      = new nTupleAnalysis::jetHists("offJets_matchedCalocsvTagJet",      fs, "");
-  hOffJet_matchedCaloDeepcsvTag     = new nTupleAnalysis::jetHists("offJets_matchedCaloDeepcsvTag",     fs, "");
-  hOffJet_matchedCaloDeepcsvTagJet  = new nTupleAnalysis::jetHists("offJets_matchedCaloDeepcsvTagJet",  fs, "");
+  if(doCaloJets){
+    hOffJet_matchedCalocsvTag         = new nTupleAnalysis::jetHists("offJets_matchedCalocsvTag",         fs, "");
+    hOffJet_matchedCalocsvTagJet      = new nTupleAnalysis::jetHists("offJets_matchedCalocsvTagJet",      fs, "");
+    hOffJet_matchedCaloDeepcsvTag     = new nTupleAnalysis::jetHists("offJets_matchedCaloDeepcsvTag",     fs, "");
+    hOffJet_matchedCaloDeepcsvTagJet  = new nTupleAnalysis::jetHists("offJets_matchedCaloDeepcsvTagJet",  fs, "");
 
-  hOffJetTightDeepCSV_matchedCaloJet       = new nTupleAnalysis::jetHists("offJetsTight_matchedCaloJet",       fs, "");
-  hOffJetMediumDeepCSV_matchedCaloJet      = new nTupleAnalysis::jetHists("offJetsMedium_matchedCaloJet",      fs, "");
-  hOffJetLooseDeepCSV_matchedCaloJet       = new nTupleAnalysis::jetHists("offJetsLoose_matchedCaloJet",       fs, "");
+    hOffJetTightDeepCSV_matchedCaloJet       = new nTupleAnalysis::jetHists("offJetsTight_matchedCaloJet",       fs, "");
+    hOffJetMediumDeepCSV_matchedCaloJet      = new nTupleAnalysis::jetHists("offJetsMedium_matchedCaloJet",      fs, "");
+    hOffJetLooseDeepCSV_matchedCaloJet       = new nTupleAnalysis::jetHists("offJetsLoose_matchedCaloJet",       fs, "");
 
-  hOffJetMedDeepCSV_matchedCaloJet      = new nTupleAnalysis::jetHists("offJetsMedDeepCSV_matchedCaloJet",      fs, "", "matchedBJet");
-  hOffJetMedDeepCSV_matchedCaloDeepCSV  = new nTupleAnalysis::jetHists("offJetsMedDeepCSV_matchedCaloDeepCSV",  fs, "", "matchedBJet");
-  hOffJetMedDeepCSV_matchedCaloCSV      = new nTupleAnalysis::jetHists("offJetsMedDeepCSV_matchedCaloCSV",      fs, "", "matchedBJet");
+    hOffJetMedDeepCSV_matchedCaloJet      = new nTupleAnalysis::jetHists("offJetsMedDeepCSV_matchedCaloJet",      fs, "", "matchedBJet");
+    hOffJetMedDeepCSV_matchedCaloDeepCSV  = new nTupleAnalysis::jetHists("offJetsMedDeepCSV_matchedCaloDeepCSV",  fs, "", "matchedBJet");
+    hOffJetMedDeepCSV_matchedCaloCSV      = new nTupleAnalysis::jetHists("offJetsMedDeepCSV_matchedCaloCSV",      fs, "", "matchedBJet");
 
-  hOffJetMedDeepFlav_matchedCaloJet      = new nTupleAnalysis::jetHists("offJetsMedDeepFlav_matchedCaloJet",      fs, "", "matchedBJet");
-  hOffJetMedDeepFlav_matchedCaloDeepCSV  = new nTupleAnalysis::jetHists("offJetsMedDeepFlav_matchedCaloDeepCSV",  fs, "", "matchedBJet");
-  hOffJetMedDeepFlav_matchedCaloCSV      = new nTupleAnalysis::jetHists("offJetsMedDeepFlav_matchedCaloCSV",      fs, "", "matchedBJet");
+    hOffJetMedDeepFlav_matchedCaloJet      = new nTupleAnalysis::jetHists("offJetsMedDeepFlav_matchedCaloJet",      fs, "", "matchedBJet");
+    hOffJetMedDeepFlav_matchedCaloDeepCSV  = new nTupleAnalysis::jetHists("offJetsMedDeepFlav_matchedCaloDeepCSV",  fs, "", "matchedBJet");
+    hOffJetMedDeepFlav_matchedCaloCSV      = new nTupleAnalysis::jetHists("offJetsMedDeepFlav_matchedCaloCSV",      fs, "", "matchedBJet");
+  }
 
   if(isMC){
     hOffJets_matched_L        = new nTupleAnalysis::jetHists("offJets_matched_L",       fs, "", jetDetailString);
     hOffJets_matchedJet_L     = new nTupleAnalysis::jetHists("offJets_matchedJet_L",    fs, "", jetDetailString);
-    hOffJets_matchedCalo_L    = new nTupleAnalysis::jetHists("offJets_matchedCalo_L",   fs, "", jetDetailString);
-    hOffJets_matchedCaloJet_L = new nTupleAnalysis::jetHists("offJets_matchedCaloJet_L",fs, "", jetDetailString);
 
     hOffJets_matched_B        = new nTupleAnalysis::jetHists("offJets_matched_B",       fs, "", jetDetailString );
     hOffJets_matchedJet_B     = new nTupleAnalysis::jetHists("offJets_matchedJet_B",    fs, "", jetDetailString );
-    hOffJets_matchedCalo_B    = new nTupleAnalysis::jetHists("offJets_matchedCalo_B",   fs, "", jetDetailString );
-    hOffJets_matchedCaloJet_B = new nTupleAnalysis::jetHists("offJets_matchedCaloJet_B",fs, "", jetDetailString );
 
     hOffJets_matched_C        = new nTupleAnalysis::jetHists("offJets_matched_C",       fs, "");
     hOffJets_matchedJet_C     = new nTupleAnalysis::jetHists("offJets_matchedJet_C",    fs, "");
-    hOffJets_matchedCalo_C    = new nTupleAnalysis::jetHists("offJets_matchedCalo_C",   fs, "");
-    hOffJets_matchedCaloJet_C = new nTupleAnalysis::jetHists("offJets_matchedCaloJet_C",fs, "");
+
+    if(doCaloJets){
+      hOffJets_matchedCalo_L    = new nTupleAnalysis::jetHists("offJets_matchedCalo_L",   fs, "", jetDetailString);
+      hOffJets_matchedCaloJet_L = new nTupleAnalysis::jetHists("offJets_matchedCaloJet_L",fs, "", jetDetailString);
+
+      hOffJets_matchedCalo_B    = new nTupleAnalysis::jetHists("offJets_matchedCalo_B",   fs, "", jetDetailString );
+      hOffJets_matchedCaloJet_B = new nTupleAnalysis::jetHists("offJets_matchedCaloJet_B",fs, "", jetDetailString );
+
+      hOffJets_matchedCalo_C    = new nTupleAnalysis::jetHists("offJets_matchedCalo_C",   fs, "");
+      hOffJets_matchedCaloJet_C = new nTupleAnalysis::jetHists("offJets_matchedCaloJet_C",fs, "");
+    }
+
+
   }
 
   hPfJets          = new nTupleAnalysis::jetHists("pfJets",           fs, "");
   hPfJets_matched  = new nTupleAnalysis::jetHists("pfJets_matched",           fs, "");
 
 
-
-  hCaloJets            = new nTupleAnalysis::jetHists("caloJets",           fs, "");
-  hCaloJets_matched    = new nTupleAnalysis::jetHists("caloJets_matched",           fs, "");
+  if(doCaloJets){
+    hCaloJets            = new nTupleAnalysis::jetHists("caloJets",           fs, "");
+    hCaloJets_matched    = new nTupleAnalysis::jetHists("caloJets_matched",           fs, "");
+  }
 
 
   if(doTracks){
@@ -178,16 +191,18 @@ BTagAnalysis::BTagAnalysis(TChain* _eventsRAW, TChain* _eventsAOD, fwlite::TFile
     hPfTracks_matched    = new nTupleAnalysis::trackHists("pfTracks_matched",fs, "");
     hPfTracks_unmatched  = new nTupleAnalysis::trackHists("pfTracks_unmatched",fs, "");
 
-    hOffTracksCalo                = new nTupleAnalysis::trackHists("offTracksCalo",fs, "");
-    hOffTracksCalo_unmatched      = new nTupleAnalysis::trackHists("offTracksCalo_unmatched",fs, "");
-    hOffTracksCalo_matched        = new nTupleAnalysis::trackHists("offTracksCalo_matched",fs, "");
-    hOffTracksCalo_noV0           = new nTupleAnalysis::trackHists("offTracksCalo_noV0",fs, "");
-    hOffTracksCalo_matched_noV0   = new nTupleAnalysis::trackHists("offTracksCalo_matched_noV0",fs, "");
+    if(doCaloJets){
+      hOffTracksCalo                = new nTupleAnalysis::trackHists("offTracksCalo",fs, "");
+      hOffTracksCalo_unmatched      = new nTupleAnalysis::trackHists("offTracksCalo_unmatched",fs, "");
+      hOffTracksCalo_matched        = new nTupleAnalysis::trackHists("offTracksCalo_matched",fs, "");
+      hOffTracksCalo_noV0           = new nTupleAnalysis::trackHists("offTracksCalo_noV0",fs, "");
+      hOffTracksCalo_matched_noV0   = new nTupleAnalysis::trackHists("offTracksCalo_matched_noV0",fs, "");
 
-    hCaloTracks            = new nTupleAnalysis::trackHists("caloTracks",fs, "");
-    hCaloTracks_noV0       = new nTupleAnalysis::trackHists("caloTracks_noV0",fs, "");
-    hCaloTracks_matched    = new nTupleAnalysis::trackHists("caloTracks_matched",fs, "");
-    hCaloTracks_unmatched  = new nTupleAnalysis::trackHists("caloTracks_unmatched",fs, "");
+      hCaloTracks            = new nTupleAnalysis::trackHists("caloTracks",fs, "");
+      hCaloTracks_noV0       = new nTupleAnalysis::trackHists("caloTracks_noV0",fs, "");
+      hCaloTracks_matched    = new nTupleAnalysis::trackHists("caloTracks_matched",fs, "");
+      hCaloTracks_unmatched  = new nTupleAnalysis::trackHists("caloTracks_unmatched",fs, "");
+    }
 
     hOffBTags           = new nTupleAnalysis::btaggingHists("offBTags",fs, "");
     hOffBTags_matched   = new nTupleAnalysis::btaggingHists("offBTags_matched",fs, "");
@@ -195,13 +210,16 @@ BTagAnalysis::BTagAnalysis(TChain* _eventsRAW, TChain* _eventsAOD, fwlite::TFile
     hOffBTags_matched_noV0   = new nTupleAnalysis::btaggingHists("offBTags_matched_noV0",fs, "");
 
     hPfBTags           = new nTupleAnalysis::btaggingHists("pfBTags",fs, "");
+    hPfBTags_unmatched = new nTupleAnalysis::btaggingHists("pfBTags_unmatched",fs, "");
 
     hmttOff           = dir.make<TH1F>("mtt_off",            "BTagAnalysis/mtt_off;             mtt;   Entries", 100,-0.01, 2);
     hmttOff_isFromV0  = dir.make<TH1F>("mtt_off_isFromV0",   "BTagAnalysis/mtt_off_isFromV0;    mtt;   Entries", 100,-0.01, 2);
     hmttPf            = dir.make<TH1F>("mtt_pf",             "BTagAnalysis/mtt_pf;              mtt;   Entries", 100,-0.01, 2);
     hmttPf_isFromV0   = dir.make<TH1F>("mtt_pf_isFromV0",    "BTagAnalysis/mtt_pf_isFromV0;     mtt;   Entries", 100,-0.01, 2);
-    hmttCalo            = dir.make<TH1F>("mtt_calo",             "BTagAnalysis/mtt_calo;              mtt;   Entries", 100,-0.01, 2);
-    hmttCalo_isFromV0   = dir.make<TH1F>("mtt_calo_isFromV0",    "BTagAnalysis/mtt_calo_isFromV0;     mtt;   Entries", 100,-0.01, 2);
+    if(doCaloJets){
+      hmttCalo            = dir.make<TH1F>("mtt_calo",             "BTagAnalysis/mtt_calo;              mtt;   Entries", 100,-0.01, 2);
+      hmttCalo_isFromV0   = dir.make<TH1F>("mtt_calo_isFromV0",    "BTagAnalysis/mtt_calo_isFromV0;     mtt;   Entries", 100,-0.01, 2);
+    }
   }
 
   //
@@ -548,91 +566,28 @@ int BTagAnalysis::processEvent(){
     //
     //  Calo Jets
     //
-    float dRCalo = 1e6;
-    nTupleAnalysis::jetPtr matchedCaloJet = nullptr;
+    if(doCaloJets){
+      float dRCalo = 1e6;
+      nTupleAnalysis::jetPtr matchedCaloJet = nullptr;
 
-    for(const nTupleAnalysis::jetPtr& caloJet : event->caloJets){
-      float this_dR = caloJet->p.DeltaR(offJet->p);
-      if (this_dR < dRCalo){
-    	dRCalo = this_dR;
-    	matchedCaloJet = caloJet;
+      for(const nTupleAnalysis::jetPtr& caloJet : event->caloJets){
+	float this_dR = caloJet->p.DeltaR(offJet->p);
+	if (this_dR < dRCalo){
+	  dRCalo = this_dR;
+	  matchedCaloJet = caloJet;
+	}
+      }
+
+
+      if( dRCalo < 0.4){
+
+	cutflowJets->Fill("hasHLTMatchCalo", eventWeight);
+
+	CaloJetAnalysis(offJet,matchedCaloJet,eventWeight);
+
+	++nOffJets_matchedCalo;
       }
     }
-
-    if( dRCalo < 0.4){
-
-      cutflowJets->Fill("hasHLTMatchCalo", eventWeight);
-
-      CaloJetAnalysis(offJet,matchedCaloJet,eventWeight);
-
-      ++nOffJets_matchedCalo;
-    }
-
-
-    // Fill offJetHists
-    // offJets_ROC
-    //  wp60 DeepCSV > 0.76 (actual efficiency = 0.604992842829)
-    //  wp70 DeepCSV > 0.56 (actual efficiency = 0.717503578586)
-    //  wp80 DeepCSV > 0.36 (actual efficiency = 0.808474091039)
-    //  wp90 DeepCSV > 0.12 (actual efficiency = 0.912533638706)
-
-    //if(offJetMatchedJet){
-
-      ///        // pfJets_matched_ROC
-      ///	//  wp60 DeepCSV > 0.64 (actual efficiency = 0.610276798066)
-      ///	//  wp70 DeepCSV > 0.48 (actual efficiency = 0.708732661175)
-      ///	//  wp80 DeepCSV > 0.28 (actual efficiency = 0.814155211306)
-      ///	//  wp90 DeepCSV > 0.08 (actual efficiency = 0.924525480128)
-      ///	if(offJet.m_matchedJet->m_deepcsv > 0.64){ //approximate 60% Online WP
-      ///	  offJetHists_matched_online60.Fill(offJet);
-      ///	  if( offJet.m_deepcsv > 0.56) offJetHists_offline70_matched_online60.Fill(offJet);
-      ///	  if(offJet.m_hadronFlavour == 5){
-      ///	    offJetHists_B_matched_online60.Fill(offJet);
-      ///	    if(offJet.m_deepcsv > 0.56) offJetHists_offline70_B_matched_online60.Fill(offJet);
-      ///	  }else{
-      ///	    offJetHists_L_matched_online60.Fill(offJet);
-      ///	    if(offJet.m_deepcsv > 0.56) offJetHists_offline70_L_matched_online60.Fill(offJet);
-      ///	  }
-      ///	}
-      ///
-      ///	if(offJet.m_matchedJet->m_deepcsv > 0.48){ //approximate 70% Online WP
-      ///	  offJetHists_matched_online70.Fill(offJet);
-      ///	  if(offJet.m_deepcsv > 0.56) offJetHists_offline70_matched_online70.Fill(offJet);
-      ///	  if(offJet.m_hadronFlavour == 5){
-      ///	    offJetHists_B_matched_online70.Fill(offJet);
-      ///	    if(offJet.m_deepcsv > 0.56) offJetHists_offline70_B_matched_online70.Fill(offJet);
-      ///	  }else{
-      ///	    offJetHists_L_matched_online70.Fill(offJet);
-      ///	    if(offJet.m_deepcsv > 0.56) offJetHists_offline70_L_matched_online70.Fill(offJet);
-      ///	  }
-      ///	}
-      ///
-      ///	if(offJet.m_matchedJet->m_deepcsv > 0.28){ //approximate 80% Online WP
-      ///	  offJetHists_matched_online80.Fill(offJet);
-      ///	  if(offJet.m_deepcsv > 0.56) offJetHists_offline70_matched_online80.Fill(offJet);
-      ///	  if(offJet.m_hadronFlavour == 5){
-      ///	    offJetHists_B_matched_online80.Fill(offJet);
-      ///	    if(offJet.m_deepcsv > 0.56) offJetHists_offline70_B_matched_online80.Fill(offJet);
-      ///	  }else{
-      ///	    offJetHists_L_matched_online80.Fill(offJet);
-      ///	    if(offJet.m_deepcsv > 0.56) offJetHists_offline70_L_matched_online80.Fill(offJet);
-      ///	  }
-      ///	}
-      ///
-      ///	if(offJet.m_matchedJet->m_deepcsv > 0.08){ //approximate 90% Online WP
-      ///	  offJetHists_matched_online90.Fill(offJet);
-      ///	  if(offJet.m_deepcsv > 0.56) offJetHists_offline70_matched_online90.Fill(offJet);
-      ///	  if(offJet.m_hadronFlavour == 5){
-      ///	    offJetHists_B_matched_online90.Fill(offJet);
-      ///	    if(offJet.m_deepcsv > 0.56) offJetHists_offline70_B_matched_online90.Fill(offJet);
-      ///	  }else{
-      ///	    offJetHists_L_matched_online90.Fill(offJet);
-      ///	    if(offJet.m_deepcsv > 0.56) offJetHists_offline70_L_matched_online90.Fill(offJet);
-      ///	  }
-      ///	}
-    //    }//m_matchedJet
-
-
   }//offJets
 
 
@@ -640,8 +595,10 @@ int BTagAnalysis::processEvent(){
   hOffJets           ->nJets->Fill(nOffJets        ,eventWeight);
   hOffJets_matched   ->nJets->Fill(nOffJets_matched,eventWeight);
 
-  hOffJets_matchedCalo->nJets->Fill(nOffJets_matchedCalo,eventWeight);
-  hOffJets_matchedCaloJet->nJets->Fill(nOffJets_matchedCalo,eventWeight);
+  if(doCaloJets){
+    hOffJets_matchedCalo->nJets->Fill(nOffJets_matchedCalo,eventWeight);
+    hOffJets_matchedCaloJet->nJets->Fill(nOffJets_matchedCalo,eventWeight);
+  }
 
 
 
@@ -678,36 +635,44 @@ int BTagAnalysis::processEvent(){
   //
   //  calo Jets
   //
-  for(const nTupleAnalysis::jetPtr& caloJet : event->caloJets){
-    if(fabs(caloJet->eta) > 4.5) continue;
-    if(caloJet->pt       < 30)   continue;
 
-    //caloJetHistsPreOLap.Fill(caloJet);
-    if(nTupleAnalysis::failOverlap(caloJet->p,event->elecs, 0.4)) continue;
-    if(nTupleAnalysis::failOverlap(caloJet->p,event->muons, 0.4)) continue;
+  if(doCaloJets){
+    for(const nTupleAnalysis::jetPtr& caloJet : event->caloJets){
+      if(fabs(caloJet->eta) > 4.5) continue;
+      if(caloJet->pt       < 30)   continue;
 
-    hCaloJets->Fill(caloJet, eventWeight);
+      //caloJetHistsPreOLap.Fill(caloJet);
+      if(nTupleAnalysis::failOverlap(caloJet->p,event->elecs, 0.4)) continue;
+      if(nTupleAnalysis::failOverlap(caloJet->p,event->muons, 0.4)) continue;
 
-    if(caloJet->DeepCSV > 1)
-      std::cout << "Error " << "Offline" << " DeepCSV is " << caloJet->DeepCSV << std::endl;
+      hCaloJets->Fill(caloJet, eventWeight);
+
+      if(caloJet->DeepCSV > 1)
+	std::cout << "Error " << "Offline" << " DeepCSV is " << caloJet->DeepCSV << std::endl;
+
+      if(caloJet->DeepCSVb > 1)
+	std::cout << "Error " << "Offline" << " DeepCSVb is " << caloJet->DeepCSVb << std::endl;
+
+      if(caloJet->DeepCSVbb > 1)
+	std::cout << "Error " << "Offline" << " DeepCSVbb is " << caloJet->DeepCSVbb << std::endl;
+
 
     if(caloJet->DeepCSVb > 1)
       std::cout << "Error " << "Offline" << " DeepCSVb is " << caloJet->DeepCSVb << std::endl;
 
-    if(caloJet->DeepCSVbb > 1)
-      std::cout << "Error " << "Offline" << " DeepCSVbb is " << caloJet->DeepCSVbb << std::endl;
 
+      const nTupleAnalysis::jetPtr caloJetMatchedJet = caloJet->matchedJet.lock();
+      if(caloJetMatchedJet){
+	hCaloJets_matched->Fill(caloJet, eventWeight);
 
-    const nTupleAnalysis::jetPtr caloJetMatchedJet = caloJet->matchedJet.lock();
-    if(caloJetMatchedJet){
-      hCaloJets_matched->Fill(caloJet, eventWeight);
-
-      //if(caloJet->m_matchedJet->m_hadronFlavour == 5)
-      //	caloJetHists_matchedB.Fill(caloJet);
-      //	else
-      //	  caloJetHists_matchedL.Fill(caloJet);
+	//if(caloJet->m_matchedJet->m_hadronFlavour == 5)
+	//	caloJetHists_matchedB.Fill(caloJet);
+	//	else
+	//	  caloJetHists_matchedL.Fill(caloJet);
+      }
     }
   }
+
 
 
 
@@ -750,7 +715,7 @@ bool BTagAnalysis::passLumiMask(){
   //edm::LuminosityBlockID lumiID(event->run, event->lumiBlock);
 
   //define function that checks if a lumiID is contained in a lumiBlockRange
-  bool (*funcPtr) (edm::LuminosityBlockRange const &, edm::LuminosityBlockID const &) = &edm::contains;
+  //bool (*funcPtr) (edm::LuminosityBlockRange const &, edm::LuminosityBlockID const &) = &edm::contains;
 
   //Loop over the lumiMask and use funcPtr to check for a match
   //std::vector< edm::LuminosityBlockRange >::const_iterator iter = std::find_if (lumiMask.begin(), lumiMask.end(), boost::bind(funcPtr, _1, lumiID) );
@@ -1056,6 +1021,10 @@ void BTagAnalysis::PFJetAnalysis(const nTupleAnalysis::jetPtr& offJet,const nTup
 
 
       hPfBTags->FillTrkTagVarHists(pfTrkTag, weight);
+      const nTupleAnalysis::trkTagVarPtr pfTrkTagMatch = pfTrkTag->matchedTrkTagVar.lock();
+      if(!pfTrkTagMatch)
+	hPfBTags_unmatched->FillTrkTagVarHists(pfTrkTag, weight);
+
       ++nPfTrkTags;
 
     }//OffTrkTag

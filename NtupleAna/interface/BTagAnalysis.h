@@ -36,6 +36,7 @@ namespace TriggerStudies {
     TFileDirectory dir;
 
     bool doTracks = true;
+    bool doCaloJets = true;
 
     int histogramming = 1e6;
     int treeEvents;
@@ -149,6 +150,7 @@ namespace TriggerStudies {
     nTupleAnalysis::btaggingHists* hOffBTags_matched_noV0;
 
     nTupleAnalysis::btaggingHists* hPfBTags;
+    nTupleAnalysis::btaggingHists* hPfBTags_unmatched;
 
     nTupleAnalysis::vertexHists* hVtx;
     nTupleAnalysis::vertexHists* hOffVtx;

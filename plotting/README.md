@@ -28,7 +28,8 @@
 # Track Level Efficiency plots (from one sample)
 #
 
-> python ../plotting/MakeTrackEffs.py --input [Histograms with Trks ]  --out [Output Directory Name]
+> python ../plotting/MakeTrackEffs.py     --input [Histograms with Trks ]  --out [Output Directory Name]
+> python ../plotting/MakeBTagTrackEffs.py --input [Histograms with Trks ]  --out [Output Directory Name]
 
 #
 # Compare Track Level Efficiency plots (from two different samples)
