@@ -28,16 +28,16 @@
 #include "TriggerStudies/NtupleAna/interface/Helpers.h"
 
 using namespace NtupleAna;
-using std::cout; 
-using std::endl; 
-using std::string; 
+using std::cout;
+using std::endl;
+using std::string;
 using optutl::CommandLineParser;
 
 int main(int argc, char * argv[]){
   // load framework libraries
   gSystem->Load( "libFWCoreFWLite" );
   FWLiteEnabler::enable();
-  
+
 
   // initialize command line parser
   CommandLineParser parser ("Analyze FWLite Histograms");
@@ -49,7 +49,7 @@ int main(int argc, char * argv[]){
   // set defaults
   parser.integerValue ("maxEvents"  ) = -1;
   parser.integerValue ("outputEvery") =   10000;
-  parser.stringValue  ("outputFile" ) = "TEST.root";  
+  parser.stringValue  ("outputFile" ) = "TEST.root";
 
 
   parser.parseArguments (argc, argv);
@@ -78,7 +78,7 @@ int main(int argc, char * argv[]){
   bool loadTrkLevel = ana.getParameter<bool>("LoadTrkLevel");
   bool debug = ana.getParameter<bool>("debug");
   //string offJetName = ana.getParameter<string>("offJetName");
-  
+
 
   //
   //  Inint Tree
@@ -128,7 +128,7 @@ int main(int argc, char * argv[]){
 
   //
   // Make output ntuple/Hists
-  // 
+  //
   fwlite::TFileService fs = fwlite::TFileService(outputFileName);
 
   TFileDirectory cutFlowDir = fs.mkdir("CutFlow");
@@ -187,7 +187,7 @@ int main(int argc, char * argv[]){
   JetHists offJetHists_offline70   = JetHists("offJets_offline70",  fs);
   JetHists offJetHists_offline70_B = JetHists("offJets_offline70_B",fs);
   JetHists offJetHists_offline70_L = JetHists("offJets_offline70_L",fs);
-  
+
   JetHists offJetHists_offline70_matched        = JetHists("offJets_offline70_matched",  fs);
   JetHists offJetHists_offline70_B_matched      = JetHists("offJets_offline70_B_matched",fs);
   JetHists offJetHists_offline70_L_matched      = JetHists("offJets_offline70_L_matched",fs);
@@ -203,7 +203,7 @@ int main(int argc, char * argv[]){
   JetHists offJetHists_offline70_matched_online80   = JetHists("offJets_offline70_matched_online80",  fs);
   JetHists offJetHists_offline70_B_matched_online80 = JetHists("offJets_offline70_B_matched_online80",  fs);
   JetHists offJetHists_offline70_L_matched_online80 = JetHists("offJets_offline70_L_matched_online80",  fs);
-  
+
   JetHists offJetHists_offline70_matched_online90   = JetHists("offJets_offline70_matched_online90",  fs);
   JetHists offJetHists_offline70_B_matched_online90 = JetHists("offJets_offline70_B_matched_online90",  fs);
   JetHists offJetHists_offline70_L_matched_online90 = JetHists("offJets_offline70_L_matched_online90",  fs);
@@ -213,7 +213,7 @@ int main(int argc, char * argv[]){
   //
   EventDisplayData eventDisplay = EventDisplayData("offline");
 
-  
+
   cout << " In procNtupleExample " << endl;
 
   int nEventThisFile = tree->GetEntries();
@@ -222,7 +222,7 @@ int main(int argc, char * argv[]){
   cout <<  "Number of input events: " << nEventThisFile << endl;
 
   for(int entry = 0; entry<nEventThisFile; entry++){
-    
+
     if(entry %outputEvery == 0 || debug)
       cout << "Processed .... "<<entry<<" Events"<<endl;
     if( (maxEvents > 0) && (entry > maxEvents))
@@ -257,7 +257,7 @@ int main(int argc, char * argv[]){
 
       if(fabs(offJet.m_eta) > 2.4) continue;
       if(offJet.m_pt       < 35)   continue;
-      
+
       offJetHistsPreOLap.Fill(offJet);
 
       if(NtupleAna::failOverlap(offJet,elecs)) continue;
@@ -320,12 +320,12 @@ int main(int argc, char * argv[]){
 	    if(this_dR < dR){
 	      dR2 = dR;
 	      secondClosest = matchedTrack;
-	      
+
 	      dR  = this_dR;
 	      matchedTrack = &pfTrack;
 	    }
 	  }
-	
+
 	  if( dR > 0.01){
 	    //if dR > 1e5:
 	    offTrackHists_unmatched.Fill(offTrack);
@@ -416,7 +416,7 @@ int main(int argc, char * argv[]){
 	    if(offJet.m_deepcsv > 0.56) offJetHists_offline70_L_matched_online70.Fill(offJet);
 	  }
 	}
-	
+
 	if(offJet.m_matchedJet->m_deepcsv > 0.28){ //approximate 80% Online WP
 	  offJetHists_matched_online80.Fill(offJet);
 	  if(offJet.m_deepcsv > 0.56) offJetHists_offline70_matched_online80.Fill(offJet);
@@ -428,7 +428,7 @@ int main(int argc, char * argv[]){
 	    if(offJet.m_deepcsv > 0.56) offJetHists_offline70_L_matched_online80.Fill(offJet);
 	  }
 	}
-      
+
 	if(offJet.m_matchedJet->m_deepcsv > 0.08){ //approximate 90% Online WP
 	  offJetHists_matched_online90.Fill(offJet);
 	  if(offJet.m_deepcsv > 0.56) offJetHists_offline70_matched_online90.Fill(offJet);
@@ -450,15 +450,15 @@ int main(int argc, char * argv[]){
 	  break;
 	}
       }
-    
+
     }//offJets
 
     //
     //  pf Jets
     //
     for(JetData& pfJet : pfJets){
-      if(fabs(pfJet.m_eta) > 2.5) continue;
-      if(pfJet.m_pt       < 35)   continue;
+      if(fabs(pfJet.m_eta) > 4.5) continue;
+      if(pfJet.m_pt       < 30)   continue;
 
 
       pfJetHistsPreOLap.Fill(pfJet);
@@ -502,10 +502,10 @@ int main(int argc, char * argv[]){
 	  caloJetHists_matchedL.Fill(caloJet);
       }
     }
-   
+
     if(makeEventDisplays) eventDisplay.NewEvent();
- 
-    
+
+
   }
 
 
