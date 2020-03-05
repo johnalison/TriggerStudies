@@ -209,6 +209,19 @@ namespace TriggerStudies {
     void getLumiData(std::string);
     ~BTagAnalysis();
 
+    void OfflineToOnlineTrackMatching(const nTupleAnalysis::jetPtr& offJet, const nTupleAnalysis::trackPtr& offTrk,
+				      const nTupleAnalysis::jetPtr& hltJet, 
+				      float dRMatch);
+
+    void OfflineToOnlineTrkTagMatching(const nTupleAnalysis::jetPtr& offJet, const nTupleAnalysis::trkTagVarPtr& offTrkTag,
+				       const nTupleAnalysis::jetPtr& hltJet, 
+				       float dRMatch);
+
+    void OfflineToOnlineSVMatching(const nTupleAnalysis::svPtr& offSV,
+				   const nTupleAnalysis::jetPtr& hltJet, 
+				   float dRMatch);
+
+
     void PFJetAnalysis(const nTupleAnalysis::jetPtr& offJet,const nTupleAnalysis::jetPtr& hltJet, float weight);
     void CaloJetAnalysis(const nTupleAnalysis::jetPtr& offJet,const nTupleAnalysis::jetPtr& hltJet, float weight);
 

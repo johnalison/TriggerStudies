@@ -724,65 +724,123 @@ BTagAnalysis::~BTagAnalysis(){
 } 
 
 
+//
+//  Set Match tracks
+//
+void BTagAnalysis::OfflineToOnlineTrackMatching(const nTupleAnalysis::jetPtr& offJet, const nTupleAnalysis::trackPtr& offTrk,
+						const nTupleAnalysis::jetPtr& hltJet, 
+						float dRMatch){
+
+  float dR = 1e6;
+  float dR2 = 1e6;
+
+  nTupleAnalysis::trackPtr matchedTrack  = nullptr;
+  nTupleAnalysis::trackPtr secondClosest = nullptr;
+  
+  for(const nTupleAnalysis::trackPtr& hltTrack: hltJet->tracks){
+
+    //need to check that the track (with matching resolution cone r=0.01) is in region where R=0.3 circles inside the two jets overlap!
+    if(hltTrack->dR                  > 0.29) continue; // hltTrack is not in cone of pfJet
+    if(hltTrack->p.DeltaR(offJet->p) > 0.29) continue; // hltTrack is not in cone of offJet
+  
+    float this_dR = offTrk->p.DeltaR(hltTrack->p);
+    
+    if(this_dR > dR && this_dR < dR2){
+      dR2 = this_dR;
+      secondClosest = hltTrack;
+    }
+  
+    if(this_dR < dR){
+      dR2 = dR;
+      secondClosest = matchedTrack;
+  	    
+      dR  = this_dR;
+      matchedTrack = hltTrack;
+    }
+  	  
+  }// matched pf tracks
+  
+
+  if(dR < dRMatch){
+    matchedTrack->matchedTrack = offTrk;
+    matchedTrack->nMatches += 1;
+
+    offTrk->matchedTrack     = matchedTrack;
+    offTrk->secondClosest    = secondClosest;
+    offTrk->nMatches              += 1;
+  }
+
+  return;
+}
+
+//
+//  Set Match Track Tags
+//
+void BTagAnalysis::OfflineToOnlineTrkTagMatching(const nTupleAnalysis::jetPtr& offJet, const nTupleAnalysis::trkTagVarPtr& offTrkTag,
+						 const nTupleAnalysis::jetPtr& hltJet, 
+						 float dRMatch){
+  
+  float dR = 1e6;
+  nTupleAnalysis::trkTagVarPtr matchedTrkTag  = nullptr;
+  for(const nTupleAnalysis::trkTagVarPtr& hltTrkTag: hltJet->trkTagVars){
+    if(hltTrkTag->trackDeltaR                  > 0.29) continue; // hltTrack is not in cone of hltJet
+    if(hltTrkTag->p.DeltaR(offJet->p) > 0.29) continue; // hltTrack is not in cone of offJet
+  
+    float this_dR = offTrkTag->p.DeltaR(hltTrkTag->p);
+    if(this_dR < dR){
+      dR  = this_dR;
+      matchedTrkTag = hltTrkTag;
+    }
+  
+  
+  }
+
+  if(dR < dRMatch){
+    matchedTrkTag->matchedTrkTagVar = offTrkTag;
+    offTrkTag->matchedTrkTagVar     = matchedTrkTag;
+  }
+  
+  return;
+}
+
+
+
+//
+//  Set Match Track Tags
+//
+void BTagAnalysis::OfflineToOnlineSVMatching(const nTupleAnalysis::svPtr& offSV,
+					     const nTupleAnalysis::jetPtr& hltJet, 
+					     float dRMatch){
+  
+  float dR2 = 1e6;
+
+  nTupleAnalysis::svPtr matchedSV  = nullptr;
+  for(const nTupleAnalysis::svPtr& hltSV: hltJet->svs){
+  
+    float dX = (offSV->x - hltSV->x);
+    float dY = (offSV->y - hltSV->y);
+    float dZ = (offSV->z - hltSV->z);
+    float this_dR2 =  dX*dX + dY*dY + dZ*dZ;
+
+    if(this_dR2 < dR2){
+      dR2  = this_dR2;
+      matchedSV = hltSV;
+    }
+  
+  }
+
+  if(dR2 < (dRMatch*dRMatch)){
+    matchedSV->matchedSV = offSV;
+    offSV     ->matchedSV     = matchedSV;
+  }
+  
+  return;
+}
+
+
+
 void BTagAnalysis::PFJetAnalysis(const nTupleAnalysis::jetPtr& offJet,const nTupleAnalysis::jetPtr& hltJet, float weight){
 
-  //
-  // Jet info
-  //
-  hOffJets_matched->Fill(offJet,weight);
-  hOffJets_matchedJet->Fill(hltJet,weight);
-
-  //
-  // Offline Btaggs
-  //
-  if((offJet->DeepCSV > OfflineDeepCSVTightCut))
-    hOffJetTightDeepCSV_matchedPFJet->Fill(hltJet, weight);	  
-  if((offJet->DeepCSV > OfflineDeepCSVMediumCut)){
-    hOffJetMediumDeepCSV_matchedPFJet->Fill(hltJet, weight);	  
-    hOffJetMedDeepCSV_matchedPFJet    ->Fill(offJet, weight);    
-    if(hltJet->CSVv2   > OnlineCSVCutPF)     hOffJetMedDeepCSV_matchedPFCSV    ->Fill(offJet, weight);    
-    if(hltJet->DeepCSV > OnlineDeepCSVCutPF) hOffJetMedDeepCSV_matchedPFDeepCSV->Fill(offJet, weight);    
-  }
-    
-  if((offJet->DeepCSV > OfflineDeepCSVLooseCut))
-    hOffJetLooseDeepCSV_matchedPFJet->Fill(hltJet, weight);	  
-
-  if(offJet->deepFlavB > OfflineDeepFlavourMediumCut){
-    hOffJetMedDeepFlav_matchedPFJet ->Fill(offJet, weight);	  
-    if(hltJet->CSVv2   > OnlineCSVCutPF)     hOffJetMedDeepFlav_matchedPFCSV    ->Fill(offJet, weight);    
-    if(hltJet->DeepCSV > OnlineDeepCSVCutPF) hOffJetMedDeepFlav_matchedPFDeepCSV->Fill(offJet, weight);    
-  }
-
-  // 
-  // If pass CVS working point
-  //
-  if(hltJet->CSVv2 >= OnlineCSVCutPF){
-    hOffJet_matchedPFcsvTag   ->Fill(offJet, weight);
-    hOffJet_matchedPFcsvTagJet->Fill(hltJet, weight);
-  }
-
-
-  // 
-  // If pass DeepCVS working point
-  //
-  if(hltJet->DeepCSV >= OnlineDeepCSVCutPF){
-    hOffJet_matchedPFDeepcsvTag   ->Fill(offJet, weight);
-    hOffJet_matchedPFDeepcsvTagJet->Fill(hltJet, weight);
-  }
-
-  
-  if(isMC){
-    if(offJet->hadronFlavour == 5){
-      hOffJets_matched_B->Fill(offJet, weight);
-      hOffJets_matchedJet_B->Fill(hltJet, weight);
-    }else if(offJet->hadronFlavour == 4){
-      hOffJets_matched_C->Fill(offJet, weight);
-      hOffJets_matchedJet_C->Fill(hltJet, weight);
-    }else if(offJet->hadronFlavour == 0){
-      hOffJets_matched_L->Fill(offJet, weight);
-      hOffJets_matchedJet_L->Fill(hltJet, weight);
-    }
-  }
 
   if(doTracks){
 
@@ -812,7 +870,7 @@ void BTagAnalysis::PFJetAnalysis(const nTupleAnalysis::jetPtr& offJet,const nTup
   
       //need to check that the track (with matching resolution cone r=0.01) is in region where R=0.3 circles inside the two jets overlap!
       //if offTrack.dR > 0.29 - offJet.match_dR: continue
-      if(offTrack->dR                              > 0.29) continue; // offTrack is not in cone of offJet
+      if(offTrack->dR                  > 0.29) continue; // offTrack is not in cone of offJet
       if(offTrack->p.DeltaR(hltJet->p) > 0.29) continue; // offTrack is not in cone of pfJet
   	
   	
@@ -823,57 +881,28 @@ void BTagAnalysis::PFJetAnalysis(const nTupleAnalysis::jetPtr& offJet,const nTup
         ++nOffTracks_noV0;
       }
   
-      float dR = 1e6;
-      float dR2 = 1e6;
-      float dR_noV0 = 1e6;
-      nTupleAnalysis::trackPtr matchedTrack  = nullptr;
-      nTupleAnalysis::trackPtr secondClosest = nullptr;
-  
-      for(const nTupleAnalysis::trackPtr& pfTrack: hltJet->tracks){
-        //need to check that the track (with matching resolution cone r=0.01) is in region where R=0.3 circles inside the two jets overlap!
-        if(pfTrack->dR                  > 0.29) continue; // pfTrack is not in cone of pfJet
-        if(pfTrack->p.DeltaR(offJet->p) > 0.29) continue; // pfTrack is not in cone of offJet
-  
-        float this_dR = offTrack->p.DeltaR(pfTrack->p);
-        if(this_dR > dR && this_dR < dR2){
-	  dR2 = this_dR;
-	  secondClosest = pfTrack;
-        }
-  
-        if(this_dR < dR){
-	  dR2 = dR;
-	  secondClosest = matchedTrack;
-  	    
-	  dR  = this_dR;
-	  matchedTrack = pfTrack;
-        }
-  	  
-        if(!pfTrack->isfromV0 && this_dR < dR_noV0){
-	  dR_noV0 = this_dR;
-        }
-  	  
-      }// matched pf tracks
-  	
-      if( dR > 0.01){
-        //if dR > 1e5:
-        hOffTracks_unmatched->Fill(offTrack, weight);
-        continue;
-      }
-  	
-      if(!offTrack->isfromV0 && (dR_noV0 < 0.01)){
-        hOffTracks_matched_noV0->Fill(offTrack, weight);
-        ++nOffTracks_matched_noV0;
-      }
-  
-      ++nOffTracks_matched;
-      matchedTrack->matchedTrack = offTrack;
-      offTrack->matchedTrack     = matchedTrack;
-      offTrack->secondClosest    = secondClosest;
-      offTrack->nMatches              += 1;
-      matchedTrack->nMatches += 1;
-      hOffTracks_matched    ->Fill(offTrack, weight);
+      //
+      //  Match offline track with PF Track
+      //
+      OfflineToOnlineTrackMatching(offJet, offTrack, hltJet, 0.01);
+
       const nTupleAnalysis::trackPtr offTrackMatchedTrack = offTrack->matchedTrack.lock();
-      hPfTracks_matched ->Fill(offTrackMatchedTrack,weight);
+
+      if(offTrackMatchedTrack){
+	
+	if(!offTrack->isfromV0 && !offTrackMatchedTrack->isfromV0){
+	  hOffTracks_matched_noV0->Fill(offTrack, weight);
+	  ++nOffTracks_matched_noV0;
+	}
+  
+	++nOffTracks_matched;
+	hOffTracks_matched    ->Fill(offTrack, weight);
+	hPfTracks_matched ->Fill(offTrackMatchedTrack,weight);
+
+      }else{
+        hOffTracks_unmatched->Fill(offTrack, weight);
+      }
+
     }//off Tracks
         
     hOffTracks             ->nTracks->Fill(nOffTracks, weight);
@@ -883,7 +912,7 @@ void BTagAnalysis::PFJetAnalysis(const nTupleAnalysis::jetPtr& offJet,const nTup
   
 
     //
-    //  Off BTags
+    //  Off BTags trkTagVars
     //
     unsigned int nTrkTags = 0;
     unsigned int nTrkTags_matched = 0;
@@ -904,44 +933,22 @@ void BTagAnalysis::PFJetAnalysis(const nTupleAnalysis::jetPtr& offJet,const nTup
         hOffBTags_noV0->FillTrkTagVarHists(offTrkTag, weight);	  
         ++nTrkTags_noV0;
       }
+
+      OfflineToOnlineTrkTagMatching(offJet, offTrkTag, hltJet, 0.01);
   
-      float dR = 1e6;
-      float dR_noV0 = 1e6;
-      nTupleAnalysis::trkTagVarPtr matchedTrkTag  = nullptr;
-      for(const nTupleAnalysis::trkTagVarPtr& pfTrkTag: hltJet->trkTagVars){
-        if(pfTrkTag->trackDeltaR                  > 0.29) continue; // pfTrack is not in cone of pfJet
-        if(pfTrkTag->p.DeltaR(offJet->p) > 0.29) continue; // pfTrack is not in cone of offJet
+      const nTupleAnalysis::trkTagVarPtr offTrackMatchedTrkTag = offTrkTag->matchedTrkTagVar.lock();      
+      if(offTrackMatchedTrkTag){
   
-        float this_dR = offTrkTag->p.DeltaR(pfTrkTag->p);
-        if(this_dR < dR){
-	  dR  = this_dR;
-	  matchedTrkTag = pfTrkTag;
-        }
+	if(!offTrkTag->matchIsFromV0 && !offTrackMatchedTrkTag->matchIsFromV0){
+	  hOffBTags_matched_noV0->FillTrkTagVarHists(offTrkTag, weight);
+	  ++nTrkTags_matched_noV0;
+	}
   
-        if(!pfTrkTag->matchIsFromV0 && this_dR < dR_noV0){
-	  dR_noV0 = this_dR;
-        }
-  
+	++nTrkTags_matched;
+	hOffBTags_matched    ->FillTrkTagVarHists(offTrkTag, weight);
+	//const nTupleAnalysis::trackPtr offTrackMatchedTrkTag = offTrkTag->matchedTrkTagVar.lock();
+	//hPfTracks_matched ->FillTrkTagVarHists(offTrackMatchedTrkTag,weight);
       }
-  	
-  
-      if( dR > 0.01){
-        //if dR > 1e5:
-        //hOffBTags_unmatched->Fill(offTrack, weight);
-        continue;
-      }
-  
-      if(!offTrkTag->matchIsFromV0 && (dR_noV0 < 0.01)){
-        hOffBTags_matched_noV0->FillTrkTagVarHists(offTrkTag, weight);
-        ++nTrkTags_matched_noV0;
-      }
-  
-      ++nTrkTags_matched;
-      matchedTrkTag->matchedTrkTagVar = offTrkTag;
-      offTrkTag->matchedTrkTagVar     = matchedTrkTag;
-      hOffBTags_matched    ->FillTrkTagVarHists(offTrkTag, weight);
-      //const nTupleAnalysis::trackPtr offTrackMatchedTrkTag = offTrkTag->matchedTrkTagVar.lock();
-      //hPfTracks_matched ->FillTrkTagVarHists(offTrackMatchedTrkTag,weight);
   
   
     }//OffTrkTag
@@ -950,6 +957,16 @@ void BTagAnalysis::PFJetAnalysis(const nTupleAnalysis::jetPtr& offJet,const nTup
     hOffBTags_matched     ->trkTag_nTracks->Fill(nTrkTags_matched, weight);
     hOffBTags_noV0        ->trkTag_nTracks->Fill(nTrkTags_noV0, weight);
     hOffBTags_matched_noV0->trkTag_nTracks->Fill(nTrkTags_matched_noV0, weight);
+
+
+    //
+    //  Off BTags SVs
+    //
+    for(const nTupleAnalysis::svPtr& offSV: offJet->svs){
+
+      OfflineToOnlineSVMatching(offSV, hltJet, 0.01);
+  
+    }//OffTrkTag
   
   
     //
@@ -1026,74 +1043,70 @@ void BTagAnalysis::PFJetAnalysis(const nTupleAnalysis::jetPtr& offJet,const nTup
 
   }//doTracks  
 
-  return;
-}
-
-
-void BTagAnalysis::CaloJetAnalysis(const nTupleAnalysis::jetPtr& offJet,const nTupleAnalysis::jetPtr& hltJet, float weight){
-
   //
   // Jet info
   //
-  hOffJets_matchedCalo   ->Fill(offJet,weight);
-  hOffJets_matchedCaloJet->Fill(hltJet,weight);
-  
+  hOffJets_matched->Fill(offJet,weight);
+  hOffJets_matchedJet->Fill(hltJet,weight);
+
   //
   // Offline Btaggs
   //
   if((offJet->DeepCSV > OfflineDeepCSVTightCut))
-    hOffJetTightDeepCSV_matchedCaloJet->Fill(hltJet, weight);	  
+    hOffJetTightDeepCSV_matchedPFJet->Fill(hltJet, weight);	  
   if((offJet->DeepCSV > OfflineDeepCSVMediumCut)){
-    hOffJetMediumDeepCSV_matchedCaloJet->Fill(hltJet, weight);	  
-    hOffJetMedDeepCSV_matchedCaloJet    ->Fill(offJet, weight);    
-    if(hltJet->CSVv2   > OnlineCSVCutPF)     hOffJetMedDeepCSV_matchedCaloCSV    ->Fill(offJet, weight);    
-    if(hltJet->DeepCSV > OnlineDeepCSVCutPF) hOffJetMedDeepCSV_matchedCaloDeepCSV->Fill(offJet, weight);    
+    hOffJetMediumDeepCSV_matchedPFJet->Fill(hltJet, weight);	  
+    hOffJetMedDeepCSV_matchedPFJet    ->Fill(offJet, weight);    
+    if(hltJet->CSVv2   > OnlineCSVCutPF)     hOffJetMedDeepCSV_matchedPFCSV    ->Fill(offJet, weight);    
+    if(hltJet->DeepCSV > OnlineDeepCSVCutPF) hOffJetMedDeepCSV_matchedPFDeepCSV->Fill(offJet, weight);    
   }
-
+    
   if((offJet->DeepCSV > OfflineDeepCSVLooseCut))
-    hOffJetLooseDeepCSV_matchedCaloJet->Fill(hltJet, weight);	  
+    hOffJetLooseDeepCSV_matchedPFJet->Fill(hltJet, weight);	  
 
   if(offJet->deepFlavB > OfflineDeepFlavourMediumCut){
-    hOffJetMedDeepFlav_matchedCaloJet ->Fill(offJet, weight);	  
-    if(hltJet->CSVv2   > OnlineCSVCutCalo)     hOffJetMedDeepFlav_matchedCaloCSV    ->Fill(offJet, weight);    
-    if(hltJet->DeepCSV > OnlineDeepCSVCutCalo) hOffJetMedDeepFlav_matchedCaloDeepCSV->Fill(offJet, weight);    
+    hOffJetMedDeepFlav_matchedPFJet ->Fill(offJet, weight);	  
+    if(hltJet->CSVv2   > OnlineCSVCutPF)     hOffJetMedDeepFlav_matchedPFCSV    ->Fill(offJet, weight);    
+    if(hltJet->DeepCSV > OnlineDeepCSVCutPF) hOffJetMedDeepFlav_matchedPFDeepCSV->Fill(offJet, weight);    
   }
-
 
   // 
   // If pass CVS working point
   //
-  if(hltJet->CSVv2 >= OnlineCSVCutCalo){
-    hOffJet_matchedCalocsvTag   ->Fill(offJet, weight);
-    hOffJet_matchedCalocsvTagJet->Fill(hltJet, weight);
+  if(hltJet->CSVv2 >= OnlineCSVCutPF){
+    hOffJet_matchedPFcsvTag   ->Fill(offJet, weight);
+    hOffJet_matchedPFcsvTagJet->Fill(hltJet, weight);
   }
 
 
   // 
   // If pass DeepCVS working point
   //
-  if(hltJet->DeepCSV >= OnlineDeepCSVCutCalo){
-    hOffJet_matchedCaloDeepcsvTag   ->Fill(offJet, weight);
-    hOffJet_matchedCaloDeepcsvTagJet->Fill(hltJet, weight);
+  if(hltJet->DeepCSV >= OnlineDeepCSVCutPF){
+    hOffJet_matchedPFDeepcsvTag   ->Fill(offJet, weight);
+    hOffJet_matchedPFDeepcsvTagJet->Fill(hltJet, weight);
   }
 
-
-
+  
   if(isMC){
     if(offJet->hadronFlavour == 5){
-      hOffJets_matchedCalo_B->Fill(offJet, weight);
-      hOffJets_matchedCaloJet_B->Fill(hltJet, weight);
+      hOffJets_matched_B->Fill(offJet, weight);
+      hOffJets_matchedJet_B->Fill(hltJet, weight);
     }else if(offJet->hadronFlavour == 4){
-      hOffJets_matchedCalo_C->Fill(offJet, weight);
-      hOffJets_matchedCaloJet_C->Fill(hltJet, weight);
+      hOffJets_matched_C->Fill(offJet, weight);
+      hOffJets_matchedJet_C->Fill(hltJet, weight);
     }else if(offJet->hadronFlavour == 0){
-      hOffJets_matchedCalo_L->Fill(offJet, weight);
-      hOffJets_matchedCaloJet_L->Fill(hltJet, weight);
+      hOffJets_matched_L->Fill(offJet, weight);
+      hOffJets_matchedJet_L->Fill(hltJet, weight);
     }
   }
 
 
+  return;
+}
 
+
+void BTagAnalysis::CaloJetAnalysis(const nTupleAnalysis::jetPtr& offJet,const nTupleAnalysis::jetPtr& hltJet, float weight){
 
   if(doTracks){
 
@@ -1121,57 +1134,30 @@ void BTagAnalysis::CaloJetAnalysis(const nTupleAnalysis::jetPtr& offJet,const nT
 	++nOffTracks_noV0;
       }
 
-      float dR = 1e6;
-      float dR2 = 1e6;
-      float dR_noV0 = 1e6;
-      nTupleAnalysis::trackPtr matchedTrack  = nullptr;
-      nTupleAnalysis::trackPtr secondClosest = nullptr;
+      //
+      //  Match offline track with CaloJet Track
+      //
+      OfflineToOnlineTrackMatching(offJet, offTrack, hltJet, 0.01);
 
-      for(const nTupleAnalysis::trackPtr& caloTrack: hltJet->tracks){
-	//need to check that the track (with matching resolution cone r=0.01) is in region where R=0.3 circles inside the two jets overlap!
-	if(caloTrack->dR                  > 0.29) continue; // caloTrack is not in cone of caloJet
-	if(caloTrack->p.DeltaR(offJet->p) > 0.29) continue; // caloTrack is not in cone of offJet
-
-	float this_dR = offTrack->p.DeltaR(caloTrack->p);
-	if(this_dR > dR && this_dR < dR2){
-	  dR2 = this_dR;
-	  secondClosest = caloTrack;
-	}
-
-	if(this_dR < dR){
-	  dR2 = dR;
-	  secondClosest = matchedTrack;
-	    
-	  dR  = this_dR;
-	  matchedTrack = caloTrack;
-	}
-	  
-	if(!caloTrack->isfromV0 && this_dR < dR_noV0){
-	  dR_noV0 = this_dR;
-	}
-	  
-      }// matched calo tracks
-	
-      if( dR > 0.01){
-	//if dR > 1e5:
-	hOffTracksCalo_unmatched->Fill(offTrack, weight);
-	continue;
-      }
-	
-      if(!offTrack->isfromV0 && (dR_noV0 < 0.01)){
-	hOffTracksCalo_matched_noV0->Fill(offTrack, weight);
-	++nOffTracks_matched_noV0;
-      }
-
-      ++nOffTracks_matched;
-      matchedTrack->matchedTrack = offTrack;
-      offTrack->matchedTrack     = matchedTrack;
-      offTrack->secondClosest    = secondClosest;
-      offTrack->nMatches              += 1;
-      matchedTrack->nMatches += 1;
-      hOffTracksCalo_matched    ->Fill(offTrack, weight);
       const nTupleAnalysis::trackPtr offTrackMatchedTrack = offTrack->matchedTrack.lock();
-      hCaloTracks_matched ->Fill(offTrackMatchedTrack,weight);
+
+      if(offTrackMatchedTrack){
+
+	if(!offTrack->isfromV0 && !offTrackMatchedTrack->isfromV0){
+	  hOffTracksCalo_matched_noV0->Fill(offTrack, weight);
+	  ++nOffTracks_matched_noV0;
+	}
+
+	++nOffTracks_matched;
+	hOffTracksCalo_matched    ->Fill(offTrack, weight);
+	hCaloTracks_matched ->Fill(offTrackMatchedTrack,weight);
+
+      }else{
+
+	hOffTracksCalo_unmatched->Fill(offTrack, weight);
+
+      }
+	
     }//off Tracks
       
     hOffTracksCalo             ->nTracks->Fill(nOffTracks, weight);
@@ -1227,7 +1213,69 @@ void BTagAnalysis::CaloJetAnalysis(const nTupleAnalysis::jetPtr& offJet,const nT
     hCaloTracks_matched      ->nTracks->Fill(nCaloTracks_matched, weight);
     hCaloTracks_noV0         ->nTracks->Fill(nCaloTracks_noV0, weight);
     //hOffTracks_matched_noV0->nTracks->Fill(nOffTracks_matched_noV0, weight);
+
+  }// doTracks
+
+  //
+  // Jet info
+  //
+  hOffJets_matchedCalo   ->Fill(offJet,weight);
+  hOffJets_matchedCaloJet->Fill(hltJet,weight);
+  
+  //
+  // Offline Btaggs
+  //
+  if((offJet->DeepCSV > OfflineDeepCSVTightCut))
+    hOffJetTightDeepCSV_matchedCaloJet->Fill(hltJet, weight);	  
+  if((offJet->DeepCSV > OfflineDeepCSVMediumCut)){
+    hOffJetMediumDeepCSV_matchedCaloJet->Fill(hltJet, weight);	  
+    hOffJetMedDeepCSV_matchedCaloJet    ->Fill(offJet, weight);    
+    if(hltJet->CSVv2   > OnlineCSVCutPF)     hOffJetMedDeepCSV_matchedCaloCSV    ->Fill(offJet, weight);    
+    if(hltJet->DeepCSV > OnlineDeepCSVCutPF) hOffJetMedDeepCSV_matchedCaloDeepCSV->Fill(offJet, weight);    
   }
+
+  if((offJet->DeepCSV > OfflineDeepCSVLooseCut))
+    hOffJetLooseDeepCSV_matchedCaloJet->Fill(hltJet, weight);	  
+
+  if(offJet->deepFlavB > OfflineDeepFlavourMediumCut){
+    hOffJetMedDeepFlav_matchedCaloJet ->Fill(offJet, weight);	  
+    if(hltJet->CSVv2   > OnlineCSVCutCalo)     hOffJetMedDeepFlav_matchedCaloCSV    ->Fill(offJet, weight);    
+    if(hltJet->DeepCSV > OnlineDeepCSVCutCalo) hOffJetMedDeepFlav_matchedCaloDeepCSV->Fill(offJet, weight);    
+  }
+
+
+  // 
+  // If pass CVS working point
+  //
+  if(hltJet->CSVv2 >= OnlineCSVCutCalo){
+    hOffJet_matchedCalocsvTag   ->Fill(offJet, weight);
+    hOffJet_matchedCalocsvTagJet->Fill(hltJet, weight);
+  }
+
+
+  // 
+  // If pass DeepCVS working point
+  //
+  if(hltJet->DeepCSV >= OnlineDeepCSVCutCalo){
+    hOffJet_matchedCaloDeepcsvTag   ->Fill(offJet, weight);
+    hOffJet_matchedCaloDeepcsvTagJet->Fill(hltJet, weight);
+  }
+
+
+  if(isMC){
+    if(offJet->hadronFlavour == 5){
+      hOffJets_matchedCalo_B->Fill(offJet, weight);
+      hOffJets_matchedCaloJet_B->Fill(hltJet, weight);
+    }else if(offJet->hadronFlavour == 4){
+      hOffJets_matchedCalo_C->Fill(offJet, weight);
+      hOffJets_matchedCaloJet_C->Fill(hltJet, weight);
+    }else if(offJet->hadronFlavour == 0){
+      hOffJets_matchedCalo_L->Fill(offJet, weight);
+      hOffJets_matchedCaloJet_L->Fill(hltJet, weight);
+    }
+  }
+
+
 
   return;
 }
