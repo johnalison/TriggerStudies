@@ -121,9 +121,9 @@ process.fwliteOutput = cms.PSet(
 
 
 if o.doTracks: 
-    jetDetailString = "Tracks.btagInputs"
+    jetDetailString = "Tracks.btagInputs.matched"
 else:
-    jetDetailString = ""
+    jetDetailString = "matched"
 
 
 #Setup event loop object
