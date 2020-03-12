@@ -358,6 +358,13 @@ for v in ["tracks/ip3d_sig",
           "btags/ip3d_sig",
           "btags/ip3d_sig_l",
 
+          "btags/trackPt",
+          "btags/trackEta",
+          "btags/trackPhi",
+          "btags/trackNPixelHits",
+          "btags/trackNTotalHits",
+
+
           "pt_s",
           "pt_m",
           #"trackJetPt",
@@ -476,6 +483,7 @@ for v in [
         "btags/sv_nSVs",
         "tracks/nTracks",
         "btags_noV0/nTracks",
+        "btags/nTracks",
         "btags/sv_NTracks",
         ]:
 
