@@ -2,7 +2,7 @@
 #sys.path.insert(0, '../../')
 #import ROOTHelp.FancyROOTStyle
 
-#from iPlotLoadPath import loadPath 
+#from iPlotLoadPath import loadPath
 #loadPath()
 
 
@@ -20,7 +20,8 @@ labName = options.labName.split(",")
 print labName
 
 
-plotDirs = ["offJets_matched","offJets_matchedJet",    "offJets_matchedCalo",   "offJets_matchedCaloJet"]
+# plotDirs = ["offJets_matched","offJets_matchedJet",    "offJets_matchedCalo",   "offJets_matchedCaloJet"]
+plotDirs = ["offJets_matched","offJets_matchedJet"]
 
 
 
@@ -61,7 +62,7 @@ for v in ["tracks/ip3d_sig",
           #"trackSip3dValAboveCharm",
           #"trackSumJetDeltaR",
           #"vertexFitProb",
-          
+
           "tracks/PtRel"          ,
           "tracks/PtRatio"        ,
           "tracks/PPar"           ,
@@ -81,8 +82,8 @@ for v in ["tracks/ip3d_sig",
     else:
         binning = 2
 
-        
-    for d in plotDirs: 
+
+    for d in plotDirs:
         plot(v,d,       binning=binning,doratio=1,rMin=0.5,rMax=1.5,logy=1,labels=labName,norm=options.norm)
 
     #doVarRatio(v,
@@ -176,13 +177,13 @@ for v in [        "tracks/eta",
     else:
         binning = 2
 
-    for d in plotDirs: 
+    for d in plotDirs:
         plot(v,d,       binning=binning,doratio=1,rMin=0.5,rMax=1.5,logy=0,labels=labName, norm=options.norm)
-                    
 
 
 
-for v in [ 
+
+for v in [
 "btags/chargedEmEnergyFraction",
 "btags/chargedHadronEnergyFraction",
 "btags/elecEnergyFraction",
@@ -209,9 +210,9 @@ for v in [
 #        "neutralHadronEnergyFraction",
 #        "trackSumJetEtRatio",
         ]:
-    for d in plotDirs: 
+    for d in plotDirs:
         plot(v,d,       binning=1,doratio=1,rMin=0.5,rMax=1.5,logy=0,minY=0,labels=labName,norm=options.norm)
-    
+
 #
 #
 #for v in [
@@ -229,9 +230,5 @@ for v in [
         "btags/sv_Mass",
         "m",
         ]:
-    for d in plotDirs: 
+    for d in plotDirs:
         plot(v,d,       binning=1,doratio=1,rMin=0.5,rMax=1.5,logy=0,x_min = 0, x_max=15,labels=labName,norm=options.norm)
-
-
-
-
