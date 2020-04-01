@@ -353,6 +353,7 @@ int BTagAnalysis::processEvent(){
 
   cutflow->Fill("foundMatch", 1.0);
 
+  if(debug) cout << "Fill/Select Muons" << endl;
   std::vector<nTupleAnalysis::muonPtr> selMuons;
   for(nTupleAnalysis::muonPtr& muon: event->muons){
     hAllMuons->Fill(muon,1.0);
@@ -365,6 +366,8 @@ int BTagAnalysis::processEvent(){
   hSelMuons->nMuons->Fill(selMuons.size());
 
   
+
+  if(debug) cout << "Fill/Select Elecs" << endl;
   std::vector<nTupleAnalysis::elecPtr> selElecs;
   for(nTupleAnalysis::elecPtr& elec: event->elecs){
     hAllElecs->Fill(elec,1.0);
@@ -376,8 +379,10 @@ int BTagAnalysis::processEvent(){
   hAllElecs->nElecs->Fill(event->elecs.size());
   hSelElecs->nElecs->Fill(selElecs.size());
 
+
   bool doLeptonCuts = false;
   if(doLeptonCuts){
+    if(debug) cout << "Doing Lepton Cuts " << endl;
     if(selMuons.size() == 1)
       cutflow->Fill("passMuonCut", 1.0);
     
@@ -401,6 +406,7 @@ int BTagAnalysis::processEvent(){
   if(isMC && pileUpTool){
     puWeight = pileUpTool->getWeight(event->offPVs.size());
     eventWeight =  puWeight * selElecs.at(0)->SF * selMuons.at(0)->SF;
+
   }
 
 
@@ -409,6 +415,7 @@ int BTagAnalysis::processEvent(){
   //
   //  Offline BTags
   //
+  if(debug) cout << "Count BTags " << endl;
   unsigned int nOffJetsForCut = 0;
   unsigned int nOffJetsTaggedForCut = 0;
   float totalSFWeight = 1.0;
