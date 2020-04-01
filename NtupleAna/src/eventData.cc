@@ -124,8 +124,18 @@ eventData::eventData(TChain* _treeRAW, TChain* _treeAOD, bool mc, std::string y,
     
   //treeMuons    = new nTupleAnalysis::muonData("PFMuon",     treeRAW);
   //treeElecs    = new nTupleAnalysis::elecData("PFElectron", treeRAW);
-  treeMuons    = new nTupleAnalysis::muonData("PatMuon",     treeRAW, true, isMC, year);
-  treeElecs    = new nTupleAnalysis::elecData("PatElec",     treeRAW, isMC, year);
+  if(treeRAW->FindBranch("nPatMuon")){
+    treeMuons    = new nTupleAnalysis::muonData("PatMuon",     treeRAW, true, isMC, year);
+  }else{
+    treeMuons = nullptr;
+  }
+
+
+  if(treeRAW->FindBranch("nPatElec")){
+    treeElecs    = new nTupleAnalysis::elecData("PatElec",     treeRAW, isMC, year);
+  }else{
+    treeElecs = nullptr;
+  }
 
   treePVs    = new nTupleAnalysis::vertexData("PV",     treeRAW);
   offTreePVs = new nTupleAnalysis::vertexData("PV",     treeAOD);
@@ -204,8 +214,12 @@ void eventData::update(int e){
   pfJets   = pfTreeJets ->getJets(20,1e6,2.4);
   if(doCaloJets)
     caloJets = caloTreeJets ->getJets(30,1e6,2.4);
-  muons    = treeMuons  ->getMuons(20, 2.4);
-  elecs    = treeElecs  ->getElecs(30, 2.4);
+
+  if(treeMuons)
+    muons    = treeMuons  ->getMuons(20, 2.4);
+
+  if(treeElecs)
+    elecs    = treeElecs  ->getElecs(30, 2.4);
 
   pvs    = treePVs     ->getVerticies();
   offPVs = offTreePVs  ->getVerticies();
