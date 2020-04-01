@@ -376,9 +376,10 @@ int BTagAnalysis::processEvent(){
       selElecs.push_back(elec);
     }
   }
+  if(debug) cout << "Done Elec Loop" << endl;
   hAllElecs->nElecs->Fill(event->elecs.size());
   hSelElecs->nElecs->Fill(selElecs.size());
-
+  if(debug) cout << "Done Elec Fill " << endl;
 
   bool doLeptonCuts = false;
   if(doLeptonCuts){
@@ -405,8 +406,9 @@ int BTagAnalysis::processEvent(){
   float puWeight    = 1.0;
   if(isMC && pileUpTool){
     puWeight = pileUpTool->getWeight(event->offPVs.size());
-    eventWeight =  puWeight * selElecs.at(0)->SF * selMuons.at(0)->SF;
-
+    eventWeight =  puWeight;
+    if(doLeptonCuts)
+      eventWeight *= (selElecs.at(0)->SF * selMuons.at(0)->SF);
   }
 
 
@@ -523,7 +525,7 @@ int BTagAnalysis::processEvent(){
       if(nTupleAnalysis::failOverlap(offJetOther->p,event->muons,0.4)) continue;
       float thisDr = offJetOther->p.DeltaR(offJet->p);
       if(thisDr < min_dR_all) min_dR_all = thisDr;
-
+ 
       if(offJetOther->DeepCSV       < OfflineDeepCSVTightCut)   continue;	
       if(thisDr < min_dR_bjet) min_dR_bjet = thisDr;
 
