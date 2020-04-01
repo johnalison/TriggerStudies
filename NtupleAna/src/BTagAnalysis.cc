@@ -1,4 +1,3 @@
-
 #include <iostream>
 #include <iomanip>
 #include <cstdio>
@@ -9,6 +8,7 @@
 #include "TriggerStudies/NtupleAna/interface/BTagAnalysis.h"
 #include "nTupleAnalysis/baseClasses/interface/helpers.h"
 
+using std::cout; using std::endl; 
 using namespace TriggerStudies;
 
 // 2018
@@ -43,7 +43,7 @@ const float OfflineDeepFlavourLooseCut2017   = 0.0521;
 
 
 BTagAnalysis::BTagAnalysis(TChain* _eventsRAW, TChain* _eventsAOD, fwlite::TFileService& fs, bool _isMC, std::string _year, int _histogramming, bool _debug, std::string PUFileName, std::string jetDetailString){
-  if(_debug) std::cout<<"In BTagAnalysis constructor"<<std::endl;
+  if(_debug) cout<<"In BTagAnalysis constructor"<<endl;
   debug      = _debug;
   isMC       = _isMC;
   year       = _year;
@@ -101,7 +101,7 @@ BTagAnalysis::BTagAnalysis(TChain* _eventsRAW, TChain* _eventsAOD, fwlite::TFile
   hEventsNoPUWeight       = new nTupleAnalysis::eventHists("EventsNoPUWeight", fs);
 
   hOffJetsPreOLap         = new nTupleAnalysis::jetHists("offJetsPreOLap",        fs, "Pre Overlap");
-  hOffJets                = new nTupleAnalysis::jetHists("offJets",               fs, "");
+  hOffJets                = new nTupleAnalysis::jetHists("offJets",               fs, "", jetDetailString);
   hOffJets_matched        = new nTupleAnalysis::jetHists("offJets_matched",       fs, "", jetDetailString);
   hOffJets_matchedJet     = new nTupleAnalysis::jetHists("offJets_matchedJet",    fs, "", jetDetailString);
   if(doCaloJets){
@@ -204,13 +204,18 @@ BTagAnalysis::BTagAnalysis(TChain* _eventsRAW, TChain* _eventsAOD, fwlite::TFile
       hCaloTracks_unmatched  = new nTupleAnalysis::trackHists("caloTracks_unmatched",fs, "");
     }
 
+    hOffBTagsAll        = new nTupleAnalysis::btaggingHists("offBTagsAll",fs, "");
     hOffBTags           = new nTupleAnalysis::btaggingHists("offBTags",fs, "");
     hOffBTags_matched   = new nTupleAnalysis::btaggingHists("offBTags_matched",fs, "");
+    hOffBTags_unmatched = new nTupleAnalysis::btaggingHists("offBTags_unmatched",fs, "");
     hOffBTags_noV0           = new nTupleAnalysis::btaggingHists("offBTags_noV0",fs, "");
     hOffBTags_matched_noV0   = new nTupleAnalysis::btaggingHists("offBTags_matched_noV0",fs, "");
 
     hPfBTags           = new nTupleAnalysis::btaggingHists("pfBTags",fs, "");
+    hPfBTags_matched   = new nTupleAnalysis::btaggingHists("pfBTags_matched",fs, "");
     hPfBTags_unmatched = new nTupleAnalysis::btaggingHists("pfBTags_unmatched",fs, "");
+
+    hDeltaROffPf       = dir.make<TH1F>("dR_OffPf",            "BTagAnalysis/dR_OffPf;             DeltaR;   Entries", 100,-0.01, 5);
 
     hmttOff           = dir.make<TH1F>("mtt_off",            "BTagAnalysis/mtt_off;             mtt;   Entries", 100,-0.01, 2);
     hmttOff_isFromV0  = dir.make<TH1F>("mtt_off_isFromV0",   "BTagAnalysis/mtt_off_isFromV0;    mtt;   Entries", 100,-0.01, 2);
@@ -254,7 +259,7 @@ BTagAnalysis::BTagAnalysis(TChain* _eventsRAW, TChain* _eventsAOD, fwlite::TFile
     if( PUFileName != ""){
       pileUpTool = new nTupleAnalysis::pileUpWeightTool(PUFileName);
     }else{
-      std::cout << "Skipping PU reweighting" << std::endl;
+      cout << "Skipping PU reweighting" << endl;
     }
   }
 
@@ -299,7 +304,7 @@ int BTagAnalysis::eventLoop(int maxEvents, int nSkipEvents){
   //Set Number of events to process. Take manual maxEvents if maxEvents is > 0 and less than the total number of events in the input files. 
   nEvents = (maxEvents > 0 && maxEvents < treeEvents) ? maxEvents : treeEvents;
 
-  std::cout << "\nProcess " << nEvents << " of " << treeEvents << " events.\n";
+  cout << "\nProcess " << nEvents << " of " << treeEvents << " events.\n";
 
   start = std::clock();//2546000 //2546043
   lastTime = std::clock();
@@ -319,9 +324,9 @@ int BTagAnalysis::eventLoop(int maxEvents, int nSkipEvents){
 
   }
   
-  std::cout << std::endl;
-  std::cout << "BTagAnalysis::End of Event Loop" << std::endl;
-  if(!isMC) std::cout << "Runs " << firstRun << "-" << lastRun << std::endl;
+  cout << endl;
+  cout << "BTagAnalysis::End of Event Loop" << endl;
+  if(!isMC) cout << "Runs " << firstRun << "-" << lastRun << endl;
 
   minutes = static_cast<int>(duration/60);
   seconds = static_cast<int>(duration - minutes*60);
@@ -335,9 +340,10 @@ int BTagAnalysis::eventLoop(int maxEvents, int nSkipEvents){
 }
 
 int BTagAnalysis::processEvent(){
-  if(debug) std::cout << "processEvent start" << std::endl;
+  if(debug) cout << "processEvent start" << endl;
 
   cutflow->Fill("all", 1.0);
+
   if(event->run != event->runAOD)
     return 0;
 
@@ -378,12 +384,12 @@ int BTagAnalysis::processEvent(){
       cutflow->Fill("passElecCut", 1.0);
     
     if(selMuons.size() != 1){
-      if(debug) std::cout << "Fail Muon Cut" << std::endl;
+      if(debug) cout << "Fail Muon Cut" << endl;
       return 0;
     }
     
     if(selElecs.size() != 1){
-      if(debug) std::cout << "Fail Elec Cut" << std::endl;
+      if(debug) cout << "Fail Elec Cut" << endl;
       return 0;
     }
     cutflow->Fill("passLeptonCut", 1.0);
@@ -406,6 +412,11 @@ int BTagAnalysis::processEvent(){
   unsigned int nOffJetsTaggedForCut = 0;
   float totalSFWeight = 1.0;
   for(const nTupleAnalysis::jetPtr& offJet : event->offJets){
+
+    for(const nTupleAnalysis::trkTagVarPtr& trkTag: offJet->trkTagVars) {
+      hOffBTagsAll->FillTrkTagVarHists(trkTag, eventWeight);
+    }
+
     if(fabs(offJet->eta) > 2.4) continue;
     if(offJet->pt       < 35)   continue;
 
@@ -420,7 +431,7 @@ int BTagAnalysis::processEvent(){
   }
   
   if(nOffJetsForCut < 2      ){
-    if(debug) std::cout << "Fail NJet Cut" << std::endl;
+    if(debug) cout << "Fail NJet Cut" << endl;
     return 0;
   }
   cutflow->Fill("passNJetCut", eventWeight);
@@ -429,7 +440,7 @@ int BTagAnalysis::processEvent(){
   if(doOfflineBTagCut){
     
     if(nOffJetsTaggedForCut < 1) {
-      if(debug) std::cout << "Fail NBJet Cut" << std::endl;
+      if(debug) cout << "Fail NBJet Cut" << endl;
       return 0;
     }
     cutflow->Fill("passNBJetCut", eventWeight);
@@ -526,15 +537,18 @@ int BTagAnalysis::processEvent(){
     //
     ++nOffJets;
     hOffJets->Fill(offJet,eventWeight);
+    for(const nTupleAnalysis::trkTagVarPtr& trkTag: offJet->trkTagVars) {
+      hOffBTagsAll->FillTrkTagVarHists(trkTag, eventWeight);
+    }
 
     if(offJet->DeepCSV > 1)
-      std::cout << "Error " << "Offline" << " DeepCSV is " << offJet->DeepCSV << std::endl; 
+      cout << "Error " << "Offline" << " DeepCSV is " << offJet->DeepCSV << endl; 
 			       
     if(offJet->DeepCSVb > 1)   
-      std::cout << "Error " << "Offline" << " DeepCSVb is " << offJet->DeepCSVb << std::endl; 
+      cout << "Error " << "Offline" << " DeepCSVb is " << offJet->DeepCSVb << endl; 
 			       
     if(offJet->DeepCSVbb > 1)  
-      std::cout << "Error " << "Offline" << " DeepCSVbb is " << offJet->DeepCSVbb << std::endl; 
+      cout << "Error " << "Offline" << " DeepCSVbb is " << offJet->DeepCSVbb << endl; 
         
     // Match offline to online
     float dR = 1e6;
@@ -547,6 +561,8 @@ int BTagAnalysis::processEvent(){
 	matchedJet = pfJet;
       }
     }
+
+    hDeltaROffPf->Fill(dR,eventWeight);
 
     // 
     //  Have PF Match
@@ -647,13 +663,13 @@ int BTagAnalysis::processEvent(){
       hCaloJets->Fill(caloJet, eventWeight);
 
       if(caloJet->DeepCSV > 1)
-	std::cout << "Error " << "Offline" << " DeepCSV is " << caloJet->DeepCSV << std::endl; 
+	cout << "Error " << "Offline" << " DeepCSV is " << caloJet->DeepCSV << endl; 
 			       
       if(caloJet->DeepCSVb > 1)   
-	std::cout << "Error " << "Offline" << " DeepCSVb is " << caloJet->DeepCSVb << std::endl; 
+	cout << "Error " << "Offline" << " DeepCSVb is " << caloJet->DeepCSVb << endl; 
 			       
       if(caloJet->DeepCSVbb > 1)  
-	std::cout << "Error " << "Offline" << " DeepCSVbb is " << caloJet->DeepCSVbb << std::endl; 
+	cout << "Error " << "Offline" << " DeepCSVbb is " << caloJet->DeepCSVbb << endl; 
 
 
       const nTupleAnalysis::jetPtr caloJetMatchedJet = caloJet->matchedJet.lock();  
@@ -677,7 +693,7 @@ int BTagAnalysis::processEvent(){
   //
   if(!isMC){
     if(!passLumiMask()){
-      if(debug) std::cout << "Fail lumiMask" << std::endl;
+      if(debug) cout << "Fail lumiMask" << endl;
       return 0;
     }
     //cutflow->Fill(event, "lumiMask", true);
@@ -685,7 +701,7 @@ int BTagAnalysis::processEvent(){
     //keep track of total lumi
 
     //if(!event->passHLT){
-    //  if(debug) std::cout << "Fail HLT: data" << std::endl;
+    //  if(debug) cout << "Fail HLT: data" << endl;
     //  return 0;
     //}
     //cutflow->Fill(event, "HLT", true);
@@ -720,7 +736,7 @@ bool BTagAnalysis::passLumiMask(){
 
 
 BTagAnalysis::~BTagAnalysis(){
-  std::cout << "BTagAnalysis::destroyed" << std::endl;
+  cout << "BTagAnalysis::destroyed" << endl;
 } 
 
 
@@ -798,7 +814,12 @@ void BTagAnalysis::OfflineToOnlineTrkTagMatching(const nTupleAnalysis::jetPtr& o
   if(dR < dRMatch){
     matchedTrkTag->matchedTrkTagVar = offTrkTag;
     offTrkTag->matchedTrkTagVar     = matchedTrkTag;
-  }
+  }//else{
+    //cout << " dR  " << dR << endl;
+    //cout << " \t offtrk  " << offTrkTag->trackEta << " " << offTrkTag->trackPhi << endl;
+    //if(matchedTrkTag)
+    //  cout << " \t hlttrk  " << matchedTrkTag->trackEta << " " << matchedTrkTag->trackPhi << endl;
+  //}
   
   return;
 }
@@ -920,6 +941,7 @@ void BTagAnalysis::PFJetAnalysis(const nTupleAnalysis::jetPtr& offJet,const nTup
     unsigned int nTrkTags_matched_noV0 = 0;
   
     for(const nTupleAnalysis::trkTagVarPtr& offTrkTag: offJet->trkTagVars){
+
       //need to check that the track (with matching resolution cone r=0.01) is in region where R=0.3 circles inside the two jets overlap!
       //if offTrack.dR > 0.29 - offJet.match_dR: continue
       if(offTrkTag->trackDeltaR                              > 0.29) continue; // offTrack is not in cone of offJet
@@ -945,10 +967,14 @@ void BTagAnalysis::PFJetAnalysis(const nTupleAnalysis::jetPtr& offJet,const nTup
 	}
   
 	++nTrkTags_matched;
+	//cout << "Filling offBTag_match" << endl;
 	hOffBTags_matched    ->FillTrkTagVarHists(offTrkTag, weight);
 	//const nTupleAnalysis::trackPtr offTrackMatchedTrkTag = offTrkTag->matchedTrkTagVar.lock();
 	//hPfTracks_matched ->FillTrkTagVarHists(offTrackMatchedTrkTag,weight);
+      }else{
+	hOffBTags_unmatched    ->FillTrkTagVarHists(offTrkTag, weight);
       }
+
   
   
     }//OffTrkTag
@@ -1032,8 +1058,11 @@ void BTagAnalysis::PFJetAnalysis(const nTupleAnalysis::jetPtr& offJet,const nTup
   
       hPfBTags->FillTrkTagVarHists(pfTrkTag, weight);
       const nTupleAnalysis::trkTagVarPtr pfTrkTagMatch = pfTrkTag->matchedTrkTagVar.lock();
-      if(!pfTrkTagMatch)
+      if(pfTrkTagMatch){
+	hPfBTags_matched  ->FillTrkTagVarHists(pfTrkTag, weight);
+      }else{
 	hPfBTags_unmatched->FillTrkTagVarHists(pfTrkTag, weight);
+      }
 
       ++nPfTrkTags;
   

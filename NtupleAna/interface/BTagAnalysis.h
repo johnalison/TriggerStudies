@@ -144,12 +144,15 @@ namespace TriggerStudies {
     nTupleAnalysis::trackHists* hOffTracksCalo_noV0;
     nTupleAnalysis::trackHists* hOffTracksCalo_matched_noV0;
 
+    nTupleAnalysis::btaggingHists* hOffBTagsAll;
     nTupleAnalysis::btaggingHists* hOffBTags;
     nTupleAnalysis::btaggingHists* hOffBTags_matched;
+    nTupleAnalysis::btaggingHists* hOffBTags_unmatched;
     nTupleAnalysis::btaggingHists* hOffBTags_noV0;
     nTupleAnalysis::btaggingHists* hOffBTags_matched_noV0;
 
     nTupleAnalysis::btaggingHists* hPfBTags;
+    nTupleAnalysis::btaggingHists* hPfBTags_matched;
     nTupleAnalysis::btaggingHists* hPfBTags_unmatched;
 
     nTupleAnalysis::vertexHists* hVtx;
@@ -170,6 +173,8 @@ namespace TriggerStudies {
     TH1F*   hmttCalo           ;
     TH1F*   hmttCalo_isFromV0  ;
 
+
+    TH1F*   hDeltaROffPf          ;
 
     //eventHists* allEvents   = NULL;
     //tagHists* passPreSel    = NULL;
