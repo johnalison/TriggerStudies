@@ -10,6 +10,7 @@
 
 using std::cout; using std::endl; 
 using namespace TriggerStudies;
+using std::cout;  using std::endl;
 
 // 2018
 // https://twiki.cern.ch/twiki/bin/viewauth/CMS/BtagRecommendation102X
@@ -352,6 +353,7 @@ int BTagAnalysis::processEvent(){
 
   cutflow->Fill("foundMatch", 1.0);
 
+  if(debug) cout << "Fill/Select Muons" << endl;
   std::vector<nTupleAnalysis::muonPtr> selMuons;
   for(nTupleAnalysis::muonPtr& muon: event->muons){
     hAllMuons->Fill(muon,1.0);
@@ -364,6 +366,8 @@ int BTagAnalysis::processEvent(){
   hSelMuons->nMuons->Fill(selMuons.size());
 
   
+
+  if(debug) cout << "Fill/Select Elecs" << endl;
   std::vector<nTupleAnalysis::elecPtr> selElecs;
   for(nTupleAnalysis::elecPtr& elec: event->elecs){
     hAllElecs->Fill(elec,1.0);
@@ -372,11 +376,14 @@ int BTagAnalysis::processEvent(){
       selElecs.push_back(elec);
     }
   }
+  if(debug) cout << "Done Elec Loop" << endl;
   hAllElecs->nElecs->Fill(event->elecs.size());
   hSelElecs->nElecs->Fill(selElecs.size());
+  if(debug) cout << "Done Elec Fill " << endl;
 
   bool doLeptonCuts = false;
   if(doLeptonCuts){
+    if(debug) cout << "Doing Lepton Cuts " << endl;
     if(selMuons.size() == 1)
       cutflow->Fill("passMuonCut", 1.0);
     
@@ -399,7 +406,9 @@ int BTagAnalysis::processEvent(){
   float puWeight    = 1.0;
   if(isMC && pileUpTool){
     puWeight = pileUpTool->getWeight(event->offPVs.size());
-    eventWeight =  puWeight * selElecs.at(0)->SF * selMuons.at(0)->SF;
+    eventWeight =  puWeight;
+    if(doLeptonCuts)
+      eventWeight *= (selElecs.at(0)->SF * selMuons.at(0)->SF);
   }
 
 
@@ -408,6 +417,7 @@ int BTagAnalysis::processEvent(){
   //
   //  Offline BTags
   //
+  if(debug) cout << "Count BTags " << endl;
   unsigned int nOffJetsForCut = 0;
   unsigned int nOffJetsTaggedForCut = 0;
   float totalSFWeight = 1.0;
@@ -515,7 +525,7 @@ int BTagAnalysis::processEvent(){
       if(nTupleAnalysis::failOverlap(offJetOther->p,event->muons,0.4)) continue;
       float thisDr = offJetOther->p.DeltaR(offJet->p);
       if(thisDr < min_dR_all) min_dR_all = thisDr;
-
+ 
       if(offJetOther->DeepCSV       < OfflineDeepCSVTightCut)   continue;	
       if(thisDr < min_dR_bjet) min_dR_bjet = thisDr;
 
@@ -939,15 +949,14 @@ void BTagAnalysis::PFJetAnalysis(const nTupleAnalysis::jetPtr& offJet,const nTup
     unsigned int nTrkTags_matched = 0;
     unsigned int nTrkTags_noV0 = 0;
     unsigned int nTrkTags_matched_noV0 = 0;
-  
+
     for(const nTupleAnalysis::trkTagVarPtr& offTrkTag: offJet->trkTagVars){
 
       //need to check that the track (with matching resolution cone r=0.01) is in region where R=0.3 circles inside the two jets overlap!
       //if offTrack.dR > 0.29 - offJet.match_dR: continue
       if(offTrkTag->trackDeltaR                              > 0.29) continue; // offTrack is not in cone of offJet
       if(offTrkTag->p.DeltaR(hltJet->p) > 0.29) continue; // offTrack is not in cone of pfJet
-  
-  
+
       hOffBTags->FillTrkTagVarHists(offTrkTag, weight);
       ++nTrkTags;
   
@@ -978,7 +987,7 @@ void BTagAnalysis::PFJetAnalysis(const nTupleAnalysis::jetPtr& offJet,const nTup
   
   
     }//OffTrkTag
-  
+
     hOffBTags             ->trkTag_nTracks->Fill(nTrkTags, weight);
     hOffBTags_matched     ->trkTag_nTracks->Fill(nTrkTags_matched, weight);
     hOffBTags_noV0        ->trkTag_nTracks->Fill(nTrkTags_noV0, weight);
