@@ -10,6 +10,7 @@
 
 using std::cout; using std::endl; 
 using namespace TriggerStudies;
+using std::cout;  using std::endl;
 
 // 2018
 // https://twiki.cern.ch/twiki/bin/viewauth/CMS/BtagRecommendation102X
@@ -939,15 +940,14 @@ void BTagAnalysis::PFJetAnalysis(const nTupleAnalysis::jetPtr& offJet,const nTup
     unsigned int nTrkTags_matched = 0;
     unsigned int nTrkTags_noV0 = 0;
     unsigned int nTrkTags_matched_noV0 = 0;
-  
+
     for(const nTupleAnalysis::trkTagVarPtr& offTrkTag: offJet->trkTagVars){
 
       //need to check that the track (with matching resolution cone r=0.01) is in region where R=0.3 circles inside the two jets overlap!
       //if offTrack.dR > 0.29 - offJet.match_dR: continue
       if(offTrkTag->trackDeltaR                              > 0.29) continue; // offTrack is not in cone of offJet
       if(offTrkTag->p.DeltaR(hltJet->p) > 0.29) continue; // offTrack is not in cone of pfJet
-  
-  
+
       hOffBTags->FillTrkTagVarHists(offTrkTag, weight);
       ++nTrkTags;
   
@@ -978,7 +978,7 @@ void BTagAnalysis::PFJetAnalysis(const nTupleAnalysis::jetPtr& offJet,const nTup
   
   
     }//OffTrkTag
-  
+
     hOffBTags             ->trkTag_nTracks->Fill(nTrkTags, weight);
     hOffBTags_matched     ->trkTag_nTracks->Fill(nTrkTags_matched, weight);
     hOffBTags_noV0        ->trkTag_nTracks->Fill(nTrkTags_noV0, weight);
