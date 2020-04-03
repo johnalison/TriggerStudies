@@ -16,6 +16,7 @@ parser.add_option('-d', '--debug',                dest="debug",         action="
 parser.add_option('-m', '--isMC',                 dest="isMC",          action="store_true", default=False, help="isMC")
 parser.add_option('--isTurnOnStudy',              action="store_true",  default=False, help="doTurn On Study")
 parser.add_option('--doTracks',                   action="store_true",  default=False, help="doTurn On Study")
+parser.add_option('--doLeptonSel',                action="store_true",  default=False, help="doLepton Selection")
 parser.add_option('-y', '--year',                 dest="year",          default="2016", help="Year specifies trigger (and lumiMask for data)")
 #parser.add_option('-l', '--lumi', type="float",   dest="lumi",          default=1.0,    help="Luminosity for MC normalization: units [pb]")
 parser.add_option( '--inputAOD',                dest="inputAOD",         default="TriggerStudies/fileLists/data2016H.txt", help="Input file(s). If it ends in .txt, will treat it as a list of input files.")
@@ -132,6 +133,7 @@ process.BTagAnalyzer = cms.PSet(
     fileNamesAOD   = cms.vstring(fileNamesAOD),
     isMC    = cms.bool(o.isMC),
     isTurnOnStudy    = cms.bool(o.isTurnOnStudy),
+    doLeptonSel      = cms.bool(o.doLeptonSel),
     year    = cms.string(o.year),
     puFile    = cms.string(o.puFile),
     jetDetailString    = cms.string(jetDetailString),

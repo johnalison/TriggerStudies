@@ -49,6 +49,7 @@ int main(int argc, char * argv[]){
   bool debug = parameters.getParameter<bool>("debug");
   bool isMC  = parameters.getParameter<bool>("isMC");
   bool isTurnOnStudy  = parameters.getParameter<bool>("isTurnOnStudy");
+  bool doLeptonSel = parameters.getParameter<bool>("doLeptonSel");
   int histogramming = parameters.getParameter<int>("histogramming");
   int skipEvents = parameters.getParameter<int>("skipEvents");
   std::string year = parameters.getParameter<std::string>("year");
@@ -113,6 +114,7 @@ int main(int argc, char * argv[]){
   } else{
     std::cout << "BTagAnalysis " << std::endl;
     BTagAnalysis a = BTagAnalysis(treeRAW, treeAOD, fsh, isMC, year, histogramming, debug, PUFileName, jetDetailString);
+    a.doLeptonSel = doLeptonSel;
     //if(!isMC){
     //  a.lumiMask = lumiMask;
     //  std::string lumiData = parameters.getParameter<std::string>("lumiData");

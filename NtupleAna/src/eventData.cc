@@ -127,6 +127,7 @@ eventData::eventData(TChain* _treeRAW, TChain* _treeAOD, bool mc, std::string y,
   if(treeRAW->FindBranch("nPatMuon")){
     treeMuons    = new nTupleAnalysis::muonData("PatMuon",     treeRAW, true, isMC, year);
   }else{
+    cout << "No PatMuons (missing branch 'nPatMuon'). Will ignore Muons" << endl;
     treeMuons = nullptr;
   }
 
@@ -134,6 +135,7 @@ eventData::eventData(TChain* _treeRAW, TChain* _treeAOD, bool mc, std::string y,
   if(treeRAW->FindBranch("nPatElec")){
     treeElecs    = new nTupleAnalysis::elecData("PatElec",     treeRAW, isMC, year);
   }else{
+    cout << "No PatMuons (missing branch 'nPatElec'). Will ignore Elecs" << endl;
     treeElecs = nullptr;
   }
 
