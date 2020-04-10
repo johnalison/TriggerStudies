@@ -15,7 +15,7 @@ This code processes ntuples that are produced from CMSSW and makes a bunch of hi
    >  eg: ratios of histograms in different folders can give efficiencies or fake rates as a function of any variable plotted
 
 Overview of output ROOT file produced
-============
+=======================================
 
 ROOT file has a bunch of directories which contain histograms
 
@@ -69,7 +69,7 @@ ROOT file has a bunch of directories which contain histograms
   - `pfBTags` -  plots of tracks used as inputs to the btagging (in PF jets)
   - `pfBTags_unmatched` - subset of tracks used as inputs to the btagging (in PF jets) without an offline track match
 
-Structure of an output directory:
+#### Structure of an output directory:
   - histograms directly with in the folder are plots of jet-level quantities. 
   - sub-folders are plots of objects associated to the jet 
      eg: tracks / btagging inputs
@@ -79,52 +79,62 @@ Structure of an output directory:
 
 
 Overview of code used to produce the histograms:
------------------------------------------------
+===============================================
 
--) Two packages used
+Two packages used
 
-  nTupleAnalysis - code not specific to the b-jet trigger studies
-     baseclass used by several different contexts 
+  `nTupleAnalysis` - code not specific to the b-jet trigger studies.
+    Baseclass used by several different contexts.
 
-  TriggerStudies - code not specific to the b-jet trigger studies
-     code that performs the trigger analysis
+  `TriggerStudies` - code specific to the b-jet trigger studies.
+     This is the code that performs the trigger analysis.
 
--) nTupleAnalysis 
-    - has containers that hold object-level data 
-    - has classes that define and fill object-level histograms
-    - almost all histograms produced come from object-level histograms in nTupleAnalysis
-     eg: jetHists /trackHists ect 
-    - advantage of using nTupleAnalysis is can share code in different contexts.	 
+## nTupleAnalysis
+  
+- Has containers that hold object-level data ([Data-objects](###Data-objects))
+- Has classes that define and fill object-level histograms ([Histogram-classes](###Histogram-classes))
+- Almost all histograms produced come from object-level histograms in `nTupleAnalysis`
+     >  eg: `jetHists` /`trackHists` ect 
+- advantage of using `nTupleAnalysis` is can share code in different contexts.	 
 
-    Data-objects: jetData /trackData ect.
-       Idea:  Build data structures at the object-level that are easier to work with.
-          - we read in "flat ntuples"
-          - ntuples organized "by row" meaning have list of variables, entry for each object
-             eg: jet_Pt = [pt_jet1, pt_jet2 , ... ] and jet_Eta = [eta_jet1, eta_jet2, ...] 
-             Input grouped by jet-variable not by jet 
-          - much more useful and physically motivated to group by jet instead of by variable 
-              ie: can group "by column", where we create "jet-object" that is filled with each jet-variable for given jet
-                 eg: jet1.pt = jet_Pt[1]  jet1.eta = jet_Eta[1] ect
-          - whole point of *Data.cc classes is to do the "by row" -> "by column" conversion
-          - result is a list of objects (simple c++ container classes) that have all variables associated to the given object
-          - physics analysis uses these objects: make analysis logic / filling histograms cleaner/easier 
-          - simple object-level data structures located in corresponding header files. eg: jet class defined in jetData.h
-	  - point of nTupleAnalysis is to hide the details of the input ntuple from you
-             All the thinking is happening at the object-level not the variable level
 
-     Histogram classes: straight-forward
 
-  No high-level thought happening in the baseclass. Just reading things in, and filling histograms
-    No complicated selection no fancy physics calculation.  
+### Data objects
+
+<ins>**Idea:**</ins>  Build data structures at the object-level that are easier to work with.
+
+   >  jetData.cc , trackData.cc ect.
+
+ - We read in "flat ntuples"
+ - ntuples organized "by row" meaning have list of variables, entry for each object
+   > eg: jet_Pt = [pt_jet1, pt_jet2 , ... ] and jet_Eta = [eta_jet1, eta_jet2, ...] 
+
+   >  Input grouped by jet-variable not by jet 
+- Much more useful and physically motivated to group by jet instead of by variable 
+   > ie: can group "by column", where we create "jet-object" that is filled with each jet-variable for given jet
  
--) Trigger Studies 
+   > eg: jet1.pt = jet_Pt[1]  jet1.eta = jet_Eta[1] ect
+- Whole point of `*Data.cc` classes is to do the "by row" -> "by column" conversion
+- Result is a list of objects (simple c++ container classes) that have all variables associated to the given object
+- Downstream physics analysis then uses these objects: make analysis logic and filling histograms cleaner/easier 
+- Simple object-level data structures located in corresponding header files. eg: jet class defined in `jetData.h`
+- Point of `nTupleAnalysis` is to hide the details of the input ntuple from you
+   > All the thinking is happening at the object-level not the variable level
 
-    Where more of the finesse is happening. 
-       - does selection
-       - does object-matching
-       - defines and fills histograms  
+### Histogram classes
+   > straight-forward
 
-    -) Breakdown of input command:
+**nTupleAnalysis take away**:   No high-level thought happening in the baseclass. Just reading things in, and filling histograms.
+  No complicated selection no fancy physics calculation.  
+ 
+
+## TriggerStudies 
+This is where more of the finesse is happening. 
+- does selection
+- does object-matching
+- defines and fills histograms  
+
+### Breakdown of input command:
 
 Here is Example run script (input files on lxplus) 
 
@@ -141,72 +151,57 @@ Here is Example run script (input files on lxplus)
     --nevents -1
 ```
 
- Calls a c++ executable and configures it with a python file and various input options
+This command calls a c++ executable and configures it with a python file and various command line input options.
 
-  `BTagAnalyzer` - name of c++ executable (source in /bin ) 
-  TriggerStudies/NtupleAna/scripts/BTagAnalyzer_cfg.py - configuration file written in python that gets passed to the c++ executable
-  other lines are options passed to the python configuration.   
-    --input* paths to the input files
-    -o where to put the output histogram 
-    --histFile name of output histogram
+- `BTagAnalyzer` - name of c++ executable (source in /bin ) 
+- `TriggerStudies/NtupleAna/scripts/BTagAnalyzer_cfg.py` - configuration file written in python that gets passed to the c++ executable
+-  other lines are options passed to the python configuration.   
+    >  --input* paths to the input files
+  
+    >  -o where to put the output histogram 
+  
+    >  --histFile name of output histogram
 
 
-Executable lives in bin/BTagAnalyzer.cc
-   Whole point of this code is to read-in the configuration and pass everything to BTagAnlysis class (src/BTagAnalysis.cc) which does the work event loop
+**The executable lives in `bin/BTagAnalyzer.cc`**
+   Whole point of this code is to read-in the configuration and pass everything to `BTagAnlysis` class (`src/BTagAnalysis.cc`) which does the work event loop.
    
 
-Configuration file in scripts/BTagAnalyzer_cfg.py
-   read in the command line options, passes them to the c++ executable BTagAnalyzer
+**Configuration file `scripts/BTagAnalyzer_cfg.py`**
+   Reads in the command line options, passes them to the c++ executable `BTagAnalyzer`
 
-Code with the analysis is src/BTagAnalysis.cc
-  Does three things
-  - Creates eventData
-  - Does event loop
-  - Does object matching (truth labeling) 
-  - Defines and fill histograms
+Code with the analysis is `src/BTagAnalysis.cc`
+Does four things
+  - Creates `eventData`
+  - Does the event loop
+  - Does object matching (and truth labeling) 
+  - Defines and fills histograms
 
-  eventData:  (in TriggerStudies) class that loads the various objects-level offJet / PFJets ect. data  (deined  
-    - simple structure that holds data for the whole event
-    - meta-version of the object-level data classes in the nTupleAnalysis
-    - configures which object-level data to hold
-    - most of work forwarded to the nTupleAnalysis baseclass
-    - eventData::update gets called every event, the calls the functions that do the "by-row" -> "by-column" conversion
-    - hold vectors of the column sorted objects (offJets/ pfJets etc.)
+### eventData: 
+Class in `TriggerStudies` package  that loads the various objects-level offJet / PFJets ect. data  (deined  
+- simple structure that holds data for the whole event
+- meta-version of the object-level data classes in the `nTupleAnalysis`
+- configures which object-level data to hold
+- most of work forwarded to the `nTupleAnalysis` baseclass
+- `eventData::update` gets called every event, 
+   > the calls the functions that do the "by-row" -> "by-column" conversion
+- hold vectors of the column-sorted objects (`offJets`/ `pfJets` etc.)
 
-  Histograms are defined  in the constructor (called once per job) 
-   eg:    hOffJets_matched_B        = new nTupleAnalysis::jetHists("offJets_matched_B",       fs, "", jetDetailString );
-       "offJets_matched_B" - specifies name in the output rootfile
-        jetDetailString - string that encode the level of detail of plots produced  
+### Histograms 
+Histograms are defined in the constructor (called once per job) 
+eg:
+```c++
+hOffJets_matched_B        = new nTupleAnalysis::jetHists("offJets_matched_B",       fs, "", jetDetailString );
+```
+here:
+- `offJets_matched_B` - specifies directory name in the output rootfile
+- `jetDetailString` - is a string that encodes the level of detail of plots produced  
 
 
-  eventLopp also called once per job. 
-     - loops over the events and actually does the analysis 
+### eventLopp 
+Also called once per job. 
+ - loops over the events and actually does the analysis 
 
-   All the action happens within this loop. (and subroutines within this loop) 
-   Best to look at the code to see whats done. 
+All the action happens within this loop. (and subroutines within this loop) 
+Best to look at the code to see whats done. 
 
-FAQ: 
------
-  - "Off" - specifies offline quantities
-  - "PF" - specifies Online (HLT) "Particle-flow" quantities (Default) 
-  - "Calo" - specifies Online (HLT) "Calo" quantities 
-  - XXX_matched - is a directory of XXX objects matched to the corresponding HLT or Off object
-      eg: offJets_matched = directory with plots of offline jets matched to online (PF) jets
-          pfJets_matched = directory with plots of online PF jets matched to offline jets
-  - XXX_matchedJet - is a directory of the objects that matched the XXX objects
-       eg: offJets_matchedJet = directory with plots of online PF jets that were matched to the offline jets
-           pfJets_matchedJet = directory with plots of offline jets that were matched to the online PF jets
-  - isProbe: is a ttbar tag-and-probe selection 
-  - Histogram post-fixes like  "_l", "_m" "_s", ect are used when plotting same variable with different range: 
-     eg: pt_l / pt_m / pt_s  could have ranges
-         _l  (Large) 0 - 1000
-         _m  (medium) 0 - 500
-         _s  (medium) 0 - 100
-
-  - Directors with postscripts "_L" / "_C", and "_B" refers to truth-matched jets
-     "_L" - only light-flavour
-     "_B" - only bjets
-     "_C" - only charm-jets
-
-  - Truth matching: All truth matching is done via offline jet labels. 
-     ie: truth label of an HLT jet is the truth label of the matching offline-jet
