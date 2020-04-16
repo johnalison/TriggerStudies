@@ -149,9 +149,11 @@ def plotSame(name,graphs,colors,styles, plotCaloJet=False, plotPFJet=False, plot
 
     if plotCSV:
         if plotDeepCSV:
-            CSVText   = getText("CSV      (dashed)  ",xStart=xStart,yStart=yStart,size=0.04,color=ROOT.kBlack)
+            # CSVText   = getText("CSV      (dashed)  ",xStart=xStart,yStart=yStart,size=0.04,color=ROOT.kBlack)
+            CSVText   = getText("JetBProb      (dashed)  ",xStart=xStart,yStart=yStart,size=0.04,color=ROOT.kBlack)
         else:
-            CSVText   = getText("CSV",xStart=xStart,yStart=yStart,size=0.04,color=ROOT.kBlack)
+            # CSVText   = getText("CSV",xStart=xStart,yStart=yStart,size=0.04,color=ROOT.kBlack)
+            CSVText   = getText("JetBProb",xStart=xStart,yStart=yStart,size=0.04,color=ROOT.kBlack)
         CSVText.Draw("same")
 
 
@@ -169,8 +171,8 @@ def plotSame(name,graphs,colors,styles, plotCaloJet=False, plotPFJet=False, plot
 def main():
 
 
-    calo_csv_roc       = makeRocPlot("Calo_csv",     "CSVv2_l",     bkg="matchedCaloJet_L",sig="matchedCaloJet_B",dir="offJets")
-    calo_deepcsv_roc   = makeRocPlot("Calo_deepcsv",  "DeepCSV_l",  bkg="matchedCaloJet_L",sig="matchedCaloJet_B",dir="offJets")
+    # calo_csv_roc       = makeRocPlot("Calo_csv",     "CSVv2_l",     bkg="matchedCaloJet_L",sig="matchedCaloJet_B",dir="offJets")
+    # calo_deepcsv_roc   = makeRocPlot("Calo_deepcsv",  "DeepCSV_l",  bkg="matchedCaloJet_L",sig="matchedCaloJet_B",dir="offJets")
 
 
 
@@ -184,9 +186,11 @@ def main():
 
     off_deepcsv_roc   = makeRocPlot("Offline_deepcsv", "DeepCSV_l", bkg="matched_L",sig="matched_B",dir="offJets")
     # off_csv_roc       = makeRocPlot("Offline_csv",     "CSVv2_l",     bkg="matched_L",sig="matched_B",dir="offJets")
+    off_probb_roc       = makeRocPlot("Offline_probb",     "probB",     bkg="matched_L",sig="matched_B",dir="offJets")
 
     # pf_csv_roc       = makeRocPlot("PF_csv",     "CSVv2_l",     bkg="matchedJet_L",sig="matchedJet_B",dir="offJets")
     pf_deepcsv_roc   = makeRocPlot("PF_deepcsv",     "DeepCSV_l", bkg="matchedJet_L",sig="matchedJet_B",dir="offJets")
+    pf_probb_roc   = makeRocPlot("PF_probb",     "probB", bkg="matchedJet_L",sig="matchedJet_B",dir="offJets")
 
 
     for i, rocType in enumerate(["Rej","Eff"]):
@@ -272,30 +276,33 @@ def main():
                  )
 
 
-        plotSame("Off_vs_HLT_All_"+rocType,
-                 [off_deepcsv_roc[i], off_csv_roc[i], calo_csv_roc[i],  calo_deepcsv_roc[i],   pf_deepcsv_roc[i],  pf_csv_roc[i]],
-                 [ROOT.kBlack,       ROOT.kBlack,     ROOT.kRed  ,      ROOT.kRed,             ROOT.kBlue,         ROOT.kBlue],
-                 [ROOT.kSolid,      ROOT.kDashed,     ROOT.kDashed,     ROOT.kSolid,           ROOT.kSolid,        ROOT.kDashed],
-                 plotCaloJet = True,
-                 plotPFJet = True,
-                 plotOffJet = True,
-                 plotCSV = True,
-                 plotDeepCSV = True,
-                 rocType = rocType
-                 )
+        # plotSame("Off_vs_HLT_All_"+rocType,
+        #          [off_deepcsv_roc[i], off_csv_roc[i], calo_csv_roc[i],  calo_deepcsv_roc[i],   pf_deepcsv_roc[i],  pf_csv_roc[i]],
+        #          [ROOT.kBlack,       ROOT.kBlack,     ROOT.kRed  ,      ROOT.kRed,             ROOT.kBlue,         ROOT.kBlue],
+        #          [ROOT.kSolid,      ROOT.kDashed,     ROOT.kDashed,     ROOT.kSolid,           ROOT.kSolid,        ROOT.kDashed],
+        #          plotCaloJet = True,
+        #          plotPFJet = True,
+        #          plotOffJet = True,
+        #          plotCSV = True,
+        #          plotDeepCSV = True,
+        #          rocType = rocType
+        #          )
 
 
         plotSame("Off_vs_HLTDeepCSV_"+rocType,
-                 [off_deepcsv_roc[i], pf_deepcsv_roc[i]],
+                 # [off_deepcsv_roc[i], pf_deepcsv_roc[i]],
+                 [off_deepcsv_roc[i], pf_deepcsv_roc[i], off_probb_roc[i], pf_probb_roc[i]],
                  # [off_deepcsv_roc[i], calo_deepcsv_roc[i], pf_deepcsv_roc[i]],
-                 [ROOT.kBlack,      ROOT.kBlue],
+                 # [ROOT.kBlack,      ROOT.kBlue],
+                 [ROOT.kBlack,      ROOT.kBlue, ROOT.kBlack, ROOT.kBlue],
                  # [ROOT.kBlack,       ROOT.kRed  ,      ROOT.kBlue],
-                 [ROOT.kSolid,      ROOT.kSolid],
+                 # [ROOT.kSolid,      ROOT.kSolid],
+                 [ROOT.kSolid,      ROOT.kSolid, ROOT.kDashed,      ROOT.kDashed],
                  # [ROOT.kSolid,      ROOT.kSolid,      ROOT.kSolid],
                  plotCaloJet = False,
                  plotPFJet = True,
                  plotOffJet = True,
-                 plotCSV = False,
+                 plotCSV = True,
                  plotDeepCSV = True,
                  rocType = rocType
                  )
