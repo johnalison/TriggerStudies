@@ -37,7 +37,8 @@ namespace TriggerStudies {
 
     bool doTracks = true;
     bool doCaloJets = true;
-
+    bool doLeptonSel = false;
+    
     int histogramming = 1e6;
     int treeEvents;
     eventData* event;

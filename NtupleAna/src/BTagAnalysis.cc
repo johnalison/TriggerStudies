@@ -385,8 +385,7 @@ int BTagAnalysis::processEvent(){
   hSelElecs->nElecs->Fill(selElecs.size());
   if(debug) cout << "Done Elec Fill " << endl;
 
-  bool doLeptonCuts = false;
-  if(doLeptonCuts){
+  if(doLeptonSel){
     if(debug) cout << "Doing Lepton Cuts " << endl;
     if(selMuons.size() == 1)
       cutflow->Fill("passMuonCut", 1.0);
@@ -411,7 +410,7 @@ int BTagAnalysis::processEvent(){
   if(isMC && pileUpTool){
     puWeight = pileUpTool->getWeight(event->offPVs.size());
     eventWeight =  puWeight;
-    if(doLeptonCuts)
+    if(doLeptonSel)
       eventWeight *= (selElecs.at(0)->SF * selMuons.at(0)->SF);
   }
 
