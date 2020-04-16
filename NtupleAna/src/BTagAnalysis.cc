@@ -432,8 +432,8 @@ int BTagAnalysis::processEvent(){
       hOffBTagsAll->FillTrkTagVarHists(trkTag, eventWeight);
     }
 
-    if(fabs(offJet->eta) > 2.4) continue;
-    if(offJet->pt       < 35)   continue;
+    if(fabs(offJet->eta) > 4.5) continue;
+    if(offJet->pt       < 30)   continue;
 
 
     if(nTupleAnalysis::failOverlap(offJet->p,event->elecs,0.4)) continue;
