@@ -126,6 +126,14 @@ if o.doTracks:
 else:
     jetDetailString = "matched"
 
+process.NNConfig = cms.PSet(
+    NNConfig = cms.FileInPath('RecoBTag/Combined/data/DeepCSV_PhaseII.json'),
+    checkSVForDefaults = cms.bool(True),
+    meanPadding = cms.bool(True),
+    toAdd = cms.PSet(probbb = cms.string('probb')
+                     )
+    )
+
 
 #Setup event loop object
 process.BTagAnalyzer = cms.PSet(

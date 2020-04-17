@@ -57,6 +57,8 @@ int main(int argc, char * argv[]){
   std::string PUFileName = parameters.getParameter<std::string>("puFile");
   std::string jetDetailString = parameters.getParameter<std::string>("jetDetailString");
 
+  const edm::ParameterSet& nnParameters = process.getParameter<edm::ParameterSet>("NNConfig");
+
   //
   //lumiMask
   //
@@ -113,7 +115,7 @@ int main(int argc, char * argv[]){
 
   } else{
     std::cout << "BTagAnalysis " << std::endl;
-    BTagAnalysis a = BTagAnalysis(treeRAW, treeAOD, fsh, isMC, year, histogramming, debug, PUFileName, jetDetailString);
+    BTagAnalysis a = BTagAnalysis(treeRAW, treeAOD, fsh, isMC, year, histogramming, debug, PUFileName, jetDetailString, nnParameters);
     a.doLeptonSel = doLeptonSel;
     //if(!isMC){
     //  a.lumiMask = lumiMask;
