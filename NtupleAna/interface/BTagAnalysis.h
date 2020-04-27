@@ -22,12 +22,7 @@
 #include "nTupleAnalysis/baseClasses/interface/vertexHists.h"
 #include "nTupleAnalysis/baseClasses/interface/pileUpWeightTool.h"
 
-#include "DataFormats/BTauReco/interface/TaggingVariable.h"
-
-
-//from lwtnn
-#include "lwtnn/LightweightNeuralNetwork.hh"
-#include "lwtnn/parse_json.hh"
+#include "TriggerStudies/NtupleAna/interface/NeuralNetworkAndConstants.h"
 
 namespace TriggerStudies {
 
@@ -49,7 +44,7 @@ namespace TriggerStudies {
     int histogramming = 1e6;
     int treeEvents;
     eventData* event;
-
+    
     nTupleAnalysis::eventHists* hEvents;
     nTupleAnalysis::eventHists* hEventsNoPUWeight;
 
@@ -213,34 +208,7 @@ namespace TriggerStudies {
     struct rusage usage;
     long int usageMB;
 
-    // From https://github.com/cms-sw/cmssw/blob/6ec5f2f206b43e0996b67f4d51ae3136bc5edf92/RecoBTag/Combined/plugins/DeepFlavourJetTagsProducer.cc#L58
-    struct MVAVar {
-      std::string name;
-      reco::btau::TaggingVariableName id;
-      int index;
-      double default_value;
-    };
-
-    class NeuralNetworkAndConstants {
-    public:
-      NeuralNetworkAndConstants(const edm::ParameterSet&);
-
-      std::unique_ptr<const lwt::LightweightNeuralNetwork> const& neural_network() const { return neural_network_; }
-      std::vector<std::string> const& outputs() const { return outputs_; }
-      bool check_sv_for_defaults() const { return check_sv_for_defaults_; }
-      std::map<std::string, std::string> const& toadd() const { return toadd_; }
-      std::vector<MVAVar> const& variables() const { return variables_; }
-
-    private:
-      std::unique_ptr<const lwt::LightweightNeuralNetwork> neural_network_;
-      std::vector<std::string> outputs_;
-      bool check_sv_for_defaults_;
-      std::map<std::string, std::string> toadd_;
-      std::vector<MVAVar> variables_;
-    };
-
-    std::shared_ptr<NeuralNetworkAndConstants>  gc;
-
+    std::shared_ptr<NeuralNetworkAndConstants>  neuralNet;
 
 
     BTagAnalysis(TChain* _eventsRAW, TChain* _eventsAOD, fwlite::TFileService& fs, bool _isMC, std::string _year, int _histogramming, bool _debug, std::string PUFileName, std::string jetDetailString, const edm::ParameterSet& nnConfig);

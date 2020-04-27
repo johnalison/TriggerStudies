@@ -3,8 +3,6 @@
 #include <cstdio>
 #include <TROOT.h>
 #include <boost/bind.hpp>
-#include <fstream>
-#include <set>
 
 
 #include "TriggerStudies/NtupleAna/interface/BTagAnalysis.h"
@@ -43,70 +41,6 @@ const float OfflineDeepFlavourTightCut2017   = 0.7489;
 const float OfflineDeepFlavourMediumCut2017  = 0.3033;
 const float OfflineDeepFlavourLooseCut2017   = 0.0521;
 
-
-    // From https://github.com/cms-sw/cmssw/blob/6ec5f2f206b43e0996b67f4d51ae3136bc5edf92/RecoBTag/Combined/plugins/DeepFlavourJetTagsProducer.cc#L119
-BTagAnalysis::NeuralNetworkAndConstants::NeuralNetworkAndConstants(const edm::ParameterSet& iConfig) {
-
-  bool mean_padding = iConfig.getParameter<bool>("meanPadding");
-
-
-  //parse json
-  edm::FileInPath nnconfig = iConfig.getParameter<edm::FileInPath>("NNConfig");
-  std::ifstream jsonfile(nnconfig.fullPath());
-  auto config = lwt::parse_json(jsonfile);
-
-  //create NN and store the output names for the future
-    neural_network_ =
-      std::make_unique<const lwt::LightweightNeuralNetwork>(config.inputs, config.layers, config.outputs);
-
-    outputs_ = config.outputs;
-    set<string> outset(outputs_.begin(), outputs_.end());
-
-    //in case we want to merge some different outputs together
-    edm::ParameterSet toaddPSet = iConfig.getParameter<edm::ParameterSet>("toAdd");
-    for (auto const& output : toaddPSet.getParameterNamesForType<string>()) {
-      string target = toaddPSet.getParameter<string>(output);
-      if (outset.find(output) == outset.end())
-        throw cms::Exception("RuntimeError") << "The required output: " << output << " to be added to " << target
-                                             << " could not be found among the NN outputs" << endl;
-      if (outset.find(target) == outset.end())
-        throw cms::Exception("RuntimeError") << "The required output: " << target << ", target of addition of "
-                                             << output << " could not be found among the NN outputs" << endl;
-      toadd_[output] = target;
-    }
-
-    //get the set-up for the inputs
-    for (auto const& input : config.inputs) {
-      MVAVar var;
-      var.name = input.name;
-      //two paradigms
-      vector<string> tokens;
-      if (var.name != "Jet_JP" && var.name != "Jet_JBP" && var.name != "Jet_SoftMu" && var.name != "Jet_SoftEl") {
-	boost::split(tokens, var.name, boost::is_any_of("_"));
-      } else {
-        tokens.push_back(var.name);
-      }
-      if (tokens.empty()) {
-        throw cms::Exception("RuntimeError")
-	  << "I could not parse properly " << input.name << " as input feature" << std::endl;
-      }
-      var.id = reco::getTaggingVariableName(tokens.at(0));
-      //die grafully if the tagging variable is not found!
-      if (var.id == reco::btau::lastTaggingVariable) {
-        throw cms::Exception("ValueError")
-	  << "I could not find the TaggingVariable named " << tokens.at(0)
-	  << " from the NN input variable: " << input.name << ". Please check the spelling" << std::endl;
-      }
-      var.index = (tokens.size() == 2) ? stoi(tokens.at(1)) : -1;
-      var.default_value =
-	(mean_padding)
-              ? 0.
-	: -1 * input.offset;  //set default to -offset so that when scaling (val+offset)*scale the outcome is 0
-      //for mean padding it is set to zero so that undefined values are assigned -mean/scale
-
-      variables_.push_back(var);
-    }
-}
 
 
 BTagAnalysis::BTagAnalysis(TChain* _eventsRAW, TChain* _eventsAOD, fwlite::TFileService& fs, bool _isMC, std::string _year, int _histogramming, bool _debug, std::string PUFileName, std::string jetDetailString, const edm::ParameterSet& nnConfig){
@@ -335,10 +269,8 @@ BTagAnalysis::BTagAnalysis(TChain* _eventsRAW, TChain* _eventsAOD, fwlite::TFile
   //
   //
   cout << "Making the NN " << endl;
-  gc = std::make_shared<NeuralNetworkAndConstants>(nnConfig);
-  for (auto const& outnode : gc->outputs()) {
-    cout << " \t output "  <<  outnode << endl;
-  }
+  neuralNet = std::make_shared<NeuralNetworkAndConstants>(nnConfig);
+
 } 
 
 
@@ -657,37 +589,16 @@ int BTagAnalysis::processEvent(){
       //
       // Testing
       //
-      lwt::ValueMap inputs_;  //typedef of unordered_map<string, float>
-      lwt::ValueMap nnout;
-      vector<string> const& outputs = gc->outputs();
-      map<string, string> const& toadd = gc->toadd();
-      gc->check_sv_for_defaults();
-
-      cout << " ====================  " << endl;
-      for (auto const& var : gc->variables()) {
-	cout << "\t"<< var.name << endl;
-	if (var.index >= 0) {
-	  inputs_[var.name] = 2.0;
-	}
-	//single value tagging var
-	else {
-	  inputs_[var.name] = 1.0;
-	}
-	
-	//count if the input is nan
-	if (std::isnan(inputs_[var.name])) {
-	  //naninput++;
-	}
-      }
-
-
-      nnout = gc->neural_network()->compute(inputs_);
+      lwt::ValueMap nnout = neuralNet->compute(matchedJet);
 
       cout << "Output: " << endl;
+      map<string, string> const& toadd = neuralNet->toadd();
       for (auto const& entry : toadd) {
 	cout << "\t" << entry.first << " " << entry.second << endl;
 	cout << nnout[entry.second] << " " <<  nnout[entry.first] << endl;
+	cout << "\t sum" << nnout[entry.second] + nnout[entry.first] << endl;
       }
+
       
 
     }//offJet has match
