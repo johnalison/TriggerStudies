@@ -4,7 +4,7 @@
 #include <iostream>
 #include <boost/bind.hpp>
 #include <boost/algorithm/string.hpp> 
-
+#include "nTupleAnalysis/baseClasses/interface/btaggingData.h"
 
 using namespace TriggerStudies;
 using std::cout; using std::endl; 
@@ -80,72 +80,103 @@ lwt::ValueMap NeuralNetworkAndConstants::compute(const nTupleAnalysis::jetPtr& j
   lwt::ValueMap inputs_;  //typedef of unordered_map<string, float>
   //neuralNet->check_sv_for_defaults();
       
-  inputs_["jetPt"] = 12.1284;
-  inputs_["jetEta"] = -1.50645;
-  inputs_["jetNSecondaryVertices"] = 0;
-  inputs_["trackSumJetEtRatio"] = 0.242598;
-  inputs_["trackSumJetDeltaR"] = 0.0971793;
-  inputs_["vertexCategory"] = 2;
-  inputs_["trackSip2dValAboveCharm"] = -1;
-  inputs_["trackSip2dSigAboveCharm"] = -1;
-  inputs_["trackSip3dValAboveCharm"] = -1;
-  inputs_["trackSip3dSigAboveCharm"] = -1;
-  inputs_["jetNSelectedTracks"] = 2;
-  inputs_["jetNTracksEtaRel"] = 0;
-  inputs_["trackJetDist_0"] =  -0.00630845;
-  inputs_["trackJetDist_1"] =  -0.00272192;
-  inputs_["trackJetDist_2"] =  0;
-  inputs_["trackJetDist_3"] =  0;
-  inputs_["trackJetDist_4"] =  0;
-  inputs_["trackJetDist_5"] =  0;
-  inputs_["trackPtRel_0"] =  0.210688;
-  inputs_["trackPtRel_1"] =  0.10662;
-  inputs_["trackPtRel_2"] =  0;
-  inputs_["trackPtRel_3"] =  0;
-  inputs_["trackPtRel_4"] =  0;
-  inputs_["trackPtRel_5"] =  0;
-  inputs_["trackDeltaR_0"] =  0.121708;
-  inputs_["trackDeltaR_1"] =  0.097125;
-  inputs_["trackDeltaR_2"] =  0;
-  inputs_["trackDeltaR_3"] =  0;
-  inputs_["trackDeltaR_4"] =  0;
-  inputs_["trackDeltaR_5"] =  0;
-  inputs_["trackPtRatio_0"] =  0.0539723;
-  inputs_["trackPtRatio_1"] =  0.042573;
-  inputs_["trackPtRatio_2"] =  0;
-  inputs_["trackPtRatio_3"] =  0;
-  inputs_["trackPtRatio_4"] =  0;
-  inputs_["trackPtRatio_5"] =  0;
-  inputs_["trackSip3dSig_0"] = 1.82768;
-  inputs_["trackSip3dSig_1"] = 1.95659;
-  inputs_["trackSip3dSig_2"] = 0;
-  inputs_["trackSip3dSig_3"] = 0;
-  inputs_["trackSip3dSig_4"] = 0;
-  inputs_["trackSip3dSig_5"] = 0;
-  inputs_["trackSip2dSig_0"] = 1.81956;
-  inputs_["trackSip2dSig_1"] = 0.590408;
-  inputs_["trackSip2dSig_2"] = 0;
-  inputs_["trackSip2dSig_3"] = 0;
-  inputs_["trackSip2dSig_4"] = 0;
-  inputs_["trackSip2dSig_5"] = 0;
-  inputs_["trackDecayLenVal_0"] = 0.0458966;
-  inputs_["trackDecayLenVal_1"] = 0.263346;
-  inputs_["trackDecayLenVal_2"] = 0;
-  inputs_["trackDecayLenVal_3"] = 0;
-  inputs_["trackDecayLenVal_4"] = 0;
-  inputs_["trackDecayLenVal_5"] = 0;
-  inputs_["trackEtaRel_0"] = 0;
-  inputs_["trackEtaRel_1"] = 0;
-  inputs_["trackEtaRel_2"] = 0;
-  inputs_["trackEtaRel_3"] = 0;
-  inputs_["vertexMass"] = 0;
-  inputs_["vertexNTracks"] = 0;
-  inputs_["vertexEnergyRatio"] = 0;
-  inputs_["vertexJetDeltaR"] = 0;
+  const nTupleAnalysis::tagVarPtr& btagData = jet->tagVars;
+
+  inputs_["jetPt"] = jet->pt;
+  inputs_["jetEta"] = jet->eta;
+  inputs_["jetNSecondaryVertices"] = btagData->jetNSecondaryVertices;
+  inputs_["trackSumJetEtRatio"] = btagData->trackSumJetEtRatio;
+  inputs_["trackSumJetDeltaR"] = btagData->trackSumJetDeltaR;
+  inputs_["vertexCategory"] = btagData->vertexCategory;
+  inputs_["trackSip2dValAboveCharm"] = btagData->trackSip2dValAboveCharm;
+  inputs_["trackSip2dSigAboveCharm"] = btagData->trackSip2dSigAboveCharm;
+  inputs_["trackSip3dValAboveCharm"] = btagData->trackSip3dValAboveCharm;
+  inputs_["trackSip3dSigAboveCharm"] = btagData->trackSip3dSigAboveCharm;
+  inputs_["vertexEnergyRatio"]       = btagData->vertexEnergyRatio;
+
+  inputs_["jetNSelectedTracks"] = jet->nseltracks;
+  inputs_["jetNTracksEtaRel"] = 0; // Need
+
+
+  inputs_["vertexMass"]          = 0;
+  inputs_["vertexNTracks"]       = 0;
+  inputs_["vertexEnergyRatio"]   = 0;
+  inputs_["vertexJetDeltaR"]     = 0;
   inputs_["flightDistance2dVal"] = 0;
   inputs_["flightDistance2dSig"] = 0;
   inputs_["flightDistance3dVal"] = 0;
   inputs_["flightDistance3dSig"] = 0;
+
+  if(jet->svs.size()){
+    const nTupleAnalysis::svPtr& secVtxData = jet->svs.at(0); // How should this be sorted ?
+    inputs_["vertexMass"]          = secVtxData->mass;
+    inputs_["vertexNTracks"]       = secVtxData->nTrk;
+    inputs_["vertexJetDeltaR"]     = secVtxData->deltaR_jet;
+    inputs_["flightDistance2dVal"] = secVtxData->flight2D;
+    inputs_["flightDistance2dSig"] = secVtxData->flight2DSig;
+    inputs_["flightDistance3dVal"] = secVtxData->flight;
+    inputs_["flightDistance3dSig"] = secVtxData->flightSig;
+  }
+
+
+
+  std::stringstream ss;
+
+  float defaultValue = 0.0;
+  unsigned int nTracks = jet->trkTagVars.size();
+  
+  for(unsigned int trkItr = 0; trkItr < 6; ++trkItr){
+    ss.str("");
+    ss << trkItr;
+    
+    float trackJetDistVal   = defaultValue;
+    float trackPtRelVal     = defaultValue;
+    float trackDeltaRVal    = defaultValue;
+    float trackPtRatio      = defaultValue;
+    float trackSip3dSig     = defaultValue;
+    float trackSip2dSig     = defaultValue;
+    float trackDecayLenVal  = defaultValue;
+
+    std::string trackJetDistName     = "trackJetDist_" + ss.str();
+    std::string trackPtRelName       = "trackPtRel_" + ss.str();
+    std::string trackDeltaRName      = "trackDeltaR_" + ss.str();
+    std::string trackPtRatioName     = "trackPtRatio_" + ss.str();
+    std::string trackSip3dSigName    = "trackSip3dSig_" + ss.str();
+    std::string trackSip2dSigName    = "trackSip2dSig_" + ss.str();
+    std::string trackDecayLenValName = "trackDecayLenVal_" + ss.str();
+
+    if(trkItr < nTracks){
+      const nTupleAnalysis::trkTagVarPtr& thisTrk = jet->trkTagVars.at(trkItr);
+      trackJetDistVal  = thisTrk->trackJetDistVal;
+      trackPtRelVal    = thisTrk->trackPtRel;
+      trackDeltaRVal   = thisTrk->trackDeltaR;
+      trackPtRatio     = thisTrk->trackPtRatio;
+      trackSip3dSig    = thisTrk->trackSip3dSig;
+      trackSip2dSig    = thisTrk->trackSip2dSig;
+      trackDecayLenVal = thisTrk->trackDecayLenVal;
+    }
+    
+    inputs_[trackJetDistName     ] = trackJetDistVal;
+    inputs_[trackPtRelName       ] = trackPtRelVal;
+    inputs_[trackDeltaRName      ] = trackDeltaRVal    ;
+    inputs_[trackPtRatioName     ] = trackPtRatio      ;
+    inputs_[trackSip3dSigName    ] = trackSip3dSig     ;
+    inputs_[trackSip2dSigName    ] = trackSip2dSig     ;
+    inputs_[trackDecayLenValName ] = trackDecayLenVal  ;
+
+
+
+  }
+
+  inputs_["trackEtaRel_0"] = 0;// Need
+  inputs_["trackEtaRel_1"] = 0;// Need
+  inputs_["trackEtaRel_2"] = 0;// Need
+  inputs_["trackEtaRel_3"] = 0;// Need
+
+  for(auto const& var : variables()){
+    cout << var.name << " is " << inputs_[var.name] << endl;
+  }
+
 
 
   return neural_network()->compute(inputs_);;
