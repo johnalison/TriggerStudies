@@ -15,7 +15,7 @@
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
 
 // Uncomment for SCL6
-//#define BTagAnalysis_SLC6 1  
+#define BTagAnalysis_SLC6 1  
 
 #if defined BTagAnalysis_SLC6
 #include "nTupleAnalysis/baseClasses/interface/myParameterSetReader.h"
