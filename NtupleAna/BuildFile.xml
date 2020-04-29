@@ -1,10 +1,12 @@
 <use   name="boost"/>
+<use   name="lwtnn"/>
 <use   name="rootcore"/>
 <use   name="roothistmatrix"/>
 <use   name="CommonTools/Utils"/>
 <use   name="DataFormats/FWLite"/>
 <use   name="DataFormats/MuonReco"/>
 <use   name="CondFormats/BTauObjects"/>
+<use   name="DataFormats/BTauReco"/>
 <use   name="CondTools/BTau"/>
 <use   name="nTupleAnalysis/baseClasses"/>
 <export>

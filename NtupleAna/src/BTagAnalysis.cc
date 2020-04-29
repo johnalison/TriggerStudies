@@ -10,7 +10,7 @@
 
 using std::cout; using std::endl; 
 using namespace TriggerStudies;
-using std::cout;  using std::endl;
+using std::vector;  using std::map; using std::string; using std::set;
 
 // 2018
 // https://twiki.cern.ch/twiki/bin/viewauth/CMS/BtagRecommendation102X
@@ -43,7 +43,7 @@ const float OfflineDeepFlavourLooseCut2017   = 0.0521;
 
 
 
-BTagAnalysis::BTagAnalysis(TChain* _eventsRAW, TChain* _eventsAOD, fwlite::TFileService& fs, bool _isMC, std::string _year, int _histogramming, bool _debug, std::string PUFileName, std::string jetDetailString){
+BTagAnalysis::BTagAnalysis(TChain* _eventsRAW, TChain* _eventsAOD, fwlite::TFileService& fs, bool _isMC, std::string _year, int _histogramming, bool _debug, std::string PUFileName, std::string jetDetailString, const edm::ParameterSet& nnConfig){
   if(_debug) cout<<"In BTagAnalysis constructor"<<endl;
   debug      = _debug;
   isMC       = _isMC;
@@ -264,12 +264,18 @@ BTagAnalysis::BTagAnalysis(TChain* _eventsRAW, TChain* _eventsAOD, fwlite::TFile
     }
   }
 
-  //  if(histogramming >= 4) allEvents     = new eventHists("allEvents",     fs);
-  //  if(histogramming >= 3) passPreSel    = new   tagHists("passPreSel",    fs, true, isMC, blind);
-  //  if(histogramming >= 2) passDijetMass = new   tagHists("passDijetMass", fs, true, isMC, blind);
-  //  if(histogramming >= 1) passMDRs      = new   tagHists("passMDRs",      fs, true, isMC, blind);
-  //  //if(histogramming > 1        ) passMDCs     = new   tagHists("passMDCs",   fs, true, isMC, blind);
-  //  //if(histogramming > 0        ) passDEtaBB   = new   tagHists("passDEtaBB", fs, true, isMC, blind);
+  //
+  // Adding the NN
+  //
+  //
+  if(nnConfig.getParameter<bool>("reCalcWeights")){
+    edm::FileInPath nnInputFile = nnConfig.getParameter<edm::FileInPath>("NNConfig");
+    cout << "Creating Neuralnet from  " << nnInputFile << endl;
+    neuralNet = std::make_shared<NeuralNetworkAndConstants>(nnConfig);
+  }else{
+    neuralNet = nullptr; 
+  }
+
 } 
 
 
@@ -581,9 +587,27 @@ int BTagAnalysis::processEvent(){
       cutflowJets->Fill("hasHLTMatchPF", eventWeight);    
       offJet->matchedJet = matchedJet;
 
+      //
+      // Testing Neural Net
+      //
+      if(neuralNet){
+	lwt::ValueMap nnout = neuralNet->compute(matchedJet);
+	float DeepCSV_reCalc = nnout["probb"] + nnout["probbb"];
+        matchedJet->DeepCSV_reCalc = DeepCSV_reCalc;
+	
+	if(fabs(DeepCSV_reCalc - matchedJet->DeepCSV) > 0.001){
+	  cout << "Event: " << event->event << endl;
+	  cout << "DeepCSV_reCalc: " << DeepCSV_reCalc << " vs " << matchedJet->DeepCSV << endl;
+	  nnout = neuralNet->compute(matchedJet, true);
+	}
+      }
+
+
+
       PFJetAnalysis(offJet,matchedJet,eventWeight);
       
       ++nOffJets_matched;
+
 
     }//offJet has match
 
@@ -1144,6 +1168,8 @@ void BTagAnalysis::PFJetAnalysis(const nTupleAnalysis::jetPtr& offJet,const nTup
 
 
 void BTagAnalysis::CaloJetAnalysis(const nTupleAnalysis::jetPtr& offJet,const nTupleAnalysis::jetPtr& hltJet, float weight){
+
+
 
   if(doTracks){
 
