@@ -13,7 +13,9 @@
 #include "DataFormats/FWLite/interface/InputSource.h"
 #include "DataFormats/FWLite/interface/OutputFiles.h"
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
-#include "nTupleAnalysis/baseClasses/interface/myParameterSetReader.h"
+//#include "nTupleAnalysis/baseClasses/interface/myParameterSetReader.h"
+#include "FWCore/PythonParameterSet/interface/MakePyBind11ParameterSets.h"
+
 
 #include "PhysicsTools/FWLite/interface/TFileService.h"
 
@@ -41,8 +43,10 @@ int main(int argc, char * argv[]){
   //
   // get the python configuration
   //
-  const edm::ParameterSet& process    = edm::readPSetsFrom(argv[1], argc, argv)->getParameter<edm::ParameterSet>("process");
+  //const edm::ParameterSet& process    = edm::readPSetsFrom(argv[1], argc, argv)->getParameter<edm::ParameterSet>("process");
   //std::shared_ptr<edm::ParameterSet> config = edm::readConfig(argv[1], argc, argv);
+  const edm::ParameterSet& process    = edm::cmspybind11::readPSetsFrom(argv[1], argc, argv)->getParameter<edm::ParameterSet>("process");
+
   //const edm::ParameterSet& process    = config->getParameter<edm::ParameterSet>("process");
 
   const edm::ParameterSet& parameters = process.getParameter<edm::ParameterSet>("BTagAnalyzer");

@@ -9,6 +9,7 @@
 <use   name="DataFormats/BTauReco"/>
 <use   name="CondTools/BTau"/>
 <use   name="nTupleAnalysis/baseClasses"/>
+<use   name="rootgraphics"/>
 <export>
   <lib   name="1"/>
 </export>
