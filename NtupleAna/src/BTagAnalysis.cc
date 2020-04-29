@@ -268,8 +268,13 @@ BTagAnalysis::BTagAnalysis(TChain* _eventsRAW, TChain* _eventsAOD, fwlite::TFile
   // Adding the NN
   //
   //
-  cout << "Making the NN " << endl;
-  neuralNet = std::make_shared<NeuralNetworkAndConstants>(nnConfig);
+  if(nnConfig.getParameter<bool>("reCalcWeights")){
+    edm::FileInPath nnInputFile = nnConfig.getParameter<edm::FileInPath>("NNConfig");
+    cout << "Creating Neuralnet from  " << nnInputFile << endl;
+    neuralNet = std::make_shared<NeuralNetworkAndConstants>(nnConfig);
+  }else{
+    neuralNet = nullptr; 
+  }
 
 } 
 
@@ -582,21 +587,27 @@ int BTagAnalysis::processEvent(){
       cutflowJets->Fill("hasHLTMatchPF", eventWeight);    
       offJet->matchedJet = matchedJet;
 
+      //
+      // Testing Neural Net
+      //
+      if(neuralNet){
+	lwt::ValueMap nnout = neuralNet->compute(matchedJet);
+	float DeepCSV_reCalc = nnout["probb"] + nnout["probbb"];
+        matchedJet->DeepCSV_reCalc = DeepCSV_reCalc;
+	
+	if(fabs(DeepCSV_reCalc - matchedJet->DeepCSV) > 0.001){
+	  cout << "Event: " << event->event << endl;
+	  cout << "DeepCSV_reCalc: " << DeepCSV_reCalc << " vs " << matchedJet->DeepCSV << endl;
+	  nnout = neuralNet->compute(matchedJet, true);
+	}
+      }
+
+
+
       PFJetAnalysis(offJet,matchedJet,eventWeight);
       
       ++nOffJets_matched;
 
-      //
-      // Testing
-      //
-      lwt::ValueMap nnout = neuralNet->compute(matchedJet);
-      float DeepCSV_reCalc = nnout["probb"] + nnout["probbb"];
-      
-      if(fabs(DeepCSV_reCalc - matchedJet->DeepCSV) > 0.001){
-	cout << "Event: " << event->event << endl;
-	cout << "DeepCSV_reCalc: " << DeepCSV_reCalc << " vs " << matchedJet->DeepCSV << endl;
-	nnout = neuralNet->compute(matchedJet, true);
-      }
 
     }//offJet has match
 

@@ -26,6 +26,7 @@ parser.add_option('--puFile',                     dest="puFile",       default="
 parser.add_option('-n', '--nevents',              dest="nevents",       default="-1", help="Number of events to process. Default -1 for no limit.")
 parser.add_option(      '--histogramming',        dest="histogramming", default="1e6", help="Histogramming level. 0 to make no kinematic histograms. 1: only make histograms for full event selection, larger numbers add hists in reverse cutflow order.")
 parser.add_option(      '--skipEvents',        dest="skipEvents", default="0", help="")
+parser.add_option(      '--nnConfig',        default=None, help="")
 parser.add_option(      '--histFile',             dest="histFile",      default="hists.root", help="name of ouptut histogram file")
 o, a = parser.parse_args()
 
@@ -126,13 +127,23 @@ if o.doTracks:
 else:
     jetDetailString = "matched"
 
-process.NNConfig = cms.PSet(
-    NNConfig = cms.FileInPath('RecoBTag/Combined/data/DeepCSV_PhaseII.json'),
-    checkSVForDefaults = cms.bool(True),
-    meanPadding = cms.bool(True),
-    toAdd = cms.PSet(probbb = cms.string('probb')
-                     )
-    )
+#
+#  Recalc NN weights
+#
+if o.nnConfig:
+    jetDetailString += "reCalcDeepCSV"
+    process.NNConfig = cms.PSet(
+        reCalcWeights = cms.bool(True),
+        NNConfig = cms.FileInPath(o.nnConfig),
+        checkSVForDefaults = cms.bool(True),
+        meanPadding = cms.bool(True),
+        toAdd = cms.PSet(probbb = cms.string('probb'))
+        )
+else:
+    process.NNConfig = cms.PSet(
+        reCalcWeights = cms.bool(False),
+        )
+
 
 
 #Setup event loop object
