@@ -3,12 +3,14 @@
 ## Quick Start
 
 ## 
-> cmsrel CMSSW_10_1_7
-> cd CMSSW_10_1_7/src/
-> cmsenv
-> git clone git@github.com:patrickbryant/nTupleAnalysis.git
-> git clone git@github.com:johnalison/TriggerStudies.git
-> scram b -j 6
+cmsrel CMSSW_11_1_0_pre6
+cd CMSSW_11_1_0_pre6/src/
+cmsenv 
+git cms-init
+git cms-merge-topic patrickbryant:MakePyBind11ParameterSetsIncludingCommandLineArguments
+git clone -b CMSSW_11  git@github.com:patrickbryant/nTupleAnalysis.git
+git clone -b CMSSW_11  git@github.com:johnalison/TriggerStudies.git
+
 
 ## Assuming that goes well and example that runs on data is (From LPC)
 
