@@ -30,7 +30,7 @@ namespace TriggerStudies {
     bool check_sv_for_defaults() const { return check_sv_for_defaults_; }
     std::map<std::string, std::string> const& toadd() const { return toadd_; }
     std::vector<MVAVar> const& variables() const { return variables_; }
-    lwt::ValueMap compute(const nTupleAnalysis::jetPtr& jet);
+    lwt::ValueMap compute(const nTupleAnalysis::jetPtr& jet, bool debug = false);
 
   private:
     std::unique_ptr<const lwt::LightweightNeuralNetwork> neural_network_;

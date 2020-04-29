@@ -590,16 +590,13 @@ int BTagAnalysis::processEvent(){
       // Testing
       //
       lwt::ValueMap nnout = neuralNet->compute(matchedJet);
-
-      cout << "Output: " << endl;
-      map<string, string> const& toadd = neuralNet->toadd();
-      for (auto const& entry : toadd) {
-	cout << "\t" << entry.first << " " << entry.second << endl;
-	cout << nnout[entry.second] << " " <<  nnout[entry.first] << endl;
-	cout << "\t sum" << nnout[entry.second] + nnout[entry.first] << endl;
-      }
-
+      float DeepCSV_reCalc = nnout["probb"] + nnout["probbb"];
       
+      if(fabs(DeepCSV_reCalc - matchedJet->DeepCSV) > 0.001){
+	cout << "Event: " << event->event << endl;
+	cout << "DeepCSV_reCalc: " << DeepCSV_reCalc << " vs " << matchedJet->DeepCSV << endl;
+	nnout = neuralNet->compute(matchedJet, true);
+      }
 
     }//offJet has match
 

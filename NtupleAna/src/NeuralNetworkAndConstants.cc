@@ -75,12 +75,17 @@ NeuralNetworkAndConstants::NeuralNetworkAndConstants(const edm::ParameterSet& iC
 }
 
 
-lwt::ValueMap NeuralNetworkAndConstants::compute(const nTupleAnalysis::jetPtr& jet){
-  
+lwt::ValueMap NeuralNetworkAndConstants::compute(const nTupleAnalysis::jetPtr& jet, bool debug){
   lwt::ValueMap inputs_;  //typedef of unordered_map<string, float>
   //neuralNet->check_sv_for_defaults();
+
       
   const nTupleAnalysis::tagVarPtr& btagData = jet->tagVars;
+
+  if(btagData->jetNTracks < 1){
+    lwt::ValueMap defaultOut = {{"probb",-0.1},{"probbb",0.0}};
+    return defaultOut;
+  }
 
   inputs_["jetPt"] = jet->pt;
   inputs_["jetEta"] = jet->eta;
@@ -93,31 +98,18 @@ lwt::ValueMap NeuralNetworkAndConstants::compute(const nTupleAnalysis::jetPtr& j
   inputs_["trackSip3dValAboveCharm"] = btagData->trackSip3dValAboveCharm;
   inputs_["trackSip3dSigAboveCharm"] = btagData->trackSip3dSigAboveCharm;
   inputs_["vertexEnergyRatio"]       = btagData->vertexEnergyRatio;
+  //cout << btagData->jetNTracksCSV << " vs " << jet->nseltracks << endl;
 
-  inputs_["jetNSelectedTracks"] = jet->nseltracks;
-  inputs_["jetNTracksEtaRel"] = 0; // Need
-
-
-  inputs_["vertexMass"]          = 0;
-  inputs_["vertexNTracks"]       = 0;
-  inputs_["vertexEnergyRatio"]   = 0;
-  inputs_["vertexJetDeltaR"]     = 0;
-  inputs_["flightDistance2dVal"] = 0;
-  inputs_["flightDistance2dSig"] = 0;
-  inputs_["flightDistance3dVal"] = 0;
-  inputs_["flightDistance3dSig"] = 0;
-
-  if(jet->svs.size()){
-    const nTupleAnalysis::svPtr& secVtxData = jet->svs.at(0); // How should this be sorted ?
-    inputs_["vertexMass"]          = secVtxData->mass;
-    inputs_["vertexNTracks"]       = secVtxData->nTrk;
-    inputs_["vertexJetDeltaR"]     = secVtxData->deltaR_jet;
-    inputs_["flightDistance2dVal"] = secVtxData->flight2D;
-    inputs_["flightDistance2dSig"] = secVtxData->flight2DSig;
-    inputs_["flightDistance3dVal"] = secVtxData->flight;
-    inputs_["flightDistance3dSig"] = secVtxData->flightSig;
-  }
-
+  inputs_["jetNSelectedTracks"]  = btagData->jetNTracks; 
+  inputs_["jetNTracksEtaRel"]    = btagData->jetNTracksEtaRel; // Need
+  inputs_["vertexMass"]          = btagData->vertexMass;
+  inputs_["vertexNTracks"]       = btagData->vertexNTracks;
+  inputs_["vertexJetDeltaR"]     = btagData->vertexJetDeltaR;
+  inputs_["vertexEnergyRatio"]   = btagData->vertexEnergyRatio;
+  inputs_["flightDistance2dVal"] = btagData->flightDistance2dVal;
+  inputs_["flightDistance2dSig"] = btagData->flightDistance2dSig;
+  inputs_["flightDistance3dVal"] = btagData->flightDistance3dVal;
+  inputs_["flightDistance3dSig"] = btagData->flightDistance3dSig;
 
 
   std::stringstream ss;
@@ -163,21 +155,36 @@ lwt::ValueMap NeuralNetworkAndConstants::compute(const nTupleAnalysis::jetPtr& j
     inputs_[trackSip3dSigName    ] = trackSip3dSig     ;
     inputs_[trackSip2dSigName    ] = trackSip2dSig     ;
     inputs_[trackDecayLenValName ] = trackDecayLenVal  ;
-
-
-
   }
 
-  inputs_["trackEtaRel_0"] = 0;// Need
-  inputs_["trackEtaRel_1"] = 0;// Need
-  inputs_["trackEtaRel_2"] = 0;// Need
-  inputs_["trackEtaRel_3"] = 0;// Need
+  for(unsigned int trkEtaRelItr = 0; trkEtaRelItr < 4; ++trkEtaRelItr){
+    ss.str("");
+    ss << trkEtaRelItr;
 
-  for(auto const& var : variables()){
-    cout << var.name << " is " << inputs_[var.name] << endl;
+    float trackEtaRelVal   = defaultValue;
+
+    std::string trackEtaRelName     = "trackEtaRel_" + ss.str();
+
+    if(trkEtaRelItr < btagData->TagVarCSV_trackEtaRel.size()){
+      trackEtaRelVal   = btagData->TagVarCSV_trackEtaRel.at(trkEtaRelItr);
+    }
+
+    inputs_[trackEtaRelName] = trackEtaRelVal;// Need
+  }
+
+  if(debug){
+    for(auto const& var : variables()){
+      cout << var.name << " is " << inputs_[var.name] << endl;
+    }
+
+    lwt::ValueMap nnout = neural_network()->compute(inputs_);
+    cout << "\t" << "probb probbb"  << endl;
+    cout << nnout["probb"] << " " <<  nnout["probbb"] << endl;
+    cout << "\t sum" << nnout["probb"] + nnout["probbb"] << endl;
+    cout << " Input DeepCSV is " << jet->DeepCSV << endl;
   }
 
 
 
-  return neural_network()->compute(inputs_);;
+  return neural_network()->compute(inputs_);
 }
