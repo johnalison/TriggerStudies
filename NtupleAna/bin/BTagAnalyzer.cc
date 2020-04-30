@@ -13,7 +13,16 @@
 #include "DataFormats/FWLite/interface/InputSource.h"
 #include "DataFormats/FWLite/interface/OutputFiles.h"
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
+
+// Uncomment for SCL6
+#define BTagAnalysis_SLC6 1  
+
+#if defined BTagAnalysis_SLC6
 #include "nTupleAnalysis/baseClasses/interface/myParameterSetReader.h"
+#else
+#include "FWCore/PythonParameterSet/interface/MakePyBind11ParameterSets.h"
+#endif 
+
 
 #include "PhysicsTools/FWLite/interface/TFileService.h"
 
@@ -41,9 +50,11 @@ int main(int argc, char * argv[]){
   //
   // get the python configuration
   //
+#if defined BTagAnalysis_SLC6
   const edm::ParameterSet& process    = edm::readPSetsFrom(argv[1], argc, argv)->getParameter<edm::ParameterSet>("process");
-  //std::shared_ptr<edm::ParameterSet> config = edm::readConfig(argv[1], argc, argv);
-  //const edm::ParameterSet& process    = config->getParameter<edm::ParameterSet>("process");
+#else
+  const edm::ParameterSet& process    = edm::cmspybind11::readPSetsFrom(argv[1], argc, argv)->getParameter<edm::ParameterSet>("process");
+#endif 
 
   const edm::ParameterSet& parameters = process.getParameter<edm::ParameterSet>("BTagAnalyzer");
   bool debug = parameters.getParameter<bool>("debug");
@@ -56,6 +67,8 @@ int main(int argc, char * argv[]){
   std::vector<std::string> filesAOD = parameters.getParameter<std::vector<std::string> >("fileNamesAOD");
   std::string PUFileName = parameters.getParameter<std::string>("puFile");
   std::string jetDetailString = parameters.getParameter<std::string>("jetDetailString");
+
+  const edm::ParameterSet& nnParameters = process.getParameter<edm::ParameterSet>("NNConfig");
 
   //
   //lumiMask
@@ -113,7 +126,7 @@ int main(int argc, char * argv[]){
 
   } else{
     std::cout << "BTagAnalysis " << std::endl;
-    BTagAnalysis a = BTagAnalysis(treeRAW, treeAOD, fsh, isMC, year, histogramming, debug, PUFileName, jetDetailString);
+    BTagAnalysis a = BTagAnalysis(treeRAW, treeAOD, fsh, isMC, year, histogramming, debug, PUFileName, jetDetailString, nnParameters);
     a.doLeptonSel = doLeptonSel;
     //if(!isMC){
     //  a.lumiMask = lumiMask;

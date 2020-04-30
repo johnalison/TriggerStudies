@@ -10,7 +10,7 @@
 >  ROOTHelp
 
 # Setup the ROOT Help 
-# sourse ROOTHelp/setup.sh
+# source ROOTHelp/setup.sh
 
 # The plot making is then done in a subdir of TriggerStudies
 # eg 

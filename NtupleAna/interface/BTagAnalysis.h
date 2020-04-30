@@ -22,6 +22,8 @@
 #include "nTupleAnalysis/baseClasses/interface/vertexHists.h"
 #include "nTupleAnalysis/baseClasses/interface/pileUpWeightTool.h"
 
+#include "TriggerStudies/NtupleAna/interface/NeuralNetworkAndConstants.h"
+
 namespace TriggerStudies {
 
   class BTagAnalysis {
@@ -42,7 +44,7 @@ namespace TriggerStudies {
     int histogramming = 1e6;
     int treeEvents;
     eventData* event;
-
+    
     nTupleAnalysis::eventHists* hEvents;
     nTupleAnalysis::eventHists* hEventsNoPUWeight;
 
@@ -230,7 +232,10 @@ namespace TriggerStudies {
     struct rusage usage;
     long int usageMB;
 
-    BTagAnalysis(TChain*, TChain*, fwlite::TFileService&, bool, std::string, int, bool, std::string, std::string);
+    std::shared_ptr<NeuralNetworkAndConstants>  neuralNet;
+
+
+    BTagAnalysis(TChain* _eventsRAW, TChain* _eventsAOD, fwlite::TFileService& fs, bool _isMC, std::string _year, int _histogramming, bool _debug, std::string PUFileName, std::string jetDetailString, const edm::ParameterSet& nnConfig);
     void monitor(long int);
     int eventLoop(int, int nSkipEvents = 0);
     int processEvent();

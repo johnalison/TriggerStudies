@@ -1,92 +1,75 @@
 # TriggerStudies
 
-## Setup  (From CMSSW/src release area)
+## Quick Start in SLC7
 
-## Eg: (Only do this once)
-> cmsrel CMSSW_10_1_7
+```bash
+cmsrel CMSSW_11_1_0_pre6
+cd CMSSW_11_1_0_pre6/src/
+cmsenv 
+git cms-init
+git cms-merge-topic patrickbryant:MakePyBind11ParameterSetsIncludingCommandLineArguments
+git clone -b CMSSW_11  git@github.com:patrickbryant/nTupleAnalysis.git
+git clone -b CMSSW_11  git@github.com:johnalison/TriggerStudies.git
+```
+
+> Edit:
+>  `nTupleAnalysis/baseClasses/src/myParameterSetReader.cc`
+> and
+>  `nTupleAnalysis/baseClasses/src/myMakeParameterSets.cc`
+> to make sure that line
+>
+>    `#define NTUPLEANALYSIS_SLC6 1` 
+>
+> is commented OUT
 
 
-## Then on next logon.
+>Edit 
+>`TriggerStudies/NtupleAna/bin/BTagAnalyzer.cc`
+>to make sure that line
+>
+>  `#define BTagAnalysis_SLC6 1` 
+>
+> is commented OUT
 
-> cd CMSSW_10_1_7/src/
+```bash
+scram b -j 5
+```
 
-> cmsenv
+## Quick Start in SLC6
 
-> git clone git@github.com:patrickbryant/nTupleAnalysis.git
+```bash
+cd CMSSW_10_2_0/src
+cmsenv
+git clone git@github.com:patrickbryant/nTupleAnalysis.git
+git clone git@github.com:patrickbryant/ZZ4b.git
+```
 
-> git clone git@github.com:johnalison/TriggerStudies.git
+> Edit:
+> `nTupleAnalysis/baseClasses/src/myParameterSetReader.cc`
+> `nTupleAnalysis/baseClasses/src/myMakeParameterSets.cc`
+> to make sure that line
+>
+>  `#define NTUPLEANALYSIS_SLC6 1` 
+>
+> is UNCOMMENTED
 
-## Compile
 
-> scram b -j 6
+> Edit 
+> TriggerStudies/NtupleAna/bin/BTagAnalyzer.cc
+> to make sure that line
+>
+> `#define BTagAnalysis_SLC6 1` 
+>
+> is commented OUT
 
 
-## Assuming that goes well and example that runs on data is
+
+## Assuming that goes well and example that runs on data is (From LPC)
 
 > source TriggerStudies/NtupleAna/run/runData18B.sh
 
-#
-# The following is OLD
-#
 
 
-# Run
-> procNtupleExample TriggerStudies/NtupleAna/scripts/procNtupleExampleConfig_cfg.py
+## Neural Net input files
 
-# To make NPV file
->  py TriggerStudies/NtupleAna/scripts/makePUWeightFile.py -d JetLevelStudyOutputData_runCandD.root -m JetLevelStudyOutputMC_All_runF_weighted.root -o TriggerStudies/NtupleAna/data/PUWeights_runCandD.root
-
-# To Run all MC for eg runE
-> source TriggerStudies/NtupleAna/run/runAll.sh runE
-
-
-> mkdir run
-> cd run
-
-
-> python ../python/procNtupleExample.py -i ../tree_Oct3_20kEvents.root -o TestFile.root
-
-# Run over multiple files
-> python     ../python/procNtupleExample.py -i inputList.txt  --inputList  -o TestFile.root
-
-# Make ROC
-> python ../python/makeROC.py -i TestFile.root -o TestROC.root
-# Plot ROC
-> cd ../../
-
-checkout PlotTools
-> git clone git@github.com:patrickbryant/PlotTools.git
-
-> cd TriggerStudies/run
-
-> python ../python/plotROC.py -i TestROC.root -o TestROC
-
-# Plot All The Things
-> python ../python/plots.py -i TestFile.root
-
-This will make a run/plots directory with lots and lots of plots. 
-
-# Making commits
-Any new feature you wish to add will need to be in a new branch:
-> git checkout -b feature/newFeature
-
-And then rebase with master to make sure your branch is as up-to-date as possible when making the pull-request:
-> git pull --rebase origin master
-
-and push your commits to the remote (setting upstream):
-> git push -u origin feature/newFeature
-
-and then submit a pull request. When it’s been merged, you can run:
-> git checkout master
-
-> git pull --rebase origin master
-
-> git remote prune origin
-
-# Make Input file lists
-
-
-> python TriggerStudies/NtupleAna/scripts/makeInputFiles.py  -i /store/user/jda102//BTagNTuples/2017RAW/crab_projects_v4/MuonEG/Run2017B-v1/190531_114955  -o inputFiles_2017B_RAW -n 500 -t 5
-
-# Add -r to actually run the command
-
+> wget https://raw.githubusercontent.com/cms-data/RecoBTag-Combined/master/DeepCSV_PhaseII.json -P RecoBTag/Combined/data/
