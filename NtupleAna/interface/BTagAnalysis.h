@@ -38,7 +38,7 @@ namespace TriggerStudies {
     bool doTracks = true;
     bool doCaloJets = true;
     bool doLeptonSel = false;
-    
+
     int histogramming = 1e6;
     int treeEvents;
     eventData* event;
@@ -58,7 +58,13 @@ namespace TriggerStudies {
     nTupleAnalysis::jetHists* hOffJetsPreOLap;
     nTupleAnalysis::jetHists* hOffJets;
     nTupleAnalysis::jetHists* hOffJets_matched;
+    nTupleAnalysis::jetHists* hOffJets_matched_eta1;
+    nTupleAnalysis::jetHists* hOffJets_matched_eta2;
+    nTupleAnalysis::jetHists* hOffJets_matched_eta3;
     nTupleAnalysis::jetHists* hOffJets_matchedJet;
+    nTupleAnalysis::jetHists* hOffJets_matchedJet_eta1;
+    nTupleAnalysis::jetHists* hOffJets_matchedJet_eta2;
+    nTupleAnalysis::jetHists* hOffJets_matchedJet_eta3;
     nTupleAnalysis::jetHists* hOffJets_matchedCalo;
     nTupleAnalysis::jetHists* hOffJets_matchedCaloJet;
 
@@ -94,15 +100,33 @@ namespace TriggerStudies {
 
 
     nTupleAnalysis::jetHists*  hOffJets_matched_L   ;
+    nTupleAnalysis::jetHists*  hOffJets_matched_L_eta1   ;
+    nTupleAnalysis::jetHists*  hOffJets_matched_L_eta2   ;
+    nTupleAnalysis::jetHists*  hOffJets_matched_L_eta3   ;
     nTupleAnalysis::jetHists*  hOffJets_matchedJet_L;
+    nTupleAnalysis::jetHists*  hOffJets_matchedJet_L_eta1;
+    nTupleAnalysis::jetHists*  hOffJets_matchedJet_L_eta2;
+    nTupleAnalysis::jetHists*  hOffJets_matchedJet_L_eta3;
     nTupleAnalysis::jetHists*  hOffJets_matchedCalo_L;
     nTupleAnalysis::jetHists*  hOffJets_matchedCaloJet_L;
     nTupleAnalysis::jetHists*  hOffJets_matched_B   ;
+    nTupleAnalysis::jetHists*  hOffJets_matched_B_eta1   ;
+    nTupleAnalysis::jetHists*  hOffJets_matched_B_eta2   ;
+    nTupleAnalysis::jetHists*  hOffJets_matched_B_eta3   ;
     nTupleAnalysis::jetHists*  hOffJets_matchedJet_B;
+    nTupleAnalysis::jetHists*  hOffJets_matchedJet_B_eta1;
+    nTupleAnalysis::jetHists*  hOffJets_matchedJet_B_eta2;
+    nTupleAnalysis::jetHists*  hOffJets_matchedJet_B_eta3;
     nTupleAnalysis::jetHists*  hOffJets_matchedCalo_B;
     nTupleAnalysis::jetHists*  hOffJets_matchedCaloJet_B;
     nTupleAnalysis::jetHists*  hOffJets_matched_C   ;
+    nTupleAnalysis::jetHists*  hOffJets_matched_C_eta1   ;
+    nTupleAnalysis::jetHists*  hOffJets_matched_C_eta2   ;
+    nTupleAnalysis::jetHists*  hOffJets_matched_C_eta3   ;
     nTupleAnalysis::jetHists*  hOffJets_matchedJet_C;
+    nTupleAnalysis::jetHists*  hOffJets_matchedJet_C_eta1;
+    nTupleAnalysis::jetHists*  hOffJets_matchedJet_C_eta2;
+    nTupleAnalysis::jetHists*  hOffJets_matchedJet_C_eta3;
     nTupleAnalysis::jetHists*  hOffJets_matchedCalo_C;
     nTupleAnalysis::jetHists*  hOffJets_matchedCaloJet_C;
 
@@ -165,7 +189,7 @@ namespace TriggerStudies {
     float OfflineDeepFlavourMediumCut = -99;
     float OnlineCSVCut            = -99;
     float OnlineDeepCSVCut        = -99;
-  
+
 
     TH1F*   hmttOff          ;
     TH1F*   hmttOff_isFromV0 ;
@@ -179,7 +203,7 @@ namespace TriggerStudies {
 
     //eventHists* allEvents   = NULL;
     //tagHists* passPreSel    = NULL;
-    
+
     long int nEvents = 0;
     std::vector<edm::LuminosityBlockRange> lumiMask;
     UInt_t prevLumiBlock = 0;
@@ -216,15 +240,15 @@ namespace TriggerStudies {
     ~BTagAnalysis();
 
     void OfflineToOnlineTrackMatching(const nTupleAnalysis::jetPtr& offJet, const nTupleAnalysis::trackPtr& offTrk,
-				      const nTupleAnalysis::jetPtr& hltJet, 
+				      const nTupleAnalysis::jetPtr& hltJet,
 				      float dRMatch);
 
     void OfflineToOnlineTrkTagMatching(const nTupleAnalysis::jetPtr& offJet, const nTupleAnalysis::trkTagVarPtr& offTrkTag,
-				       const nTupleAnalysis::jetPtr& hltJet, 
+				       const nTupleAnalysis::jetPtr& hltJet,
 				       float dRMatch);
 
     void OfflineToOnlineSVMatching(const nTupleAnalysis::svPtr& offSV,
-				   const nTupleAnalysis::jetPtr& hltJet, 
+				   const nTupleAnalysis::jetPtr& hltJet,
 				   float dRMatch);
 
 
@@ -237,4 +261,3 @@ namespace TriggerStudies {
 
 }
 #endif // BTagAnalysis_H
-

@@ -214,16 +214,16 @@ void eventData::update(int e){
   }
 
 
-  offJets  = offTreeJets->getJets(20,1e6,4.5);
-  pfJets   = pfTreeJets ->getJets(20,1e6,4.5);
+  offJets  = offTreeJets->getJets(30,1e6,4);
+  pfJets   = pfTreeJets ->getJets(30,1e6,4);
   if(doCaloJets)
     caloJets = caloTreeJets ->getJets(30,1e6,2.4);
 
   if(treeMuons)
-    muons    = treeMuons  ->getMuons(20, 2.4);
+    muons    = treeMuons  ->getMuons(30, 3.);
 
   if(treeElecs)
-    elecs    = treeElecs  ->getElecs(30, 2.4);
+    elecs    = treeElecs  ->getElecs(30, 3.);
 
 
   pvs    = treePVs     ->getVerticies();
