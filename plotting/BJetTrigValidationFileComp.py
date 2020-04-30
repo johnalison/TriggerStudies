@@ -21,13 +21,17 @@ print labName
 
 
 # plotDirs = ["offJets_matched","offJets_matchedJet",    "offJets_matchedCalo",   "offJets_matchedCaloJet"]
-plotDirs = ["offJets_matched","offJets_matchedJet"]
+plotDirs = ["offJets_matched","offJets_matchedJet",
+            "offJets_matched_eta1","offJets_matchedJet_eta1",
+            "offJets_matched_eta2","offJets_matchedJet_eta2",
+            "offJets_matched_eta3","offJets_matchedJet_eta3"]
 
 
 
 for v in ["tracks/ip3d_sig",
           "tracks/ip2d_sig",
-          "CSVv2_l",
+          # "CSVv2_l",
+          "probB",
           "DeepCSV_l",
           #"deepcsv_bb",
           "btags/sv_Flight2D",

@@ -26,9 +26,14 @@ from JetLevelPlotUtils import getCMSText
 
 inFile  = ROOT.TFile(o.inFile,  "READ")
 
+etaRanges = ["_eta1","_eta2","_eta3"]
+
 import os
 if not os.path.exists(o.outDir):
     os.makedirs(o.outDir)
+for etaRange in etaRanges:
+    if not os.path.exists(o.outDir+etaRange):
+        os.makedirs(o.outDir+etaRange)
 
 
 maxDict = {"jetNSelectedTracks":20,
@@ -116,17 +121,23 @@ def getHist(inFile,dir,var,binning,color):
 #    can.SaveAs(o.outDir+"/"+varName+".png")
 
 
-def doVarRatio(var,binning,xTitle,setLogy=1,minX=None,maxX=None,minY=None):
+def doVarRatio(var, binning, xTitle, setLogy=1, minX=None, maxX=None, minY=None, etaRange=None):
     if o.doCaloJets:
         offLF = getHist(inFile,"offJets_matchedCalo_L",          var,binning,ROOT.kBlack)
         hltLF = getHist(inFile,"offJets_matchedCaloJet_L",var,binning,ROOT.kBlack)
         offBQ = getHist(inFile,"offJets_matchedCalo_B",          var,binning,ROOT.kRed)
         hltBQ = getHist(inFile,"offJets_matchedCaloJet_B",var,binning,ROOT.kRed)
     else:
-        offLF = getHist(inFile,"offJets_matched_L",          var,binning,ROOT.kBlack)
-        hltLF = getHist(inFile,"offJets_matchedJet_L",var,binning,ROOT.kBlack)
-        offBQ = getHist(inFile,"offJets_matched_B",          var,binning,ROOT.kRed)
-        hltBQ = getHist(inFile,"offJets_matchedJet_B",var,binning,ROOT.kRed)
+        if etaRange:
+            offLF = getHist(inFile,"offJets_matched_L"+etaRange,          var,binning,ROOT.kBlack)
+            hltLF = getHist(inFile,"offJets_matchedJet_L"+etaRange,var,binning,ROOT.kBlack)
+            offBQ = getHist(inFile,"offJets_matched_B"+etaRange,          var,binning,ROOT.kRed)
+            hltBQ = getHist(inFile,"offJets_matchedJet_B"+etaRange,var,binning,ROOT.kRed)
+        else:
+            offLF = getHist(inFile,"offJets_matched_L",          var,binning,ROOT.kBlack)
+            hltLF = getHist(inFile,"offJets_matchedJet_L",var,binning,ROOT.kBlack)
+            offBQ = getHist(inFile,"offJets_matched_B",          var,binning,ROOT.kRed)
+            hltBQ = getHist(inFile,"offJets_matchedJet_B",var,binning,ROOT.kRed)
 
 
     maxY = max(offLF.GetMaximum(),offBQ.GetMaximum(),
@@ -187,11 +198,12 @@ def doVarRatio(var,binning,xTitle,setLogy=1,minX=None,maxX=None,minY=None):
         offLF.GetXaxis().SetRangeUser(offLF.GetXaxis().GetXmin(),maxDict[var] )
 
     offLF.Draw("hist")
-    #hltLF.SetMarkerSize(0.75)
+    # hltLF.SetMarkerSize(0.75)
+    hltLF.SetMarkerSize(0.5)
     #hltLF.SetMarkerStyle(21)
     hltLF.Draw("same pe")
     offBQ.Draw("hist same")
-    #hltBQ.SetMarkerSize(0.75)
+    hltBQ.SetMarkerSize(0.5)
     #hltBQ.SetMarkerStyle(21)
     hltBQ.Draw("same pe")
     leg.Draw("same")
@@ -235,7 +247,8 @@ def doVarRatio(var,binning,xTitle,setLogy=1,minX=None,maxX=None,minY=None):
 
     LFRatio.Draw("PE")
     LFRatio.Draw("PE same")
-    oldSize = LFRatio.GetMarkerSize()
+    # oldSize = LFRatio.GetMarkerSize()
+    oldSize = hltLF.GetMarkerSize()
     LFRatio.SetMarkerSize(0)
     LFRatio.DrawCopy("same e0")
     LFRatio.SetMarkerSize(oldSize)
@@ -244,7 +257,8 @@ def doVarRatio(var,binning,xTitle,setLogy=1,minX=None,maxX=None,minY=None):
 
     BQRatio.Draw("PE same")
     BQRatio.Draw("PE same")
-    oldSize = BQRatio.GetMarkerSize()
+    # oldSize = BQRatio.GetMarkerSize()
+    oldSize = hltBQ.GetMarkerSize()
     BQRatio.SetMarkerSize(0)
     BQRatio.DrawCopy("same e0")
     BQRatio.SetMarkerSize(oldSize)
@@ -316,8 +330,12 @@ def doVarRatio(var,binning,xTitle,setLogy=1,minX=None,maxX=None,minY=None):
 
     #varName = var.replace("tracks/","").replace("btags/","btags_")
     varName = var.replace("tracks/","track_").replace("btags/","btag_").replace("btags_noV0/","btag_noV0_")
-    canvas.SaveAs(o.outDir+"/"+varName+".pdf")
-    canvas.SaveAs(o.outDir+"/"+varName+".png")
+    if etaRange:
+        canvas.SaveAs(o.outDir+etaRange+"/"+varName+".pdf")
+        canvas.SaveAs(o.outDir+etaRange+"/"+varName+".png")
+    else:
+        canvas.SaveAs(o.outDir+"/"+varName+".pdf")
+        canvas.SaveAs(o.outDir+"/"+varName+".png")
     #canvas.SaveAs(o.outDir+"/"+var+".eps")
     #canvas.SaveAs(o.outDir+"/"+var+".png")
 
@@ -332,7 +350,7 @@ def doVarRatio(var,binning,xTitle,setLogy=1,minX=None,maxX=None,minY=None):
 
 for v in ["tracks/ip3d_sig",
           "tracks/ip2d_sig",
-          "CSVv2_l",
+          # "CSVv2_l",
           "DeepCSV_l",
           "probB",
           #"deepcsv_bb",
@@ -402,6 +420,7 @@ for v in ["tracks/ip3d_sig",
           #binning = [-100 , -90,-80 , -70  , -60 ,  -50 , -40 , -34 , -32 , -30 , -28 , -26 , -24 , -22 , -20 , -18 , -16 , -14 , -12 , -10 , -8 , -6 , -4 , -2 , 0 , 2 , 4 , 6 , 8 , 10 , 12 , 14 , 16 , 18 , 20 , 22 , 24 , 26 , 28 , 30 , 32 , 34 , 40 , 50 , 60 , 70 , 80, 90 , 100]
           #binning = [-100,-90,-80,-70,-60,-50,-40,-30,-20,-10,-5,0,5,10,15,20,30,40,50,60,70,80,90,100]
           )
+    for etaRange in etaRanges: doVarRatio(v,xTitle = v,binning = binning, etaRange=etaRange)
 
 
 
@@ -431,7 +450,7 @@ for v in [        "tracks/eta",
         #"trackEtaRel"         ,
         #"jetNSelectedTracks",
         #"mult",
-        #"nTrk",
+        # "nTrk",
         #"jetNTracksEtaRel",
 
                   "btags/chargedHadronMultiplicity",
@@ -472,6 +491,7 @@ for v in [        "tracks/eta",
           binning = binning,
           setLogy = 0,
           )
+    for etaRange in etaRanges: doVarRatio(v,xTitle = v,binning = binning,setLogy = 0, etaRange=etaRange)
 
 
 
@@ -493,6 +513,7 @@ for v in [
           binning = 1,
           setLogy = 0,
           )
+    for etaRange in etaRanges: doVarRatio(v,xTitle = v,binning = 1,setLogy = 0, etaRange=etaRange)
 
 
 for v in [
@@ -516,6 +537,7 @@ for v in [
           setLogy = 0,
                minY = 0,
          )
+    for etaRange in etaRanges: doVarRatio(v,xTitle = v,binning = 1,setLogy = 0,minY = 0, etaRange=etaRange)
 
 #
 #
@@ -541,6 +563,8 @@ for v in [
           minX = 0,
           maxX = 15
           )
+    for etaRange in etaRanges: doVarRatio(v,xTitle = v,binning = 1,setLogy = 0,          minX = 0,
+              maxX = 15, etaRange=etaRange)
 
 
 
