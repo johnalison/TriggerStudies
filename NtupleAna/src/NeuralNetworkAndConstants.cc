@@ -97,7 +97,7 @@ lwt::ValueMap NeuralNetworkAndConstants::compute(const nTupleAnalysis::jetPtr& j
   inputs_["trackSip2dSigAboveCharm"] = btagData->trackSip2dSigAboveCharm;
   inputs_["trackSip3dValAboveCharm"] = btagData->trackSip3dValAboveCharm;
   inputs_["trackSip3dSigAboveCharm"] = btagData->trackSip3dSigAboveCharm;
-  inputs_["vertexEnergyRatio"]       = btagData->vertexEnergyRatio;
+
   //cout << btagData->jetNTracksCSV << " vs " << jet->nseltracks << endl;
 
   inputs_["jetNSelectedTracks"]  = btagData->jetNTracks; 
@@ -110,7 +110,6 @@ lwt::ValueMap NeuralNetworkAndConstants::compute(const nTupleAnalysis::jetPtr& j
   inputs_["flightDistance2dSig"] = btagData->flightDistance2dSig;
   inputs_["flightDistance3dVal"] = btagData->flightDistance3dVal;
   inputs_["flightDistance3dSig"] = btagData->flightDistance3dSig;
-
 
   std::stringstream ss;
 
