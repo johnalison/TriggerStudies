@@ -15,13 +15,13 @@
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
 
 // Uncomment for SCL6
-#define BTagAnalysis_SLC6 1  
+// #define BTagAnalysis_SLC6 1  
 
 #if defined BTagAnalysis_SLC6
 #include "nTupleAnalysis/baseClasses/interface/myParameterSetReader.h"
 #else
 #include "FWCore/PythonParameterSet/interface/MakePyBind11ParameterSets.h"
-#endif 
+#endif
 
 
 #include "PhysicsTools/FWLite/interface/TFileService.h"
@@ -54,7 +54,7 @@ int main(int argc, char * argv[]){
   const edm::ParameterSet& process    = edm::readPSetsFrom(argv[1], argc, argv)->getParameter<edm::ParameterSet>("process");
 #else
   const edm::ParameterSet& process    = edm::cmspybind11::readPSetsFrom(argv[1], argc, argv)->getParameter<edm::ParameterSet>("process");
-#endif 
+#endif
 
   const edm::ParameterSet& parameters = process.getParameter<edm::ParameterSet>("BTagAnalyzer");
   bool debug = parameters.getParameter<bool>("debug");
@@ -73,7 +73,7 @@ int main(int argc, char * argv[]){
   //
   //lumiMask
   //
-  const edm::ParameterSet& inputs = process.getParameter<edm::ParameterSet>("inputs");   
+  const edm::ParameterSet& inputs = process.getParameter<edm::ParameterSet>("inputs");
   std::vector<edm::LuminosityBlockRange> lumiMask;
   if( !isMC && inputs.exists("lumisToProcess") ){
     std::vector<edm::LuminosityBlockRange> const & lumisTemp = inputs.getUntrackedParameter<std::vector<edm::LuminosityBlockRange> > ("lumisToProcess");
@@ -83,10 +83,10 @@ int main(int argc, char * argv[]){
   if(debug) for(auto lumiID: lumiMask) std::cout<<"lumiID "<<lumiID<<std::endl;
 
   //NANOAOD Input source
-  fwlite::InputSource inputHandler(process); 
+  fwlite::InputSource inputHandler(process);
 
   //
-  //  Add RAW Files 
+  //  Add RAW Files
   //
   TChain* treeRAW     = new TChain("btagana/ttree");
   for(unsigned int iFile=0; iFile<inputHandler.files().size(); ++iFile){
@@ -98,7 +98,7 @@ int main(int argc, char * argv[]){
 
 
   //
-  //  Add AOD Files 
+  //  Add AOD Files
   //
   TChain* treeAOD     = new TChain("btagana/ttree");
   for(unsigned int iFile=0; iFile<filesAOD.size(); ++iFile){
@@ -112,7 +112,7 @@ int main(int argc, char * argv[]){
   fwlite::OutputFiles histOutput(process);
   std::cout << "Event Loop Histograms: " << histOutput.file() << std::endl;
   fwlite::TFileService fsh = fwlite::TFileService(histOutput.file());
-    
+
   //
   // Define analysis and run event loop
   //
@@ -133,7 +133,7 @@ int main(int argc, char * argv[]){
     //  std::string lumiData = parameters.getParameter<std::string>("lumiData");
     //  a.getLumiData(lumiData);
     //}
-    
+
     int maxEvents = inputHandler.maxEvents();
     a.eventLoop(maxEvents, skipEvents);
   }
