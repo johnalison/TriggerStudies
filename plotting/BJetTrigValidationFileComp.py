@@ -14,17 +14,22 @@ from iUtils import parseOpts as parseOpts
 (options, args) = parseOpts()
 pm = getPM(options)
 
-
 print options.labName
 labName = options.labName.split(",")
 print labName
 
 
 # plotDirs = ["offJets_matched","offJets_matchedJet",    "offJets_matchedCalo",   "offJets_matchedCaloJet"]
-plotDirs = ["offJets_matched","offJets_matchedJet",
-            "offJets_matched_eta1","offJets_matchedJet_eta1",
-            "offJets_matched_eta2","offJets_matchedJet_eta2",
-            "offJets_matched_eta3","offJets_matchedJet_eta3"]
+if options.puppi:
+    plotDirs = ["offJets_matchedPuppi","offJets_matchedPuppiJet",
+                "offJets_matchedPuppi_eta1","offJets_matchedPuppiJet_eta1",
+                "offJets_matchedPuppi_eta2","offJets_matchedPuppiJet_eta2",
+                "offJets_matchedPuppi_eta3","offJets_matchedPuppiJet_eta3"]
+else:
+    plotDirs = ["offJets_matched","offJets_matchedJet",
+                "offJets_matched_eta1","offJets_matchedJet_eta1",
+                "offJets_matched_eta2","offJets_matchedJet_eta2",
+                "offJets_matched_eta3","offJets_matchedJet_eta3"]
 
 for v in ["tracks/ip3d_sig",
     "tracks/ip2d_sig",
@@ -62,11 +67,11 @@ for v in ["tracks/ip3d_sig",
     "pt_s",
     "pt_m",
     #"trackJetPt",
-    "trackSip2dSigAboveCharm",
-    "trackSip2dValAboveCharm",
-    "trackSip3dSigAboveCharm",
-    "trackSip3dValAboveCharm",
-    "trackSumJetDeltaR",
+    # "trackSip2dSigAboveCharm",
+    # "trackSip2dValAboveCharm",
+    # "trackSip3dSigAboveCharm",
+    # "trackSip3dValAboveCharm",
+    # "trackSumJetDeltaR",
     #"vertexFitProb",
 
     "tracks/PtRel"          ,

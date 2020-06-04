@@ -10,6 +10,7 @@ p = OptionParser()
 p.add_option('--input',  type = 'string', default = "outBTag.FTKBtagging.ttbar.mwt2.All.root", dest = 'inFile', help = 'intput File' )
 p.add_option('--output', type = 'string', default = "makeRocCurves", dest = 'outDir', help = 'output dir' )
 p.add_option('--doCaloJets',  action="store_true",help = 'output dir' )
+p.add_option('--doPuppiJets',  action="store_true",help = 'output dir' )
 p.add_option('--cmsText', type = 'string', default = "Work in Progress",  help = '' )
 #p.add_option('--lumiText', default = "",  help = '' )
 (o,a) = p.parse_args()
@@ -127,6 +128,17 @@ def doVarRatio(var, binning, xTitle, setLogy=1, minX=None, maxX=None, minY=None,
         hltLF = getHist(inFile,"offJets_matchedCaloJet_L",var,binning,ROOT.kBlack)
         offBQ = getHist(inFile,"offJets_matchedCalo_B",          var,binning,ROOT.kRed)
         hltBQ = getHist(inFile,"offJets_matchedCaloJet_B",var,binning,ROOT.kRed)
+    elif o.doPuppiJets:
+        if etaRange:
+            offLF = getHist(inFile,"offJets_matchedPuppi_L"+etaRange,          var,binning,ROOT.kBlack)
+            hltLF = getHist(inFile,"offJets_matchedPuppiJet_L"+etaRange,var,binning,ROOT.kBlack)
+            offBQ = getHist(inFile,"offJets_matchedPuppi_B"+etaRange,          var,binning,ROOT.kRed)
+            hltBQ = getHist(inFile,"offJets_matchedPuppiJet_B"+etaRange,var,binning,ROOT.kRed)
+        else:
+            offLF = getHist(inFile,"offJets_matchedPuppi_L",          var,binning,ROOT.kBlack)
+            hltLF = getHist(inFile,"offJets_matchedPuppiJet_L",var,binning,ROOT.kBlack)
+            offBQ = getHist(inFile,"offJets_matchedPuppi_B",          var,binning,ROOT.kRed)
+            hltBQ = getHist(inFile,"offJets_matchedPuppiJet_B",var,binning,ROOT.kRed)
     else:
         if etaRange:
             offLF = getHist(inFile,"offJets_matched_L"+etaRange,          var,binning,ROOT.kBlack)
