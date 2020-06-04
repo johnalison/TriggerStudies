@@ -15,6 +15,7 @@ eventData::eventData(TChain* _treeRAW, TChain* _treeAOD, bool mc, std::string y,
   debug = d;
 
   doCaloJets = jetDetailLevel.find("CaloJets") != std::string::npos;
+  doPuppiJets = jetDetailLevel.find("PuppiJets") != std::string::npos;
 
   treeEventsAOD = treeAOD->GetEntries();
 
@@ -122,6 +123,8 @@ eventData::eventData(TChain* _treeRAW, TChain* _treeAOD, bool mc, std::string y,
 
   if(doCaloJets)
     caloTreeJets = new nTupleAnalysis::jetData( "Jet",  treeRAW, true, false, jetDetailLevel, "CaloJet."     );
+  if(doPuppiJets)
+    puppiTreeJets = new nTupleAnalysis::jetData( "Jet",  treeRAW, true, false, jetDetailLevel, "PuppiJet."     );
 
 
   //treeMuons    = new nTupleAnalysis::muonData("PFMuon",     treeRAW);
@@ -218,6 +221,8 @@ void eventData::update(int e){
   pfJets   = pfTreeJets ->getJets(30,1e6,4);
   if(doCaloJets)
     caloJets = caloTreeJets ->getJets(30,1e6,2.4);
+  if(doPuppiJets)
+    puppiJets = puppiTreeJets ->getJets(30,1e6,4.);
 
   if(treeMuons)
     muons    = treeMuons  ->getMuons(30, 3.);

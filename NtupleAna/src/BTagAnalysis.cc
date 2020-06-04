@@ -27,8 +27,10 @@ const float OfflineDeepFlavourLooseCut2018   = 0.0494;
 // https://cmswbm.cern.ch/cmsdb/servlet/HLTPath?PATHID=2090546
 const float OnlineDeepCSVCutPF    = 0.24;
 const float OnlineDeepCSVCutCalo  = 0.17;
+const float OnlineDeepCSVCutPuppi  = 0.17;
 const float OnlineCSVCutPF        = 0.7;
 const float OnlineCSVCutCalo      = 0.5;
+const float OnlineCSVCutPuppi      = 0.5;
 
 
 // 2017
@@ -59,6 +61,7 @@ BTagAnalysis::BTagAnalysis(TChain* _eventsRAW, TChain* _eventsAOD, fwlite::TFile
 
   doTracks = jetDetailString.find("Tracks") != std::string::npos;
   doCaloJets = jetDetailString.find("CaloJets") != std::string::npos;
+  doPuppiJets = jetDetailString.find("PuppiJets") != std::string::npos;
 
   event      = new eventData(eventsRAW, eventsAOD, isMC, year, debug, jetDetailString);
   treeEvents = eventsRAW->GetEntries();
@@ -84,6 +87,7 @@ BTagAnalysis::BTagAnalysis(TChain* _eventsRAW, TChain* _eventsAOD, fwlite::TFile
   cutflowJets->AddCut("isProbe");
   cutflowJets->AddCut("hasHLTMatchPF");
   cutflowJets->AddCut("hasHLTMatchCalo");
+  cutflowJets->AddCut("hasHLTMatchPuppi");
 
 
   //
@@ -114,6 +118,17 @@ BTagAnalysis::BTagAnalysis(TChain* _eventsRAW, TChain* _eventsAOD, fwlite::TFile
   if(doCaloJets){
     hOffJets_matchedCalo    = new nTupleAnalysis::jetHists("offJets_matchedCalo",   fs, "", jetDetailString);
     hOffJets_matchedCaloJet = new nTupleAnalysis::jetHists("offJets_matchedCaloJet",fs, "", jetDetailString);
+  }
+  if(doPuppiJets){
+    hOffJetsPuppi                = new nTupleAnalysis::jetHists("offJetsPuppi",               fs, "", jetDetailString);
+    hOffJets_matchedPuppi             = new nTupleAnalysis::jetHists("offJets_matchedPuppi",   fs, "", jetDetailString);
+    hOffJets_matchedPuppi_eta1        = new nTupleAnalysis::jetHists("offJets_matchedPuppi_eta1",       fs, "", jetDetailString);
+    hOffJets_matchedPuppi_eta2        = new nTupleAnalysis::jetHists("offJets_matchedPuppi_eta2",       fs, "", jetDetailString);
+    hOffJets_matchedPuppi_eta3        = new nTupleAnalysis::jetHists("offJets_matchedPuppi_eta3",       fs, "", jetDetailString);
+    hOffJets_matchedPuppiJet          = new nTupleAnalysis::jetHists("offJets_matchedPuppiJet",fs, "", jetDetailString);
+    hOffJets_matchedPuppiJet_eta1     = new nTupleAnalysis::jetHists("offJets_matchedPuppiJet_eta1",    fs, "", jetDetailString);
+    hOffJets_matchedPuppiJet_eta2     = new nTupleAnalysis::jetHists("offJets_matchedPuppiJet_eta2",    fs, "", jetDetailString);
+    hOffJets_matchedPuppiJet_eta3     = new nTupleAnalysis::jetHists("offJets_matchedPuppiJet_eta3",    fs, "", jetDetailString);
   }
 
   hOffJet_matchedPFcsvTag         = new nTupleAnalysis::jetHists("offJets_matchedPFcsvTag",         fs, "");
@@ -150,6 +165,24 @@ BTagAnalysis::BTagAnalysis(TChain* _eventsRAW, TChain* _eventsAOD, fwlite::TFile
     hOffJetMedDeepFlav_matchedCaloJet      = new nTupleAnalysis::jetHists("offJetsMedDeepFlav_matchedCaloJet",      fs, "", "matchedBJet");
     hOffJetMedDeepFlav_matchedCaloDeepCSV  = new nTupleAnalysis::jetHists("offJetsMedDeepFlav_matchedCaloDeepCSV",  fs, "", "matchedBJet");
     hOffJetMedDeepFlav_matchedCaloCSV      = new nTupleAnalysis::jetHists("offJetsMedDeepFlav_matchedCaloCSV",      fs, "", "matchedBJet");
+  }
+  if(doPuppiJets){
+    hOffJet_matchedPuppicsvTag         = new nTupleAnalysis::jetHists("offJets_matchedPuppicsvTag",         fs, "");
+    hOffJet_matchedPuppicsvTagJet      = new nTupleAnalysis::jetHists("offJets_matchedPuppicsvTagJet",      fs, "");
+    hOffJet_matchedPuppiDeepcsvTag     = new nTupleAnalysis::jetHists("offJets_matchedPuppiDeepcsvTag",     fs, "");
+    hOffJet_matchedPuppiDeepcsvTagJet  = new nTupleAnalysis::jetHists("offJets_matchedPuppiDeepcsvTagJet",  fs, "");
+
+    hOffJetTightDeepCSV_matchedPuppiJet       = new nTupleAnalysis::jetHists("offJetsTight_matchedPuppiJet",       fs, "");
+    hOffJetMediumDeepCSV_matchedPuppiJet      = new nTupleAnalysis::jetHists("offJetsMedium_matchedPuppiJet",      fs, "");
+    hOffJetLooseDeepCSV_matchedPuppiJet       = new nTupleAnalysis::jetHists("offJetsLoose_matchedPuppiJet",       fs, "");
+
+    hOffJetMedDeepCSV_matchedPuppiJet      = new nTupleAnalysis::jetHists("offJetsMedDeepCSV_matchedPuppiJet",      fs, "", "matchedBJet");
+    hOffJetMedDeepCSV_matchedPuppiDeepCSV  = new nTupleAnalysis::jetHists("offJetsMedDeepCSV_matchedPuppiDeepCSV",  fs, "", "matchedBJet");
+    hOffJetMedDeepCSV_matchedPuppiCSV      = new nTupleAnalysis::jetHists("offJetsMedDeepCSV_matchedPuppiCSV",      fs, "", "matchedBJet");
+
+    hOffJetMedDeepFlav_matchedPuppiJet      = new nTupleAnalysis::jetHists("offJetsMedDeepFlav_matchedPuppiJet",      fs, "", "matchedBJet");
+    hOffJetMedDeepFlav_matchedPuppiDeepCSV  = new nTupleAnalysis::jetHists("offJetsMedDeepFlav_matchedPuppiDeepCSV",  fs, "", "matchedBJet");
+    hOffJetMedDeepFlav_matchedPuppiCSV      = new nTupleAnalysis::jetHists("offJetsMedDeepFlav_matchedPuppiCSV",      fs, "", "matchedBJet");
   }
 
   if(isMC){
@@ -190,6 +223,35 @@ BTagAnalysis::BTagAnalysis(TChain* _eventsRAW, TChain* _eventsAOD, fwlite::TFile
       hOffJets_matchedCalo_C    = new nTupleAnalysis::jetHists("offJets_matchedCalo_C",   fs, "");
       hOffJets_matchedCaloJet_C = new nTupleAnalysis::jetHists("offJets_matchedCaloJet_C",fs, "");
     }
+    if(doPuppiJets){
+      hOffJets_matchedPuppi_L             = new nTupleAnalysis::jetHists("offJets_matchedPuppi_L",   fs, "", jetDetailString);
+      hOffJets_matchedPuppi_L_eta1        = new nTupleAnalysis::jetHists("offJets_matchedPuppi_L_eta1",       fs, "", jetDetailString);
+      hOffJets_matchedPuppi_L_eta2        = new nTupleAnalysis::jetHists("offJets_matchedPuppi_L_eta2",       fs, "", jetDetailString);
+      hOffJets_matchedPuppi_L_eta3        = new nTupleAnalysis::jetHists("offJets_matchedPuppi_L_eta3",       fs, "", jetDetailString);
+      hOffJets_matchedPuppiJet_L          = new nTupleAnalysis::jetHists("offJets_matchedPuppiJet_L",fs, "", jetDetailString);
+      hOffJets_matchedPuppiJet_L_eta1     = new nTupleAnalysis::jetHists("offJets_matchedPuppiJet_L_eta1",    fs, "", jetDetailString);
+      hOffJets_matchedPuppiJet_L_eta2     = new nTupleAnalysis::jetHists("offJets_matchedPuppiJet_L_eta2",    fs, "", jetDetailString);
+      hOffJets_matchedPuppiJet_L_eta3     = new nTupleAnalysis::jetHists("offJets_matchedPuppiJet_L_eta3",    fs, "", jetDetailString);
+
+      hOffJets_matchedPuppi_B             = new nTupleAnalysis::jetHists("offJets_matchedPuppi_B",   fs, "", jetDetailString );
+      hOffJets_matchedPuppi_B_eta1        = new nTupleAnalysis::jetHists("offJets_matchedPuppi_B_eta1",       fs, "", jetDetailString );
+      hOffJets_matchedPuppi_B_eta2        = new nTupleAnalysis::jetHists("offJets_matchedPuppi_B_eta2",       fs, "", jetDetailString );
+      hOffJets_matchedPuppi_B_eta3        = new nTupleAnalysis::jetHists("offJets_matchedPuppi_B_eta3",       fs, "", jetDetailString );
+      hOffJets_matchedPuppiJet_B          = new nTupleAnalysis::jetHists("offJets_matchedPuppiJet_B",fs, "", jetDetailString );
+      hOffJets_matchedPuppiJet_B_eta1     = new nTupleAnalysis::jetHists("offJets_matchedPuppiJet_B_eta1",    fs, "", jetDetailString );
+      hOffJets_matchedPuppiJet_B_eta2     = new nTupleAnalysis::jetHists("offJets_matchedPuppiJet_B_eta2",    fs, "", jetDetailString );
+      hOffJets_matchedPuppiJet_B_eta3     = new nTupleAnalysis::jetHists("offJets_matchedPuppiJet_B_eta3",    fs, "", jetDetailString );
+
+      hOffJets_matchedPuppi_C             = new nTupleAnalysis::jetHists("offJets_matchedPuppi_C",   fs, "");
+      hOffJets_matchedPuppi_C_eta1        = new nTupleAnalysis::jetHists("offJets_matchedPuppi_C_eta1",       fs, "");
+      hOffJets_matchedPuppi_C_eta2        = new nTupleAnalysis::jetHists("offJets_matchedPuppi_C_eta2",       fs, "");
+      hOffJets_matchedPuppi_C_eta3        = new nTupleAnalysis::jetHists("offJets_matchedPuppi_C_eta3",       fs, "");
+      //hOffJets_matchedPuppiJet_C          = new nTupleAnalysis::jetHists("offJets_matchedPuppiJet_C",fs, "");
+      hOffJets_matchedPuppiJet_C          = new nTupleAnalysis::jetHists("offJets_matchedPuppiJet_C",    fs, "");
+      hOffJets_matchedPuppiJet_C_eta1     = new nTupleAnalysis::jetHists("offJets_matchedPuppiJet_C_eta1",    fs, "");
+      hOffJets_matchedPuppiJet_C_eta2     = new nTupleAnalysis::jetHists("offJets_matchedPuppiJet_C_eta2",    fs, "");
+      hOffJets_matchedPuppiJet_C_eta3     = new nTupleAnalysis::jetHists("offJets_matchedPuppiJet_C_eta3",    fs, "");
+    }
 
 
   }
@@ -201,6 +263,10 @@ BTagAnalysis::BTagAnalysis(TChain* _eventsRAW, TChain* _eventsAOD, fwlite::TFile
   if(doCaloJets){
     hCaloJets            = new nTupleAnalysis::jetHists("caloJets",           fs, "");
     hCaloJets_matched    = new nTupleAnalysis::jetHists("caloJets_matched",           fs, "");
+  }
+  if(doPuppiJets){
+    hPuppiJets            = new nTupleAnalysis::jetHists("puppiJets",           fs, "");
+    hPuppiJets_matched    = new nTupleAnalysis::jetHists("puppiJets_matched",           fs, "");
   }
 
 
@@ -228,6 +294,18 @@ BTagAnalysis::BTagAnalysis(TChain* _eventsRAW, TChain* _eventsAOD, fwlite::TFile
       hCaloTracks_matched    = new nTupleAnalysis::trackHists("caloTracks_matched",fs, "");
       hCaloTracks_unmatched  = new nTupleAnalysis::trackHists("caloTracks_unmatched",fs, "");
     }
+    if(doPuppiJets){
+      hOffTracksPuppi                = new nTupleAnalysis::trackHists("offTracksPuppi",fs, "");
+      hOffTracksPuppi_unmatched      = new nTupleAnalysis::trackHists("offTracksPuppi_unmatched",fs, "");
+      hOffTracksPuppi_matched        = new nTupleAnalysis::trackHists("offTracksPuppi_matched",fs, "");
+      hOffTracksPuppi_noV0           = new nTupleAnalysis::trackHists("offTracksPuppi_noV0",fs, "");
+      hOffTracksPuppi_matched_noV0   = new nTupleAnalysis::trackHists("offTracksPuppi_matched_noV0",fs, "");
+
+      hPuppiTracks            = new nTupleAnalysis::trackHists("puppiTracks",fs, "");
+      hPuppiTracks_noV0       = new nTupleAnalysis::trackHists("puppiTracks_noV0",fs, "");
+      hPuppiTracks_matched    = new nTupleAnalysis::trackHists("puppiTracks_matched",fs, "");
+      hPuppiTracks_unmatched  = new nTupleAnalysis::trackHists("puppiTracks_unmatched",fs, "");
+    }
 
     hOffBTagsAll        = new nTupleAnalysis::btaggingHists("offBTagsAll",fs, "");
     hOffBTags           = new nTupleAnalysis::btaggingHists("offBTags",fs, "");
@@ -240,6 +318,10 @@ BTagAnalysis::BTagAnalysis(TChain* _eventsRAW, TChain* _eventsAOD, fwlite::TFile
     hPfBTags_matched   = new nTupleAnalysis::btaggingHists("pfBTags_matched",fs, "");
     hPfBTags_unmatched = new nTupleAnalysis::btaggingHists("pfBTags_unmatched",fs, "");
 
+    hPuppiBTags           = new nTupleAnalysis::btaggingHists("puppiBTags",fs, "");
+    hPuppiBTags_matched   = new nTupleAnalysis::btaggingHists("puppiBTags_matched",fs, "");
+    hPuppiBTags_unmatched = new nTupleAnalysis::btaggingHists("puppiBTags_unmatched",fs, "");
+
     hDeltaROffPf       = dir.make<TH1F>("dR_OffPf",            "BTagAnalysis/dR_OffPf;             DeltaR;   Entries", 100,-0.01, 5);
 
     hmttOff           = dir.make<TH1F>("mtt_off",            "BTagAnalysis/mtt_off;             mtt;   Entries", 100,-0.01, 2);
@@ -249,6 +331,10 @@ BTagAnalysis::BTagAnalysis(TChain* _eventsRAW, TChain* _eventsAOD, fwlite::TFile
     if(doCaloJets){
       hmttCalo            = dir.make<TH1F>("mtt_calo",             "BTagAnalysis/mtt_calo;              mtt;   Entries", 100,-0.01, 2);
       hmttCalo_isFromV0   = dir.make<TH1F>("mtt_calo_isFromV0",    "BTagAnalysis/mtt_calo_isFromV0;     mtt;   Entries", 100,-0.01, 2);
+    }
+    if(doPuppiJets){
+      hmttPuppi            = dir.make<TH1F>("mtt_puppi",             "BTagAnalysis/mtt_puppi;              mtt;   Entries", 100,-0.01, 2);
+      hmttPuppi_isFromV0   = dir.make<TH1F>("mtt_puppi_isFromV0",    "BTagAnalysis/mtt_puppi_isFromV0;     mtt;   Entries", 100,-0.01, 2);
     }
   }
 
@@ -521,6 +607,7 @@ int BTagAnalysis::processEvent(){
   unsigned int nOffJets             = 0;
   unsigned int nOffJets_matched     = 0;
   unsigned int nOffJets_matchedCalo = 0;
+  unsigned int nOffJets_matchedPuppi = 0;
 
   for(const nTupleAnalysis::jetPtr& offJet : event->offJets){
     cutflowJets->Fill("all", eventWeight);
@@ -583,6 +670,9 @@ int BTagAnalysis::processEvent(){
     //
     ++nOffJets;
     hOffJets->Fill(offJet,eventWeight);
+    if(doPuppiJets){
+      hOffJetsPuppi->Fill(offJet,eventWeight);
+    }
     for(const nTupleAnalysis::trkTagVarPtr& trkTag: offJet->trkTagVars) {
       hOffBTagsAll->FillTrkTagVarHists(trkTag, eventWeight);
     }
@@ -671,6 +761,32 @@ int BTagAnalysis::processEvent(){
 	++nOffJets_matchedCalo;
       }
     }
+    //
+    //  Puppi Jets
+    //
+    if(doPuppiJets){
+      float dRPuppi = 1e6;
+      nTupleAnalysis::jetPtr matchedPuppiJet = nullptr;
+
+      for(const nTupleAnalysis::jetPtr& puppiJet : event->puppiJets){
+	float this_dR = puppiJet->p.DeltaR(offJet->p);
+	if (this_dR < dRPuppi){
+	  dRPuppi = this_dR;
+	  matchedPuppiJet = puppiJet;
+	}
+      }
+
+
+      if( dRPuppi < 0.4){
+
+	cutflowJets->Fill("hasHLTMatchPuppi", eventWeight);
+  offJet->matchedJet = matchedPuppiJet;
+
+	PuppiJetAnalysis(offJet,matchedPuppiJet,eventWeight);
+
+	++nOffJets_matchedPuppi;
+      }
+    }
   }//offJets
 
 
@@ -681,6 +797,12 @@ int BTagAnalysis::processEvent(){
   if(doCaloJets){
     hOffJets_matchedCalo->nJets->Fill(nOffJets_matchedCalo,eventWeight);
     hOffJets_matchedCaloJet->nJets->Fill(nOffJets_matchedCalo,eventWeight);
+  }
+  if(doPuppiJets){
+    hOffJetsPuppi           ->nJets->Fill(nOffJets        ,eventWeight);
+    //hOffJets_matchedPuppi->nJets->Fill(nOffJets_matchedPuppi,eventWeight);
+    hOffJets_matchedPuppi->nJets->Fill(nOffJets_matchedPuppi,eventWeight);
+    hOffJets_matchedPuppiJet->nJets->Fill(nOffJets_matchedPuppi,eventWeight);
   }
 
 
@@ -751,6 +873,46 @@ int BTagAnalysis::processEvent(){
 	//	caloJetHists_matchedB.Fill(caloJet);
 	//	else
 	//	  caloJetHists_matchedL.Fill(caloJet);
+      }
+    }
+  }
+
+  //
+  //  Puppi Jets
+  //
+
+  if(doPuppiJets){
+    for(const nTupleAnalysis::jetPtr& puppiJet : event->puppiJets){
+      if(fabs(puppiJet->eta) > 4) continue;
+      if(puppiJet->pt       < 30)   continue;
+
+      //puppiJetHistsPreOLap.Fill(puppiJet);
+      if(nTupleAnalysis::failOverlap(puppiJet->p,event->elecs, 0.4)) continue;
+      if(nTupleAnalysis::failOverlap(puppiJet->p,event->muons, 0.4)) continue;
+
+      hPuppiJets->Fill(puppiJet, eventWeight);
+
+      if(puppiJet->DeepCSV > 1)
+	cout << "Error " << "Offline" << " DeepCSV is " << puppiJet->DeepCSV << endl;
+
+      if(puppiJet->DeepCSVb > 1)
+	cout << "Error " << "Offline" << " DeepCSVb is " << puppiJet->DeepCSVb << endl;
+
+      if(puppiJet->DeepCSVbb > 1)
+	cout << "Error " << "Offline" << " DeepCSVbb is " << puppiJet->DeepCSVbb << endl;
+
+    if(puppiJet->DeepCSVb > 1)
+      std::cout << "Error " << "Offline" << " DeepCSVb is " << puppiJet->DeepCSVb << std::endl;
+
+
+      const nTupleAnalysis::jetPtr puppiJetMatchedJet = puppiJet->matchedJet.lock();
+      if(puppiJetMatchedJet){
+	hPuppiJets_matched->Fill(puppiJet, eventWeight);
+
+	//if(puppiJet->m_matchedJet->m_hadronFlavour == 5)
+	//	puppiJetHists_matchedB.Fill(puppiJet);
+	//	else
+	//	  puppiJetHists_matchedL.Fill(puppiJet);
       }
     }
   }
@@ -1427,4 +1589,323 @@ void BTagAnalysis::CaloJetAnalysis(const nTupleAnalysis::jetPtr& offJet,const nT
 
 
   return;
+}
+
+void BTagAnalysis::PuppiJetAnalysis(const nTupleAnalysis::jetPtr& offJet,const nTupleAnalysis::jetPtr& hltJet, float weight){
+
+
+      if(doTracks){
+
+        //
+        //  Off tracks
+        //
+        unsigned int nOffTracks = 0;
+        unsigned int nOffTracks_matched = 0;
+        unsigned int nOffTracks_noV0 = 0;
+        unsigned int nOffTracks_matched_noV0 = 0;
+
+
+        for(const nTupleAnalysis::trackPtr& offTrack: offJet->tracks){
+
+          //
+          //  track mass calculation
+          //
+          for(const nTupleAnalysis::trackPtr& offTrack_pair: offJet->tracks){
+            if(offTrack == offTrack_pair) continue;
+            float thisMass = (offTrack->p + offTrack_pair->p).M();
+
+            // hmttOff->Fill(thisMass , weight);
+            // if(offTrack->isfromV0)
+    	  // hmttOff_isFromV0->Fill(thisMass , weight);
+
+          }
+
+          //need to check that the track (with matching resolution cone r=0.01) is in region where R=0.3 circles inside the two jets overlap!
+          //if offTrack.dR > 0.29 - offJet.match_dR: continue
+          if(offTrack->dR                  > 0.29) continue; // offTrack is not in cone of offJet
+          if(offTrack->p.DeltaR(hltJet->p) > 0.29) continue; // offTrack is not in cone of puppiJet
+
+
+          hOffTracksPuppi->Fill(offTrack, weight);
+          ++nOffTracks;
+          if(!offTrack->isfromV0){
+            hOffTracksPuppi_noV0->Fill(offTrack, weight);
+            ++nOffTracks_noV0;
+          }
+
+          //
+          //  Match offline track with PF Track
+          //
+          OfflineToOnlineTrackMatching(offJet, offTrack, hltJet, 0.01);
+
+          const nTupleAnalysis::trackPtr offTrackMatchedTrack = offTrack->matchedTrack.lock();
+
+          if(offTrackMatchedTrack){
+
+    	if(!offTrack->isfromV0 && !offTrackMatchedTrack->isfromV0){
+    	  hOffTracksPuppi_matched_noV0->Fill(offTrack, weight);
+    	  ++nOffTracks_matched_noV0;
+    	}
+
+    	++nOffTracks_matched;
+    	hOffTracksPuppi_matched    ->Fill(offTrack, weight);
+    	hPuppiTracks_matched ->Fill(offTrackMatchedTrack,weight);
+
+          }else{
+            hOffTracksPuppi_unmatched->Fill(offTrack, weight);
+          }
+
+        }//off Tracks
+
+        hOffTracksPuppi             ->nTracks->Fill(nOffTracks, weight);
+        hOffTracksPuppi_matched     ->nTracks->Fill(nOffTracks_matched, weight);
+        hOffTracksPuppi_noV0        ->nTracks->Fill(nOffTracks_noV0, weight);
+        hOffTracksPuppi_matched_noV0->nTracks->Fill(nOffTracks_matched_noV0, weight);
+
+
+        //
+        //  Off BTags trkTagVars
+        //
+        unsigned int nTrkTags = 0;
+        unsigned int nTrkTags_matched = 0;
+        unsigned int nTrkTags_noV0 = 0;
+        unsigned int nTrkTags_matched_noV0 = 0;
+
+        for(const nTupleAnalysis::trkTagVarPtr& offTrkTag: offJet->trkTagVars){
+
+          //need to check that the track (with matching resolution cone r=0.01) is in region where R=0.3 circles inside the two jets overlap!
+          //if offTrack.dR > 0.29 - offJet.match_dR: continue
+          if(offTrkTag->trackDeltaR                              > 0.29) continue; // offTrack is not in cone of offJet
+          if(offTrkTag->p.DeltaR(hltJet->p) > 0.29) continue; // offTrack is not in cone of puppiJet
+
+          hOffBTags->FillTrkTagVarHists(offTrkTag, weight);
+          ++nTrkTags;
+
+          if(!offTrkTag->matchIsFromV0){
+            hOffBTags_noV0->FillTrkTagVarHists(offTrkTag, weight);
+            ++nTrkTags_noV0;
+          }
+
+          OfflineToOnlineTrkTagMatching(offJet, offTrkTag, hltJet, 0.01);
+
+          const nTupleAnalysis::trkTagVarPtr offTrackMatchedTrkTag = offTrkTag->matchedTrkTagVar.lock();
+          if(offTrackMatchedTrkTag){
+
+    	if(!offTrkTag->matchIsFromV0 && !offTrackMatchedTrkTag->matchIsFromV0){
+    	  hOffBTags_matched_noV0->FillTrkTagVarHists(offTrkTag, weight);
+    	  ++nTrkTags_matched_noV0;
+    	}
+
+    	++nTrkTags_matched;
+    	//cout << "Filling offBTag_match" << endl;
+    	hOffBTags_matched    ->FillTrkTagVarHists(offTrkTag, weight);
+    	//const nTupleAnalysis::trackPtr offTrackMatchedTrkTag = offTrkTag->matchedTrkTagVar.lock();
+    	//hPuppiTracks_matched ->FillTrkTagVarHists(offTrackMatchedTrkTag,weight);
+          }else{
+    	hOffBTags_unmatched    ->FillTrkTagVarHists(offTrkTag, weight);
+          }
+
+        }//OffTrkTag
+
+        hOffBTags             ->trkTag_nTracks->Fill(nTrkTags, weight);
+        hOffBTags_matched     ->trkTag_nTracks->Fill(nTrkTags_matched, weight);
+        hOffBTags_noV0        ->trkTag_nTracks->Fill(nTrkTags_noV0, weight);
+        hOffBTags_matched_noV0->trkTag_nTracks->Fill(nTrkTags_matched_noV0, weight);
+
+
+        //
+        //  Off BTags SVs
+        //
+        for(const nTupleAnalysis::svPtr& offSV: offJet->svs){
+
+          OfflineToOnlineSVMatching(offSV, hltJet, 0.01);
+
+        }//OffTrkTag
+
+
+        //
+        // PF Tracks
+        //
+        unsigned int nPuppiTracks = 0;
+        unsigned int nPuppiTracks_matched = 0;
+        unsigned int nPuppiTracks_noV0 = 0;
+        for(const nTupleAnalysis::trackPtr& puppiTrack: hltJet->tracks){
+
+          //
+          //  track mass calculation
+          //
+          for(const nTupleAnalysis::trackPtr& puppiTrack_pair: hltJet->tracks){
+            if(puppiTrack == puppiTrack_pair) continue;
+            float thisMass = (puppiTrack->p + puppiTrack_pair->p).M();
+
+            hmttPuppi->Fill(thisMass , weight);
+            if(puppiTrack->isfromV0)
+    	  hmttPuppi_isFromV0->Fill(thisMass , weight);
+
+          }
+
+          //need to check that the track (with matching resolution cone r=0.01) is in region where R=0.3 circles inside the two jets overlap!
+          if(puppiTrack->dR                  > 0.29) continue; // puppiTrack is not in cone of puppiJet
+          if(puppiTrack->p.DeltaR(offJet->p) > 0.29) continue; // puppiTrack is not in cone of offJet
+
+          hPuppiTracks->Fill(puppiTrack, weight); //all puppitracks in matched jets
+          hPuppiTracks->FillMatchStats(puppiTrack, weight); //check how often we match puppiTracks to more than one offTrack
+          ++nPuppiTracks;
+
+          if(!puppiTrack->isfromV0){
+            hPuppiTracks_noV0->Fill(puppiTrack, weight); //all puppitracks in matched jets
+            ++nPuppiTracks_noV0;
+          }
+
+          if(!puppiTrack->nMatches){
+            hPuppiTracks_unmatched->Fill(puppiTrack, weight); //all unmatched puppitracks
+            hPuppiTracks_unmatched->FillMatchStats(puppiTrack, weight);
+          }else{
+            hPuppiTracks_matched->FillMatchStats(puppiTrack, weight);
+            ++nPuppiTracks_matched;
+          }
+        }// puppiTracks
+
+        hPuppiTracks              ->nTracks->Fill(nPuppiTracks, weight);
+        hPuppiTracks_matched      ->nTracks->Fill(nPuppiTracks_matched, weight);
+        hPuppiTracks_noV0         ->nTracks->Fill(nPuppiTracks_noV0, weight);
+        //hOffTracks_matched_noV0->nTracks->Fill(nOffTracks_matched_noV0, weight);
+
+
+        //
+        //  Puppi BTags
+        //
+        unsigned int nPuppiTrkTags = 0;
+
+        for(const nTupleAnalysis::trkTagVarPtr& puppiTrkTag: hltJet->trkTagVars){
+          //need to check that the track (with matching resolution cone r=0.01) is in region where R=0.3 circles inside the two jets overlap!
+          //if offTrack.dR > 0.29 - offJet.match_dR: continue
+          if(puppiTrkTag->trackDeltaR                              > 0.29) continue; // offTrack is not in cone of offJet
+          if(puppiTrkTag->p.DeltaR(offJet->p) > 0.29) continue; // offTrack is not in cone of puppiJet
+
+
+          hPuppiBTags->FillTrkTagVarHists(puppiTrkTag, weight);
+          const nTupleAnalysis::trkTagVarPtr puppiTrkTagMatch = puppiTrkTag->matchedTrkTagVar.lock();
+          if(puppiTrkTagMatch){
+    	hPuppiBTags_matched  ->FillTrkTagVarHists(puppiTrkTag, weight);
+          }else{
+    	hPuppiBTags_unmatched->FillTrkTagVarHists(puppiTrkTag, weight);
+          }
+
+          ++nPuppiTrkTags;
+
+        }//OffTrkTag
+
+        hPuppiBTags             ->trkTag_nTracks->Fill(nPuppiTrkTags, weight);
+
+      }//doTracks
+
+      //
+      // Jet info
+      //
+      hOffJets_matchedPuppi->Fill(offJet,weight);
+      hOffJets_matchedPuppiJet->Fill(hltJet,weight);
+      if(abs(hltJet->p.Eta())<1.5){
+          hOffJets_matchedPuppi_eta1->Fill(offJet,weight);
+          hOffJets_matchedPuppiJet_eta1->Fill(hltJet,weight);
+      }
+      if(abs(hltJet->p.Eta())>=1.5 && abs(hltJet->p.Eta())<3.){
+          hOffJets_matchedPuppi_eta2->Fill(offJet,weight);
+          hOffJets_matchedPuppiJet_eta2->Fill(hltJet,weight);
+      }
+      if(abs(hltJet->p.Eta())>=3){
+          hOffJets_matchedPuppi_eta3->Fill(offJet,weight);
+          hOffJets_matchedPuppiJet_eta3->Fill(hltJet,weight);
+      }
+
+      //
+      // Offline Btaggs
+      //
+      if((offJet->DeepCSV > OfflineDeepCSVTightCut))
+        hOffJetTightDeepCSV_matchedPuppiJet->Fill(hltJet, weight);
+      if((offJet->DeepCSV > OfflineDeepCSVMediumCut)){
+        hOffJetMediumDeepCSV_matchedPuppiJet->Fill(hltJet, weight);
+        hOffJetMedDeepCSV_matchedPuppiJet    ->Fill(offJet, weight);
+        if(hltJet->CSVv2   > OnlineCSVCutPuppi)     hOffJetMedDeepCSV_matchedPuppiCSV    ->Fill(offJet, weight);
+        if(hltJet->DeepCSV > OnlineDeepCSVCutPuppi) hOffJetMedDeepCSV_matchedPuppiDeepCSV->Fill(offJet, weight);
+      }
+
+      if((offJet->DeepCSV > OfflineDeepCSVLooseCut))
+        hOffJetLooseDeepCSV_matchedPuppiJet->Fill(hltJet, weight);
+
+      if(offJet->deepFlavB > OfflineDeepFlavourMediumCut){
+        hOffJetMedDeepFlav_matchedPuppiJet ->Fill(offJet, weight);
+        if(hltJet->CSVv2   > OnlineCSVCutPuppi)     hOffJetMedDeepFlav_matchedPuppiCSV    ->Fill(offJet, weight);
+        if(hltJet->DeepCSV > OnlineDeepCSVCutPuppi) hOffJetMedDeepFlav_matchedPuppiDeepCSV->Fill(offJet, weight);
+      }
+
+      //
+      // If pass CVS working point
+      //
+      if(hltJet->CSVv2 >= OnlineCSVCutPuppi){
+        hOffJet_matchedPuppicsvTag   ->Fill(offJet, weight);
+        hOffJet_matchedPuppicsvTagJet->Fill(hltJet, weight);
+      }
+
+
+      //
+      // If pass DeepCVS working point
+      //
+      if(hltJet->DeepCSV >= OnlineDeepCSVCutPuppi){
+        hOffJet_matchedPuppiDeepcsvTag   ->Fill(offJet, weight);
+        hOffJet_matchedPuppiDeepcsvTagJet->Fill(hltJet, weight);
+      }
+
+
+      if(isMC){
+        if(offJet->hadronFlavour == 5){
+          hOffJets_matchedPuppi_B->Fill(offJet, weight);
+          hOffJets_matchedPuppiJet_B->Fill(hltJet, weight);
+          if(abs(hltJet->p.Eta())<1.5){
+              hOffJets_matchedPuppi_B_eta1->Fill(offJet, weight);
+              hOffJets_matchedPuppiJet_B_eta1->Fill(hltJet,weight);
+          }
+          if(abs(hltJet->p.Eta())>=1.5 && abs(hltJet->p.Eta())<3.){
+              hOffJets_matchedPuppi_B_eta2->Fill(offJet, weight);
+              hOffJets_matchedPuppiJet_B_eta2->Fill(hltJet,weight);
+          }
+          if(abs(hltJet->p.Eta())>=3){
+              hOffJets_matchedPuppi_B_eta3->Fill(offJet, weight);
+              hOffJets_matchedPuppiJet_B_eta3->Fill(hltJet,weight);
+          }
+        }else if(offJet->hadronFlavour == 4){
+          hOffJets_matchedPuppi_C->Fill(offJet, weight);
+          hOffJets_matchedPuppiJet_C->Fill(hltJet, weight);
+          if(abs(hltJet->p.Eta())<1.5){
+              hOffJets_matchedPuppi_C_eta1->Fill(offJet, weight);
+              hOffJets_matchedPuppiJet_C_eta1->Fill(hltJet,weight);
+          }
+          if(abs(hltJet->p.Eta())>=1.5 && abs(hltJet->p.Eta())<3.){
+              hOffJets_matchedPuppi_C_eta2->Fill(offJet, weight);
+              hOffJets_matchedPuppiJet_C_eta2->Fill(hltJet,weight);
+          }
+          if(abs(hltJet->p.Eta())>=3){
+              hOffJets_matchedPuppi_C_eta3->Fill(offJet, weight);
+              hOffJets_matchedPuppiJet_C_eta3->Fill(hltJet,weight);
+          }
+        }else if(offJet->hadronFlavour == 0){
+          hOffJets_matchedPuppi_L->Fill(offJet, weight);
+          hOffJets_matchedPuppiJet_L->Fill(hltJet, weight);
+          if(abs(hltJet->p.Eta())<1.5){
+              hOffJets_matchedPuppi_L_eta1->Fill(offJet, weight);
+              hOffJets_matchedPuppiJet_L_eta1->Fill(hltJet,weight);
+          }
+          if(abs(hltJet->p.Eta())>=1.5 && abs(hltJet->p.Eta())<3.){
+              hOffJets_matchedPuppi_L_eta2->Fill(offJet, weight);
+              hOffJets_matchedPuppiJet_L_eta2->Fill(hltJet,weight);
+          }
+          if(abs(hltJet->p.Eta())>=3){
+              hOffJets_matchedPuppi_L_eta3->Fill(offJet, weight);
+              hOffJets_matchedPuppiJet_L_eta3->Fill(hltJet,weight);
+          }
+        }
+      }
+
+
+      return;
 }

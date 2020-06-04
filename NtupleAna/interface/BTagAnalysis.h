@@ -39,12 +39,13 @@ namespace TriggerStudies {
 
     bool doTracks = true;
     bool doCaloJets = true;
+    bool doPuppiJets = true;
     bool doLeptonSel = false;
 
     int histogramming = 1e6;
     int treeEvents;
     eventData* event;
-    
+
     nTupleAnalysis::eventHists* hEvents;
     nTupleAnalysis::eventHists* hEventsNoPUWeight;
 
@@ -70,6 +71,15 @@ namespace TriggerStudies {
     nTupleAnalysis::jetHists* hOffJets_matchedCalo;
     nTupleAnalysis::jetHists* hOffJets_matchedCaloJet;
 
+    nTupleAnalysis::jetHists* hOffJetsPuppi;
+    nTupleAnalysis::jetHists* hOffJets_matchedPuppi;
+    nTupleAnalysis::jetHists* hOffJets_matchedPuppiJet;
+    nTupleAnalysis::jetHists* hOffJets_matchedPuppi_eta1;
+    nTupleAnalysis::jetHists* hOffJets_matchedPuppi_eta2;
+    nTupleAnalysis::jetHists* hOffJets_matchedPuppi_eta3;
+    nTupleAnalysis::jetHists* hOffJets_matchedPuppiJet_eta1;
+    nTupleAnalysis::jetHists* hOffJets_matchedPuppiJet_eta2;
+    nTupleAnalysis::jetHists* hOffJets_matchedPuppiJet_eta3;
 
     nTupleAnalysis::jetHists*    hOffJet_matchedPFcsvTag         ;
     nTupleAnalysis::jetHists*    hOffJet_matchedPFcsvTagJet      ;
@@ -99,6 +109,21 @@ namespace TriggerStudies {
     nTupleAnalysis::jetHists*    hOffJetMedDeepFlav_matchedCaloJet      ;
     nTupleAnalysis::jetHists*    hOffJetMedDeepFlav_matchedCaloDeepCSV  ;
     nTupleAnalysis::jetHists*    hOffJetMedDeepFlav_matchedCaloCSV      ;
+
+
+    nTupleAnalysis::jetHists*    hOffJet_matchedPuppicsvTag         ;
+    nTupleAnalysis::jetHists*    hOffJet_matchedPuppicsvTagJet      ;
+    nTupleAnalysis::jetHists*    hOffJet_matchedPuppiDeepcsvTag     ;
+    nTupleAnalysis::jetHists*    hOffJet_matchedPuppiDeepcsvTagJet  ;
+    nTupleAnalysis::jetHists*    hOffJetTightDeepCSV_matchedPuppiJet       ;
+    nTupleAnalysis::jetHists*    hOffJetMediumDeepCSV_matchedPuppiJet      ;
+    nTupleAnalysis::jetHists*    hOffJetMedDeepCSV_matchedPuppiJet      ;
+    nTupleAnalysis::jetHists*    hOffJetMedDeepCSV_matchedPuppiDeepCSV  ;
+    nTupleAnalysis::jetHists*    hOffJetMedDeepCSV_matchedPuppiCSV      ;
+    nTupleAnalysis::jetHists*    hOffJetLooseDeepCSV_matchedPuppiJet       ;
+    nTupleAnalysis::jetHists*    hOffJetMedDeepFlav_matchedPuppiJet      ;
+    nTupleAnalysis::jetHists*    hOffJetMedDeepFlav_matchedPuppiDeepCSV  ;
+    nTupleAnalysis::jetHists*    hOffJetMedDeepFlav_matchedPuppiCSV      ;
 
 
     nTupleAnalysis::jetHists*  hOffJets_matched_L   ;
@@ -132,6 +157,30 @@ namespace TriggerStudies {
     nTupleAnalysis::jetHists*  hOffJets_matchedCalo_C;
     nTupleAnalysis::jetHists*  hOffJets_matchedCaloJet_C;
 
+    nTupleAnalysis::jetHists*  hOffJets_matchedPuppi_L;
+    nTupleAnalysis::jetHists*  hOffJets_matchedPuppi_L_eta1   ;
+    nTupleAnalysis::jetHists*  hOffJets_matchedPuppi_L_eta2   ;
+    nTupleAnalysis::jetHists*  hOffJets_matchedPuppi_L_eta3   ;
+    nTupleAnalysis::jetHists*  hOffJets_matchedPuppiJet_L;
+    nTupleAnalysis::jetHists*  hOffJets_matchedPuppiJet_L_eta1;
+    nTupleAnalysis::jetHists*  hOffJets_matchedPuppiJet_L_eta2;
+    nTupleAnalysis::jetHists*  hOffJets_matchedPuppiJet_L_eta3;
+    nTupleAnalysis::jetHists*  hOffJets_matchedPuppi_B;
+    nTupleAnalysis::jetHists*  hOffJets_matchedPuppi_B_eta1   ;
+    nTupleAnalysis::jetHists*  hOffJets_matchedPuppi_B_eta2   ;
+    nTupleAnalysis::jetHists*  hOffJets_matchedPuppi_B_eta3   ;
+    nTupleAnalysis::jetHists*  hOffJets_matchedPuppiJet_B;
+    nTupleAnalysis::jetHists*  hOffJets_matchedPuppiJet_B_eta1;
+    nTupleAnalysis::jetHists*  hOffJets_matchedPuppiJet_B_eta2;
+    nTupleAnalysis::jetHists*  hOffJets_matchedPuppiJet_B_eta3;
+    nTupleAnalysis::jetHists*  hOffJets_matchedPuppi_C;
+    nTupleAnalysis::jetHists*  hOffJets_matchedPuppi_C_eta1   ;
+    nTupleAnalysis::jetHists*  hOffJets_matchedPuppi_C_eta2   ;
+    nTupleAnalysis::jetHists*  hOffJets_matchedPuppi_C_eta3   ;
+    nTupleAnalysis::jetHists*  hOffJets_matchedPuppiJet_C;
+    nTupleAnalysis::jetHists*  hOffJets_matchedPuppiJet_C_eta1;
+    nTupleAnalysis::jetHists*  hOffJets_matchedPuppiJet_C_eta2;
+    nTupleAnalysis::jetHists*  hOffJets_matchedPuppiJet_C_eta3;
 
     nTupleAnalysis::jetHists* hPfJets;
     nTupleAnalysis::jetHists* hPfJets_matched;
@@ -145,6 +194,12 @@ namespace TriggerStudies {
     //nTupleAnalysis::jetHists* hCaloJets_matched_B;
     //nTupleAnalysis::jetHists* hCaloJets_matched_C;
 
+    nTupleAnalysis::jetHists* hPuppiJets;
+    nTupleAnalysis::jetHists* hPuppiJets_matched;
+    //nTupleAnalysis::jetHists* hPuppiJets_matched_L;
+    //nTupleAnalysis::jetHists* hPuppiJets_matched_B;
+    //nTupleAnalysis::jetHists* hPuppiJets_matched_C;
+
     nTupleAnalysis::trackHists* hOffTracks;
     nTupleAnalysis::trackHists* hOffTracks_unmatched;
     nTupleAnalysis::trackHists* hOffTracks_matched;
@@ -152,6 +207,10 @@ namespace TriggerStudies {
     nTupleAnalysis::trackHists* hOffTracksCalo;
     nTupleAnalysis::trackHists* hOffTracksCalo_unmatched;
     nTupleAnalysis::trackHists* hOffTracksCalo_matched;
+
+    nTupleAnalysis::trackHists* hOffTracksPuppi;
+    nTupleAnalysis::trackHists* hOffTracksPuppi_unmatched;
+    nTupleAnalysis::trackHists* hOffTracksPuppi_matched;
 
 
     nTupleAnalysis::trackHists* hPfTracks;
@@ -164,12 +223,20 @@ namespace TriggerStudies {
     nTupleAnalysis::trackHists* hCaloTracks_unmatched;
     nTupleAnalysis::trackHists* hCaloTracks_noV0;
 
+    nTupleAnalysis::trackHists* hPuppiTracks;
+    nTupleAnalysis::trackHists* hPuppiTracks_matched;
+    nTupleAnalysis::trackHists* hPuppiTracks_unmatched;
+    nTupleAnalysis::trackHists* hPuppiTracks_noV0;
+
 
     nTupleAnalysis::trackHists* hOffTracks_noV0;
     nTupleAnalysis::trackHists* hOffTracks_matched_noV0;
 
     nTupleAnalysis::trackHists* hOffTracksCalo_noV0;
     nTupleAnalysis::trackHists* hOffTracksCalo_matched_noV0;
+
+    nTupleAnalysis::trackHists* hOffTracksPuppi_noV0;
+    nTupleAnalysis::trackHists* hOffTracksPuppi_matched_noV0;
 
     nTupleAnalysis::btaggingHists* hOffBTagsAll;
     nTupleAnalysis::btaggingHists* hOffBTags;
@@ -181,6 +248,10 @@ namespace TriggerStudies {
     nTupleAnalysis::btaggingHists* hPfBTags;
     nTupleAnalysis::btaggingHists* hPfBTags_matched;
     nTupleAnalysis::btaggingHists* hPfBTags_unmatched;
+
+    nTupleAnalysis::btaggingHists* hPuppiBTags;
+    nTupleAnalysis::btaggingHists* hPuppiBTags_matched;
+    nTupleAnalysis::btaggingHists* hPuppiBTags_unmatched;
 
     nTupleAnalysis::vertexHists* hVtx;
     nTupleAnalysis::vertexHists* hOffVtx;
@@ -199,6 +270,8 @@ namespace TriggerStudies {
     TH1F*   hmttPf_isFromV0  ;
     TH1F*   hmttCalo           ;
     TH1F*   hmttCalo_isFromV0  ;
+    TH1F*   hmttPuppi           ;
+    TH1F*   hmttPuppi_isFromV0  ;
 
 
     TH1F*   hDeltaROffPf          ;
@@ -259,6 +332,7 @@ namespace TriggerStudies {
 
     void PFJetAnalysis(const nTupleAnalysis::jetPtr& offJet,const nTupleAnalysis::jetPtr& hltJet, float weight);
     void CaloJetAnalysis(const nTupleAnalysis::jetPtr& offJet,const nTupleAnalysis::jetPtr& hltJet, float weight);
+    void PuppiJetAnalysis(const nTupleAnalysis::jetPtr& offJet,const nTupleAnalysis::jetPtr& hltJet, float weight);
 
     nTupleAnalysis::pileUpWeightTool* pileUpTool = nullptr;
 

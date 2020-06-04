@@ -15,8 +15,8 @@
 
 // for jet pseudoTag calculations
 #include <TRandom3.h>
-#include <numeric> 
-#include <boost/math/special_functions/binomial.hpp> 
+#include <numeric>
+#include <boost/math/special_functions/binomial.hpp>
 
 namespace TriggerStudies {
 
@@ -35,6 +35,7 @@ namespace TriggerStudies {
     std::string year;
     bool debug;
     bool doCaloJets;
+    bool doPuppiJets;
     Int_t    run       =  0;
     UInt_t    lumiBlock =  0;
     Int_t    event     =  0;
@@ -51,6 +52,9 @@ namespace TriggerStudies {
 
     nTupleAnalysis::jetData* caloTreeJets;
     std::vector<nTupleAnalysis::jetPtr> caloJets;
+    
+    nTupleAnalysis::jetData* puppiTreeJets;
+    std::vector<nTupleAnalysis::jetPtr> puppiJets;
 
     nTupleAnalysis::muonData* treeMuons;
     std::vector<nTupleAnalysis::muonPtr> muons;
@@ -65,11 +69,11 @@ namespace TriggerStudies {
     std::vector<nTupleAnalysis::vertexPtr> offPVs;
 
     // Constructors and member functions
-    eventData(TChain*, TChain*, bool, std::string, bool, std::string); 
+    eventData(TChain*, TChain*, bool, std::string, bool, std::string);
     void update(int);
 
     void dump();
-    ~eventData(); 
+    ~eventData();
 
   };
 
