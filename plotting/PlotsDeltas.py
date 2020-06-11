@@ -17,7 +17,10 @@ vars = [
 
 
 for v in vars:
-    plot(v,"offJets_matched",logy=1)
+    if not o.puppi:
+        plot(v,"offJets_matched",logy=1)
+    if o.puppi:
+        plot(v,"offJets_matchedPuppi",logy=1)
 
 
 #
@@ -101,4 +104,7 @@ vars = [
     ]
 
 for v in vars:
-    plot(v,"offJets_matched/btags/deltaHists",logy=1)
+    if not o.puppi:
+        plot(v,"offJets_matched/btags/deltaHists",logy=1)
+    if o.puppi:
+        plot(v,"offJets_matchedPuppi/btags/deltaHists",logy=1)

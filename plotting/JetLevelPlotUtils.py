@@ -183,6 +183,7 @@ def drawComp(name,inputHists,yTitle,xTitle,outDir,otherText="",setLogy=1,yMax= 1
         #hInfo[0].GetXaxis().SetRangeUser(xMin, xMax)
         hInfo[0].SetLineColor  (hInfo[2])
         hInfo[0].SetMarkerColor(hInfo[2])
+        hInfo[0].SetMarkerSize(0.5)
         if len(hInfo) > 3:
             hInfo[0].SetMarkerStyle(hInfo[3])
             hInfo[0].SetFillStyle(hInfo[3])
@@ -319,6 +320,7 @@ def drawComp(name,inputHists,yTitle,xTitle,outDir,otherText="",setLogy=1,yMax= 1
         labels = drawText(otherText,textsize=0.05,xStart=xStartOther,yStart=yStartOther)
 
 
+    canvas.SaveAs(outDir+"/"+name+".png")
     canvas.SaveAs(outDir+"/"+name+".pdf")
 
 

@@ -15,6 +15,7 @@ p.add_option('--inputMC',  type = 'string', dest = 'inFileMC', help = 'intput Fi
 p.add_option('--output', type = 'string', default = "jetLevelPlots", dest = 'outDir', help = 'output dir' )
 p.add_option('--doAlgoStudy', action="store_true" )
 p.add_option('--doCaloJets', action="store_true" )
+p.add_option('--doPuppiJets', action="store_true" )
 (o,a) = p.parse_args()
 
 #from rocCurveUtils            import drawWaterMarks
@@ -99,8 +100,12 @@ for v in vars:
     if not v.find("Pt_forAlgo") == -1:
         binning = [0,1,2,3,4,5,6,7,8,9,10,12,14,16,18,20,25,30,40,50]
 
-    eff_Matched = makeEff(v ,         ["offTracks_matched","offTracks"],inFileMC,binning=binning)
-    eff_Matched_noV0 = makeEff(v ,    ["offTracks_matched_noV0","offTracks_noV0"],inFileMC,binning=binning)
+    if not o.doPuppiJets:
+        eff_Matched = makeEff(v ,         ["offTracks_matched","offTracks"],inFileMC,binning=binning)
+        eff_Matched_noV0 = makeEff(v ,    ["offTracks_matched_noV0","offTracks_noV0"],inFileMC,binning=binning)
+    else:
+        eff_MatchedPuppi = makeEff(v ,         ["offTracksPuppi_matched","offTracksPuppi"],inFileMC,binning=binning)
+        eff_MatchedPuppi_noV0 = makeEff(v ,    ["offTracksPuppi_matched_noV0","offTracksPuppi_noV0"],inFileMC,binning=binning)
 
     if o.doCaloJets:
         effCalo_Matched = makeEff(v ,         ["offTracksCalo_matched","offTracksCalo"],inFileMC,binning=binning)
@@ -125,16 +130,28 @@ for v in vars:
         yLeg = 0.4
         xLeg = 0.6
 
-    drawComp("Eff_"+v,[(eff_Matched,"t#bar{t} MC (All Tracks)",ROOT.kBlack),
-                       # (eff_Matched_noV0,"t#bar{t} MC (After V0 veto)",ROOT.kRed),
-                       (eff_Matched_noV0,"t#bar{t} MC (After V0/K_{S}^{0} veto)",ROOT.kRed),
-                       #(eff_Matched_BTag,"t#bar{t} MC ",ROOT.kBlue),
-                       #(eff_Matched_BTag_noV0,"t#bar{t} MC ",ROOT.kGreen)
-                       ]
-             ,yTitle="Online Track Efficiency Relative to Offline",xTitle=eff_Matched.GetXaxis().GetTitle(),outDir=o.outDir,yMax=1.2,yLeg=yLeg,xLeg=xLeg,
-             xMax=eff_Matched.GetXaxis().GetXmax(),
-             xMin=eff_Matched.GetXaxis().GetXmin()
-             )
+    if not o.doPuppiJets:
+        drawComp("Eff_"+v,[(eff_Matched,"t#bar{t} MC (All Tracks)",ROOT.kBlack),
+                           # (eff_Matched_noV0,"t#bar{t} MC (After V0 veto)",ROOT.kRed),
+                           (eff_Matched_noV0,"t#bar{t} MC (After V0/K_{S}^{0} veto)",ROOT.kRed),
+                           #(eff_Matched_BTag,"t#bar{t} MC ",ROOT.kBlue),
+                           #(eff_Matched_BTag_noV0,"t#bar{t} MC ",ROOT.kGreen)
+                           ]
+                 ,yTitle="Online Track Efficiency Relative to Offline",xTitle=eff_Matched.GetXaxis().GetTitle(),outDir=o.outDir,yMax=1.2,yLeg=yLeg,xLeg=xLeg,
+                 xMax=eff_Matched.GetXaxis().GetXmax(),
+                 xMin=eff_Matched.GetXaxis().GetXmin()
+                 )
+    else:
+        drawComp("Eff_"+v,[(eff_MatchedPuppi,"t#bar{t} MC (All Tracks)",ROOT.kBlack),
+                           # (eff_Matched_noV0,"t#bar{t} MC (After V0 veto)",ROOT.kRed),
+                           (eff_MatchedPuppi_noV0,"t#bar{t} MC (After V0/K_{S}^{0} veto)",ROOT.kRed),
+                           #(eff_Matched_BTag,"t#bar{t} MC ",ROOT.kBlue),
+                           #(eff_Matched_BTag_noV0,"t#bar{t} MC ",ROOT.kGreen)
+                           ]
+                 ,yTitle="Online Track Efficiency Relative to Offline",xTitle=eff_MatchedPuppi.GetXaxis().GetTitle(),outDir=o.outDir,yMax=1.2,yLeg=yLeg,xLeg=xLeg,
+                 xMax=eff_MatchedPuppi.GetXaxis().GetXmax(),
+                 xMin=eff_MatchedPuppi.GetXaxis().GetXmin()
+                 )
 
 
 
@@ -162,15 +179,20 @@ for v in vars:
                  )
 
 
-
-    fake_Matched = makeEff(v ,        ["pfTracks_unmatched","pfTracks"],inFileMC,binning=1)
-
-
-    drawComp("Fake_"+v,[(fake_Matched,"t#bar{t} MC ",ROOT.kBlack)]
-             ,yTitle="Online Track Fake-Rate Relative to Offline",xTitle=fake_Matched.GetXaxis().GetTitle(),outDir=o.outDir,yMax=0.4,yLeg=0.9,xLeg=0.6,
-             xMax=fake_Matched.GetXaxis().GetXmax(),
-             xMin=fake_Matched.GetXaxis().GetXmin()
-             )
+    if not o.doPuppiJets:
+        fake_Matched = makeEff(v ,        ["pfTracks_unmatched","pfTracks"],inFileMC,binning=1)
+        drawComp("Fake_"+v,[(fake_Matched,"t#bar{t} MC ",ROOT.kBlack)]
+                 ,yTitle="Online Track Fake-Rate Relative to Offline",xTitle=fake_Matched.GetXaxis().GetTitle(),outDir=o.outDir,yMax=0.4,yLeg=0.9,xLeg=0.6,
+                 xMax=fake_Matched.GetXaxis().GetXmax(),
+                 xMin=fake_Matched.GetXaxis().GetXmin()
+                 )
+    else:
+        fake_MatchedPuppi = makeEff(v ,        ["puppiTracks_unmatched","puppiTracks"],inFileMC,binning=1)
+        drawComp("Fake_"+v,[(fake_MatchedPuppi,"t#bar{t} MC ",ROOT.kBlack)]
+                 ,yTitle="Online Track Fake-Rate Relative to Offline",xTitle=fake_MatchedPuppi.GetXaxis().GetTitle(),outDir=o.outDir,yMax=0.4,yLeg=0.9,xLeg=0.6,
+                 xMax=fake_MatchedPuppi.GetXaxis().GetXmax(),
+                 xMin=fake_MatchedPuppi.GetXaxis().GetXmin()
+                 )
 
     if o.doCaloJets:
         fakeCalo_Matched = makeEff(v ,    ["caloTracks_unmatched","caloTracks"],inFileMC,binning=1)
