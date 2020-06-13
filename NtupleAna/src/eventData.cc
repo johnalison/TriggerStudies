@@ -6,7 +6,7 @@ using namespace TriggerStudies;
 using std::cout;  using std::endl;
 
 
-eventData::eventData(TChain* _treeRAW, TChain* _treeAOD, bool mc, std::string y, bool d, std::string jetDetailLevel){
+eventData::eventData(TChain* _treeRAW, bool mc, std::string y, bool d, std::string jetDetailLevel, TChain* _treeAOD=nullptr){
   std::cout << "eventData::eventData()" << std::endl;
   treeRAW  = _treeRAW;
   treeAOD  = _treeAOD;
@@ -16,8 +16,8 @@ eventData::eventData(TChain* _treeRAW, TChain* _treeAOD, bool mc, std::string y,
 
   doCaloJets = jetDetailLevel.find("CaloJets") != std::string::npos;
 
-  treeEventsAOD = treeAOD->GetEntries();
-
+  //treeEventsAOD = treeAOD->GetEntries();
+/* checkEventDiffs
   bool checkEventDiffs = false;
   if(checkEventDiffs){
 
@@ -81,13 +81,14 @@ eventData::eventData(TChain* _treeRAW, TChain* _treeAOD, bool mc, std::string y,
 
 
   }
-
+  */
+/*
   treeAOD->SetBranchStatus("Run", 1);  
   treeAOD->SetBranchStatus("Evt", 1);  
   //treeAOD->BuildIndex("Run","Evt");
   TTreeIndex *index = new TTreeIndex(treeAOD,"Run", "Evt"); 
   treeAOD->SetTreeIndex(index);
-    
+*/    
     
   treeRAW->SetBranchStatus("Run", 1);  
   treeRAW->SetBranchStatus("Evt", 1);  
@@ -96,7 +97,7 @@ eventData::eventData(TChain* _treeRAW, TChain* _treeAOD, bool mc, std::string y,
   //treeRAW->SetTreeIndex(indexRaw);
     
     
-  treeRAW->AddFriend(treeAOD);
+//  treeRAW->AddFriend(treeAOD);
     
         
   //std::cout << "eventData::eventData() tree->Lookup(true)" << std::endl;
@@ -109,15 +110,15 @@ eventData::eventData(TChain* _treeRAW, TChain* _treeAOD, bool mc, std::string y,
   inputBranch(treeRAW, "Evt",           event);
         
     
-  inputBranch(treeAOD, "Run",             runAOD);
+//  inputBranch(treeAOD, "Run",             runAOD);
   //inputBranch(tree, "luminosityBlock", lumiBlock);
-  inputBranch(treeAOD, "Evt",           eventAOD);
+//  inputBranch(treeAOD, "Evt",           eventAOD);
     
   std::cout << "eventData::eventData() Initialize jets and muons" << std::endl;
   std::string jetSFName = year;
   if(jetSFName == "2018") jetSFName = "deepcsv2018";
 
-  offTreeJets  = new nTupleAnalysis::jetData( "Jet",  treeRAW, true, isMC,  jetDetailLevel, "",      jetSFName );
+  //offTreeJets  = new nTupleAnalysis::jetData( "Jet",  treeRAW, true, isMC,  jetDetailLevel, "",      jetSFName );
   pfTreeJets   = new nTupleAnalysis::jetData( "Jet",  treeRAW, true, false, jetDetailLevel, "PFJet."       );
   if(doCaloJets)
     caloTreeJets = new nTupleAnalysis::jetData( "Jet",  treeRAW, true, false, jetDetailLevel, "CaloJet."     );
@@ -140,7 +141,7 @@ eventData::eventData(TChain* _treeRAW, TChain* _treeAOD, bool mc, std::string y,
   }
 
   treePVs    = new nTupleAnalysis::vertexData("PV",     treeRAW);
-  offTreePVs = new nTupleAnalysis::vertexData("PV",     treeAOD);
+  //offTreePVs = new nTupleAnalysis::vertexData("PV",     treeAOD);
 
 } 
 
@@ -149,11 +150,11 @@ void eventData::update(int e){
     std::cout<<"Get Entry "<<e<<std::endl;
     std::cout<<treeRAW->GetCurrentFile()->GetName()<<std::endl;
     treeRAW->Show();
-
+  /*
     std::cout<<"Get Entry (AOD) "<<e<<std::endl;
     std::cout<<treeAOD->GetCurrentFile()->GetName()<<std::endl;
     treeAOD->Show();
-
+  */
   }
   Long64_t loadStatus = treeRAW->LoadTree(e);
   if(loadStatus<0){
@@ -212,7 +213,7 @@ void eventData::update(int e){
   }
 
 
-  offJets  = offTreeJets->getJets(20,1e6,2.4);
+  //offJets  = offTreeJets->getJets(20,1e6,2.4);
   pfJets   = pfTreeJets ->getJets(20,1e6,2.4);
   if(doCaloJets)
     caloJets = caloTreeJets ->getJets(30,1e6,2.4);
@@ -224,7 +225,7 @@ void eventData::update(int e){
     elecs    = treeElecs  ->getElecs(30, 2.4);
 
   pvs    = treePVs     ->getVerticies();
-  offPVs = offTreePVs  ->getVerticies();
+  //offPVs = offTreePVs  ->getVerticies();
 
   if(debug) std::cout<<"eventData updated\n";
   return;

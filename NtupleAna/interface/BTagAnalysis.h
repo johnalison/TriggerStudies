@@ -29,7 +29,7 @@ namespace TriggerStudies {
   class BTagAnalysis {
   public:
 
-    TChain* eventsAOD;
+    //TChain* eventsAOD;
     TChain* eventsRAW;
 
     bool debug = false;
@@ -211,7 +211,7 @@ namespace TriggerStudies {
     std::shared_ptr<NeuralNetworkAndConstants>  neuralNet;
 
 
-    BTagAnalysis(TChain* _eventsRAW, TChain* _eventsAOD, fwlite::TFileService& fs, bool _isMC, std::string _year, int _histogramming, bool _debug, std::string PUFileName, std::string jetDetailString, const edm::ParameterSet& nnConfig);
+    BTagAnalysis(TChain* _eventsRAW, /*TChain* _eventsAOD,*/ fwlite::TFileService& fs, bool _isMC, std::string _year, int _histogramming, bool _debug, /*std::string PUFileName,*/ std::string jetDetailString, const edm::ParameterSet& nnConfig);
     void monitor(long int);
     int eventLoop(int, int nSkipEvents = 0);
     int processEvent();
@@ -220,7 +220,7 @@ namespace TriggerStudies {
     void getLumiData(std::string);
     ~BTagAnalysis();
 
-    void OfflineToOnlineTrackMatching(const nTupleAnalysis::jetPtr& offJet, const nTupleAnalysis::trackPtr& offTrk,
+    /*void OfflineToOnlineTrackMatching(const nTupleAnalysis::jetPtr& offJet, const nTupleAnalysis::trackPtr& offTrk,
 				      const nTupleAnalysis::jetPtr& hltJet, 
 				      float dRMatch);
 
@@ -231,9 +231,9 @@ namespace TriggerStudies {
     void OfflineToOnlineSVMatching(const nTupleAnalysis::svPtr& offSV,
 				   const nTupleAnalysis::jetPtr& hltJet, 
 				   float dRMatch);
+    */
 
-
-    void PFJetAnalysis(const nTupleAnalysis::jetPtr& offJet,const nTupleAnalysis::jetPtr& hltJet, float weight);
+    void PFJetAnalysis(const nTupleAnalysis::jetPtr& hltJet, float weight,const nTupleAnalysis::jetPtr& offJet);
     void CaloJetAnalysis(const nTupleAnalysis::jetPtr& offJet,const nTupleAnalysis::jetPtr& hltJet, float weight);
 
     nTupleAnalysis::pileUpWeightTool* pileUpTool = nullptr;

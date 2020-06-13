@@ -65,7 +65,7 @@ namespace TriggerStudies {
     std::vector<nTupleAnalysis::vertexPtr> offPVs;
 
     // Constructors and member functions
-    eventData(TChain*, TChain*, bool, std::string, bool, std::string); 
+    eventData(TChain* _treeRAW, bool mc, std::string y, bool d, std::string jetDetailLevel, TChain* _treeAOD);
     void update(int);
 
     void dump();

@@ -15,7 +15,7 @@
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
 
 // Uncomment for SCL6
-#define BTagAnalysis_SLC6 1  
+//#define BTagAnalysis_SLC6 1  
 
 #if defined BTagAnalysis_SLC6
 #include "nTupleAnalysis/baseClasses/interface/myParameterSetReader.h"
@@ -59,13 +59,13 @@ int main(int argc, char * argv[]){
   const edm::ParameterSet& parameters = process.getParameter<edm::ParameterSet>("BTagAnalyzer");
   bool debug = parameters.getParameter<bool>("debug");
   bool isMC  = parameters.getParameter<bool>("isMC");
-  bool isTurnOnStudy  = parameters.getParameter<bool>("isTurnOnStudy");
-  bool doLeptonSel = parameters.getParameter<bool>("doLeptonSel");
+  //bool isTurnOnStudy  = parameters.getParameter<bool>("isTurnOnStudy");
+  //bool doLeptonSel = parameters.getParameter<bool>("doLeptonSel");
   int histogramming = parameters.getParameter<int>("histogramming");
   int skipEvents = parameters.getParameter<int>("skipEvents");
   std::string year = parameters.getParameter<std::string>("year");
-  std::vector<std::string> filesAOD = parameters.getParameter<std::vector<std::string> >("fileNamesAOD");
-  std::string PUFileName = parameters.getParameter<std::string>("puFile");
+  //std::vector<std::string> filesAOD = parameters.getParameter<std::vector<std::string> >("fileNamesAOD");
+  //std::string PUFileName = parameters.getParameter<std::string>("puFile");
   std::string jetDetailString = parameters.getParameter<std::string>("jetDetailString");
 
   const edm::ParameterSet& nnParameters = process.getParameter<edm::ParameterSet>("NNConfig");
@@ -96,7 +96,7 @@ int main(int argc, char * argv[]){
     if(debug) std::cout<<"Added to TChain"<<std::endl;
   }
 
-
+  /*
   //
   //  Add AOD Files 
   //
@@ -107,6 +107,7 @@ int main(int argc, char * argv[]){
     if(e!=1){ std::cout << "ERROR" << std::endl; return 1;}
     if(debug) std::cout<<"Added to TChain"<<std::endl;
   }
+  */
 
   //Histogram output
   fwlite::OutputFiles histOutput(process);
@@ -117,6 +118,7 @@ int main(int argc, char * argv[]){
   // Define analysis and run event loop
   //
   std::cout << "Initialize analysis: ";
+  /*
   if(isTurnOnStudy){
     std::cout << "TurnOnStudy " << std::endl;
     TrigTurnOnStudy a = TrigTurnOnStudy(treeRAW, treeAOD, fsh, isMC, year, histogramming, debug);
@@ -126,7 +128,7 @@ int main(int argc, char * argv[]){
 
   } else{
     std::cout << "BTagAnalysis " << std::endl;
-    BTagAnalysis a = BTagAnalysis(treeRAW, treeAOD, fsh, isMC, year, histogramming, debug, PUFileName, jetDetailString, nnParameters);
+    BTagAnalysis a = BTagAnalysis(treeRAW, fsh, isMC, year, histogramming, debug, jetDetailString, nnParameters);
     a.doLeptonSel = doLeptonSel;
     //if(!isMC){
     //  a.lumiMask = lumiMask;
@@ -137,6 +139,11 @@ int main(int argc, char * argv[]){
     int maxEvents = inputHandler.maxEvents();
     a.eventLoop(maxEvents, skipEvents);
   }
+  */
+  std::cout << "BTagAnalysis " << std::endl;
+  BTagAnalysis a = BTagAnalysis(treeRAW, fsh, isMC, year, histogramming, debug, jetDetailString, nnParameters);
+  int maxEvents = inputHandler.maxEvents();
+  a.eventLoop(maxEvents, skipEvents);
 
   std::cout << std::endl;
   std::cout << "Done Event Loop" << std::endl;
