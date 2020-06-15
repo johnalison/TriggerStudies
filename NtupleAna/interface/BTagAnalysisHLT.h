@@ -1,6 +1,6 @@
 // -*- C++ -*-
-#if !defined(BTagAnalysis_H)
-#define BTagAnalysis_H
+#if !defined(BTagAnalysisHLT_H)
+#define BTagAnalysisHLT_H
 
 #include <ctime>
 #include <sys/resource.h>
@@ -12,7 +12,7 @@
 #include "nTupleAnalysis/baseClasses/interface/brilCSV.h"
 #include "nTupleAnalysis/baseClasses/interface/initBranch.h"
 #include "PhysicsTools/FWLite/interface/TFileService.h"
-#include "TriggerStudies/NtupleAna/interface/eventData.h"
+#include "TriggerStudies/NtupleAna/interface/eventDataHLT.h"
 #include "nTupleAnalysis/baseClasses/interface/cutflowHists.h"
 #include "nTupleAnalysis/baseClasses/interface/muonHists.h"
 #include "nTupleAnalysis/baseClasses/interface/elecHists.h"
@@ -26,10 +26,10 @@
 
 namespace TriggerStudies {
 
-  class BTagAnalysis {
+  class BTagAnalysisHLT {
   public:
 
-    TChain* eventsAOD;
+    //TChain* eventsAOD;
     TChain* eventsRAW;
 
     bool debug = false;
@@ -43,7 +43,7 @@ namespace TriggerStudies {
     
     int histogramming = 1e6;
     int treeEvents;
-    eventData* event;
+    eventDataHLT* event;
     
     nTupleAnalysis::eventHists* hEvents;
     nTupleAnalysis::eventHists* hEventsNoPUWeight;
@@ -211,16 +211,16 @@ namespace TriggerStudies {
     std::shared_ptr<NeuralNetworkAndConstants>  neuralNet;
 
 
-    BTagAnalysis(TChain* _eventsRAW, TChain* _eventsAOD, fwlite::TFileService& fs, bool _isMC, std::string _year, int _histogramming, bool _debug, std::string PUFileName, std::string jetDetailString, const edm::ParameterSet& nnConfig);
+    BTagAnalysisHLT(TChain* _eventsRAW, /*TChain* _eventsAOD,*/ fwlite::TFileService& fs, bool _isMC, std::string _year, int _histogramming, bool _debug, /*std::string PUFileName,*/ std::string jetDetailString, const edm::ParameterSet& nnConfig);
     void monitor(long int);
     int eventLoop(int, int nSkipEvents = 0);
     int processEvent();
     bool passLumiMask();
     std::map<edm::LuminosityBlockID, float> lumiData;
     void getLumiData(std::string);
-    ~BTagAnalysis();
+    ~BTagAnalysisHLT();
 
-    void OfflineToOnlineTrackMatching(const nTupleAnalysis::jetPtr& offJet, const nTupleAnalysis::trackPtr& offTrk,
+    /*void OfflineToOnlineTrackMatching(const nTupleAnalysis::jetPtr& offJet, const nTupleAnalysis::trackPtr& offTrk,
 				      const nTupleAnalysis::jetPtr& hltJet, 
 				      float dRMatch);
 
@@ -231,9 +231,9 @@ namespace TriggerStudies {
     void OfflineToOnlineSVMatching(const nTupleAnalysis::svPtr& offSV,
 				   const nTupleAnalysis::jetPtr& hltJet, 
 				   float dRMatch);
+    */
 
-
-    void PFJetAnalysis(const nTupleAnalysis::jetPtr& offJet,const nTupleAnalysis::jetPtr& hltJet, float weight);
+    void PFJetAnalysis(const nTupleAnalysis::jetPtr& hltJet, float weight,const nTupleAnalysis::jetPtr& offJet);
     void CaloJetAnalysis(const nTupleAnalysis::jetPtr& offJet,const nTupleAnalysis::jetPtr& hltJet, float weight);
 
     nTupleAnalysis::pileUpWeightTool* pileUpTool = nullptr;
@@ -241,5 +241,5 @@ namespace TriggerStudies {
   };
 
 }
-#endif // BTagAnalysis_H
+#endif // BTagAnalysisHLT_H
 

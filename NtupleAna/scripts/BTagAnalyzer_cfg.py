@@ -147,8 +147,8 @@ else:
 
 
 #Setup event loop object
-if o.inputAOD is 'None':
-    process.BTagAnalyzer = cms.PSet(
+if o.inputAOD is None:
+    process.BTagAnalyzerHLT = cms.PSet(
         debug   = cms.bool(o.debug),
         isMC    = cms.bool(o.isMC),
         year    = cms.string(o.year),
@@ -171,5 +171,3 @@ else:
         histogramming = cms.int32(int(o.histogramming)),
         skipEvents = cms.int32(int(o.skipEvents)),
         )
-    
-

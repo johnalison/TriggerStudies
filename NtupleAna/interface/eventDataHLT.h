@@ -1,7 +1,7 @@
 // -*- C++ -*-
 
-#if !defined(eventData_H)
-#define eventData_H
+#if !defined(eventDataHLT_H)
+#define eventDataHLT_H
 
 #include <iostream>
 #include <TChain.h>
@@ -20,7 +20,7 @@
 
 namespace TriggerStudies {
 
-  class eventData {
+  class eventDataHLT {
 
   public:
     // Member variables
@@ -65,13 +65,13 @@ namespace TriggerStudies {
     std::vector<nTupleAnalysis::vertexPtr> offPVs;
 
     // Constructors and member functions
-    eventData(TChain*, TChain*, bool, std::string, bool, std::string); 
+    eventDataHLT(TChain*, bool, std::string, bool, std::string, TChain*); 
     void update(int);
 
     void dump();
-    ~eventData(); 
+    ~eventDataHLT(); 
 
   };
 
 }
-#endif // eventData_H
+#endif // eventDataHLT_H

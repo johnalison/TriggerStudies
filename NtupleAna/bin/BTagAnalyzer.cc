@@ -27,8 +27,9 @@
 #include "PhysicsTools/FWLite/interface/TFileService.h"
 
 #include "TriggerStudies/NtupleAna/interface/BTagAnalysis.h"
+#include "TriggerStudies/NtupleAna/interface/BTagAnalysisHLT.h"
 #include "TriggerStudies/NtupleAna/interface/TrigTurnOnStudy.h"
-
+#include "TriggerStudies/NtupleAna/interface/TrigTurnOnStudyHLT.h"
 using namespace TriggerStudies;
 
 int main(int argc, char * argv[]){
@@ -128,23 +129,23 @@ int main(int argc, char * argv[]){
 
   } else{
     std::cout << "BTagAnalysis " << std::endl;
-    BTagAnalysis a = BTagAnalysis(treeRAW, fsh, isMC, year, histogramming, debug, jetDetailString, nnParameters);
+    BTagAnalysis a = BTagAnalysis(treeRAW, treeAOD, fsh, isMC, year, histogramming, debug, PUFileName, jetDetailString, nnParameters);
     a.doLeptonSel = doLeptonSel;
     //if(!isMC){
     //  a.lumiMask = lumiMask;
     //  std::string lumiData = parameters.getParameter<std::string>("lumiData");
     //  a.getLumiData(lumiData);
     //}
-    
+
     int maxEvents = inputHandler.maxEvents();
     a.eventLoop(maxEvents, skipEvents);
   }
   */
   std::cout << "BTagAnalysis " << std::endl;
-  BTagAnalysis a = BTagAnalysis(treeRAW, fsh, isMC, year, histogramming, debug, jetDetailString, nnParameters);
+  BTagAnalysisHLT a = BTagAnalysisHLT(treeRAW, fsh, isMC, year, histogramming, debug, jetDetailString, nnParameters);
   int maxEvents = inputHandler.maxEvents();
   a.eventLoop(maxEvents, skipEvents);
-
+  
   std::cout << std::endl;
   std::cout << "Done Event Loop" << std::endl;
   return 0;
