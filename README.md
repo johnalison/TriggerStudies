@@ -20,4 +20,3 @@ git clone -b CMSSW_11  git@github.com:johnalison/TriggerStudies.git
 
 
 > wget https://raw.githubusercontent.com/cms-data/RecoBTag-Combined/master/DeepCSV_PhaseII.json -P RecoBTag/Combined/data/
-
