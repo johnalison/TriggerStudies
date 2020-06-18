@@ -13,7 +13,7 @@ using std::vector;  using std::map; using std::string; using std::set;
 
 // From https://github.com/cms-sw/cmssw/blob/6ec5f2f206b43e0996b67f4d51ae3136bc5edf92/RecoBTag/Combined/plugins/DeepFlavourJetTagsProducer.cc#L119
 NeuralNetworkAndConstants::NeuralNetworkAndConstants(const edm::ParameterSet& iConfig) {
-
+  cout << " Loading NN using variables " << endl;
   bool mean_padding = iConfig.getParameter<bool>("meanPadding");
 
   //parse json
@@ -69,7 +69,7 @@ NeuralNetworkAndConstants::NeuralNetworkAndConstants(const edm::ParameterSet& iC
       ? 0.
       : -1 * input.offset;  //set default to -offset so that when scaling (val+offset)*scale the outcome is 0
     //for mean padding it is set to zero so that undefined values are assigned -mean/scale
-
+    cout << " \t " << var.name << endl;
     variables_.push_back(var);
   }
 }
@@ -89,6 +89,7 @@ lwt::ValueMap NeuralNetworkAndConstants::compute(const nTupleAnalysis::jetPtr& j
 
   inputs_["jetPt"] = jet->pt;
   inputs_["jetEta"] = jet->eta;
+  inputs_["jetAbsEta"] = fabs(jet->eta);
   inputs_["jetNSecondaryVertices"] = btagData->jetNSecondaryVertices;
   inputs_["trackSumJetEtRatio"] = btagData->trackSumJetEtRatio;
   inputs_["trackSumJetDeltaR"] = btagData->trackSumJetDeltaR;
