@@ -80,6 +80,9 @@ if ".txt" in o.inputRAW:
         fileNamesRAW.append(line.replace('\n',''))
 else:
     fileNamesRAW.append(o.inputRAW)
+    if cms.bool(o.debug):
+        print(fileNamesRAW)
+
 
 
 pathOut = outputBase
@@ -147,7 +150,8 @@ else:
 
 
 #Setup event loop object
-if o.inputAOD is None:
+if o.inputAOD is 'None':
+    print('HLTOnly Configured')
     process.BTagAnalyzerHLT = cms.PSet(
         debug   = cms.bool(o.debug),
         isMC    = cms.bool(o.isMC),
