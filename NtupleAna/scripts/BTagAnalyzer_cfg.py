@@ -81,7 +81,7 @@ if ".txt" in o.inputRAW:
 else:
     fileNamesRAW.append(o.inputRAW)
     if cms.bool(o.debug):
-        print(fileNamesRAW)
+        print('fileNamesRAW:', fileNamesRAW)
 
 
 
@@ -152,7 +152,7 @@ else:
 #Setup event loop object
 if o.inputAOD is 'None':
     print('HLTOnly Configured')
-    process.BTagAnalyzerHLT = cms.PSet(
+    process.BTagAnalyzer = cms.PSet(
         debug   = cms.bool(o.debug),
         isMC    = cms.bool(o.isMC),
         year    = cms.string(o.year),

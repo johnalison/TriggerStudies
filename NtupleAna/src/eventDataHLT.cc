@@ -15,87 +15,10 @@ eventDataHLT::eventDataHLT(TChain* _treeRAW, bool mc, std::string y, bool d, std
   debug = d;
 
   doCaloJets = jetDetailLevel.find("CaloJets") != std::string::npos;
+  cout << "doCaloJets: " << doCaloJets << endl;
 
-  //treeEventsAOD = treeAOD->GetEntries();
-/* checkEventDiffs
-  bool checkEventDiffs = false;
-  if(checkEventDiffs){
-
-    //
-    // Get All events in AOD
-    //
-    inputBranch(treeAOD, "Run",             runAOD);
-    inputBranch(treeAOD, "Evt",           eventAOD);
-    
-    for(long int eAOD = 0; eAOD < treeEventsAOD; eAOD++){
-      treeAOD->GetEntry(eAOD);
-      AODEvents.push_back(std::make_pair(runAOD, eventAOD));
-    }
-
-    //
-    // Get All events in RAW
-    //
-    inputBranch(treeRAW, "Run",             run);
-    inputBranch(treeRAW, "Evt",           event);
-    int treeEventsRAW = treeRAW->GetEntries();
-
-    RunEventMap RAWEvents;
-    for(long int eRAW = 0; eRAW < treeEventsRAW; eRAW++){
-      treeRAW->GetEntry(eRAW);
-      RAWEvents.push_back(std::make_pair(run, event));
-    }
-
-    //
-    // Events in AOD but not in RAW
-    //
-    std::cout << "Events in AOD but not in RAW"  << std::endl;
-    for (auto AODPair : AODEvents) {
-      bool inRAW = false;
-      for (auto RAWPair : RAWEvents ){
-	if(AODPair.first  != RAWPair.first) continue;
-	if(AODPair.second != RAWPair.second) continue;
-	inRAW = true;
-      }
-      if(!inRAW) {
-	std::cout << "\t" << AODPair.first << "\t" << AODPair.second << std::endl;
-      }
-    }
-
-
-    //
-    // Events in RAW but not in AOD
-    //
-    std::cout << "Events in RAW but not in AOD"  << std::endl;
-    for (auto RAWPair : RAWEvents ){
-      bool inAOD = false;
-      for (auto AODPair : AODEvents) {
-	if(AODPair.first  != RAWPair.first) continue;
-	if(AODPair.second != RAWPair.second) continue;
-	inAOD = true;
-      }
-      if(!inAOD) {
-	std::cout << "\t" << RAWPair.first << "\t" << RAWPair.second << std::endl;
-      }
-    }
-
-
-
-  }
-  */
-/*
-  treeAOD->SetBranchStatus("Run", 1);  
-  treeAOD->SetBranchStatus("Evt", 1);  
-  //treeAOD->BuildIndex("Run","Evt");
-  TTreeIndex *index = new TTreeIndex(treeAOD,"Run", "Evt"); 
-  treeAOD->SetTreeIndex(index);
-*/    
-    
   treeRAW->SetBranchStatus("Run", 1);  
   treeRAW->SetBranchStatus("Evt", 1);  
-  //treeRAW->BuildIndex("Run","Evt");
-  //TTreeIndex *indexRaw = new TTreeIndex(treeRAW,"Run", "Evt"); 
-  //treeRAW->SetTreeIndex(indexRaw);
-    
     
 //  treeRAW->AddFriend(treeAOD);
     
@@ -177,31 +100,7 @@ void eventDataHLT::update(int e){
     if(debug) std::cout << "Run: " << run << " vs " << runAOD  << "  Evt: " << event << " vs " << eventAOD << std::endl;  
     //std::cout << "Tryuing with inedex " << treeAOD->GetEntryWithIndex(run,event)  << std::endl;
   }
-
-  //if((run != runAOD) || (event != eventAOD)){
-  //  if(debug) std::cout << "Run: " << run << " vs " << runAOD  << "  Evt: " << event << " vs " << eventAOD << std::endl;  
-  //  std::cout << "Run: " << run << " vs " << runAOD  << "  Evt: " << event << " vs " << eventAOD << std::endl;  
-  //  
-  //  std::cout << "Try manual lookup" << std::endl;
-  //  Int_t runToPrint = -99;
-  //  treeAOD->GetEntries();
-  //  for(long int eAOD = 0; eAOD < treeEventsAOD; eAOD++){
-  //    treeAOD->GetEntry(eAOD);
-  //    if(runAOD != runToPrint){
-  //	std::cout << " \t now! " << runAOD << " " << eventAOD << std::endl;
-  //	runToPrint = runAOD;
-  //    }
-  //
-  //    if(run != runAOD) continue;
-  //    std::cout << " \t now! " << runAOD << " " << eventAOD << std::endl;
-  //    if(event != eventAOD) continue;
-  //    std::cout << " Found match! " << std::endl;
-  //    break;
-  //  }
-  //
-  //
-  //}
-
+  /*
   if(run != runAOD){
     if(debug) std::cout << "run: " << run << " vs " << runAOD << std::endl;
     return;
@@ -211,6 +110,7 @@ void eventDataHLT::update(int e){
     if(debug) std::cout << "evt: " << event << " vs " << eventAOD << std::endl;  
     return;
   }
+  */
 
 
   //offJets  = offTreeJets->getJets(20,1e6,2.4);
@@ -228,6 +128,7 @@ void eventDataHLT::update(int e){
   //offPVs = offTreePVs  ->getVerticies();
 
   if(debug) std::cout<<"eventDataHLT updated\n";
+  if(debug) std::cout<<"eventDataHLT" << __LINE__ << endl;
   return;
 }
 
