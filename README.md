@@ -73,4 +73,3 @@ git clone git@github.com:patrickbryant/ZZ4b.git
 ## Neural Net input files
 
 > wget https://raw.githubusercontent.com/cms-data/RecoBTag-Combined/master/DeepCSV_PhaseII.json -P RecoBTag/Combined/data/
-
