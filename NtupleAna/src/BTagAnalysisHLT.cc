@@ -491,6 +491,7 @@ int BTagAnalysisHLT::processEvent(){
   //
   // Fill All events
   //
+  if(debug) cout << "event->offPVs.size() = " << event->offPVs.size() << endl;
   hEvents->Fill(event->offPVs.size(),  0.0, eventWeight);
   if(puWeight)
     hEventsNoPUWeight->Fill(event->offPVs.size(),  0.0, eventWeight/puWeight);
@@ -508,6 +509,7 @@ int BTagAnalysisHLT::processEvent(){
   //unsigned int nOffJets_matchedCalo = 0;
   if(debug) cout << "event->pfJets.size()" << event->pfJets.size() << endl;
   for(const nTupleAnalysis::jetPtr& pfJet : event->pfJets){
+    if(debug) cout << "entered for loop" << endl;
     cutflowJets->Fill("all", eventWeight);    
 
     if(fabs(pfJet->eta) > 2.4) continue;
