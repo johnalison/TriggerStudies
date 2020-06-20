@@ -151,7 +151,7 @@ else:
 
 #Setup event loop object
 if o.inputAOD is 'None':
-    print('HLTOnly Configured')
+    print('Configuring HLTOnly...')
     process.BTagAnalyzer = cms.PSet(
         debug   = cms.bool(o.debug),
         isMC    = cms.bool(o.isMC),
@@ -161,7 +161,9 @@ if o.inputAOD is 'None':
         histogramming = cms.int32(int(o.histogramming)),
         skipEvents = cms.int32(int(o.skipEvents)),
         )
+    print('HLTOnly configured')
 else:
+    print('Configuring RAW+AOD...')
     process.BTagAnalyzer = cms.PSet(
         debug   = cms.bool(o.debug),
         fileNamesAOD   = cms.vstring(fileNamesAOD),
@@ -175,3 +177,4 @@ else:
         histogramming = cms.int32(int(o.histogramming)),
         skipEvents = cms.int32(int(o.skipEvents)),
         )
+    print('RAW+AOD configured')
