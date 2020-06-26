@@ -95,15 +95,15 @@ BTagAnalysisHLT::BTagAnalysisHLT(TChain* _eventsRAW, /*TChain* _eventsAOD,*/ fwl
   //
   dir = fs.mkdir("BTagAnalysisHLT");
 
-  hAllMuons = new nTupleAnalysis::muonHists("AllMuons", fs, "All Muons");
-  hAllElecs = new nTupleAnalysis::elecHists("AllElecs", fs, "All Elecs");
-  hSelMuons = new nTupleAnalysis::muonHists("SelMuons", fs, "Sel Muons");
-  hSelElecs = new nTupleAnalysis::elecHists("SelElecs", fs, "Sel Elecs");
-  hMuons    = new nTupleAnalysis::muonHists("Muons", fs, "Muons");
-  hElecs    = new nTupleAnalysis::elecHists("Elecs", fs, "Elecs");
+  //hAllMuons = new nTupleAnalysis::muonHists("AllMuons", fs, "All Muons");
+  //hAllElecs = new nTupleAnalysis::elecHists("AllElecs", fs, "All Elecs");
+  //hSelMuons = new nTupleAnalysis::muonHists("SelMuons", fs, "Sel Muons");
+  //hSelElecs = new nTupleAnalysis::elecHists("SelElecs", fs, "Sel Elecs");
+  //hMuons    = new nTupleAnalysis::muonHists("Muons", fs, "Muons");
+  //hElecs    = new nTupleAnalysis::elecHists("Elecs", fs, "Elecs");
 
-  hEvents                 = new nTupleAnalysis::eventHists("Events", fs);
-  hEventsNoPUWeight       = new nTupleAnalysis::eventHists("EventsNoPUWeight", fs);
+  //hEvents                 = new nTupleAnalysis::eventHists("Events", fs);
+  //hEventsNoPUWeight       = new nTupleAnalysis::eventHists("EventsNoPUWeight", fs);
 
 /*
   hOffJetsPreOLap         = new nTupleAnalysis::jetHists("offJetsPreOLap",        fs, "Pre Overlap");
@@ -368,7 +368,7 @@ int BTagAnalysisHLT::processEvent(){
     return 0;
   */
   //cutflow->Fill("foundMatch", 1.0);
-
+  /*
   if(debug) cout << "Fill/Select Muons" << endl;
   std::vector<nTupleAnalysis::muonPtr> selMuons;
   for(nTupleAnalysis::muonPtr& muon: event->muons){
@@ -419,18 +419,19 @@ int BTagAnalysisHLT::processEvent(){
     }
     cutflow->Fill("passLeptonCut", 1.0);
   }
-
+  */
   float eventWeight = 1.0;
   float puWeight    = 1.0;
 
   //
   // Fill All events
   //
+  /*
   if(debug) cout << "event->offPVs.size() = " << event->offPVs.size() << endl;
   hEvents->Fill(event->offPVs.size(),  0.0, eventWeight);
   if(puWeight)
     hEventsNoPUWeight->Fill(event->offPVs.size(),  0.0, eventWeight/puWeight);
-
+  */
   hVtx      ->Fill(event->pvs, eventWeight);
   //hVtx      ->FillDiffHists(event->pvs, event->offPVs, eventWeight);
   //hOffVtx   ->Fill(event->offPVs, eventWeight);
@@ -452,11 +453,11 @@ int BTagAnalysisHLT::processEvent(){
 
     //hOffJetsPreOLap->Fill(offJet, eventWeight);
 
-    if(nTupleAnalysis::failOverlap(pfJet->p,event->muons,0.4)) continue;
-    cutflowJets->Fill("muonOlap", eventWeight);    
+    //if(nTupleAnalysis::failOverlap(pfJet->p,event->muons,0.4)) continue;
+    //cutflowJets->Fill("muonOlap", eventWeight);    
 
-    if(nTupleAnalysis::failOverlap(pfJet->p,event->elecs,0.4)) continue;
-    cutflowJets->Fill("elecOlap", eventWeight);    
+    //if(nTupleAnalysis::failOverlap(pfJet->p,event->elecs,0.4)) continue;
+    //cutflowJets->Fill("elecOlap", eventWeight);    
 
     //
     // Check if jet is a Probe
@@ -470,8 +471,8 @@ int BTagAnalysisHLT::processEvent(){
 
       if(pfJetOther->pt       < 35)   continue;	
       if(fabs(pfJetOther->eta) > 2.4) continue;
-      if(nTupleAnalysis::failOverlap(pfJetOther->p,event->elecs,0.4)) continue;
-      if(nTupleAnalysis::failOverlap(pfJetOther->p,event->muons,0.4)) continue;
+      //if(nTupleAnalysis::failOverlap(pfJetOther->p,event->elecs,0.4)) continue;
+      //if(nTupleAnalysis::failOverlap(pfJetOther->p,event->muons,0.4)) continue;
       float thisDr = pfJetOther->p.DeltaR(pfJet->p);
       if(thisDr < min_dR_all) min_dR_all = thisDr;
  
@@ -544,8 +545,8 @@ int BTagAnalysisHLT::processEvent(){
     if(fabs(pfJet->eta) > 2.5) continue;
     if(pfJet->pt       < 35)   continue;
   
-    if(nTupleAnalysis::failOverlap(pfJet->p,event->elecs, 0.4)) continue;
-    if(nTupleAnalysis::failOverlap(pfJet->p,event->muons, 0.4)) continue;
+    //if(nTupleAnalysis::failOverlap(pfJet->p,event->elecs, 0.4)) continue;
+    //if(nTupleAnalysis::failOverlap(pfJet->p,event->muons, 0.4)) continue; 0624
   
     hPfJets->Fill(pfJet, eventWeight);
   }
@@ -559,8 +560,8 @@ int BTagAnalysisHLT::processEvent(){
       if(caloJet->pt       < 35)   continue;
   
       //caloJetHistsPreOLap.Fill(caloJet);
-      if(nTupleAnalysis::failOverlap(caloJet->p,event->elecs, 0.4)) continue;
-      if(nTupleAnalysis::failOverlap(caloJet->p,event->muons, 0.4)) continue;
+      //if(nTupleAnalysis::failOverlap(caloJet->p,event->elecs, 0.4)) continue;
+      //if(nTupleAnalysis::failOverlap(caloJet->p,event->muons, 0.4)) continue;
   
       hCaloJets->Fill(caloJet, eventWeight);
 
@@ -682,7 +683,7 @@ void BTagAnalysisHLT::PFJetAnalysis(const nTupleAnalysis::jetPtr& hltJet, float 
     for(const nTupleAnalysis::trkTagVarPtr& pfTrkTag: hltJet->trkTagVars){
       //need to check that the track (with matching resolution cone r=0.01) is in region where R=0.3 circles inside the two jets overlap!
       //if offTrack.dR > 0.29 - offJet.match_dR: continue
-      if(pfTrkTag->trackDeltaR                              > 0.29) continue; // offTrack is not in cone of offJet
+      //if(pfTrkTag->trackDeltaR                              > 0.29) continue; // offTrack is not in cone of offJet
       //if(pfTrkTag->p.DeltaR(offJet->p) > 0.29) continue; // offTrack is not in cone of pfJet
   
       hPfBTags->FillTrkTagVarHists(pfTrkTag, weight);
