@@ -441,7 +441,7 @@ int BTagAnalysisHLT::processEvent(){
   //unsigned int nOffJets_matched     = 0;
   //unsigned int nOffJets_matchedCalo = 0;
   if(debug) cout << "event->pfJets.size()" << event->pfJets.size() << endl;
-  for(const nTupleAnalysis::jetPtr& pfJet : event->pfJets){
+  for(const nTupleAnalysis::jetPtr& pfJet : event->pfJets){ // in AOD+HLT, looping through event->offJets instead
     if(debug) cout << "entered for loop" << endl;
     cutflowJets->Fill("all", eventWeight);    
 
@@ -466,7 +466,7 @@ int BTagAnalysisHLT::processEvent(){
     float min_dR_all  = 1000;
     float min_dR_bjet = 1000;
     //const JetData* tagJet = nullptr;
-    for(const nTupleAnalysis::jetPtr& pfJetOther : event->pfJets){
+    for(const nTupleAnalysis::jetPtr& pfJetOther : event->pfJets){ // in AOD+HLT, looping through event->offJets instead
       if(pfJetOther == pfJet) continue;
 
       if(pfJetOther->pt       < 35)   continue;	
@@ -505,12 +505,9 @@ int BTagAnalysisHLT::processEvent(){
         nnout = neuralNet->compute(pfJet, true);
       }
     }
-
     PFJetAnalysis(pfJet,eventWeight,nullptr);
-      
     //++nOffJets_matched;
-
-  }//offJet has match
+  }
 
   /*
     //
