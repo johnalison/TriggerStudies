@@ -19,7 +19,7 @@ parser.add_option('--doTracks',                   action="store_true",  default=
 parser.add_option('--doLeptonSel',                action="store_true",  default=False, help="doLepton Selection")
 parser.add_option('-y', '--year',                 dest="year",          default="2016", help="Year specifies trigger (and lumiMask for data)")
 #parser.add_option('-l', '--lumi', type="float",   dest="lumi",          default=1.0,    help="Luminosity for MC normalization: units [pb]")
-parser.add_option( '--inputAOD',                dest="inputAOD",         default="TriggerStudies/fileLists/data2016H.txt", help="Input file(s). If it ends in .txt, will treat it as a list of input files.")
+parser.add_option( '--inputAOD',                dest="inputAOD",         default='None', help="Input file(s). If it ends in .txt, will treat it as a list of input files.")
 parser.add_option( '--inputRAW',                dest="inputRAW",         default="TriggerStudies/fileLists/data2016H.txt", help="Input file(s). If it ends in .txt, will treat it as a list of input files.")
 parser.add_option('-o', '--outputBase',           dest="outputBase",    default="/uscms/home/bryantp/nobackup/TriggerStudies/", help="Base path for storing output histograms and picoAOD")
 parser.add_option('--puFile',                     dest="puFile",       default="", help="PUFileName")
@@ -80,6 +80,9 @@ if ".txt" in o.inputRAW:
         fileNamesRAW.append(line.replace('\n',''))
 else:
     fileNamesRAW.append(o.inputRAW)
+    if cms.bool(o.debug):
+        print('fileNamesRAW:', fileNamesRAW)
+
 
 
 pathOut = outputBase
@@ -147,17 +150,31 @@ else:
 
 
 #Setup event loop object
-process.BTagAnalyzer = cms.PSet(
-    debug   = cms.bool(o.debug),
-    fileNamesAOD   = cms.vstring(fileNamesAOD),
-    isMC    = cms.bool(o.isMC),
-    isTurnOnStudy    = cms.bool(o.isTurnOnStudy),
-    doLeptonSel      = cms.bool(o.doLeptonSel),
-    year    = cms.string(o.year),
-    puFile    = cms.string(o.puFile),
-    jetDetailString    = cms.string(jetDetailString),
-    lumiData= cms.string(lumiData[o.year]),
-    histogramming = cms.int32(int(o.histogramming)),
-    skipEvents = cms.int32(int(o.skipEvents)),
-    )
-
+if o.inputAOD is 'None':
+    print('Configuring HLTOnly...')
+    process.BTagAnalyzer = cms.PSet(
+        debug   = cms.bool(o.debug),
+        isMC    = cms.bool(o.isMC),
+        year    = cms.string(o.year),
+        jetDetailString    = cms.string(jetDetailString),
+        lumiData= cms.string(lumiData[o.year]),
+        histogramming = cms.int32(int(o.histogramming)),
+        skipEvents = cms.int32(int(o.skipEvents)),
+        )
+    print('HLTOnly configured')
+else:
+    print('Configuring RAW+AOD...')
+    process.BTagAnalyzer = cms.PSet(
+        debug   = cms.bool(o.debug),
+        fileNamesAOD   = cms.vstring(fileNamesAOD),
+        isMC    = cms.bool(o.isMC),
+        isTurnOnStudy    = cms.bool(o.isTurnOnStudy),
+        doLeptonSel      = cms.bool(o.doLeptonSel),
+        year    = cms.string(o.year),
+        puFile    = cms.string(o.puFile),
+        jetDetailString    = cms.string(jetDetailString),
+        lumiData= cms.string(lumiData[o.year]),
+        histogramming = cms.int32(int(o.histogramming)),
+        skipEvents = cms.int32(int(o.skipEvents)),
+        )
+    print('RAW+AOD configured')
