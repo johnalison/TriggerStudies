@@ -25,7 +25,8 @@ namespace TriggerStudies {
   public:
     // Member variables
     TChain* treeRAW;
-    TChain* treeAOD;
+    TChain* treeAOD = nullptr;
+    bool doOffline = true;
 
     typedef std::vector<std::pair<Int_t, Int_t> > RunEventMap;
     RunEventMap AODEvents;
@@ -41,7 +42,6 @@ namespace TriggerStudies {
     Int_t    runAOD       =  0;
     UInt_t    lumiBlockAOD =  0;
     Int_t eventAOD     =  0;
-
 
     nTupleAnalysis::jetData* offTreeJets;
     std::vector<nTupleAnalysis::jetPtr> offJets;
