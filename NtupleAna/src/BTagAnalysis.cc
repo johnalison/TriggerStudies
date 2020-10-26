@@ -277,7 +277,7 @@ BTagAnalysis::BTagAnalysis(TChain* _eventsRAW, TChain* _eventsAOD, fwlite::TFile
 
   hPfJets          = new nTupleAnalysis::jetHists("pfJets",           fs, "");
   hPfJets_matched  = new nTupleAnalysis::jetHists("pfJets_matched",           fs, "");
-
+  hDeltaROffPf       = dir.make<TH1F>("dR_OffPf",            "BTagAnalysis/dR_OffPf;             DeltaR;   Entries", 100,-0.01, 5);
 
   if(doCaloJets){
     hCaloJets            = new nTupleAnalysis::jetHists("caloJets",           fs, "");
@@ -342,6 +342,7 @@ BTagAnalysis::BTagAnalysis(TChain* _eventsRAW, TChain* _eventsAOD, fwlite::TFile
     hPuppiBTags_unmatched = new nTupleAnalysis::btaggingHists("puppiBTags_unmatched",fs, "");
 
     hDeltaROffPf       = dir.make<TH1F>("dR_OffPf",            "BTagAnalysis/dR_OffPf;             DeltaR;   Entries", 100,-0.01, 5);
+
 
     hmttOff           = dir.make<TH1F>("mtt_off",            "BTagAnalysis/mtt_off;             mtt;   Entries", 100,-0.01, 2);
     hmttOff_isFromV0  = dir.make<TH1F>("mtt_off_isFromV0",   "BTagAnalysis/mtt_off_isFromV0;    mtt;   Entries", 100,-0.01, 2);
@@ -585,6 +586,7 @@ int BTagAnalysis::processEvent(){
     return 0;
   }
   cutflow->Fill("passNJetCut", eventWeight);
+  if(debug) cout << "Pass NJet Cut " << endl;
 
   bool doOfflineBTagCut = false;
   if(doOfflineBTagCut){
@@ -596,9 +598,13 @@ int BTagAnalysis::processEvent(){
     cutflow->Fill("passNBJetCut", eventWeight);
   }
 
+  if(debug) cout << "Pass NBJet Cut " << endl;
+
   if(isMC)
     eventWeight *= totalSFWeight;
 
+
+  if(debug) cout << "Fill Leptons " << endl;
   hMuons->nMuons->Fill(event->muons.size());
   for(auto muon: event->muons)
     hMuons->Fill(muon,eventWeight);
@@ -611,6 +617,7 @@ int BTagAnalysis::processEvent(){
   //
   // Fill All events
   //
+  if(debug) cout << "Fill All Events " << endl;
   hEvents->Fill(event->offPVs.size(),  0.0, eventWeight);
   if(puWeight)
     hEventsNoPUWeight->Fill(event->offPVs.size(),  0.0, eventWeight/puWeight);
@@ -628,6 +635,7 @@ int BTagAnalysis::processEvent(){
   unsigned int nOffJets_matchedCalo = 0;
   unsigned int nOffJets_matchedPuppi = 0;
 
+  if(debug) cout << "Starting off jets loop  " << endl;
   for(const nTupleAnalysis::jetPtr& offJet : event->offJets){
     cutflowJets->Fill("all", eventWeight);
 
@@ -656,6 +664,8 @@ int BTagAnalysis::processEvent(){
     float min_dR_all  = 1000;
     float min_dR_bjet = 1000;
     //const JetData* tagJet = nullptr;
+
+    if(debug) cout << "Starting off jets loop for probe check " << endl;
     for(const nTupleAnalysis::jetPtr& offJetOther : event->offJets){
       if(offJetOther == offJet) continue;
 
@@ -682,16 +692,22 @@ int BTagAnalysis::processEvent(){
     // Require that there only be one other probe
     //    Note: this will suppress LF
     if(nOtherTags != 1) continue;
+
     cutflowJets->Fill("isProbe", eventWeight);
+    if(debug) cout << "Pass Probe cut " << endl;
 
     //
     //  Offline Jets
     //
     ++nOffJets;
     hOffJets->Fill(offJet,eventWeight);
+
     if(doPuppiJets){
       hOffJetsPuppi->Fill(offJet,eventWeight);
     }
+
+    if(debug) cout << "Filling offline BTags " << endl;
+
     for(const nTupleAnalysis::trkTagVarPtr& trkTag: offJet->trkTagVars) {
       hOffBTagsAll->FillTrkTagVarHists(trkTag, eventWeight);
     }
@@ -710,8 +726,11 @@ int BTagAnalysis::processEvent(){
     float dR = 1e6;
     nTupleAnalysis::jetPtr matchedJet = nullptr;
 
+    if(debug) cout << "Matching to PF jets " << endl;
     for(const nTupleAnalysis::jetPtr& pfJet : event->pfJets){
+      if(debug) cout << " new jet " << endl;
       float this_dR = pfJet->p.DeltaR(offJet->p);
+      if(debug) cout << " this dR " << this_dR << endl;
       if (this_dR < dR){
 	dR = this_dR;
 	matchedJet = pfJet;
@@ -727,6 +746,7 @@ int BTagAnalysis::processEvent(){
     //
     if( dR < 0.4){
 
+      if(debug) cout << "Have a PF jet match " << endl;
       cutflowJets->Fill("hasHLTMatchPF", eventWeight);
       offJet->matchedJet = matchedJet;
 
@@ -734,6 +754,8 @@ int BTagAnalysis::processEvent(){
       // Testing Neural Net
       //
       if(neuralNet){
+	if(debug) cout << "Testing the NN " << endl;
+
 	lwt::ValueMap nnout = neuralNet->compute(matchedJet);
 	float DeepCSV_reCalc = nnout["probb"] + nnout["probbb"];
         matchedJet->DeepCSV_reCalc = DeepCSV_reCalc;
@@ -746,7 +768,7 @@ int BTagAnalysis::processEvent(){
       }
 
 
-
+      if(debug) cout << "Doing PFJetAnalysis " << endl;
       PFJetAnalysis(offJet,matchedJet,eventWeight);
 
       ++nOffJets_matched;
@@ -1123,9 +1145,10 @@ void BTagAnalysis::OfflineToOnlineSVMatching(const nTupleAnalysis::svPtr& offSV,
 
 
 void BTagAnalysis::PFJetAnalysis(const nTupleAnalysis::jetPtr& offJet,const nTupleAnalysis::jetPtr& hltJet, float weight){
-
+  if(debug) cout << "In PFJetAnalysis " << endl;
 
   if(doTracks){
+    if(debug) cout << " ... doing tracks " << endl;
 
     //
     //  Off tracks
@@ -1331,9 +1354,11 @@ void BTagAnalysis::PFJetAnalysis(const nTupleAnalysis::jetPtr& offJet,const nTup
 
   }//doTracks
 
+
   //
   // Jet info
   //
+  if(debug) cout << " ... doing jet info " << endl;
   hOffJets_matched->Fill(offJet,weight);
   hOffJets_matchedJet->Fill(hltJet,weight);
   if(abs(hltJet->p.Eta())<1.5){
