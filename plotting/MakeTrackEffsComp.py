@@ -18,6 +18,7 @@ p.add_option('--name2',  help = 'intput File' )
 p.add_option('--output', type = 'string', default = "jetLevelPlots", dest = 'outDir', help = 'output dir' )
 p.add_option('--doAlgoStudy', action="store_true" )
 p.add_option('--doCaloJets', action="store_true" )
+p.add_option('--doPuppiJets', action="store_true" )
 (o,a) = p.parse_args()
 
 #from rocCurveUtils            import drawWaterMarks
@@ -45,8 +46,8 @@ vars = [
     "phi"            ,
    "eta"            ,
     "Chi2",
-    "DecayLenVal"    ,
-    "DecayLenVal_l"  ,
+    # "DecayLenVal"    ,
+    # "DecayLenVal_l"  ,
     "DeltaR"         ,
     "DeltaR_l"       ,
     "Eta"            ,
@@ -86,7 +87,7 @@ vars = [
     "ip3d_sig_l"     ,
 
 
-       "trackMomentum"       ,
+       # "trackMomentum"       ,
        # "ip2d",
        # "ip2d_l",
        # "ip3d",
@@ -97,10 +98,10 @@ vars = [
        # "ip3d_sig_l",
        # "ip2d_err",
        # "ip3d_err",
-       "trackHasInnerPixHit",
-       "trackNPixelHits",
+       # "trackHasInnerPixHit",
+       # "trackNPixelHits",
 
-       "trackNTotalHits",
+       # "trackNTotalHits",
 
         ]
 
@@ -166,6 +167,29 @@ for v in vars:
                  xMax=eff_Matched_1.GetXaxis().GetXmax(),
                  xMin=eff_Matched_1.GetXaxis().GetXmin()
                  )
+    if o.doPuppiJets:
+        effNumName = "offTracksPuppi_matched"
+        effDenName = "offTracksPuppi"
+
+        print v ,         [effNumName,     effDenName]
+        eff_Matched_1 = makeEff(v ,         [effNumName,     effDenName],         inFile1,binning=binning)
+        eff_Matched_2 = makeEff(v ,           [effNumName,     effDenName],         inFile2,  binning=binning)
+
+        yLeg = 0.93
+        xLeg = 0.5
+        if v in  ["algo","origAlgo"]:
+            yLeg = 0.4
+            xLeg = 0.6
+
+        drawComp("PuppiEff_"+v,[(eff_Matched_1,o.name1,       ROOT.kBlack),
+                               (eff_Matched_2,o.name2,  ROOT.kRed, ROOT.kOpenCircle),
+                               #(eff_Matched_BTag,"t#bar{t} MC ",ROOT.kBlue),
+                           #(eff_Matched_BTag_noV0,"t#bar{t} MC ",ROOT.kGreen)
+                           ]
+                 ,yTitle="Online Track Efficiency Relative to Offline",xTitle=eff_Matched_1.GetXaxis().GetTitle(),outDir=o.outDir,yMax=1.2,yLeg=yLeg,xLeg=xLeg,
+                 xMax=eff_Matched_1.GetXaxis().GetXmax(),
+                 xMin=eff_Matched_1.GetXaxis().GetXmin()
+                 )
 
 
         #
@@ -216,6 +240,19 @@ for v in vars:
         fake_Matched_2   = makeEff(v ,    [fakeNumName,  fakeDenName],inFile2,  binning=1)
 
         drawComp("CaloFake_"+v,[(fake_Matched_1,o.name1,ROOT.kBlack),
+                            (fake_Matched_2,o.name2,ROOT.kRed, ROOT.kOpenCircle),]
+                 ,yTitle="Online Track Fake-Rate Relative to Offline",xTitle=fake_Matched_1.GetXaxis().GetTitle(),outDir=o.outDir,yMax=0.4,yLeg=0.9,xLeg=0.6,
+                 xMax=fake_Matched_1.GetXaxis().GetXmax(),
+                 xMin=fake_Matched_1.GetXaxis().GetXmin()
+                 )
+    if o.doPuppiJets:
+        fakeNumName = "puppiTracks_unmatched"
+        fakeDenName = "puppiTracks"
+
+        fake_Matched_1 = makeEff(v ,    [fakeNumName,  fakeDenName],inFile1,binning=1)
+        fake_Matched_2   = makeEff(v ,    [fakeNumName,  fakeDenName],inFile2,  binning=1)
+
+        drawComp("puppiFake_"+v,[(fake_Matched_1,o.name1,ROOT.kBlack),
                             (fake_Matched_2,o.name2,ROOT.kRed, ROOT.kOpenCircle),]
                  ,yTitle="Online Track Fake-Rate Relative to Offline",xTitle=fake_Matched_1.GetXaxis().GetTitle(),outDir=o.outDir,yMax=0.4,yLeg=0.9,xLeg=0.6,
                  xMax=fake_Matched_1.GetXaxis().GetXmax(),

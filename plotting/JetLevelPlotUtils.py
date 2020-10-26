@@ -579,11 +579,11 @@ def drawCompRatio(outName,histInfo,yTitle,xTitle,rTitle,outDir,setLogy=1,yMax=No
 
     hist2.Draw("hist")
     #hltLF.SetMarkerSize(0.75)
-    hltLF.SetMarkerSize(0.5)
+    # hltLF.SetMarkerSize(0.5)
     #hltLF.SetMarkerStyle(21)
     hist1.Draw("same pe")
     #offBQ.Draw("hist same")
-    hltBQ.SetMarkerSize(0.5)
+    # hltBQ.SetMarkerSize(0.5)
     #hltBQ.SetMarkerStyle(21)
     #hltBQ.Draw("same pe")
     leg.Draw("same")
@@ -770,11 +770,11 @@ def drawStackCompRatio(outName,dataInfo,MCInfo,yTitle,xTitle,rTitle,outDir,min=1
 
 
     #hltLF.SetMarkerSize(0.75)
-    hltLF.SetMarkerSize(0.5)
+    # hltLF.SetMarkerSize(0.5)
     #hltLF.SetMarkerStyle(21)
     histData.Draw("same pe")
     #offBQ.Draw("hist same")
-    hltBQ.SetMarkerSize(0.5)
+    # hltBQ.SetMarkerSize(0.5)
     #hltBQ.SetMarkerStyle(21)
     #hltBQ.Draw("same pe")
     leg.Draw("same")

@@ -217,7 +217,7 @@ for v in [
     "tracks/IsFromV0",
     "tracks/IsFromSV",
     #        "neutralHadronEnergyFraction",
-    "trackSumJetEtRatio",
+    # "trackSumJetEtRatio",
         ]:
     for d in plotDirs:
         plot(v,d,       binning=1,doratio=1,rMin=0.5,rMax=1.5,logy=0,minY=0,labels=labName,norm=options.norm)
