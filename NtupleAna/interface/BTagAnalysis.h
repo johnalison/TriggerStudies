@@ -126,6 +126,16 @@ namespace TriggerStudies {
     nTupleAnalysis::jetHists*    hOffJetMedDeepFlav_matchedPuppiCSV      ;
 
 
+    nTupleAnalysis::jetHists*  hOffJets_matched_LandPU   ;
+    nTupleAnalysis::jetHists*  hOffJets_matched_LandPU_eta1   ;
+    nTupleAnalysis::jetHists*  hOffJets_matched_LandPU_eta2   ;
+    nTupleAnalysis::jetHists*  hOffJets_matched_LandPU_eta3   ;
+    nTupleAnalysis::jetHists*  hOffJets_matchedJet_LandPU;
+    nTupleAnalysis::jetHists*  hOffJets_matchedJet_LandPU_eta1;
+    nTupleAnalysis::jetHists*  hOffJets_matchedJet_LandPU_eta2;
+    nTupleAnalysis::jetHists*  hOffJets_matchedJet_LandPU_eta3;
+    nTupleAnalysis::jetHists*  hOffJets_matchedCalo_LandPU;
+    nTupleAnalysis::jetHists*  hOffJets_matchedCaloJet_LandPU;
     nTupleAnalysis::jetHists*  hOffJets_matched_L   ;
     nTupleAnalysis::jetHists*  hOffJets_matched_L_eta1   ;
     nTupleAnalysis::jetHists*  hOffJets_matched_L_eta2   ;
@@ -157,6 +167,14 @@ namespace TriggerStudies {
     nTupleAnalysis::jetHists*  hOffJets_matchedCalo_C;
     nTupleAnalysis::jetHists*  hOffJets_matchedCaloJet_C;
 
+    nTupleAnalysis::jetHists*  hOffJets_matchedPuppi_LandPU;
+    nTupleAnalysis::jetHists*  hOffJets_matchedPuppi_LandPU_eta1   ;
+    nTupleAnalysis::jetHists*  hOffJets_matchedPuppi_LandPU_eta2   ;
+    nTupleAnalysis::jetHists*  hOffJets_matchedPuppi_LandPU_eta3   ;
+    nTupleAnalysis::jetHists*  hOffJets_matchedPuppiJet_LandPU;
+    nTupleAnalysis::jetHists*  hOffJets_matchedPuppiJet_LandPU_eta1;
+    nTupleAnalysis::jetHists*  hOffJets_matchedPuppiJet_LandPU_eta2;
+    nTupleAnalysis::jetHists*  hOffJets_matchedPuppiJet_LandPU_eta3;
     nTupleAnalysis::jetHists*  hOffJets_matchedPuppi_L;
     nTupleAnalysis::jetHists*  hOffJets_matchedPuppi_L_eta1   ;
     nTupleAnalysis::jetHists*  hOffJets_matchedPuppi_L_eta2   ;

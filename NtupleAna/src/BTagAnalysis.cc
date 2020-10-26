@@ -195,6 +195,15 @@ BTagAnalysis::BTagAnalysis(TChain* _eventsRAW, TChain* _eventsAOD, fwlite::TFile
     hOffJets_matchedJet_L_eta2     = new nTupleAnalysis::jetHists("offJets_matchedJet_L_eta2",    fs, "", jetDetailString);
     hOffJets_matchedJet_L_eta3     = new nTupleAnalysis::jetHists("offJets_matchedJet_L_eta3",    fs, "", jetDetailString);
 
+    hOffJets_matched_LandPU        = new nTupleAnalysis::jetHists("offJets_matched_LandPU",       fs, "", jetDetailString);
+    hOffJets_matched_LandPU_eta1        = new nTupleAnalysis::jetHists("offJets_matched_LandPU_eta1",       fs, "", jetDetailString);
+    hOffJets_matched_LandPU_eta2        = new nTupleAnalysis::jetHists("offJets_matched_LandPU_eta2",       fs, "", jetDetailString);
+    hOffJets_matched_LandPU_eta3        = new nTupleAnalysis::jetHists("offJets_matched_LandPU_eta3",       fs, "", jetDetailString);
+    hOffJets_matchedJet_LandPU     = new nTupleAnalysis::jetHists("offJets_matchedJet_LandPU",    fs, "", jetDetailString);
+    hOffJets_matchedJet_LandPU_eta1     = new nTupleAnalysis::jetHists("offJets_matchedJet_LandPU_eta1",    fs, "", jetDetailString);
+    hOffJets_matchedJet_LandPU_eta2     = new nTupleAnalysis::jetHists("offJets_matchedJet_LandPU_eta2",    fs, "", jetDetailString);
+    hOffJets_matchedJet_LandPU_eta3     = new nTupleAnalysis::jetHists("offJets_matchedJet_LandPU_eta3",    fs, "", jetDetailString);
+
     hOffJets_matched_B        = new nTupleAnalysis::jetHists("offJets_matched_B",       fs, "", jetDetailString );
     hOffJets_matched_B_eta1        = new nTupleAnalysis::jetHists("offJets_matched_B_eta1",       fs, "", jetDetailString );
     hOffJets_matched_B_eta2        = new nTupleAnalysis::jetHists("offJets_matched_B_eta2",       fs, "", jetDetailString );
@@ -216,6 +225,8 @@ BTagAnalysis::BTagAnalysis(TChain* _eventsRAW, TChain* _eventsAOD, fwlite::TFile
     if(doCaloJets){
       hOffJets_matchedCalo_L    = new nTupleAnalysis::jetHists("offJets_matchedCalo_L",   fs, "", jetDetailString);
       hOffJets_matchedCaloJet_L = new nTupleAnalysis::jetHists("offJets_matchedCaloJet_L",fs, "", jetDetailString);
+      hOffJets_matchedCalo_LandPU    = new nTupleAnalysis::jetHists("offJets_matchedCalo_LandPU",   fs, "", jetDetailString);
+      hOffJets_matchedCaloJet_LandPU = new nTupleAnalysis::jetHists("offJets_matchedCaloJet_LandPU",fs, "", jetDetailString);
 
       hOffJets_matchedCalo_B    = new nTupleAnalysis::jetHists("offJets_matchedCalo_B",   fs, "", jetDetailString );
       hOffJets_matchedCaloJet_B = new nTupleAnalysis::jetHists("offJets_matchedCaloJet_B",fs, "", jetDetailString );
@@ -232,6 +243,14 @@ BTagAnalysis::BTagAnalysis(TChain* _eventsRAW, TChain* _eventsAOD, fwlite::TFile
       hOffJets_matchedPuppiJet_L_eta1     = new nTupleAnalysis::jetHists("offJets_matchedPuppiJet_L_eta1",    fs, "", jetDetailString);
       hOffJets_matchedPuppiJet_L_eta2     = new nTupleAnalysis::jetHists("offJets_matchedPuppiJet_L_eta2",    fs, "", jetDetailString);
       hOffJets_matchedPuppiJet_L_eta3     = new nTupleAnalysis::jetHists("offJets_matchedPuppiJet_L_eta3",    fs, "", jetDetailString);
+      hOffJets_matchedPuppi_LandPU             = new nTupleAnalysis::jetHists("offJets_matchedPuppi_LandPU",   fs, "", jetDetailString);
+      hOffJets_matchedPuppi_LandPU_eta1        = new nTupleAnalysis::jetHists("offJets_matchedPuppi_LandPU_eta1",       fs, "", jetDetailString);
+      hOffJets_matchedPuppi_LandPU_eta2        = new nTupleAnalysis::jetHists("offJets_matchedPuppi_LandPU_eta2",       fs, "", jetDetailString);
+      hOffJets_matchedPuppi_LandPU_eta3        = new nTupleAnalysis::jetHists("offJets_matchedPuppi_LandPU_eta3",       fs, "", jetDetailString);
+      hOffJets_matchedPuppiJet_LandPU          = new nTupleAnalysis::jetHists("offJets_matchedPuppiJet_LandPU",fs, "", jetDetailString);
+      hOffJets_matchedPuppiJet_LandPU_eta1     = new nTupleAnalysis::jetHists("offJets_matchedPuppiJet_LandPU_eta1",    fs, "", jetDetailString);
+      hOffJets_matchedPuppiJet_LandPU_eta2     = new nTupleAnalysis::jetHists("offJets_matchedPuppiJet_LandPU_eta2",    fs, "", jetDetailString);
+      hOffJets_matchedPuppiJet_LandPU_eta3     = new nTupleAnalysis::jetHists("offJets_matchedPuppiJet_LandPU_eta3",    fs, "", jetDetailString);
 
       hOffJets_matchedPuppi_B             = new nTupleAnalysis::jetHists("offJets_matchedPuppi_B",   fs, "", jetDetailString );
       hOffJets_matchedPuppi_B_eta1        = new nTupleAnalysis::jetHists("offJets_matchedPuppi_B_eta1",       fs, "", jetDetailString );
@@ -852,17 +871,21 @@ int BTagAnalysis::processEvent(){
 
       hCaloJets->Fill(caloJet, eventWeight);
 
-      if(caloJet->DeepCSV > 1)
-	cout << "Error " << "Offline" << " DeepCSV is " << caloJet->DeepCSV << endl;
+      if(caloJet->DeepCSV > 1){
+	       cout << "Error " << "Offline" << " DeepCSV is " << caloJet->DeepCSV << endl;
+       }
 
-      if(caloJet->DeepCSVb > 1)
-	cout << "Error " << "Offline" << " DeepCSVb is " << caloJet->DeepCSVb << endl;
+      if(caloJet->DeepCSVb > 1){
+  	     cout << "Error " << "Offline" << " DeepCSVb is " << caloJet->DeepCSVb << endl;
+       }
 
-      if(caloJet->DeepCSVbb > 1)
-	cout << "Error " << "Offline" << " DeepCSVbb is " << caloJet->DeepCSVbb << endl;
+      if(caloJet->DeepCSVbb > 1){
+	       cout << "Error " << "Offline" << " DeepCSVbb is " << caloJet->DeepCSVbb << endl;
+      }
 
-    if(caloJet->DeepCSVb > 1)
-      std::cout << "Error " << "Offline" << " DeepCSVb is " << caloJet->DeepCSVb << std::endl;
+      if(caloJet->DeepCSVb > 1){
+        std::cout << "Error " << "Offline" << " DeepCSVb is " << caloJet->DeepCSVb << std::endl;
+      }
 
 
       const nTupleAnalysis::jetPtr caloJetMatchedJet = caloJet->matchedJet.lock();
@@ -892,27 +915,31 @@ int BTagAnalysis::processEvent(){
 
       hPuppiJets->Fill(puppiJet, eventWeight);
 
-      if(puppiJet->DeepCSV > 1)
-	cout << "Error " << "Offline" << " DeepCSV is " << puppiJet->DeepCSV << endl;
+      if(puppiJet->DeepCSV > 1){
+	       cout << "Error " << "Offline" << " DeepCSV is " << puppiJet->DeepCSV << endl;
+      }
 
-      if(puppiJet->DeepCSVb > 1)
-	cout << "Error " << "Offline" << " DeepCSVb is " << puppiJet->DeepCSVb << endl;
+      if(puppiJet->DeepCSVb > 1){
+	       cout << "Error " << "Offline" << " DeepCSVb is " << puppiJet->DeepCSVb << endl;
+       }
 
-      if(puppiJet->DeepCSVbb > 1)
-	cout << "Error " << "Offline" << " DeepCSVbb is " << puppiJet->DeepCSVbb << endl;
+      if(puppiJet->DeepCSVbb > 1){
+	       cout << "Error " << "Offline" << " DeepCSVbb is " << puppiJet->DeepCSVbb << endl;
+       }
 
-    if(puppiJet->DeepCSVb > 1)
+    if(puppiJet->DeepCSVb > 1){
       std::cout << "Error " << "Offline" << " DeepCSVb is " << puppiJet->DeepCSVb << std::endl;
+    }
 
 
       const nTupleAnalysis::jetPtr puppiJetMatchedJet = puppiJet->matchedJet.lock();
       if(puppiJetMatchedJet){
-	hPuppiJets_matched->Fill(puppiJet, eventWeight);
+      	hPuppiJets_matched->Fill(puppiJet, eventWeight);
 
-	//if(puppiJet->m_matchedJet->m_hadronFlavour == 5)
-	//	puppiJetHists_matchedB.Fill(puppiJet);
-	//	else
-	//	  puppiJetHists_matchedL.Fill(puppiJet);
+      	//if(puppiJet->m_matchedJet->m_hadronFlavour == 5)
+      	//	puppiJetHists_matchedB.Fill(puppiJet);
+      	//	else
+      	//	  puppiJetHists_matchedL.Fill(puppiJet);
       }
     }
   }
@@ -1393,19 +1420,35 @@ void BTagAnalysis::PFJetAnalysis(const nTupleAnalysis::jetPtr& offJet,const nTup
           hOffJets_matchedJet_C_eta3->Fill(hltJet,weight);
       }
     }else if(offJet->hadronFlavour == 0){
-      hOffJets_matched_L->Fill(offJet, weight);
-      hOffJets_matchedJet_L->Fill(hltJet, weight);
+      hOffJets_matched_LandPU->Fill(offJet, weight);
+      hOffJets_matchedJet_LandPU->Fill(hltJet, weight);
       if(abs(hltJet->p.Eta())<1.5){
-          hOffJets_matched_L_eta1->Fill(offJet, weight);
-          hOffJets_matchedJet_L_eta1->Fill(hltJet,weight);
+          hOffJets_matched_LandPU_eta1->Fill(offJet, weight);
+          hOffJets_matchedJet_LandPU_eta1->Fill(hltJet,weight);
       }
       if(abs(hltJet->p.Eta())>=1.5 && abs(hltJet->p.Eta())<3.){
-          hOffJets_matched_L_eta2->Fill(offJet, weight);
-          hOffJets_matchedJet_L_eta2->Fill(hltJet,weight);
+          hOffJets_matched_LandPU_eta2->Fill(offJet, weight);
+          hOffJets_matchedJet_LandPU_eta2->Fill(hltJet,weight);
       }
       if(abs(hltJet->p.Eta())>=3){
-          hOffJets_matched_L_eta3->Fill(offJet, weight);
-          hOffJets_matchedJet_L_eta3->Fill(hltJet,weight);
+          hOffJets_matched_LandPU_eta3->Fill(offJet, weight);
+          hOffJets_matchedJet_LandPU_eta3->Fill(hltJet,weight);
+      }
+      if(offJet->flavourCleaned!=0){
+        hOffJets_matched_L->Fill(offJet, weight);
+        hOffJets_matchedJet_L->Fill(hltJet, weight);
+        if(abs(hltJet->p.Eta())<1.5){
+            hOffJets_matched_L_eta1->Fill(offJet, weight);
+            hOffJets_matchedJet_L_eta1->Fill(hltJet,weight);
+        }
+        if(abs(hltJet->p.Eta())>=1.5 && abs(hltJet->p.Eta())<3.){
+            hOffJets_matched_L_eta2->Fill(offJet, weight);
+            hOffJets_matchedJet_L_eta2->Fill(hltJet,weight);
+        }
+        if(abs(hltJet->p.Eta())>=3){
+            hOffJets_matched_L_eta3->Fill(offJet, weight);
+            hOffJets_matchedJet_L_eta3->Fill(hltJet,weight);
+        }
       }
     }
   }
@@ -1581,8 +1624,12 @@ void BTagAnalysis::CaloJetAnalysis(const nTupleAnalysis::jetPtr& offJet,const nT
       hOffJets_matchedCalo_C->Fill(offJet, weight);
       hOffJets_matchedCaloJet_C->Fill(hltJet, weight);
     }else if(offJet->hadronFlavour == 0){
-      hOffJets_matchedCalo_L->Fill(offJet, weight);
-      hOffJets_matchedCaloJet_L->Fill(hltJet, weight);
+      hOffJets_matchedCalo_LandPU->Fill(offJet, weight);
+      hOffJets_matchedCaloJet_LandPU->Fill(hltJet, weight);
+      if(offJet->flavourCleaned!=0){
+        hOffJets_matchedCalo_L->Fill(offJet, weight);
+        hOffJets_matchedCaloJet_L->Fill(hltJet, weight);
+      }
     }
   }
 
@@ -1612,11 +1659,10 @@ void BTagAnalysis::PuppiJetAnalysis(const nTupleAnalysis::jetPtr& offJet,const n
           //
           for(const nTupleAnalysis::trackPtr& offTrack_pair: offJet->tracks){
             if(offTrack == offTrack_pair) continue;
-            float thisMass = (offTrack->p + offTrack_pair->p).M();
-
+            // float thisMass = (offTrack->p + offTrack_pair->p).M();
             // hmttOff->Fill(thisMass , weight);
             // if(offTrack->isfromV0)
-    	  // hmttOff_isFromV0->Fill(thisMass , weight);
+              // hmttOff_isFromV0->Fill(thisMass , weight);
 
           }
 
@@ -1889,19 +1935,35 @@ void BTagAnalysis::PuppiJetAnalysis(const nTupleAnalysis::jetPtr& offJet,const n
               hOffJets_matchedPuppiJet_C_eta3->Fill(hltJet,weight);
           }
         }else if(offJet->hadronFlavour == 0){
-          hOffJets_matchedPuppi_L->Fill(offJet, weight);
-          hOffJets_matchedPuppiJet_L->Fill(hltJet, weight);
+          hOffJets_matchedPuppi_LandPU->Fill(offJet, weight);
+          hOffJets_matchedPuppiJet_LandPU->Fill(hltJet, weight);
           if(abs(hltJet->p.Eta())<1.5){
-              hOffJets_matchedPuppi_L_eta1->Fill(offJet, weight);
-              hOffJets_matchedPuppiJet_L_eta1->Fill(hltJet,weight);
+              hOffJets_matchedPuppi_LandPU_eta1->Fill(offJet, weight);
+              hOffJets_matchedPuppiJet_LandPU_eta1->Fill(hltJet,weight);
           }
           if(abs(hltJet->p.Eta())>=1.5 && abs(hltJet->p.Eta())<3.){
-              hOffJets_matchedPuppi_L_eta2->Fill(offJet, weight);
-              hOffJets_matchedPuppiJet_L_eta2->Fill(hltJet,weight);
+              hOffJets_matchedPuppi_LandPU_eta2->Fill(offJet, weight);
+              hOffJets_matchedPuppiJet_LandPU_eta2->Fill(hltJet,weight);
           }
           if(abs(hltJet->p.Eta())>=3){
-              hOffJets_matchedPuppi_L_eta3->Fill(offJet, weight);
-              hOffJets_matchedPuppiJet_L_eta3->Fill(hltJet,weight);
+              hOffJets_matchedPuppi_LandPU_eta3->Fill(offJet, weight);
+              hOffJets_matchedPuppiJet_LandPU_eta3->Fill(hltJet,weight);
+          }
+          if(offJet->flavourCleaned!=0){
+            hOffJets_matchedPuppi_L->Fill(offJet, weight);
+            hOffJets_matchedPuppiJet_L->Fill(hltJet, weight);
+            if(abs(hltJet->p.Eta())<1.5){
+                hOffJets_matchedPuppi_L_eta1->Fill(offJet, weight);
+                hOffJets_matchedPuppiJet_L_eta1->Fill(hltJet,weight);
+            }
+            if(abs(hltJet->p.Eta())>=1.5 && abs(hltJet->p.Eta())<3.){
+                hOffJets_matchedPuppi_L_eta2->Fill(offJet, weight);
+                hOffJets_matchedPuppiJet_L_eta2->Fill(hltJet,weight);
+            }
+            if(abs(hltJet->p.Eta())>=3){
+                hOffJets_matchedPuppi_L_eta3->Fill(offJet, weight);
+                hOffJets_matchedPuppiJet_L_eta3->Fill(hltJet,weight);
+            }
           }
         }
       }
