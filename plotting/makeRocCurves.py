@@ -79,11 +79,11 @@ def makeRocPlot(name, var, bkg, sig, dir, varNorm=None,debug=False):
         rocPlots[-1].GetYaxis().SetTitle(yTitle)
         rocPlots[-1].GetYaxis().SetRangeUser(config[1],config[2])
         rocPlots[-1].Draw("AL")
-        can.SaveAs(o.outDir+"/roc_"+name+"_"+config[0]+".pdf")
-        can.SaveAs(o.outDir+"/roc_"+name+"_"+config[0]+".png")
+        # can.SaveAs(o.outDir+"/roc_"+name+"_"+config[0]+".pdf")
+        # can.SaveAs(o.outDir+"/roc_"+name+"_"+config[0]+".png")
     return rocPlots
 
-def plotSame(name,graphs,colors,styles, plotCaloJet=False, plotPFJet=False, plotOffJet=False, plotPuppiJet=False, plotCSV=False,plotDeepCSV=False,workingPts= None,rocType=None):
+def plotSame(name,graphs,colors,styles, plotCaloJet=False, plotPFJet=False, plotOffJet=False, plotPuppiJet=False, plotCSV=False,plotDeepCSV=False,workingPts= None,rocType=None,plotDeepJet=False):
 
     can = ROOT.TCanvas(name,name)
     can.cd().SetLogy(1)
@@ -127,7 +127,7 @@ def plotSame(name,graphs,colors,styles, plotCaloJet=False, plotPFJet=False, plot
         yStart = yStart - 0.05
         caloJetText.Draw("same")
     if plotPFJet:
-        pfJetText   = getText("HLT PF Jets  ",xStart=xStart,yStart=yStart,size=0.04,color=ROOT.kBlue)
+        pfJetText   = getText("HLT PFCHS Jets  ",xStart=xStart,yStart=yStart,size=0.04,color=ROOT.kBlue)
         pfJetText.Draw("same")
     if plotPuppiJet:
         puppiJetText   = getText("HLT Puppi Jets  ",xStart=xStart,yStart=yStart,size=0.04,color=ROOT.kBlue)
@@ -146,9 +146,21 @@ def plotSame(name,graphs,colors,styles, plotCaloJet=False, plotPFJet=False, plot
     if plotDeepCSV:
         if plotCSV:
             deepCSVText   = getText("DeepCSV (solid)  ",xStart=xStart,yStart=yStart,size=0.04,color=ROOT.kBlack)
+        elif plotDeepJet:
+            deepCSVText   = getText("DeepJet (dotted)  ",xStart=xStart,yStart=yStart,size=0.04,color=ROOT.kBlack)
         else:
             deepCSVText   = getText("DeepCSV",xStart=xStart,yStart=yStart,size=0.04,color=ROOT.kBlack)
         deepCSVText.Draw("same")
+        yStart = yStart - 0.05
+
+    if plotDeepJet:
+        if plotCSV:
+            deepJetText   = getText("DeepJet (solid)  ",xStart=xStart,yStart=yStart,size=0.04,color=ROOT.kBlack)
+        elif plotDeepCSV:
+            deepJetText   = getText("DeepCSV (solid)  ",xStart=xStart,yStart=yStart,size=0.04,color=ROOT.kBlack)
+        else:
+            deepJetText   = getText("DeepJet",xStart=xStart,yStart=yStart,size=0.04,color=ROOT.kBlack)
+        deepJetText.Draw("same")
         yStart = yStart - 0.05
 
     if plotCSV:
@@ -169,7 +181,7 @@ def plotSame(name,graphs,colors,styles, plotCaloJet=False, plotPFJet=False, plot
     can.SaveAs(o.outDir+"/roc_"+name+".png")
 
 
-def plotEtaRangesSame(name,graphs,colors,styles, plotCaloJet=False, plotPFJet=False, plotPuppiJet=False, plotOffJet=False,plotDeepCSV=False,workingPts= None,rocType=None):
+def plotEtaRangesSame(name,graphs,colors,styles, plotCaloJet=False, plotPFJet=False, plotPuppiJet=False, plotOffJet=False,plotDeepCSV=False,workingPts= None,rocType=None,plotDeepJet=False):
 
     can = ROOT.TCanvas(name,name)
     can.cd().SetLogy(1)
@@ -209,14 +221,15 @@ def plotEtaRangesSame(name,graphs,colors,styles, plotCaloJet=False, plotPFJet=Fa
         offJetText.Draw("same")
 
     if plotPFJet:
-        pfJetText   = getText("HLT PF Jets  (Dashed) ",xStart=xStart,yStart=yStart,size=0.04,color=ROOT.kBlack)
+        pfJetText   = getText("HLT PFCHS Jets  (Dashed) ",xStart=xStart,yStart=yStart,size=0.04,color=ROOT.kBlack)
         pfJetText.Draw("same")
     if plotPuppiJet:
         puppiJetText   = getText("HLT Puppi Jets  (Dashed) ",xStart=xStart,yStart=yStart,size=0.04,color=ROOT.kBlack)
         puppiJetText.Draw("same")
 
     yStart = 0.35
-    xStart = 0.6
+    # xStart = 0.6
+    xStart = 0.67
     if rocType == "Rej":
         xStart = 0.2
 
@@ -233,7 +246,19 @@ def plotEtaRangesSame(name,graphs,colors,styles, plotCaloJet=False, plotPFJet=Fa
         eta1text.Draw("same")
         eta2text.Draw("same")
         eta3text.Draw("same")
+    elif plotDeepJet:
+        deepCSVText   = getText("DeepJet (all Jets)",xStart=xStart,yStart=yStart,size=0.04,color=ROOT.kBlack)
+        deepCSVText.Draw("same")
+        yStart = yStart - 0.05
 
+        eta1text  = getText("DeepJet (|#eta|<1.5)",xStart=xStart,yStart=yStart,size=0.04,color=ROOT.kBlue+1)
+        yStart = yStart - 0.05
+        eta2text  = getText("DeepJet (1.5<|#eta|<3)",xStart=xStart,yStart=yStart,size=0.04,color=ROOT.kRed)
+        yStart = yStart - 0.05
+        eta3text  = getText("DeepJet (|#eta|>3)",xStart=xStart,yStart=yStart,size=0.04,color=ROOT.kGreen+2)
+        eta1text.Draw("same")
+        eta2text.Draw("same")
+        eta3text.Draw("same")
     can.SaveAs(o.outDir+"/roc_"+name+".pdf")
     can.SaveAs(o.outDir+"/roc_"+name+".png")
 
@@ -250,6 +275,7 @@ def main():
     off_deepcsv_roc_eta2   = makeRocPlot("Offline_deepcsv_eta2", "DeepCSV_l", bkg="matched_L_eta2",sig="matched_B_eta2",dir="offJets")
     off_deepcsv_roc_eta3   = makeRocPlot("Offline_deepcsv_eta3", "DeepCSV_l", bkg="matched_L_eta3",sig="matched_B_eta3",dir="offJets")
     off_csv_roc            = makeRocPlot("Offline_csv",          "CSVv2_l",   bkg="matched_L",sig="matched_B",dir="offJets")
+    # off_deepjet_roc        = makeRocPlot("Offline_csv",          "CSVv2_l",   bkg="matched_L",sig="matched_B",dir="offJets")
     off_probb_roc          = makeRocPlot("Offline_probb",        "probB",     bkg="matched_L",sig="matched_B",dir="offJets")
 
     pf_csv_roc            = makeRocPlot("PF_csv",          "CSVv2_l",   bkg="matchedJet_L",sig="matchedJet_B",dir="offJets")
@@ -264,14 +290,22 @@ def main():
         puppi_off_deepcsv_roc_eta1   = makeRocPlot("Puppi_Offline_deepcsv_eta1", "DeepCSV_l", bkg="matchedPuppi_L_eta1",sig="matchedPuppi_B_eta1",dir="offJets")
         puppi_off_deepcsv_roc_eta2   = makeRocPlot("Puppi_Offline_deepcsv_eta2", "DeepCSV_l", bkg="matchedPuppi_L_eta2",sig="matchedPuppi_B_eta2",dir="offJets")
         puppi_off_deepcsv_roc_eta3   = makeRocPlot("Puppi_Offline_deepcsv_eta3", "DeepCSV_l", bkg="matchedPuppi_L_eta3",sig="matchedPuppi_B_eta3",dir="offJets")
+        puppi_off_deepjet_roc_eta1   = makeRocPlot("Puppi_Offline_deepjet_eta1", "DeepJet_l", bkg="matchedPuppi_L_eta1",sig="matchedPuppi_B_eta1",dir="offJets")
+        puppi_off_deepjet_roc_eta2   = makeRocPlot("Puppi_Offline_deepjet_eta2", "DeepJet_l", bkg="matchedPuppi_L_eta2",sig="matchedPuppi_B_eta2",dir="offJets")
+        puppi_off_deepjet_roc_eta3   = makeRocPlot("Puppi_Offline_deepjet_eta3", "DeepJet_l", bkg="matchedPuppi_L_eta3",sig="matchedPuppi_B_eta3",dir="offJets")
         puppi_off_csv_roc            = makeRocPlot("Puppi_Offline_csv",          "CSVv2_l",   bkg="matchedPuppi_L",sig="matchedPuppi_B",dir="offJets")
+        puppi_off_deepjet_roc        = makeRocPlot("Puppi_Offline_deepjet",      "DeepJet_l",   bkg="matchedPuppi_L",sig="matchedPuppi_B",dir="offJets")
         puppi_off_probb_roc          = makeRocPlot("Puppi_Offline_probb",        "probB",     bkg="matchedPuppi_L",sig="matchedPuppi_B",dir="offJets")
 
         puppi_csv_roc            = makeRocPlot("Puppi_csv",          "CSVv2_l",   bkg="matchedPuppiJet_L",sig="matchedPuppiJet_B",dir="offJets")
+        puppi_deepjet_roc        = makeRocPlot("Puppi_deepjet",      "DeepJet_l",   bkg="matchedPuppiJet_L",sig="matchedPuppiJet_B",dir="offJets")
         puppi_deepcsv_roc        = makeRocPlot("Puppi_deepcsv",      "DeepCSV_l", bkg="matchedPuppiJet_L",sig="matchedPuppiJet_B",dir="offJets")
         puppi_deepcsv_roc_eta1   = makeRocPlot("Puppi_deepcsv_eta1", "DeepCSV_l", bkg="matchedPuppiJet_L_eta1",sig="matchedPuppiJet_B_eta1",dir="offJets")
         puppi_deepcsv_roc_eta2   = makeRocPlot("Puppi_deepcsv_eta2", "DeepCSV_l", bkg="matchedPuppiJet_L_eta2",sig="matchedPuppiJet_B_eta2",dir="offJets")
         puppi_deepcsv_roc_eta3   = makeRocPlot("Puppi_deepcsv_eta3", "DeepCSV_l", bkg="matchedPuppiJet_L_eta3",sig="matchedPuppiJet_B_eta3",dir="offJets")
+        puppi_deepjet_roc_eta1   = makeRocPlot("Puppi_deepjet_eta1", "DeepJet_l", bkg="matchedPuppiJet_L_eta1",sig="matchedPuppiJet_B_eta1",dir="offJets")
+        puppi_deepjet_roc_eta2   = makeRocPlot("Puppi_deepjet_eta2", "DeepJet_l", bkg="matchedPuppiJet_L_eta2",sig="matchedPuppiJet_B_eta2",dir="offJets")
+        puppi_deepjet_roc_eta3   = makeRocPlot("Puppi_deepjet_eta3", "DeepJet_l", bkg="matchedPuppiJet_L_eta3",sig="matchedPuppiJet_B_eta3",dir="offJets")
         puppi_probb_roc          = makeRocPlot("Puppi_probb",        "probB",     bkg="matchedPuppiJet_L",sig="matchedPuppiJet_B",dir="offJets")
 
 
@@ -365,6 +399,19 @@ def main():
                      plotDeepCSV = True,
                      rocType = rocType
                      )
+            plotSame("PuppiOff_vs_HLTDeepJet_"+rocType,
+                     [puppi_off_deepjet_roc[i], puppi_deepjet_roc[i]],
+                     [ROOT.kBlack,      ROOT.kBlue],
+                     [ROOT.kSolid,      ROOT.kSolid],
+                     plotCaloJet = False,
+                     plotPFJet = False,
+                     plotOffJet = True,
+                     plotPuppiJet=True,
+                     plotCSV = False,
+                     plotDeepCSV = False,
+                     rocType = rocType,
+                     plotDeepJet = True
+                     )
             plotEtaRangesSame("PuppiOff_vs_HLTDeepCSV_"+rocType+"_etaRanges",
                      [puppi_off_deepcsv_roc[i], puppi_deepcsv_roc[i],
                       puppi_off_deepcsv_roc_eta1[i], puppi_deepcsv_roc_eta1[i],
@@ -384,6 +431,27 @@ def main():
                       plotPuppiJet=True,
                       plotDeepCSV = True,
                       rocType = rocType
+                      )
+            plotEtaRangesSame("PuppiOff_vs_HLTDeepJet_"+rocType+"_etaRanges",
+                     [puppi_off_deepjet_roc[i], puppi_deepjet_roc[i],
+                      puppi_off_deepjet_roc_eta1[i], puppi_deepjet_roc_eta1[i],
+                      puppi_off_deepjet_roc_eta2[i], puppi_deepjet_roc_eta2[i],
+                      puppi_off_deepjet_roc_eta3[i], puppi_deepjet_roc_eta3[i]],
+                     [ROOT.kBlack,      ROOT.kBlack,
+                      ROOT.kBlue+1,      ROOT.kBlue+1,
+                      ROOT.kRed,      ROOT.kRed,
+                      ROOT.kGreen+2,      ROOT.kGreen+2],
+                     [ROOT.kSolid,      ROOT.kDotted,
+                      ROOT.kSolid,      ROOT.kDotted,
+                      ROOT.kSolid,      ROOT.kDotted,
+                      ROOT.kSolid,      ROOT.kDotted],
+                      plotCaloJet = False,
+                      plotPFJet = False,
+                      plotOffJet = True,
+                      plotPuppiJet=True,
+                      plotDeepCSV = False,
+                      rocType = rocType,
+                      plotDeepJet = True
                       )
 
         if o.doCaloJets:
@@ -595,6 +663,20 @@ def main():
                      plotCSV = True,
                      plotDeepCSV = True,
                      rocType = rocType
+                     )
+
+            plotSame("PuppiOff_vs_HLT_All_"+rocType,
+                     [puppi_off_deepcsv_roc[i], puppi_off_deepjet_roc[i], puppi_deepcsv_roc[i],  puppi_deepjet_roc[i]],
+                     [ROOT.kBlack,       ROOT.kBlack,     ROOT.kBlue,         ROOT.kBlue],
+                     [ROOT.kSolid,      ROOT.kDashed,     ROOT.kSolid,        ROOT.kDashed],
+                     plotCaloJet = False,
+                     plotPFJet = False,
+                     plotOffJet = True,
+                     plotPuppiJet=True,
+                     plotCSV = False,
+                     plotDeepCSV = True,
+                     rocType = rocType,
+                     plotDeepJet=True
                      )
 
 

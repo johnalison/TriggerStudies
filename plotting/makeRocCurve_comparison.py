@@ -183,7 +183,8 @@ def plotSame(name,graphs,colors,styles, plotCaloJet=False, plotPFJet=False, plot
     cmsLine2.Draw("same")
 
     yStart = 0.75
-    xStart = 0.225
+    # xStart = 0.225
+    xStart = 0.185
     if rocType == "Rej":
         xStart = 0.5
         yStart = 0.875
@@ -194,22 +195,28 @@ def plotSame(name,graphs,colors,styles, plotCaloJet=False, plotPFJet=False, plot
         offJetText.Draw("same")
 
     if plotPFJet:
-        pfJetText   = getText("HLT PF Jets"+" TRKv0 (+TICL dotted)",xStart=xStart,yStart=yStart,size=0.03,color=ROOT.kRed)
+        # pfJetText   = getText("HLT PFCHS Jets"+" TRKv0 (+TICL dotted)",xStart=xStart,yStart=yStart,size=0.03,color=ROOT.kRed)
+        pfJetText   = getText("HLT PFCHS Jets"+" TRKv0",xStart=xStart,yStart=yStart,size=0.03,color=ROOT.kRed)
         pfJetText.Draw("same")
         yStart = yStart - 0.04
-        # pfJetText2   = getText("HLT PF Jets"+" TRKv2 (+TICL in dotted)",xStart=xStart,yStart=yStart,size=0.03,color=ROOT.kBlue+1)
+        # pfJetText2   = getText("HLT PFCHS Jets"+" TRKv2 (+TICL in dotted)",xStart=xStart,yStart=yStart,size=0.03,color=ROOT.kBlue+1)
         # pfJetText2.Draw("same")
         # yStart = yStart - 0.04
-        pfJetText3   = getText("HLT PF Jets"+" TRKv6 (+TICL dotted)",xStart=xStart,yStart=yStart,size=0.03,color=ROOT.kGreen+2)
+        # pfJetText3   = getText("HLT PFCHS Jets"+" TRKv6 (+TICL dotted)",xStart=xStart,yStart=yStart,size=0.03,color=ROOT.kGreen+2)
+        pfJetText3   = getText("HLT PFCHS Jets"+" TRKv6",xStart=xStart,yStart=yStart,size=0.03,color=ROOT.kGreen+2)
         pfJetText3.Draw("same")
-        # pfJetText4   = getText("HLT PF Jets"+" TRKv0+TICL",xStart=xStart,yStart=yStart,size=0.03,color=ROOT.kRed)
+        # pfJetText4   = getText("HLT PFCHS Jets"+" TRKv0+TICL",xStart=xStart,yStart=yStart,size=0.03,color=ROOT.kRed)
         # pfJetText4.Draw("same")
         # yStart = yStart - 0.04
-        # pfJetText5   = getText("HLT PF Jets"+" TRKv2+TICL",xStart=xStart,yStart=yStart,size=0.03,color=ROOT.kBlue+1)
+        # pfJetText5   = getText("HLT PFCHS Jets"+" TRKv2+TICL",xStart=xStart,yStart=yStart,size=0.03,color=ROOT.kBlue+1)
         # pfJetText5.Draw("same")
         yStart = yStart - 0.04
-        pfJetText6   = getText("HLT PF Jets"+" TRKv6+skimTracks (+TICL dotted)",xStart=xStart,yStart=yStart,size=0.03,color=ROOT.kBlue+1)
+        # pfJetText6   = getText("HLT PFCHS Jets"+" TRKv6+skimTracks (+TICL dotted)",xStart=xStart,yStart=yStart,size=0.03,color=ROOT.kBlue+1)
+        pfJetText6   = getText("HLT PFCHS Jets"+" TRKv6+skimTracks",xStart=xStart,yStart=yStart,size=0.03,color=ROOT.kBlue+1)
         pfJetText6.Draw("same")
+        yStart = yStart - 0.04
+        pfJetText7   = getText("(+TICL) dotted",xStart=xStart,yStart=yStart,size=0.03,color=ROOT.kBlack)
+        pfJetText7.Draw("same")
 
 
     yStart = 0.25
@@ -247,18 +254,18 @@ def plotSame(name,graphs,colors,styles, plotCaloJet=False, plotPFJet=False, plot
 #
 def main():
 
-    off_deepcsv_roc   = makeRocPlot("Offline_deepcsv", "DeepCSV_l", bkg="matched_L",sig="matched_B",dir="offJets", inFile = "../NtupleAna/run/OUTPUT/25_05_20_HLTTDR/ttbar_PU200_TrackingV0.root")
+    off_deepcsv_roc   = makeRocPlot("Offline_deepcsv", "DeepCSV_l", bkg="matched_L",sig="matched_B",dir="offJets", inFile = "../NtupleAna/run/OUTPUT/15_06_20_Workshop/ttbar_PU200_TrackingV0.root")
     # off_deepcsv_roc2   = makeRocPlot2("Offline_deepcsv", "DeepCSV_l", bkg="matched_L",sig="matched_B",dir="offJets")
 
-    pf_deepcsv_roc    = makeRocPlot("PF_deepcsv",     "DeepCSV_l", bkg="matchedJet_L",sig="matchedJet_B",dir="offJets", inFile = "../NtupleAna/run/OUTPUT/25_05_20_HLTTDR/ttbar_PU200_TrackingV0.root")
-    # pf_deepcsv_roc2   = makeRocPlot("PF_deepcsv",     "DeepCSV_l", bkg="matchedJet_L",sig="matchedJet_B",dir="offJets", inFile = "../NtupleAna/run/OUTPUT/25_05_20_HLTTDR/ttbar_PU200_TrackingV2.root")
-    pf_deepcsv_roc3   = makeRocPlot("PF_deepcsv",     "DeepCSV_l", bkg="matchedJet_L",sig="matchedJet_B",dir="offJets", inFile = "../NtupleAna/run/OUTPUT/25_05_20_HLTTDR/ttbar_PU200_TrackingV6.root")
-    pf_deepcsv_roc7   = makeRocPlot("PF_deepcsv",     "DeepCSV_l", bkg="matchedJet_L",sig="matchedJet_B",dir="offJets", inFile = "../NtupleAna/run/OUTPUT/25_05_20_HLTTDR/ttbar_PU200_TrackingV6_skimmedTracks.root")
+    pf_deepcsv_roc    = makeRocPlot("PF_deepcsv",     "DeepCSV_l", bkg="matchedJet_L",sig="matchedJet_B",dir="offJets", inFile = "../NtupleAna/run/OUTPUT/15_06_20_Workshop/ttbar_PU200_TrackingV0.root")
+    # pf_deepcsv_roc2   = makeRocPlot("PF_deepcsv",     "DeepCSV_l", bkg="matchedJet_L",sig="matchedJet_B",dir="offJets", inFile = "../NtupleAna/run/OUTPUT/15_06_20_Workshop/ttbar_PU200_TrackingV2.root")
+    pf_deepcsv_roc3   = makeRocPlot("PF_deepcsv",     "DeepCSV_l", bkg="matchedJet_L",sig="matchedJet_B",dir="offJets", inFile = "../NtupleAna/run/OUTPUT/15_06_20_Workshop/ttbar_PU200_TrackingV6.root")
+    pf_deepcsv_roc7   = makeRocPlot("PF_deepcsv",     "DeepCSV_l", bkg="matchedJet_L",sig="matchedJet_B",dir="offJets", inFile = "../NtupleAna/run/OUTPUT/15_06_20_Workshop/ttbar_PU200_TrackingV6_skimmedTracks.root")
 
-    pf_deepcsv_roc4   = makeRocPlot("PF_deepcsv",     "DeepCSV_l", bkg="matchedJet_L",sig="matchedJet_B",dir="offJets", inFile = "../NtupleAna/run/OUTPUT/25_05_20_HLTTDR/ttbar_PU200_TrackingV0_TICL.root")
-    # pf_deepcsv_roc5   = makeRocPlot("PF_deepcsv",     "DeepCSV_l", bkg="matchedJet_L",sig="matchedJet_B",dir="offJets", inFile = "../NtupleAna/run/OUTPUT/25_05_20_HLTTDR/ttbar_PU200_TrackingV2_TICL.root")
-    pf_deepcsv_roc6   = makeRocPlot("PF_deepcsv",     "DeepCSV_l", bkg="matchedJet_L",sig="matchedJet_B",dir="offJets", inFile = "../NtupleAna/run/OUTPUT/25_05_20_HLTTDR/ttbar_PU200_TrackingV6_TICL.root")
-    pf_deepcsv_roc8   = makeRocPlot("PF_deepcsv",     "DeepCSV_l", bkg="matchedJet_L",sig="matchedJet_B",dir="offJets", inFile = "../NtupleAna/run/OUTPUT/25_05_20_HLTTDR/ttbar_PU200_TrackingV6_TICL_skimmedTracks.root")
+    pf_deepcsv_roc4   = makeRocPlot("PF_deepcsv",     "DeepCSV_l", bkg="matchedJet_L",sig="matchedJet_B",dir="offJets", inFile = "../NtupleAna/run/OUTPUT/15_06_20_Workshop/ttbar_PU200_TrackingV0_TICL.root")
+    # pf_deepcsv_roc5   = makeRocPlot("PF_deepcsv",     "DeepCSV_l", bkg="matchedJet_L",sig="matchedJet_B",dir="offJets", inFile = "../NtupleAna/run/OUTPUT/15_06_20_Workshop/ttbar_PU200_TrackingV2_TICL.root")
+    pf_deepcsv_roc6   = makeRocPlot("PF_deepcsv",     "DeepCSV_l", bkg="matchedJet_L",sig="matchedJet_B",dir="offJets", inFile = "../NtupleAna/run/OUTPUT/15_06_20_Workshop/ttbar_PU200_TrackingV6_TICL.root")
+    pf_deepcsv_roc8   = makeRocPlot("PF_deepcsv",     "DeepCSV_l", bkg="matchedJet_L",sig="matchedJet_B",dir="offJets", inFile = "../NtupleAna/run/OUTPUT/15_06_20_Workshop/ttbar_PU200_TrackingV6_TICL_skimmedTracks.root")
 
     for i, rocType in enumerate(["Rej","Eff"]):
 
@@ -277,18 +284,18 @@ def main():
                  rocType = rocType
                  )
 
-    off_deepcsv_roc   = makeRocPlot("Offline_deepcsv", "DeepCSV_l", bkg="matched_L",sig="matched_B",dir="offJets", inFile = "../NtupleAna/run/OUTPUT/25_05_20_HLTTDR/ttbar_NoPU_TrackingV0.root")
+    off_deepcsv_roc   = makeRocPlot("Offline_deepcsv", "DeepCSV_l", bkg="matched_L",sig="matched_B",dir="offJets", inFile = "../NtupleAna/run/OUTPUT/15_06_20_Workshop/ttbar_NoPU_TrackingV0.root")
     # off_deepcsv_roc2   = makeRocPlot2("Offline_deepcsv", "DeepCSV_l", bkg="matched_L",sig="matched_B",dir="offJets")
 
-    pf_deepcsv_roc    = makeRocPlot("PF_deepcsv",     "DeepCSV_l", bkg="matchedJet_L",sig="matchedJet_B",dir="offJets", inFile = "../NtupleAna/run/OUTPUT/25_05_20_HLTTDR/ttbar_NoPU_TrackingV0.root")
-    # pf_deepcsv_roc2   = makeRocPlot("PF_deepcsv",     "DeepCSV_l", bkg="matchedJet_L",sig="matchedJet_B",dir="offJets", inFile = "../NtupleAna/run/OUTPUT/25_05_20_HLTTDR/ttbar_NoPU_TrackingV2.root")
-    pf_deepcsv_roc3   = makeRocPlot("PF_deepcsv",     "DeepCSV_l", bkg="matchedJet_L",sig="matchedJet_B",dir="offJets", inFile = "../NtupleAna/run/OUTPUT/25_05_20_HLTTDR/ttbar_NoPU_TrackingV6.root")
-    pf_deepcsv_roc7   = makeRocPlot("PF_deepcsv",     "DeepCSV_l", bkg="matchedJet_L",sig="matchedJet_B",dir="offJets", inFile = "../NtupleAna/run/OUTPUT/25_05_20_HLTTDR/ttbar_NoPU_TrackingV6_skimmedTracks.root")
+    pf_deepcsv_roc    = makeRocPlot("PF_deepcsv",     "DeepCSV_l", bkg="matchedJet_L",sig="matchedJet_B",dir="offJets", inFile = "../NtupleAna/run/OUTPUT/15_06_20_Workshop/ttbar_NoPU_TrackingV0.root")
+    # pf_deepcsv_roc2   = makeRocPlot("PF_deepcsv",     "DeepCSV_l", bkg="matchedJet_L",sig="matchedJet_B",dir="offJets", inFile = "../NtupleAna/run/OUTPUT/15_06_20_Workshop/ttbar_NoPU_TrackingV2.root")
+    pf_deepcsv_roc3   = makeRocPlot("PF_deepcsv",     "DeepCSV_l", bkg="matchedJet_L",sig="matchedJet_B",dir="offJets", inFile = "../NtupleAna/run/OUTPUT/15_06_20_Workshop/ttbar_NoPU_TrackingV6.root")
+    pf_deepcsv_roc7   = makeRocPlot("PF_deepcsv",     "DeepCSV_l", bkg="matchedJet_L",sig="matchedJet_B",dir="offJets", inFile = "../NtupleAna/run/OUTPUT/15_06_20_Workshop/ttbar_NoPU_TrackingV6_skimmedTracks.root")
 
-    pf_deepcsv_roc4   = makeRocPlot("PF_deepcsv",     "DeepCSV_l", bkg="matchedJet_L",sig="matchedJet_B",dir="offJets", inFile = "../NtupleAna/run/OUTPUT/25_05_20_HLTTDR/ttbar_NoPU_TrackingV0_TICL.root")
-    # pf_deepcsv_roc5   = makeRocPlot("PF_deepcsv",     "DeepCSV_l", bkg="matchedJet_L",sig="matchedJet_B",dir="offJets", inFile = "../NtupleAna/run/OUTPUT/25_05_20_HLTTDR/ttbar_NoPU_TrackingV2_TICL.root")
-    pf_deepcsv_roc6   = makeRocPlot("PF_deepcsv",     "DeepCSV_l", bkg="matchedJet_L",sig="matchedJet_B",dir="offJets", inFile = "../NtupleAna/run/OUTPUT/25_05_20_HLTTDR/ttbar_NoPU_TrackingV6_TICL.root")
-    pf_deepcsv_roc8   = makeRocPlot("PF_deepcsv",     "DeepCSV_l", bkg="matchedJet_L",sig="matchedJet_B",dir="offJets", inFile = "../NtupleAna/run/OUTPUT/25_05_20_HLTTDR/ttbar_NoPU_TrackingV6_TICL_skimmedTracks.root")
+    pf_deepcsv_roc4   = makeRocPlot("PF_deepcsv",     "DeepCSV_l", bkg="matchedJet_L",sig="matchedJet_B",dir="offJets", inFile = "../NtupleAna/run/OUTPUT/15_06_20_Workshop/ttbar_NoPU_TrackingV0_TICL.root")
+    # pf_deepcsv_roc5   = makeRocPlot("PF_deepcsv",     "DeepCSV_l", bkg="matchedJet_L",sig="matchedJet_B",dir="offJets", inFile = "../NtupleAna/run/OUTPUT/15_06_20_Workshop/ttbar_NoPU_TrackingV2_TICL.root")
+    pf_deepcsv_roc6   = makeRocPlot("PF_deepcsv",     "DeepCSV_l", bkg="matchedJet_L",sig="matchedJet_B",dir="offJets", inFile = "../NtupleAna/run/OUTPUT/15_06_20_Workshop/ttbar_NoPU_TrackingV6_TICL.root")
+    pf_deepcsv_roc8   = makeRocPlot("PF_deepcsv",     "DeepCSV_l", bkg="matchedJet_L",sig="matchedJet_B",dir="offJets", inFile = "../NtupleAna/run/OUTPUT/15_06_20_Workshop/ttbar_NoPU_TrackingV6_TICL_skimmedTracks.root")
 
     for i, rocType in enumerate(["Rej","Eff"]):
 
