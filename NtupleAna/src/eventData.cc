@@ -246,10 +246,10 @@ void eventData::update(int e){
 
   if(doOffline){
     if(treeMuons)
-      muons    = treeMuons  ->getMuons(20, 2.4);
+      muons    = treeMuons  ->getMuons(30, 3.);
 
     if(treeElecs)
-      elecs    = treeElecs  ->getElecs(30, 2.4);
+      elecs    = treeElecs  ->getElecs(30, 3.);
 
     offPVs = offTreePVs  ->getVerticies();
   }
