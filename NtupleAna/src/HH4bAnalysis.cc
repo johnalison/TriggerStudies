@@ -178,6 +178,8 @@ int HH4bAnalysis::processEvent(){
   //h4b_all->Fill(m4b);
 
   cout << " Processing event " << endl;
+  cout << " \T BitTrigger[0] " << event->BitTrigger[0] << endl;
+  cout << " \T BitTrigger[0] " << event->BitTrigger[1] << endl;
 
   // L1 L1_PFHT330PT30_QuadPFPuppiJet_75_60_45_40_TriplePFPuppiBTagDeepCSV_2p4_v1
   //if(passTriggerBit(0,4)){

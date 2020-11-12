@@ -118,7 +118,9 @@ eventData::eventData(TChain* _treeRAW, TChain* _treeAOD, bool mc, std::string y,
   inputBranch(treeRAW, "Run",             run);
   //inputBranch(tree, "luminosityBlock", lumiBlock);
   inputBranch(treeRAW, "Evt",           event);
+  //inputBranch(treeRAW, "BitTrigger",    BitTrigger);
 
+  connectBranchArr(true, treeRAW, "BitTrigger", BitTrigger,  "nBitTrigger",  "I");
 
   if(doOffline){
     inputBranch(treeAOD, "Run",             runAOD);

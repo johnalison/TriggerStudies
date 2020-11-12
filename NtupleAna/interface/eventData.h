@@ -43,6 +43,7 @@ namespace TriggerStudies {
     Int_t    runAOD       =  0;
     UInt_t    lumiBlockAOD =  0;
     Int_t eventAOD     =  0;
+    Int_t BitTrigger[1000];
 
     nTupleAnalysis::jetData* offTreeJets;
     std::vector<nTupleAnalysis::jetPtr> offJets;
