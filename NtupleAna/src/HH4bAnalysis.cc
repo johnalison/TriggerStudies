@@ -127,6 +127,10 @@ int HH4bAnalysis::processEvent(){
   cutflow->Fill("foundMatch", 1.0);
 
 
+  std::vector<nTupleAnalysis::particlePtr> genJets =  event->genJetTree->truthParticles->getParticles();
+  for(const nTupleAnalysis::particlePtr& truthPart : genJets){
+    cout << " genJet " << truthPart->pt << "/" << truthPart->eta << "/" << truthPart->phi << endl;
+  }
 
   //
   //  Offline BTags
@@ -136,31 +140,39 @@ int HH4bAnalysis::processEvent(){
   unsigned int nOffJetsTaggedForCut = 0;
   for(const nTupleAnalysis::jetPtr& offJet : event->offJets){
 
-    if(fabs(offJet->eta) > 4) continue;
+    if(fabs(offJet->eta) > 2.5) continue;
     if(offJet->pt       < 30)   continue; // 40 ? 
 
     ++nOffJetsForCut;
     if(offJet->DeepCSV > 0) ++nOffJetsTaggedForCut; // FIX ME OFFLINE BTAG CUT
 
   }
-
-  //  
-  //if(nOffJetsForCut < 3      ){
+ 
+  //   4 Jets
+  //if(nOffJetsForCut < 4      ){
   //  if(debug) cout << "Fail NJet Cut" << endl;
   //  return 0;
   //}
   //cutflow->Fill("passNJetCut", eventWeight);
   //if(debug) cout << "Pass NJet Cut " << endl;
 
-  //bool doOfflineBTagCut = false;
-  //if(doOfflineBTagCut){
-  //
-  //  if(nOffJetsTaggedForCut < 3) {
+  
+  //   4 BJets Jets
+  //if(nOffJetsTaggedForCut < 4) {
   //    if(debug) cout << "Fail NBJet Cut" << endl;
   //    return 0;
   //  }
-  //  cutflow->Fill("passNBJetCut", eventWeight);
-  //}
+  //cutflow->Fill("passNBJetCut", eventWeight);
+  TLorentzVector combinedVec;
+  unsigned nBJetsAdded = 0;
+  for(const nTupleAnalysis::jetPtr& offJet : event->offJets){
+    //if(offJet->DeepCSV > XX){
+    // combinedVec += offJet->p;
+    //++nBJetsAdded;
+      //    }
+    //if(nBJetsAdded > 3) break;
+  }
+  float mHH = combinedVec.M();
 
   //if(debug) cout << "Pass NBJet Cut " << endl;
 

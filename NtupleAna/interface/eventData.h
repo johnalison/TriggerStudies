@@ -12,6 +12,7 @@
 #include "nTupleAnalysis/baseClasses/interface/muonData.h"
 #include "nTupleAnalysis/baseClasses/interface/elecData.h"
 #include "nTupleAnalysis/baseClasses/interface/vertexData.h"
+#include "nTupleAnalysis/baseClasses/interface/truthData.h"
 
 // for jet pseudoTag calculations
 #include <TRandom3.h>
@@ -65,6 +66,8 @@ namespace TriggerStudies {
 
     nTupleAnalysis::vertexData* treePVs;
     std::vector<nTupleAnalysis::vertexPtr> pvs;
+
+    nTupleAnalysis::truthData* genJetTree = NULL;
 
     nTupleAnalysis::vertexData* offTreePVs;
     std::vector<nTupleAnalysis::vertexPtr> offPVs;
