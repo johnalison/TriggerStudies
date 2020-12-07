@@ -48,7 +48,7 @@ int main(int argc, char * argv[]){
   const edm::ParameterSet& parameters = process.getParameter<edm::ParameterSet>("HH4bAnalyzer");
   bool debug = parameters.getParameter<bool>("debug");
   int skipEvents = parameters.getParameter<int>("skipEvents");
-  std::vector<std::string> filesAOD = parameters.getParameter<std::vector<std::string> >("fileNamesAOD");
+  std::string jetDetailString = parameters.getParameter<std::string>("jetDetailString");
 
   //NANOAOD Input source
   fwlite::InputSource inputHandler(process); 
@@ -60,18 +60,6 @@ int main(int argc, char * argv[]){
   for(unsigned int iFile=0; iFile<inputHandler.files().size(); ++iFile){
     std::cout << "           Input RAW File: " << inputHandler.files()[iFile].c_str() << std::endl;
     int e = treeRAW    ->AddFile(inputHandler.files()[iFile].c_str());
-    if(e!=1){ std::cout << "ERROR" << std::endl; return 1;}
-    if(debug) std::cout<<"Added to TChain"<<std::endl;
-  }
-
-  
-  //
-  //  Add AOD Files 
-  //
-  TChain* treeAOD     = new TChain("btagana/ttree");
-  for(unsigned int iFile=0; iFile<filesAOD.size(); ++iFile){
-    std::cout << "           Input AOD File: " << filesAOD[iFile].c_str() << std::endl;
-    int e = treeAOD    ->AddFile(filesAOD[iFile].c_str());
     if(e!=1){ std::cout << "ERROR" << std::endl; return 1;}
     if(debug) std::cout<<"Added to TChain"<<std::endl;
   }
@@ -88,7 +76,7 @@ int main(int argc, char * argv[]){
   std::cout << "Initialize analysis: ";
   
   std::cout << "HH4bAnalysis " << std::endl;
-  HH4bAnalysis a = HH4bAnalysis(treeRAW, treeAOD, fsh, debug);
+  HH4bAnalysis a = HH4bAnalysis(treeRAW, fsh, debug, jetDetailString);
 
   int maxEvents = inputHandler.maxEvents();
   a.eventLoop(maxEvents, skipEvents);

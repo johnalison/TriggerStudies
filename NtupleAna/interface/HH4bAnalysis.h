@@ -24,7 +24,6 @@ namespace TriggerStudies {
   class HH4bAnalysis {
   public:
 
-    TChain* eventsAOD;
     TChain* eventsRAW;
 
     bool debug = false;
@@ -64,7 +63,7 @@ namespace TriggerStudies {
     long int usageMB;
 
 
-    HH4bAnalysis(TChain* _eventsRAW, TChain* _eventsAOD, fwlite::TFileService& fs, bool _debug);
+    HH4bAnalysis(TChain* _eventsRAW, fwlite::TFileService& fs, bool _debug, std::string jetDetailString);
     void monitor(long int);
     int eventLoop(int, int nSkipEvents = 0);
     int processEvent();
