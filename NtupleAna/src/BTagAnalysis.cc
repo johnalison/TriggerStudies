@@ -244,22 +244,14 @@ BTagAnalysis::BTagAnalysis(TChain* _eventsRAW, TChain* _eventsAOD, fwlite::TFile
 
 
     if(doCaloJets){
-      hOffJets_matchedCalo_L    = new nTupleAnalysis::jetHists("offJets_matchedCalo_L",   fs, "", jetDetailString);
-      hOffJets_matchedCaloJet_L = new nTupleAnalysis::jetHists("offJets_matchedCaloJet_L",fs, "", jetDetailString);
-      hOffJets_matchedCalo_LandPU    = new nTupleAnalysis::jetHists("offJets_matchedCalo_LandPU",   fs, "", jetDetailString);
-      hOffJets_matchedCaloJet_LandPU = new nTupleAnalysis::jetHists("offJets_matchedCaloJet_LandPU",fs, "", jetDetailString);
-
-      hOffJets_matchedCalo_B    = new nTupleAnalysis::jetHists("offJets_matchedCalo_B",   fs, "", jetDetailString );
-      hOffJets_matchedCaloJet_B = new nTupleAnalysis::jetHists("offJets_matchedCaloJet_B",fs, "", jetDetailString );
-
-      hOffJets_matchedCalo_C    = new nTupleAnalysis::jetHists("offJets_matchedCalo_C",   fs, "");
-      hOffJets_matchedCaloJet_C = new nTupleAnalysis::jetHists("offJets_matchedCaloJet_C",fs, "");
+      hOffJets_matchedCalo_Truth    = new jetHistsTruthMatched("offJets_matchedCalo",    fs, jetDetailString);
+      hOffJets_matchedCaloJet_Truth = new jetHistsTruthMatched("offJets_matchedCaloJet", fs, jetDetailString);
     }
 
     if(doPuppiJets){
 
-      hOffJets_matched_Truth    = new jetHistsTruthMatched("offJets_matchedPuppi", fs, jetDetailString);
-      hOffJets_matchedJet_Truth = new jetHistsTruthMatched("offJets_matchedPuppiJet", fs, jetDetailString);
+      hOffJets_matchedPuppi_Truth    = new jetHistsTruthMatched("offJets_matchedPuppi", fs, jetDetailString);
+      hOffJets_matchedPuppiJet_Truth = new jetHistsTruthMatched("offJets_matchedPuppiJet", fs, jetDetailString);
 
       if(doEtaRegions){
 	hOffJets_matchedPuppi_L_eta1        = new nTupleAnalysis::jetHists("offJets_matchedPuppi_L_eta1",       fs, "", jetDetailString);
@@ -863,7 +855,7 @@ int BTagAnalysis::processEvent(){
       if( dRPuppi < 0.4){
 
 	cutflowJets->Fill("hasHLTMatchPuppi", eventWeight);
-  offJet->matchedJet = matchedPuppiJet;
+	offJet->matchedJet = matchedPuppiJet;
 
 	PuppiJetAnalysis(offJet,matchedPuppiJet,eventWeight);
 
@@ -1461,7 +1453,7 @@ void BTagAnalysis::PFJetAnalysis(const nTupleAnalysis::jetPtr& offJet,const nTup
   if(isMC){
 
     hOffJets_matched_Truth->Fill(offJet, offJet->hadronFlavour, offJet->flavourCleaned, weight);
-    hOffJets_matched_Truth->Fill(hltJet, offJet->hadronFlavour, offJet->flavourCleaned, weight);
+    hOffJets_matchedJet_Truth->Fill(hltJet, offJet->hadronFlavour, offJet->flavourCleaned, weight);
 
     if(offJet->hadronFlavour == 5){
 
@@ -1698,20 +1690,8 @@ void BTagAnalysis::CaloJetAnalysis(const nTupleAnalysis::jetPtr& offJet,const nT
 
 
   if(isMC){
-    if(offJet->hadronFlavour == 5){
-      hOffJets_matchedCalo_B->Fill(offJet, weight);
-      hOffJets_matchedCaloJet_B->Fill(hltJet, weight);
-    }else if(offJet->hadronFlavour == 4){
-      hOffJets_matchedCalo_C->Fill(offJet, weight);
-      hOffJets_matchedCaloJet_C->Fill(hltJet, weight);
-    }else if(offJet->hadronFlavour == 0){
-      hOffJets_matchedCalo_LandPU->Fill(offJet, weight);
-      hOffJets_matchedCaloJet_LandPU->Fill(hltJet, weight);
-      if(offJet->flavourCleaned!=0){
-        hOffJets_matchedCalo_L->Fill(offJet, weight);
-        hOffJets_matchedCaloJet_L->Fill(hltJet, weight);
-      }
-    }
+    hOffJets_matchedCalo_Truth   ->Fill(offJet, offJet->hadronFlavour, offJet->flavourCleaned, weight);
+    hOffJets_matchedCaloJet_Truth->Fill(hltJet, offJet->hadronFlavour, offJet->flavourCleaned, weight);
   }
 
 

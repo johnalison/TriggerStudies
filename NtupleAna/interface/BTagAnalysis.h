@@ -168,7 +168,9 @@ namespace TriggerStudies {
     nTupleAnalysis::jetHists*    hOffJetMedDeepFlav_matchedPuppiDeepCSV   = nullptr;
     nTupleAnalysis::jetHists*    hOffJetMedDeepFlav_matchedPuppiCSV       = nullptr;
 
-
+    //
+    // Truth Hists
+    //
     nTupleAnalysis::jetHists*  hOffJets_matched_LandPU_eta1    = nullptr;
     nTupleAnalysis::jetHists*  hOffJets_matched_LandPU_eta2    = nullptr;
     nTupleAnalysis::jetHists*  hOffJets_matched_LandPU_eta3    = nullptr;
@@ -177,8 +179,6 @@ namespace TriggerStudies {
     nTupleAnalysis::jetHists*  hOffJets_matchedJet_LandPU_eta2 = nullptr;
     nTupleAnalysis::jetHists*  hOffJets_matchedJet_LandPU_eta3 = nullptr;
 
-    nTupleAnalysis::jetHists*  hOffJets_matchedCalo_LandPU = nullptr;
-    nTupleAnalysis::jetHists*  hOffJets_matchedCaloJet_LandPU = nullptr;
     nTupleAnalysis::jetHists*  hOffJets_matched_L_eta1    = nullptr;
     nTupleAnalysis::jetHists*  hOffJets_matched_L_eta2    = nullptr;
     nTupleAnalysis::jetHists*  hOffJets_matched_L_eta3    = nullptr;
@@ -186,10 +186,6 @@ namespace TriggerStudies {
     nTupleAnalysis::jetHists*  hOffJets_matchedJet_L_eta1 = nullptr;
     nTupleAnalysis::jetHists*  hOffJets_matchedJet_L_eta2 = nullptr;
     nTupleAnalysis::jetHists*  hOffJets_matchedJet_L_eta3 = nullptr;
-    nTupleAnalysis::jetHists*  hOffJets_matchedCalo_L = nullptr;
-    nTupleAnalysis::jetHists*  hOffJets_matchedCaloJet_L = nullptr;
-
-    
 
     nTupleAnalysis::jetHists*  hOffJets_matched_B_eta1    = nullptr;
     nTupleAnalysis::jetHists*  hOffJets_matched_B_eta2    = nullptr;
@@ -198,8 +194,7 @@ namespace TriggerStudies {
     nTupleAnalysis::jetHists*  hOffJets_matchedJet_B_eta1 = nullptr;
     nTupleAnalysis::jetHists*  hOffJets_matchedJet_B_eta2 = nullptr;
     nTupleAnalysis::jetHists*  hOffJets_matchedJet_B_eta3 = nullptr;
-    nTupleAnalysis::jetHists*  hOffJets_matchedCalo_B = nullptr;
-    nTupleAnalysis::jetHists*  hOffJets_matchedCaloJet_B = nullptr;
+
     nTupleAnalysis::jetHists*  hOffJets_matched_C_eta1    = nullptr;
     nTupleAnalysis::jetHists*  hOffJets_matched_C_eta2    = nullptr;
     nTupleAnalysis::jetHists*  hOffJets_matched_C_eta3    = nullptr;
@@ -207,11 +202,12 @@ namespace TriggerStudies {
     nTupleAnalysis::jetHists*  hOffJets_matchedJet_C_eta1 = nullptr;
     nTupleAnalysis::jetHists*  hOffJets_matchedJet_C_eta2 = nullptr;
     nTupleAnalysis::jetHists*  hOffJets_matchedJet_C_eta3 = nullptr;
-    nTupleAnalysis::jetHists*  hOffJets_matchedCalo_C = nullptr;
-    nTupleAnalysis::jetHists*  hOffJets_matchedCaloJet_C = nullptr;
 
     jetHistsTruthMatched* hOffJets_matched_Truth = nullptr;
     jetHistsTruthMatched* hOffJets_matchedJet_Truth = nullptr;
+
+    jetHistsTruthMatched* hOffJets_matchedCalo_Truth = nullptr;
+    jetHistsTruthMatched* hOffJets_matchedCaloJet_Truth = nullptr;
 
 
     nTupleAnalysis::jetHists*  hOffJets_matchedPuppi_LandPU_eta1    = nullptr;
@@ -251,22 +247,16 @@ namespace TriggerStudies {
 
     nTupleAnalysis::jetHists* hPfJets = nullptr;
     nTupleAnalysis::jetHists* hPfJets_matched = nullptr;
-    //nTupleAnalysis::jetHists* hPfJets_matched_L = nullptr;
-    //nTupleAnalysis::jetHists* hPfJets_matched_B = nullptr;
-    //nTupleAnalysis::jetHists* hPfJets_matched_C = nullptr;
 
     nTupleAnalysis::jetHists* hCaloJets = nullptr;
     nTupleAnalysis::jetHists* hCaloJets_matched = nullptr;
-    //nTupleAnalysis::jetHists* hCaloJets_matched_L = nullptr;
-    //nTupleAnalysis::jetHists* hCaloJets_matched_B = nullptr;
-    //nTupleAnalysis::jetHists* hCaloJets_matched_C = nullptr;
 
     nTupleAnalysis::jetHists* hPuppiJets = nullptr;
     nTupleAnalysis::jetHists* hPuppiJets_matched = nullptr;
-    //nTupleAnalysis::jetHists* hPuppiJets_matched_L = nullptr;
-    //nTupleAnalysis::jetHists* hPuppiJets_matched_B = nullptr;
-    //nTupleAnalysis::jetHists* hPuppiJets_matched_C = nullptr;
 
+    //
+    // Tracks
+    //
     nTupleAnalysis::trackHists* hOffTracks = nullptr;
     nTupleAnalysis::trackHists* hOffTracks_unmatched = nullptr;
     nTupleAnalysis::trackHists* hOffTracks_matched = nullptr;
