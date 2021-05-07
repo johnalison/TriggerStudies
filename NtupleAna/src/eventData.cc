@@ -6,7 +6,7 @@ using namespace TriggerStudies;
 using std::cout;  using std::endl;
 
 
-eventData::eventData(TChain* _treeRAW, TChain* _treeAOD, bool mc, std::string y, bool d, std::string jetDetailLevel){
+eventData::eventData(TChain* _treeRAW, TChain* _treeAOD, bool mc, std::string y, bool d, std::string jetDetailLevel, std::string pfJetName){
   std::cout << "eventData::eventData()" << std::endl;
   treeRAW  = _treeRAW;
   treeAOD  = _treeAOD;
@@ -15,13 +15,13 @@ eventData::eventData(TChain* _treeRAW, TChain* _treeAOD, bool mc, std::string y,
     cout << "eventData::Only loading HLT data! " << endl;
     doOffline = false;
   }
-  
+
   isMC  = mc;
   year  = y;
   debug = d;
 
   doCaloJets = jetDetailLevel.find("CaloJets") != std::string::npos;
-
+  doPuppiJets = jetDetailLevel.find("PuppiJets") != std::string::npos;
 
   bool checkEventDiffs = false;
   if(checkEventDiffs && doOffline){
@@ -31,6 +31,7 @@ eventData::eventData(TChain* _treeRAW, TChain* _treeAOD, bool mc, std::string y,
     //
     inputBranch(treeAOD, "Run",             runAOD);
     inputBranch(treeAOD, "Evt",           eventAOD);
+
 
     treeEventsAOD = treeAOD->GetEntries();
 
@@ -87,48 +88,68 @@ eventData::eventData(TChain* _treeRAW, TChain* _treeAOD, bool mc, std::string y,
 
   } // file check
 
+
   if(doOffline){
-    treeAOD->SetBranchStatus("Run", 1);  
-    treeAOD->SetBranchStatus("Evt", 1);  
+    treeAOD->SetBranchStatus("Run", 1);
+    treeAOD->SetBranchStatus("Evt", 1);
     //treeAOD->BuildIndex("Run","Evt");
-    TTreeIndex *index = new TTreeIndex(treeAOD,"Run", "Evt"); 
+    TTreeIndex *index = new TTreeIndex(treeAOD,"Run", "Evt");
     treeAOD->SetTreeIndex(index);
-  }    
-    
-  treeRAW->SetBranchStatus("Run", 1);  
-  treeRAW->SetBranchStatus("Evt", 1);  
+  }
+
+  treeRAW->SetBranchStatus("Run", 1);
+  treeRAW->SetBranchStatus("Evt", 1);
   //treeRAW->BuildIndex("Run","Evt");
-  //TTreeIndex *indexRaw = new TTreeIndex(treeRAW,"Run", "Evt"); 
+  //TTreeIndex *indexRaw = new TTreeIndex(treeRAW,"Run", "Evt");
   //treeRAW->SetTreeIndex(indexRaw);
-    
-    
+
+
+
   if(doOffline){
     treeRAW->AddFriend(treeAOD);
   }
-        
+
   //std::cout << "eventData::eventData() tree->Lookup(true)" << std::endl;
   ///tree->Lookup(true);
   //std::cout << "eventData::eventData() tree->LoadTree(0)" << std::endl;
   //treeRAW->LoadTree(0);
-      
+
   inputBranch(treeRAW, "Run",             run);
   //inputBranch(tree, "luminosityBlock", lumiBlock);
   inputBranch(treeRAW, "Evt",           event);
-        
+  //inputBranch(treeRAW, "BitTrigger",    BitTrigger);
+
+  connectBranchArr(true, treeRAW, "BitTrigger", BitTrigger,  "nBitTrigger",  "I");
+
   if(doOffline){
     inputBranch(treeAOD, "Run",             runAOD);
     //inputBranch(tree, "luminosityBlock", lumiBlock);
     inputBranch(treeAOD, "Evt",           eventAOD);
   }
-    
+
   std::cout << "eventData::eventData() Initialize jets and muons" << std::endl;
   std::string jetSFName = year;
   if(jetSFName == "2018") jetSFName = "deepcsv2018";
 
-  if(doOffline)  offTreeJets  = new nTupleAnalysis::jetData( "Jet",  treeRAW, true, isMC,  jetDetailLevel, "",      jetSFName );
-  pfTreeJets   = new nTupleAnalysis::jetData( "Jet",  treeRAW, true, false, jetDetailLevel, "PFJet."       );
-  if(doCaloJets) caloTreeJets = new nTupleAnalysis::jetData( "Jet",  treeRAW, true, false, jetDetailLevel, "CaloJet."     );
-  
+  if(doOffline){
+    std::cout << "\t loading off offline jets with name " << "" << std::endl;    
+    offTreeJets  = new nTupleAnalysis::jetData( "Jet",  treeAOD, true, isMC,  jetDetailLevel, "",      jetSFName );
+  }
+
+  std::cout << "\t loading pfjets with name " << pfJetName << std::endl;    
+  pfTreeJets   = new nTupleAnalysis::jetData( "Jet",  treeRAW, true, false, jetDetailLevel, pfJetName       );
+
+
+  if(doCaloJets){
+    std::cout << "\t loading calo jets with name " << "CaloJet." << std::endl;    
+    caloTreeJets = new nTupleAnalysis::jetData( "Jet",  treeRAW, true, false, jetDetailLevel, "CaloJet."     );
+  }
+
+  if(doPuppiJets){
+    std::cout << "\t loading puppi jets with name " << "PuppiJet." << std::endl;    
+    puppiTreeJets = new nTupleAnalysis::jetData( "Jet",  treeRAW, true, false, jetDetailLevel, "PuppiJet."     );
+  }
+
   //treeMuons    = new nTupleAnalysis::muonData("PFMuon",     treeRAW);
   //treeElecs    = new nTupleAnalysis::elecData("PFElectron", treeRAW);
   if(doOffline){
@@ -139,18 +160,24 @@ eventData::eventData(TChain* _treeRAW, TChain* _treeAOD, bool mc, std::string y,
       treeMuons = nullptr;
     }
 
+
     if(treeRAW->FindBranch("nPatElec")){
       treeElecs    = new nTupleAnalysis::elecData("PatElec",     treeRAW, isMC, year);
     }else{
-      cout << "No PatMuons (missing branch 'nPatElec'). Will ignore Elecs" << endl;
+      cout << "No PatElectrons (missing branch 'nPatElec'). Will ignore Elecs" << endl;
       treeElecs = nullptr;
     }
-    
+
     offTreePVs = new nTupleAnalysis::vertexData("PV",     treeAOD);
   }
-  
+
   treePVs    = new nTupleAnalysis::vertexData("PV",     treeRAW);
-} 
+
+  if(treeRAW->FindBranch("nGenJets")){
+    genJetTree = new nTupleAnalysis::truthData(treeRAW, debug, "GenJet");
+  }
+
+}
 
 void eventData::update(int e){
   if(debug){
@@ -167,14 +194,14 @@ void eventData::update(int e){
   }
   Long64_t loadStatus = treeRAW->LoadTree(e);
   if(loadStatus<0){
-    std::cout << "Error "<<loadStatus<<" getting event "<<e<<std::endl; 
+    std::cout << "Error "<<loadStatus<<" getting event "<<e<<std::endl;
     return;
   }
 
 
 //  Long64_t loadStatusAOD = treeAOD->LoadTree(e);
 //  if(loadStatusAOD<0){
-//    std::cout << "Error "<<loadStatus<<" getting AOD event "<<e<<std::endl; 
+//    std::cout << "Error "<<loadStatus<<" getting AOD event "<<e<<std::endl;
 //    return;
 //  }
 
@@ -182,17 +209,18 @@ void eventData::update(int e){
   treeRAW->GetEntry(e);
   if(debug) std::cout<<"Got Entry "<<e<<std::endl;
 
+
   if(doOffline){
     if((run != runAOD) || (event != eventAOD)){
-      if(debug) std::cout << "Run: " << run << " vs " << runAOD  << "  Evt: " << event << " vs " << eventAOD << std::endl;  
+      if(debug) std::cout << "Run: " << run << " vs " << runAOD  << "  Evt: " << event << " vs " << eventAOD << std::endl;
       //std::cout << "Tryuing with inedex " << treeAOD->GetEntryWithIndex(run,event)  << std::endl;
     }
   }
 
   //if((run != runAOD) || (event != eventAOD)){
-  //  if(debug) std::cout << "Run: " << run << " vs " << runAOD  << "  Evt: " << event << " vs " << eventAOD << std::endl;  
-  //  std::cout << "Run: " << run << " vs " << runAOD  << "  Evt: " << event << " vs " << eventAOD << std::endl;  
-  //  
+  //  if(debug) std::cout << "Run: " << run << " vs " << runAOD  << "  Evt: " << event << " vs " << eventAOD << std::endl;
+  //  std::cout << "Run: " << run << " vs " << runAOD  << "  Evt: " << event << " vs " << eventAOD << std::endl;
+  //
   //  std::cout << "Try manual lookup" << std::endl;
   //  Int_t runToPrint = -99;
   //  treeAOD->GetEntries();
@@ -219,30 +247,34 @@ void eventData::update(int e){
       return;
     }
 
+
     if(event != eventAOD){
-      if(debug) std::cout << "evt: " << event << " vs " << eventAOD << std::endl;  
+      if(debug) std::cout << "evt: " << event << " vs " << eventAOD << std::endl;
       return;
     }
   }
 
 
-  if(doOffline) offJets  = offTreeJets->getJets(20,1e6,2.4);
-  pfJets   = pfTreeJets ->getJets(20,1e6,2.4);
+  if(doOffline) offJets  = offTreeJets->getJets(30,1e6,4);
+  pfJets   = pfTreeJets ->getJets(30,1e6,4);
   if(doCaloJets)
     caloJets = caloTreeJets ->getJets(30,1e6,2.4);
+  if(doPuppiJets)
+    puppiJets = puppiTreeJets ->getJets(30,1e6,4.);
 
   if(doOffline){
     if(treeMuons)
-      muons    = treeMuons  ->getMuons(20, 2.4);
+      muons    = treeMuons  ->getMuons(30, 3.);
 
     if(treeElecs)
-      elecs    = treeElecs  ->getElecs(30, 2.4);
+      elecs    = treeElecs  ->getElecs(30, 3.);
 
     offPVs = offTreePVs  ->getVerticies();
   }
 
   pvs    = treePVs     ->getVerticies();
 
+  if(genJetTree) genJetTree->update();
 
   if(debug) std::cout<<"eventData updated\n";
   return;
@@ -252,7 +284,7 @@ void eventData::update(int e){
 void eventData::dump(){
 
   std::cout << "   Run: " << run    << std::endl;
-  std::cout << " Event: " << event  << std::endl;  
+  std::cout << " Event: " << event  << std::endl;
   //std::cout << "Weight: " << weight << std::endl;
   //std::cout << " allJets: " << allJets .size() << " |  selJets: " << selJets .size() << " | tagJets: " << tagJets.size() << std::endl;
   //std::cout << "allMuons: " << allMuons.size() << " | isoMuons: " << isoMuons.size() << std::endl;
@@ -262,5 +294,4 @@ void eventData::dump(){
 
 eventData::~eventData(){
   std::cout << "eventData::destroyed" << std::endl;
-} 
-
+}

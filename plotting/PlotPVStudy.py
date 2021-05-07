@@ -28,6 +28,12 @@ plot("dz","hltVtx",logy=1,x_title="#Delta Vtx-Z (hlt-off)")
 plot("dz_s","hltVtx",logy=1,x_title="#Delta Vtx-Z (hlt-off)")
 plot("dz_l","hltVtx",logy=1,x_title="#Delta Vtx-Z (hlt-off)")
 
+if o.puppi:
+    plot("matched_dR","offJets_matchedPuppiJet")
+    plot("matched_dR","offJets_matchedPuppi")
+else:
+    plot("matched_dR","offJets_matchedJet")
+    plot("matched_dR","offJets_matched")
 
 
 #plot(["mtt_pf","mtt_off"],"BTagAnalysis",norm=1,labels=["HLT Tracks","Offline Tracks"],xlabel="Track Pair Mass [GeV]",ylabel="Track pairs [normalized]",doratio=1,rMin=0.8,rMax=1.2)

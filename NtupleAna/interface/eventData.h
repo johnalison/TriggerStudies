@@ -12,11 +12,12 @@
 #include "nTupleAnalysis/baseClasses/interface/muonData.h"
 #include "nTupleAnalysis/baseClasses/interface/elecData.h"
 #include "nTupleAnalysis/baseClasses/interface/vertexData.h"
+#include "nTupleAnalysis/baseClasses/interface/truthData.h"
 
 // for jet pseudoTag calculations
 #include <TRandom3.h>
-#include <numeric> 
-#include <boost/math/special_functions/binomial.hpp> 
+#include <numeric>
+#include <boost/math/special_functions/binomial.hpp>
 
 namespace TriggerStudies {
 
@@ -36,12 +37,14 @@ namespace TriggerStudies {
     std::string year;
     bool debug;
     bool doCaloJets;
+    bool doPuppiJets;
     Int_t    run       =  0;
     UInt_t    lumiBlock =  0;
     Int_t    event     =  0;
     Int_t    runAOD       =  0;
     UInt_t    lumiBlockAOD =  0;
     Int_t eventAOD     =  0;
+    Int_t BitTrigger[1000];
 
     nTupleAnalysis::jetData* offTreeJets;
     std::vector<nTupleAnalysis::jetPtr> offJets;
@@ -51,6 +54,9 @@ namespace TriggerStudies {
 
     nTupleAnalysis::jetData* caloTreeJets;
     std::vector<nTupleAnalysis::jetPtr> caloJets;
+    
+    nTupleAnalysis::jetData* puppiTreeJets;
+    std::vector<nTupleAnalysis::jetPtr> puppiJets;
 
     nTupleAnalysis::muonData* treeMuons;
     std::vector<nTupleAnalysis::muonPtr> muons;
@@ -61,15 +67,17 @@ namespace TriggerStudies {
     nTupleAnalysis::vertexData* treePVs;
     std::vector<nTupleAnalysis::vertexPtr> pvs;
 
+    nTupleAnalysis::truthData* genJetTree = NULL;
+
     nTupleAnalysis::vertexData* offTreePVs;
     std::vector<nTupleAnalysis::vertexPtr> offPVs;
 
     // Constructors and member functions
-    eventData(TChain*, TChain*, bool, std::string, bool, std::string); 
+    eventData(TChain* _treeRAW, TChain* _treeAOD, bool mc, std::string y, bool d, std::string jetDetailLevel, std::string pfJetName = "PFJet.");
     void update(int);
 
     void dump();
-    ~eventData(); 
+    ~eventData();
 
   };
 

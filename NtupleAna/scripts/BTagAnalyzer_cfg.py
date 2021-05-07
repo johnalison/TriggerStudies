@@ -16,7 +16,10 @@ parser.add_option('-d', '--debug',                dest="debug",         action="
 parser.add_option('-m', '--isMC',                 dest="isMC",          action="store_true", default=False, help="isMC")
 parser.add_option('--isTurnOnStudy',              action="store_true",  default=False, help="doTurn On Study")
 parser.add_option('--doTracks',                   action="store_true",  default=False, help="doTurn On Study")
+parser.add_option('--doPuppiJets',                   action="store_true",  default=False, help="do puppi jets")
 parser.add_option('--doLeptonSel',                action="store_true",  default=False, help="doLepton Selection")
+parser.add_option('--pfJetName',                default="PFJet.", help="")
+parser.add_option('--jetDetailString',                default="matched", help="")
 parser.add_option('-y', '--year',                 dest="year",          default="2016", help="Year specifies trigger (and lumiMask for data)")
 #parser.add_option('-l', '--lumi', type="float",   dest="lumi",          default=1.0,    help="Luminosity for MC normalization: units [pb]")
 parser.add_option( '--inputAOD',                dest="inputAOD",         default='None', help="Input file(s). If it ends in .txt, will treat it as a list of input files.")
@@ -42,19 +45,20 @@ JSONfiles  = {'2015':'',
               '2018':'TriggerStudies/lumiMasks/Cert_314472-325175_13TeV_PromptReco_Collisions18_JSON.txt'} #Not Final, should be updated at some point
 # Calculated lumi per lumiBlock from brilcalc. See README
 lumiData   = {'2015':'',
-              '2016':'TriggerStudies/lumiMasks/', 
+              '2016':'TriggerStudies/lumiMasks/',
               '2017':'TriggerStudies/lumiMasks/brilcalc_2017_NoTrigger.csv',
               '2018':'TriggerStudies/lumiMasks/brilcalc_2018_HLT_PFHT330PT30_QuadPFJet_75_60_45_40_TriplePFBTagDeepCSV_4p5.csv',
-              'phase2' : ''
-          } 
+              'phase2' : '',
+              'Run3' : ''
+          }
 
 # for MC we need to normalize the sample to the recommended cross section * BR times the target luminosity
 ## ZH cross sections https://twiki.cern.ch/twiki/bin/view/LHCPhysics/CERNYellowReportPageAt13TeV#ZH_Process
 ## ZZ cross section 15.0 +0.7 -0.6 +/-0.2 (MCFM at NLO in QCD with additional contributions from LO gg -> ZZ diagrams) or 16.2 +0.6 -0.4 (calculated at NNLO in QCD via MATRIX) https://arxiv.org/pdf/1607.08834.pdf pg 10
 ## Higgs BR(mH=125.0) = 0.5824, BR(mH=125.09) = 0.5809: https://twiki.cern.ch/twiki/bin/view/LHCPhysics/CERNYellowReportPageBR
 ## Z BR = 0.1512+/-0.0005 from PDG
-## store all process cross sections in pb. Can compute xs of sample with GenXsecAnalyzer. Example: 
-## cd genproductions/test/calculateXSectionAndFilterEfficiency; ./calculateXSectionAndFilterEfficiency.sh -f ../../../ZZ_dataset.txt -c RunIIAutumn18MiniAOD-102X_upgrade2018_realistic_v15-v1 -d MINIAODSIM -n -1 
+## store all process cross sections in pb. Can compute xs of sample with GenXsecAnalyzer. Example:
+## cd genproductions/test/calculateXSectionAndFilterEfficiency; ./calculateXSectionAndFilterEfficiency.sh -f ../../../ZZ_dataset.txt -c RunIIAutumn18MiniAOD-102X_upgrade2018_realistic_v15-v1 -d MINIAODSIM -n -1
 
 fileNamesAOD = []
 inputList=False
@@ -86,20 +90,20 @@ else:
 
 
 pathOut = outputBase
-if "root://cmsxrootd-site.fnal.gov//store/" in pathOut: 
+if "root://cmsxrootd-site.fnal.gov//store/" in pathOut:
     pathOut = pathOut + fileNamesAOD[0].replace("root://cmsxrootd-site.fnal.gov//store/", "") #make it a local path
 pathOut = '/'.join(pathOut.split("/")[:-1])+"/" #remove <fileName>.root
-    
+
 #if inputList: #use simplified directory structure based on grouping of filelists
 #    pathOut = outputBase+o.input.split("/")[-1].replace(".txt","/")
 
-if not os.path.exists(pathOut): 
+if not os.path.exists(pathOut):
     mkpath(pathOut)
 
 histOut = pathOut+o.histFile
 
 #
-# ParameterSets for use in bin/<script>.cc 
+# ParameterSets for use in bin/<script>.cc
 #
 process = cms.PSet()
 
@@ -125,10 +129,10 @@ process.fwliteOutput = cms.PSet(
     )
 
 
-if o.doTracks: 
-    jetDetailString = "Tracks.btagInputs.matched"
-else:
-    jetDetailString = "matched"
+jetDetailString = o.jetDetailString
+
+if o.doTracks:
+    jetDetailString += ".Tracks.btagInputs"
 
 #
 #  Recalc NN weights
@@ -147,9 +151,11 @@ else:
         reCalcWeights = cms.bool(False),
         )
 
-
+if o.doPuppiJets:
+    jetDetailString += ".PuppiJets"
 
 #Setup event loop object
+
 if o.inputAOD is 'None':
     print('Configuring HLTOnly...')
     process.BTagAnalyzer = cms.PSet(
@@ -157,6 +163,7 @@ if o.inputAOD is 'None':
         isMC    = cms.bool(o.isMC),
         year    = cms.string(o.year),
         jetDetailString    = cms.string(jetDetailString),
+        pfJetName          = cms.string(o.pfJetName),
         lumiData= cms.string(lumiData[o.year]),
         histogramming = cms.int32(int(o.histogramming)),
         skipEvents = cms.int32(int(o.skipEvents)),
@@ -173,6 +180,7 @@ else:
         year    = cms.string(o.year),
         puFile    = cms.string(o.puFile),
         jetDetailString    = cms.string(jetDetailString),
+        pfJetName    = cms.string(o.pfJetName),
         lumiData= cms.string(lumiData[o.year]),
         histogramming = cms.int32(int(o.histogramming)),
         skipEvents = cms.int32(int(o.skipEvents)),

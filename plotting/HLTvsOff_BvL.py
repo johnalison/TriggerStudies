@@ -10,6 +10,7 @@ p = OptionParser()
 p.add_option('--input',  type = 'string', default = "outBTag.FTKBtagging.ttbar.mwt2.All.root", dest = 'inFile', help = 'intput File' )
 p.add_option('--output', type = 'string', default = "makeRocCurves", dest = 'outDir', help = 'output dir' )
 p.add_option('--doCaloJets',  action="store_true",help = 'output dir' )
+p.add_option('--doPuppiJets',  action="store_true",help = 'output dir' )
 p.add_option('--cmsText', type = 'string', default = "Work in Progress",  help = '' )
 #p.add_option('--lumiText', default = "",  help = '' )
 (o,a) = p.parse_args()
@@ -26,9 +27,14 @@ from JetLevelPlotUtils import getCMSText
 
 inFile  = ROOT.TFile(o.inFile,  "READ")
 
+etaRanges = ["_eta1","_eta2","_eta3"]
+
 import os
 if not os.path.exists(o.outDir):
-    os.mkdir(o.outDir)
+    os.makedirs(o.outDir)
+for etaRange in etaRanges:
+    if not os.path.exists(o.outDir+etaRange):
+        os.makedirs(o.outDir+etaRange)
 
 
 maxDict = {"jetNSelectedTracks":20,
@@ -65,7 +71,7 @@ def getHist(inFile,dir,var,binning,color):
 #    ypos = 0.6
 #    xwidth = 0.3
 #    ywidth = 0.3
-#    
+#
 #    leg = ROOT.TLegend(xpos, ypos, xpos+xwidth, ypos+ywidth)
 #    leg.AddEntry(offBQ,"Offline tracks b-quark jets","L")
 #    leg.AddEntry(hltBQ,"HLT PF b-quark jets"    ,"PEL")
@@ -82,7 +88,7 @@ def getHist(inFile,dir,var,binning,color):
 #        offLF.SetMinimum(1e-6)
 #    else:
 #        offLF.SetMaximum(1.2*maxY)
-#        
+#
 #    offLF.GetYaxis().SetTitle("Simulated Tracks")
 #    offLF.GetXaxis().SetTitle(xTitle )
 #    offLF.Draw("hist")
@@ -99,7 +105,7 @@ def getHist(inFile,dir,var,binning,color):
 #    cmsLine1.Draw("same")
 #    cmsLine2.Draw("same")
 #
-#    
+#
 #    #xatlas, yatlas = 0.18, 0.88
 #    #atlas   = ROOT.TLatex(xatlas+0.01,   yatlas, "ATLAS")
 #    ##simulation = ROOT.TLatex(xatlas+0.11,   yatlas, "Simulation Internal")
@@ -107,7 +113,7 @@ def getHist(inFile,dir,var,binning,color):
 #    #lumi    = ROOT.TLatex(xatlas+0.01,    yatlas-0.05, "#sqrt{s}=13 TeV, t#bar{t}")
 #    #jetText = ROOT.TLatex(xatlas+0.02,   yatlas-0.1, "p_{T}^{jet} > 40 GeV, |#eta^{jet}| < 2.5" )
 #    #wm      = [atlas, simulation, lumi, jetText]
-#    
+#
 #    #watermarks = drawWaterMarks(wm)
 #
 #    varName = var.replace("tracks/","track_").replace("btags/","btag_")
@@ -116,17 +122,34 @@ def getHist(inFile,dir,var,binning,color):
 #    can.SaveAs(o.outDir+"/"+varName+".png")
 
 
-def doVarRatio(var,binning,xTitle,setLogy=1,minX=None,maxX=None,minY=None):
+def doVarRatio(var, binning, xTitle, setLogy=1, minX=None, maxX=None, minY=None, etaRange=None):
     if o.doCaloJets:
         offLF = getHist(inFile,"offJets_matchedCalo_L",          var,binning,ROOT.kBlack)
         hltLF = getHist(inFile,"offJets_matchedCaloJet_L",var,binning,ROOT.kBlack)
         offBQ = getHist(inFile,"offJets_matchedCalo_B",          var,binning,ROOT.kRed)
         hltBQ = getHist(inFile,"offJets_matchedCaloJet_B",var,binning,ROOT.kRed)
+    elif o.doPuppiJets:
+        if etaRange:
+            offLF = getHist(inFile,"offJets_matchedPuppi_L"+etaRange,          var,binning,ROOT.kBlack)
+            hltLF = getHist(inFile,"offJets_matchedPuppiJet_L"+etaRange,var,binning,ROOT.kBlack)
+            offBQ = getHist(inFile,"offJets_matchedPuppi_B"+etaRange,          var,binning,ROOT.kRed)
+            hltBQ = getHist(inFile,"offJets_matchedPuppiJet_B"+etaRange,var,binning,ROOT.kRed)
+        else:
+            offLF = getHist(inFile,"offJets_matchedPuppi_L",          var,binning,ROOT.kBlack)
+            hltLF = getHist(inFile,"offJets_matchedPuppiJet_L",var,binning,ROOT.kBlack)
+            offBQ = getHist(inFile,"offJets_matchedPuppi_B",          var,binning,ROOT.kRed)
+            hltBQ = getHist(inFile,"offJets_matchedPuppiJet_B",var,binning,ROOT.kRed)
     else:
-        offLF = getHist(inFile,"offJets_matched_L",          var,binning,ROOT.kBlack)
-        hltLF = getHist(inFile,"offJets_matchedJet_L",var,binning,ROOT.kBlack)
-        offBQ = getHist(inFile,"offJets_matched_B",          var,binning,ROOT.kRed)
-        hltBQ = getHist(inFile,"offJets_matchedJet_B",var,binning,ROOT.kRed)
+        if etaRange:
+            offLF = getHist(inFile,"offJets_matched_L"+etaRange,          var,binning,ROOT.kBlack)
+            hltLF = getHist(inFile,"offJets_matchedJet_L"+etaRange,var,binning,ROOT.kBlack)
+            offBQ = getHist(inFile,"offJets_matched_B"+etaRange,          var,binning,ROOT.kRed)
+            hltBQ = getHist(inFile,"offJets_matchedJet_B"+etaRange,var,binning,ROOT.kRed)
+        else:
+            offLF = getHist(inFile,"offJets_matched_L",          var,binning,ROOT.kBlack)
+            hltLF = getHist(inFile,"offJets_matchedJet_L",var,binning,ROOT.kBlack)
+            offBQ = getHist(inFile,"offJets_matched_B",          var,binning,ROOT.kRed)
+            hltBQ = getHist(inFile,"offJets_matchedJet_B",var,binning,ROOT.kRed)
 
 
     maxY = max(offLF.GetMaximum(),offBQ.GetMaximum(),
@@ -158,7 +181,7 @@ def doVarRatio(var,binning,xTitle,setLogy=1,minX=None,maxX=None,minY=None):
     ypos = 0.07
     xwidth = 0.7
     ywidth = 0.1
-    
+
     leg = ROOT.TLegend(xpos, ypos, xpos+xwidth, ypos+ywidth)
     leg.SetNColumns(2)
     leg.AddEntry(offBQ,"Offline tracks b-quark jets","L")
@@ -172,7 +195,7 @@ def doVarRatio(var,binning,xTitle,setLogy=1,minX=None,maxX=None,minY=None):
     bottom_pad = ROOT.TPad("pad2", "The pad 20% of the height",0,0,1,split,0)
     top_pad.Draw()
     bottom_pad.Draw()
-    
+
     axissep = 0.02
     top_pad.cd()
     top_pad.SetLogy(setLogy)
@@ -187,11 +210,12 @@ def doVarRatio(var,binning,xTitle,setLogy=1,minX=None,maxX=None,minY=None):
         offLF.GetXaxis().SetRangeUser(offLF.GetXaxis().GetXmin(),maxDict[var] )
 
     offLF.Draw("hist")
-    #hltLF.SetMarkerSize(0.75)
+    # hltLF.SetMarkerSize(0.75)
+    hltLF.SetMarkerSize(0.5)
     #hltLF.SetMarkerStyle(21)
     hltLF.Draw("same pe")
     offBQ.Draw("hist same")
-    #hltBQ.SetMarkerSize(0.75)
+    hltBQ.SetMarkerSize(0.5)
     #hltBQ.SetMarkerStyle(21)
     hltBQ.Draw("same pe")
     leg.Draw("same")
@@ -235,7 +259,8 @@ def doVarRatio(var,binning,xTitle,setLogy=1,minX=None,maxX=None,minY=None):
 
     LFRatio.Draw("PE")
     LFRatio.Draw("PE same")
-    oldSize = LFRatio.GetMarkerSize()
+    # oldSize = LFRatio.GetMarkerSize()
+    oldSize = hltLF.GetMarkerSize()
     LFRatio.SetMarkerSize(0)
     LFRatio.DrawCopy("same e0")
     LFRatio.SetMarkerSize(oldSize)
@@ -244,7 +269,8 @@ def doVarRatio(var,binning,xTitle,setLogy=1,minX=None,maxX=None,minY=None):
 
     BQRatio.Draw("PE same")
     BQRatio.Draw("PE same")
-    oldSize = BQRatio.GetMarkerSize()
+    # oldSize = BQRatio.GetMarkerSize()
+    oldSize = hltBQ.GetMarkerSize()
     BQRatio.SetMarkerSize(0)
     BQRatio.DrawCopy("same e0")
     BQRatio.SetMarkerSize(oldSize)
@@ -263,41 +289,41 @@ def doVarRatio(var,binning,xTitle,setLogy=1,minX=None,maxX=None,minY=None):
 
         factor = factors[i_pad]
         ndiv   = ndivs[i_pad]
-        
+
         prims = [ p.GetName() for p in pad.GetListOfPrimitives() ]
-        
+
         #
         #  Protection for scaling hists multiple times
         #
         procedHist = []
-        
+
         for name in prims:
-            
+
             if name in procedHist: continue
             procedHist.append(name)
-        
+
             h = pad.GetPrimitive(name)
             if isinstance(h, ROOT.TH1) or isinstance(h, ROOT.THStack) or isinstance(h, ROOT.TGraph) or isinstance(h, ROOT.TGraphErrors) or isinstance(h, ROOT.TGraphAsymmErrors):
                 if isinstance(h, ROOT.TGraph) or isinstance(h, ROOT.THStack) or isinstance(h, ROOT.TGraphErrors) or isinstance(h, ROOT.TGraphAsymmErrors):
                     h = h.GetHistogram()
                 #print "factor is",factor,h.GetName(),split
-        
+
                 if i_pad == 1:
                     h.SetLabelSize(h.GetLabelSize('Y')*factor, 'Y')
                     h.SetTitleSize(h.GetTitleSize('X')*factor, 'X')
                     h.SetTitleSize(h.GetTitleSize('Y')*factor, 'Y')
                     h.SetTitleOffset(h.GetTitleOffset('Y')/factor, 'Y')
-                    
+
                 if i_pad == 1:
                     h.GetYaxis().SetNdivisions(ndiv)
-                h.GetXaxis().SetNdivisions()                
+                h.GetXaxis().SetNdivisions()
                 if i_pad == 0:
                     h.SetLabelSize(0.0, 'X')
                     h.GetXaxis().SetTitle("")
                 else:
                     h.SetLabelSize(h.GetLabelSize('X')*factor, 'X')
                     ## Trying to remove overlapping y-axis labels.  Doesn't work.
-                    # h.GetYaxis().Set(4, h.GetYaxis().GetXmin(), h.GetYaxis().GetXmax()) 
+                    # h.GetYaxis().Set(4, h.GetYaxis().GetXmin(), h.GetYaxis().GetXmax())
                     # h.GetYaxis().SetBinLabel( h.GetYaxis().GetLast(), '')
 
 
@@ -311,12 +337,17 @@ def doVarRatio(var,binning,xTitle,setLogy=1,minX=None,maxX=None,minY=None):
     ##lumi    = ROOT.TLatex(xatlas+0.01,    yatlas-0.05, "#sqrt{s}=13 TeV, t#bar{t}")
     ##jetText = ROOT.TLatex(xatlas+0.02,   yatlas-0.1, "p_{T}^{jet} > 40 GeV, |#eta^{jet}| < 2.5" )
     ##wm      = [atlas, simulation, lumi, jetText]
-    
+
     #watermarks = drawWaterMarks(wm)
 
     #varName = var.replace("tracks/","").replace("btags/","btags_")
     varName = var.replace("tracks/","track_").replace("btags/","btag_").replace("btags_noV0/","btag_noV0_")
-    canvas.SaveAs(o.outDir+"/"+varName+".pdf")
+    if etaRange:
+        canvas.SaveAs(o.outDir+etaRange+"/"+varName+".pdf")
+        canvas.SaveAs(o.outDir+etaRange+"/"+varName+".png")
+    else:
+        canvas.SaveAs(o.outDir+"/"+varName+".pdf")
+        canvas.SaveAs(o.outDir+"/"+varName+".png")
     #canvas.SaveAs(o.outDir+"/"+var+".eps")
     #canvas.SaveAs(o.outDir+"/"+var+".png")
 
@@ -331,8 +362,10 @@ def doVarRatio(var,binning,xTitle,setLogy=1,minX=None,maxX=None,minY=None):
 
 for v in ["tracks/ip3d_sig",
           "tracks/ip2d_sig",
-          "CSVv2_l",
+          # "CSVv2_l",
           "DeepCSV_l",
+          "DeepJet_l",
+          "probB",
           #"deepcsv_bb",
           "btags/sv_Flight2D",
           "btags/sv_FlightSig2D",
@@ -347,6 +380,8 @@ for v in ["tracks/ip3d_sig",
           "tracks/ip3d_sig",
           "tracks/ip3d_sig_l",
           "tracks/pt_s",
+          # "tracks/dz",
+          # "tracks/dxy",
 
           "btags/ip2d",
           "btags/ip2d_l",
@@ -357,8 +392,33 @@ for v in ["tracks/ip3d_sig",
           "btags/ip3d_sig",
           "btags/ip3d_sig_l",
 
+          "btags_noV0/ip2d",
+          "btags_noV0/ip2d_l",
+          "btags_noV0/ip2d_sig",
+          "btags_noV0/ip2d_sig_l",
+          "btags_noV0/ip3d",
+          "btags_noV0/ip3d_l",
+          "btags_noV0/ip3d_sig",
+          "btags_noV0/ip3d_sig_l",
+
+
+          "btags/trackPt",
+          "btags/trackEta",
+          "btags/trackPhi",
+          "btags/trackNPixelHits",
+          "btags/trackNTotalHits",
+
+
           "pt_s",
           "pt_m",
+          "eta",
+          "phi",
+          "nJets",
+          "DeepCSVb_l",
+          "DeepCSVbb_l",
+          "DeepJetb_l",
+          "DeepJetbb_l",
+          "DeepJetlepb_l",
           #"trackJetPt",
           #"trackSip2dSigAboveCharm",
           #"trackSip2dValAboveCharm",
@@ -366,7 +426,7 @@ for v in ["tracks/ip3d_sig",
           #"trackSip3dValAboveCharm",
           #"trackSumJetDeltaR",
           #"vertexFitProb",
-          
+
           "tracks/PtRel"          ,
           "tracks/PtRatio"        ,
           "tracks/PPar"           ,
@@ -393,26 +453,28 @@ for v in ["tracks/ip3d_sig",
           #binning = [-100 , -90,-80 , -70  , -60 ,  -50 , -40 , -34 , -32 , -30 , -28 , -26 , -24 , -22 , -20 , -18 , -16 , -14 , -12 , -10 , -8 , -6 , -4 , -2 , 0 , 2 , 4 , 6 , 8 , 10 , 12 , 14 , 16 , 18 , 20 , 22 , 24 , 26 , 28 , 30 , 32 , 34 , 40 , 50 , 60 , 70 , 80, 90 , 100]
           #binning = [-100,-90,-80,-70,-60,-50,-40,-30,-20,-10,-5,0,5,10,15,20,30,40,50,60,70,80,90,100]
           )
+    for etaRange in etaRanges: doVarRatio(v,xTitle = v,binning = binning, etaRange=etaRange)
 
 
 
 
-for v in [        "tracks/eta",
+for v in [
+        "tracks/eta",
         "tracks/ip2d_err",
         "tracks/ip2d_err_l",
         "tracks/ip3d_err",
         "tracks/ip3d_err_l",
 #        "neMult",
         "phi",
-                  "btags/sv_BoostOverSqrtJetPt",
+        "btags/sv_BoostOverSqrtJetPt",
         "btags/sv_EnergyRatio",
         "btags/sv_Eta",
         "btags/sv_NDF",
         "btags/sv_Phi",
         "btags/sv_R",
         "btags/sv_Z",
-                  "btags/sv_massVertexEnergyFraction",
-                  "btags/sv_Chi2",
+        "btags/sv_massVertexEnergyFraction",
+        "btags/sv_Chi2",
         "btags/sv_JetDeltaR",
         "btags/sv_DistJetAxis",
         "tracks/JetDistVal"     ,
@@ -422,21 +484,21 @@ for v in [        "tracks/eta",
         #"trackEtaRel"         ,
         #"jetNSelectedTracks",
         #"mult",
-        #"nTrk",
+        # "nTrk",
         #"jetNTracksEtaRel",
 
-                  "btags/chargedHadronMultiplicity",
-                  "btags/chargedMultiplicity",
-                  "btags/elecMultiplicity",
-                  "btags/muonMultiplicity",
-                  "btags/neutralHadronMultiplicity",
-                  "btags/neutralMultiplicity",
-                  "btags/photonMultiplicity",
-                  "btags/totalMultiplicity",
+        "btags/chargedHadronMultiplicity",
+        "btags/chargedMultiplicity",
+        "btags/elecMultiplicity",
+        "btags/muonMultiplicity",
+        "btags/neutralHadronMultiplicity",
+        "btags/neutralMultiplicity",
+        "btags/photonMultiplicity",
+        "btags/totalMultiplicity",
 
         #"vertexCategory",
-                  #"ip2d",
-          "tracks/Chi2",
+        #"ip2d",
+        "tracks/Chi2",
                   ]:
 
     if o.doCaloJets:
@@ -450,7 +512,7 @@ for v in [        "tracks/eta",
                   "btags/totalMultiplicity",
                   ]:
             continue
-        
+
     vName = v.split("/")[-1]
     if vName in rebinningDB:
         binning = rebinningDB[vName]
@@ -463,6 +525,7 @@ for v in [        "tracks/eta",
           binning = binning,
           setLogy = 0,
           )
+    for etaRange in etaRanges: doVarRatio(v,xTitle = v,binning = binning,setLogy = 0, etaRange=etaRange)
 
 
 
@@ -475,6 +538,7 @@ for v in [
         "btags/sv_nSVs",
         "tracks/nTracks",
         "btags_noV0/nTracks",
+        "btags/nTracks",
         "btags/sv_NTracks",
         ]:
 
@@ -483,22 +547,26 @@ for v in [
           binning = 1,
           setLogy = 0,
           )
+    for etaRange in etaRanges: doVarRatio(v,xTitle = v,binning = 1,setLogy = 0, etaRange=etaRange)
 
 
-for v in [ 
-"btags/chargedEmEnergyFraction",
-"btags/chargedHadronEnergyFraction",
-"btags/elecEnergyFraction",
-"btags/muonEnergyFraction",
-"btags/neutralEmEnergyFraction",
-"btags/neutralHadronEnergyFraction",
-"btags/photonEnergyFraction",
+for v in [
+        "btags/chargedEmEnergyFraction",
+        "btags/chargedHadronEnergyFraction",
+        "btags/elecEnergyFraction",
+        "btags/muonEnergyFraction",
+        "btags/neutralEmEnergyFraction",
+        "btags/neutralHadronEnergyFraction",
+        "btags/photonEnergyFraction",
 
-
-          "tracks/IsFromV0",
-          "tracks/IsFromSV",
-#        "neutralHadronEnergyFraction",
-#        "trackSumJetEtRatio",
+        "tracks/IsFromV0",
+        "tracks/IsFromSV",
+        # "btags/trackIsFromV0",
+        # "btags_noV0/trackIsFromV0",
+        # "btags/trackIsFromSV",
+        # "btags_noV0/trackIsFromSV",
+        # "neutralHadronEnergyFraction",
+        # "trackSumJetEtRatio",
         ]:
     doVarRatio(v,
           xTitle = v,
@@ -506,7 +574,8 @@ for v in [
           setLogy = 0,
                minY = 0,
          )
-    
+    for etaRange in etaRanges: doVarRatio(v,xTitle = v,binning = 1,setLogy = 0,minY = 0, etaRange=etaRange)
+
 #
 #
 #for v in [
@@ -531,6 +600,8 @@ for v in [
           minX = 0,
           maxX = 15
           )
+    for etaRange in etaRanges: doVarRatio(v,xTitle = v,binning = 1,setLogy = 0,          minX = 0,
+              maxX = 15, etaRange=etaRange)
 
 
 

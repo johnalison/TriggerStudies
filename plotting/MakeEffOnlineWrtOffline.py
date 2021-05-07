@@ -29,7 +29,7 @@ inFile2    = ROOT.TFile(o.input2,  "READ")
 
 import os
 if not os.path.exists(o.outDir):
-    os.mkdir(o.outDir)
+    os.makedirs(o.outDir)
 
 
 from JetLevelPlotUtils import makeEff, drawComp, drawCompRatioGraphs, getHist
@@ -50,6 +50,10 @@ vars = [
     ]
 
 effRatios = [
+    ("offJetsMedDeepFlav_matchedPFDeepCSV",  "offJetsMedDeepFlav_matchedPFJet", "PFDeepCSV"),
+    ("offJetsMedDeepFlav_matchedPFCSV",      "offJetsMedDeepFlav_matchedPFJet", "PFCSV"),
+    ("offJetsMedDeepFlav_matchedCaloDeepCSV","offJetsMedDeepFlav_matchedCaloJet", "CaloDeepCSV"),
+    ("offJetsMedDeepFlav_matchedCaloCSV",    "offJetsMedDeepFlav_matchedCaloJet", "CaloCSV"),
     ("offJetsMedDeepCSV_matchedPFDeepCSV",   "offJetsMedDeepCSV_matchedPFJet",    "PFDeepCSV" ),
     ("offJetsMedDeepCSV_matchedPFCSV",       "offJetsMedDeepCSV_matchedPFJet",    "PFCSV" ),
     ("offJetsMedDeepCSV_matchedCaloCSV",     "offJetsMedDeepCSV_matchedCaloJet",  "CaloCSV" ),
@@ -59,7 +63,7 @@ effRatios = [
     ("offJetsMedDeepFlav_matchedCaloDeepCSV","offJetsMedDeepFlav_matchedCaloJet", "CaloDeepCSV_wrt_DeepFlav"),
     ("offJetsMedDeepFlav_matchedCaloCSV",    "offJetsMedDeepFlav_matchedCaloJet", "CaloCSV_wrt_DeepFlav"),
     ]
-        
+
 
 for v in vars:
     binning = 1
@@ -116,7 +120,7 @@ for v in vars:
                                 lumiText = o.lumiText,
                                 histForXBarycenterCalc = numHistOrigBinning
                                 )
-    
+
         else:
             drawComp("Eff_"+config[2]+"_"+v,[(eff_Matched_1,o.name1,       ROOT.kBlack),
                                (eff_Matched_2,o.name2,  ROOT.kRed, ROOT.kOpenCircle),
@@ -134,7 +138,3 @@ for v in vars:
         outFile.cd()
         eff_Matched_1.Write()
         eff_Matched_2.Write()
-
-
-
-

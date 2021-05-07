@@ -2,7 +2,7 @@
 #sys.path.insert(0, '../../')
 #import ROOTHelp.FancyROOTStyle
 
-#from iPlotLoadPath import loadPath 
+#from iPlotLoadPath import loadPath
 #loadPath()
 
 
@@ -14,21 +14,27 @@ from iUtils import parseOpts as parseOpts
 (options, args) = parseOpts()
 pm = getPM(options)
 
-
 print options.labName
 labName = options.labName.split(",")
 print labName
 
 
-#plotDirs = ["offJets_matched","offJets_matchedJet",    "offJets_matchedCalo",   "offJets_matchedCaloJet"]
-plotDirs = ["offJets_matched","offJets_matchedJet"]
+# plotDirs = ["offJets_matched","offJets_matchedJet",    "offJets_matchedCalo",   "offJets_matchedCaloJet"]
+if options.puppi:
+    plotDirs = ["offJets_matchedPuppi","offJets_matchedPuppiJet",
+                "offJets_matchedPuppi_eta1","offJets_matchedPuppiJet_eta1",
+                "offJets_matchedPuppi_eta2","offJets_matchedPuppiJet_eta2",
+                "offJets_matchedPuppi_eta3","offJets_matchedPuppiJet_eta3"]
+else:
+    plotDirs = ["offJets_matched","offJets_matchedJet",
+                "offJets_matched_eta1","offJets_matchedJet_eta1",
+                "offJets_matched_eta2","offJets_matchedJet_eta2",
+                "offJets_matched_eta3","offJets_matchedJet_eta3"]
 
-
-
-for v in [
-    "tracks/ip3d_sig",
+for v in ["tracks/ip3d_sig",
     "tracks/ip2d_sig",
-    "CSVv2_l",
+    # "CSVv2_l",
+    "probB",
     "DeepCSV_l",
     #"deepcsv_bb",
     "btags/sv_Flight2D",
@@ -61,13 +67,13 @@ for v in [
     "pt_s",
     "pt_m",
     #"trackJetPt",
-    "btags/trackSip2dSigAboveCharm",
-    "btags/trackSip2dValAboveCharm",
-    "btags/trackSip3dSigAboveCharm",
-    "btags/trackSip3dValAboveCharm",
-    "btags/trackSumJetDeltaR",
+    # "trackSip2dSigAboveCharm",
+    # "trackSip2dValAboveCharm",
+    # "trackSip3dSigAboveCharm",
+    # "trackSip3dValAboveCharm",
+    # "trackSumJetDeltaR",
     #"vertexFitProb",
-    
+
     "tracks/PtRel"          ,
     "tracks/PtRatio"        ,
     "tracks/PPar"           ,
@@ -79,7 +85,7 @@ for v in [
     "tracks/origAlgo",
 
     "btags/sv_Pt",
-    ]:
+          ]:
 
     vName = v.split("/")[-1]
     if vName in rebinningDB:
@@ -87,8 +93,8 @@ for v in [
     else:
         binning = 2
 
-        
-    for d in plotDirs: 
+
+    for d in plotDirs:
         plot(v,d,       binning=binning,doratio=1,rMin=0.5,rMax=1.5,logy=1,labels=labName,norm=options.norm)
 
     #doVarRatio(v,
@@ -180,13 +186,13 @@ for v in [
     else:
         binning = 2
 
-    for d in plotDirs: 
+    for d in plotDirs:
         plot(v,d,       binning=binning,doratio=1,rMin=0.5,rMax=1.5,logy=0,labels=labName, norm=options.norm)
-                    
 
 
 
-for v in [ 
+
+for v in [
     "btags/chargedEmEnergyFraction",
     "btags/chargedHadronEnergyFraction",
     "btags/elecEnergyFraction",
@@ -211,11 +217,11 @@ for v in [
     "tracks/IsFromV0",
     "tracks/IsFromSV",
     #        "neutralHadronEnergyFraction",
-    "btags/trackSumJetEtRatio",
-    ]:
-    for d in plotDirs: 
+    # "trackSumJetEtRatio",
+        ]:
+    for d in plotDirs:
         plot(v,d,       binning=1,doratio=1,rMin=0.5,rMax=1.5,logy=0,minY=0,labels=labName,norm=options.norm)
-    
+
 #
 #
 #for v in [
@@ -234,9 +240,5 @@ for v in [
         "btags/vertexMass",
         "m",
         ]:
-    for d in plotDirs: 
+    for d in plotDirs:
         plot(v,d,       binning=1,doratio=1,rMin=0.5,rMax=1.5,logy=0,x_min = 0, x_max=15,labels=labName,norm=options.norm)
-
-
-
-

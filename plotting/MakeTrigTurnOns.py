@@ -28,7 +28,7 @@ else:
 
 import os
 if not os.path.exists(o.outDir):
-    os.mkdir(o.outDir)
+    os.makedirs(o.outDir)
 
 
 from JetLevelPlotUtils import makeEff, drawComp, getHist, drawStackCompRatio, makeStack, makeInverseTurnOn, make2DComp, makeInverseTurnOnAll,plotRatio
@@ -58,7 +58,7 @@ effPairs = [["offJetPt15","offJetPt0"] ,
             ["offJetPt450_3vl","offJetPt0_3vl"],
             ["offJetPt500_3vl","offJetPt0_3vl"],
             ["offJetPt550_4vl","offJetPt0_4vl"],
-             
+
             ["offJetPtAll15","offJetPtAll0"] ,
             ["offJetPtAll30","offJetPtAll0"] ,
             ["offJetPtAll40","offJetPtAll0"] ,
@@ -80,7 +80,7 @@ effPairs = [["offJetPt15","offJetPt0"] ,
             ["offJetPtAll450_3vl","offJetPtAll0_3vl"],
             ["offJetPtAll500_3vl","offJetPtAll0_3vl"],
             ["offJetPtAll550_4vl","offJetPtAll0_4vl"],
-                        
+
 
             ["offHtAll180","offHtAll0"],
             ["offHtAll250","offHtAll0"],
@@ -93,7 +93,7 @@ effPairs = [["offJetPt15","offJetPt0"] ,
             ["offHtAll780_vl","offHtAll0_vl"],
             ["offHtAll890_vl","offHtAll0_vl"],
             ["offHtAll1050_2vl","offHtAll0_2vl"],
-            ]    
+            ]
 
 
 if o.mc:
@@ -131,12 +131,12 @@ if o.mc:
                 ["offHtAll890_vl","offHtAll0_vl"],
                 ["offHtAll1050_2vl","offHtAll0_2vl"],
 
-                ]    
+                ]
 
 for p in effPairs:
-        
+
     dirName    = "TrigTurnOnStudy"
-    
+
     eff_Matched_1 = makeEff(p ,         dirName,         inFile1, binning=1)
     if o.mc:
         eff_Matched_2 = makeEff([p[0].replace("_L","_B"),p[1].replace("_L","_B")] ,         dirName,         inFile1, binning=1)
@@ -158,4 +158,3 @@ for p in effPairs:
              xMin=eff_Matched_1.GetXaxis().GetXmin(),
              doFit = doFit
              )
-
