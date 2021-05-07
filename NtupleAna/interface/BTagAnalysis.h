@@ -4,6 +4,7 @@
 
 #include <ctime>
 #include <sys/resource.h>
+#include <sstream>      // std::stringstream
 
 #include <TChain.h>
 #include <TTree.h>
@@ -47,42 +48,105 @@ namespace TriggerStudies {
     int treeEvents;
     eventData* event;
 
-    struct jetHistsTruthMatched { 
 
-      nTupleAnalysis::jetHists*  matched_B      = nullptr;
-      nTupleAnalysis::jetHists*  matched_C      = nullptr;
+    struct etaRangeHists { 
 
-      nTupleAnalysis::jetHists*  matched_LandPU = nullptr;
-      nTupleAnalysis::jetHists*  matched_L      = nullptr;
+      std::vector<nTupleAnalysis::jetHists*> etaHists;
+      std::vector<float> absEtaCuts;
 
-
-      jetHistsTruthMatched(std::string jetName, fwlite::TFileService& fs, std::string jetDetailString ){
+      etaRangeHists(std::string jetName, std::vector<float> absEtaUpperLimits, fwlite::TFileService& fs, std::string jetDetailString ){
 	
-	matched_B        = new nTupleAnalysis::jetHists(jetName+"_B",       fs, "", jetDetailString );
-	matched_C        = new nTupleAnalysis::jetHists(jetName+"_C",       fs, "", jetDetailString );
-	matched_L        = new nTupleAnalysis::jetHists(jetName+"_L",       fs, "", jetDetailString );
-	matched_LandPU   = new nTupleAnalysis::jetHists(jetName+"_LandPU",  fs, "", jetDetailString );
+	absEtaCuts = absEtaUpperLimits;
+
+	// Always make a first bin
+	std::stringstream ss; 
+	ss << 1;
+	etaHists.push_back(new nTupleAnalysis::jetHists(jetName+"_eta"+ss.str(),       fs, "", jetDetailString));
+
+	// Make a bin for each upper limit
+	for(unsigned int iEta = 0; iEta < absEtaUpperLimits.size(); ++iEta){
+	  ss.str(std::string());
+	  ss << (iEta + 2);
+	  etaHists.push_back(new nTupleAnalysis::jetHists(jetName+"_eta"+ss.str(),       fs, "", jetDetailString));
+	}
+
+
+      };
+
+      void Fill(const nTupleAnalysis::jetPtr& jet, float etaForBinning, float weight){
+	
+	for(unsigned int iEta = 0; iEta < etaHists.size(); ++iEta){
+	  
+	  if(iEta < absEtaCuts.size()){
+	    if(abs(etaForBinning) < absEtaCuts.at(iEta)){
+	      etaHists.at(iEta)->Fill(jet,weight);	 
+	      break;
+	    }
+	  }else{
+	    etaHists.at(iEta)->Fill(jet,weight);	    
+	    break;
+	  }
+
+	}
 
 	
       };
 
-      void Fill(const nTupleAnalysis::jetPtr& jet, int hadronFlavour, int flavourCleaned,  float weight){
+    };
+
+
+
+    struct jetHistsTruthMatched { 
+
+      nTupleAnalysis::jetHists*  matched_B      = nullptr;
+      nTupleAnalysis::jetHists*  matched_C      = nullptr;
+      nTupleAnalysis::jetHists*  matched_LandPU = nullptr;
+      nTupleAnalysis::jetHists*  matched_L      = nullptr;
+
+      etaRangeHists*  matched_B_eta      = nullptr;
+      etaRangeHists*  matched_C_eta      = nullptr;
+      etaRangeHists*  matched_LandPU_eta = nullptr;
+      etaRangeHists*  matched_L_eta      = nullptr;
+      
+
+      jetHistsTruthMatched(std::string jetName, fwlite::TFileService& fs, std::string jetDetailString, std::vector<float> absEtaUpperLimits = {}){
+	matched_B        = new nTupleAnalysis::jetHists(jetName+"_B",       fs, "", jetDetailString );
+	matched_C        = new nTupleAnalysis::jetHists(jetName+"_C",       fs, "", jetDetailString );
+	matched_L        = new nTupleAnalysis::jetHists(jetName+"_L",       fs, "", jetDetailString );
+	matched_LandPU   = new nTupleAnalysis::jetHists(jetName+"_LandPU",  fs, "", jetDetailString );
+	
+	if(absEtaUpperLimits.size()){
+	  matched_B_eta        = new etaRangeHists(jetName+"_B",      absEtaUpperLimits,  fs, jetDetailString );
+	  matched_C_eta        = new etaRangeHists(jetName+"_C",      absEtaUpperLimits,  fs, jetDetailString );
+	  matched_L_eta        = new etaRangeHists(jetName+"_L",      absEtaUpperLimits,  fs, jetDetailString );
+	  matched_LandPU_eta   = new etaRangeHists(jetName+"_LandPU", absEtaUpperLimits,  fs, jetDetailString );
+	}
+
+      };
+
+      void Fill(const nTupleAnalysis::jetPtr& jet, int hadronFlavour, int flavourCleaned,  float weight, float etaForBinning=-1){
 
 	if(hadronFlavour == 5){
 	  matched_B->Fill(jet, weight);
+	  if(matched_B_eta) matched_B_eta->Fill(jet, etaForBinning, weight);
 	}else if(hadronFlavour == 4){
 	  matched_C->Fill(jet, weight);
+	  if(matched_C_eta) matched_C_eta->Fill(jet, etaForBinning, weight);
 	}else if(hadronFlavour == 0){
 	  matched_LandPU->Fill(jet, weight);
-	  
+	  if(matched_LandPU_eta) matched_LandPU_eta->Fill(jet, etaForBinning, weight);
 	  if(flavourCleaned!=0){
 	    matched_L->Fill(jet, weight);
+	    if(matched_L_eta) matched_L_eta->Fill(jet, etaForBinning, weight);
 	  }
 	}
 	
       };
 
     };
+
+
+
 
 
     nTupleAnalysis::eventHists* hEvents = nullptr;
@@ -99,17 +163,16 @@ namespace TriggerStudies {
     nTupleAnalysis::elecHists* hAllElecs = nullptr;
     nTupleAnalysis::elecHists* hSelElecs = nullptr;
 
+    // 
+    // Offline Jets
+    //
     nTupleAnalysis::jetHists* hOffJetsPreOLap = nullptr;
     nTupleAnalysis::jetHists* hOffJets = nullptr;
     nTupleAnalysis::jetHists* hOffJets_matched = nullptr;
-    nTupleAnalysis::jetHists* hOffJets_matched_eta1 = nullptr;
-    nTupleAnalysis::jetHists* hOffJets_matched_eta2 = nullptr;
-    nTupleAnalysis::jetHists* hOffJets_matched_eta3 = nullptr;
-
+    etaRangeHists* hOffJets_matched_eta = nullptr;
+    
     nTupleAnalysis::jetHists* hOffJets_matchedJet = nullptr;
-    nTupleAnalysis::jetHists* hOffJets_matchedJet_eta1 = nullptr;
-    nTupleAnalysis::jetHists* hOffJets_matchedJet_eta2 = nullptr;
-    nTupleAnalysis::jetHists* hOffJets_matchedJet_eta3 = nullptr;
+    etaRangeHists* hOffJets_matchedJet_eta = nullptr;
 
     nTupleAnalysis::jetHists* hOffJets_matchedCalo = nullptr;
     nTupleAnalysis::jetHists* hOffJets_matchedCaloJet = nullptr;
@@ -117,13 +180,13 @@ namespace TriggerStudies {
     nTupleAnalysis::jetHists* hOffJetsPuppi = nullptr;
     nTupleAnalysis::jetHists* hOffJets_matchedPuppi = nullptr;
     nTupleAnalysis::jetHists* hOffJets_matchedPuppiJet = nullptr;
-    nTupleAnalysis::jetHists* hOffJets_matchedPuppi_eta1 = nullptr;
-    nTupleAnalysis::jetHists* hOffJets_matchedPuppi_eta2 = nullptr;
-    nTupleAnalysis::jetHists* hOffJets_matchedPuppi_eta3 = nullptr;
-    nTupleAnalysis::jetHists* hOffJets_matchedPuppiJet_eta1 = nullptr;
-    nTupleAnalysis::jetHists* hOffJets_matchedPuppiJet_eta2 = nullptr;
-    nTupleAnalysis::jetHists* hOffJets_matchedPuppiJet_eta3 = nullptr;
+    etaRangeHists* hOffJets_matchedPuppi_eta = nullptr;
+    etaRangeHists* hOffJets_matchedPuppiJet_eta = nullptr;
 
+
+    //
+    //  BTags Matching 
+    //
     nTupleAnalysis::jetHists*    hOffJet_matchedPFcsvTag          = nullptr;
     nTupleAnalysis::jetHists*    hOffJet_matchedPFcsvTagJet       = nullptr;
     nTupleAnalysis::jetHists*    hOffJet_matchedPFDeepcsvTag      = nullptr;
@@ -171,76 +234,11 @@ namespace TriggerStudies {
     //
     // Truth Hists
     //
-    nTupleAnalysis::jetHists*  hOffJets_matched_LandPU_eta1    = nullptr;
-    nTupleAnalysis::jetHists*  hOffJets_matched_LandPU_eta2    = nullptr;
-    nTupleAnalysis::jetHists*  hOffJets_matched_LandPU_eta3    = nullptr;
-
-    nTupleAnalysis::jetHists*  hOffJets_matchedJet_LandPU_eta1 = nullptr;
-    nTupleAnalysis::jetHists*  hOffJets_matchedJet_LandPU_eta2 = nullptr;
-    nTupleAnalysis::jetHists*  hOffJets_matchedJet_LandPU_eta3 = nullptr;
-
-    nTupleAnalysis::jetHists*  hOffJets_matched_L_eta1    = nullptr;
-    nTupleAnalysis::jetHists*  hOffJets_matched_L_eta2    = nullptr;
-    nTupleAnalysis::jetHists*  hOffJets_matched_L_eta3    = nullptr;
-
-    nTupleAnalysis::jetHists*  hOffJets_matchedJet_L_eta1 = nullptr;
-    nTupleAnalysis::jetHists*  hOffJets_matchedJet_L_eta2 = nullptr;
-    nTupleAnalysis::jetHists*  hOffJets_matchedJet_L_eta3 = nullptr;
-
-    nTupleAnalysis::jetHists*  hOffJets_matched_B_eta1    = nullptr;
-    nTupleAnalysis::jetHists*  hOffJets_matched_B_eta2    = nullptr;
-    nTupleAnalysis::jetHists*  hOffJets_matched_B_eta3    = nullptr;
-
-    nTupleAnalysis::jetHists*  hOffJets_matchedJet_B_eta1 = nullptr;
-    nTupleAnalysis::jetHists*  hOffJets_matchedJet_B_eta2 = nullptr;
-    nTupleAnalysis::jetHists*  hOffJets_matchedJet_B_eta3 = nullptr;
-
-    nTupleAnalysis::jetHists*  hOffJets_matched_C_eta1    = nullptr;
-    nTupleAnalysis::jetHists*  hOffJets_matched_C_eta2    = nullptr;
-    nTupleAnalysis::jetHists*  hOffJets_matched_C_eta3    = nullptr;
-
-    nTupleAnalysis::jetHists*  hOffJets_matchedJet_C_eta1 = nullptr;
-    nTupleAnalysis::jetHists*  hOffJets_matchedJet_C_eta2 = nullptr;
-    nTupleAnalysis::jetHists*  hOffJets_matchedJet_C_eta3 = nullptr;
-
     jetHistsTruthMatched* hOffJets_matched_Truth = nullptr;
     jetHistsTruthMatched* hOffJets_matchedJet_Truth = nullptr;
 
     jetHistsTruthMatched* hOffJets_matchedCalo_Truth = nullptr;
     jetHistsTruthMatched* hOffJets_matchedCaloJet_Truth = nullptr;
-
-
-    nTupleAnalysis::jetHists*  hOffJets_matchedPuppi_LandPU_eta1    = nullptr;
-    nTupleAnalysis::jetHists*  hOffJets_matchedPuppi_LandPU_eta2    = nullptr;
-    nTupleAnalysis::jetHists*  hOffJets_matchedPuppi_LandPU_eta3    = nullptr;
-
-    nTupleAnalysis::jetHists*  hOffJets_matchedPuppiJet_LandPU_eta1 = nullptr;
-    nTupleAnalysis::jetHists*  hOffJets_matchedPuppiJet_LandPU_eta2 = nullptr;
-    nTupleAnalysis::jetHists*  hOffJets_matchedPuppiJet_LandPU_eta3 = nullptr;
-
-    nTupleAnalysis::jetHists*  hOffJets_matchedPuppi_L_eta1    = nullptr;
-    nTupleAnalysis::jetHists*  hOffJets_matchedPuppi_L_eta2    = nullptr;
-    nTupleAnalysis::jetHists*  hOffJets_matchedPuppi_L_eta3    = nullptr;
-
-    nTupleAnalysis::jetHists*  hOffJets_matchedPuppiJet_L_eta1 = nullptr;
-    nTupleAnalysis::jetHists*  hOffJets_matchedPuppiJet_L_eta2 = nullptr;
-    nTupleAnalysis::jetHists*  hOffJets_matchedPuppiJet_L_eta3 = nullptr;
-
-    nTupleAnalysis::jetHists*  hOffJets_matchedPuppi_B_eta1    = nullptr;
-    nTupleAnalysis::jetHists*  hOffJets_matchedPuppi_B_eta2    = nullptr;
-    nTupleAnalysis::jetHists*  hOffJets_matchedPuppi_B_eta3    = nullptr;
-
-    nTupleAnalysis::jetHists*  hOffJets_matchedPuppiJet_B_eta1 = nullptr;
-    nTupleAnalysis::jetHists*  hOffJets_matchedPuppiJet_B_eta2 = nullptr;
-    nTupleAnalysis::jetHists*  hOffJets_matchedPuppiJet_B_eta3 = nullptr;
-
-    nTupleAnalysis::jetHists*  hOffJets_matchedPuppi_C_eta1    = nullptr;
-    nTupleAnalysis::jetHists*  hOffJets_matchedPuppi_C_eta2    = nullptr;
-    nTupleAnalysis::jetHists*  hOffJets_matchedPuppi_C_eta3    = nullptr;
-
-    nTupleAnalysis::jetHists*  hOffJets_matchedPuppiJet_C_eta1 = nullptr;
-    nTupleAnalysis::jetHists*  hOffJets_matchedPuppiJet_C_eta2 = nullptr;
-    nTupleAnalysis::jetHists*  hOffJets_matchedPuppiJet_C_eta3 = nullptr;
 
     jetHistsTruthMatched* hOffJets_matchedPuppi_Truth = nullptr;
     jetHistsTruthMatched* hOffJets_matchedPuppiJet_Truth = nullptr;

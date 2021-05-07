@@ -19,6 +19,7 @@ parser.add_option('--doTracks',                   action="store_true",  default=
 parser.add_option('--doPuppiJets',                   action="store_true",  default=False, help="do puppi jets")
 parser.add_option('--doLeptonSel',                action="store_true",  default=False, help="doLepton Selection")
 parser.add_option('--pfJetName',                default="PFJet.", help="")
+parser.add_option('--jetDetailString',                default="matched", help="")
 parser.add_option('-y', '--year',                 dest="year",          default="2016", help="Year specifies trigger (and lumiMask for data)")
 #parser.add_option('-l', '--lumi', type="float",   dest="lumi",          default=1.0,    help="Luminosity for MC normalization: units [pb]")
 parser.add_option( '--inputAOD',                dest="inputAOD",         default='None', help="Input file(s). If it ends in .txt, will treat it as a list of input files.")
@@ -128,10 +129,10 @@ process.fwliteOutput = cms.PSet(
     )
 
 
+jetDetailString = o.jetDetailString
+
 if o.doTracks:
-    jetDetailString = "Tracks.btagInputs.matched"
-else:
-    jetDetailString = "matched"
+    jetDetailString += ".Tracks.btagInputs"
 
 #
 #  Recalc NN weights
