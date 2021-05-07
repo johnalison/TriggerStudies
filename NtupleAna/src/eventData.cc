@@ -6,7 +6,7 @@ using namespace TriggerStudies;
 using std::cout;  using std::endl;
 
 
-eventData::eventData(TChain* _treeRAW, TChain* _treeAOD, bool mc, std::string y, bool d, std::string jetDetailLevel){
+eventData::eventData(TChain* _treeRAW, TChain* _treeAOD, bool mc, std::string y, bool d, std::string jetDetailLevel, std::string pfJetName){
   std::cout << "eventData::eventData()" << std::endl;
   treeRAW  = _treeRAW;
   treeAOD  = _treeAOD;
@@ -22,7 +22,6 @@ eventData::eventData(TChain* _treeRAW, TChain* _treeAOD, bool mc, std::string y,
 
   doCaloJets = jetDetailLevel.find("CaloJets") != std::string::npos;
   doPuppiJets = jetDetailLevel.find("PuppiJets") != std::string::npos;
-
 
   bool checkEventDiffs = false;
   if(checkEventDiffs && doOffline){
@@ -132,13 +131,24 @@ eventData::eventData(TChain* _treeRAW, TChain* _treeAOD, bool mc, std::string y,
   std::string jetSFName = year;
   if(jetSFName == "2018") jetSFName = "deepcsv2018";
 
-  if(doOffline)  offTreeJets  = new nTupleAnalysis::jetData( "Jet",  treeRAW, true, isMC,  jetDetailLevel, "",      jetSFName );
+  if(doOffline){
+    std::cout << "\t loading off offline jets with name " << "" << std::endl;    
+    offTreeJets  = new nTupleAnalysis::jetData( "Jet",  treeAOD, true, isMC,  jetDetailLevel, "",      jetSFName );
+  }
 
-  if(doOffline)  offTreeJets  = new nTupleAnalysis::jetData( "Jet",  treeRAW, true, isMC,  jetDetailLevel, "",      jetSFName );
-  pfTreeJets   = new nTupleAnalysis::jetData( "Jet",  treeRAW, true, false, jetDetailLevel, "PFJet."       );
+  std::cout << "\t loading pfjets with name " << pfJetName << std::endl;    
+  pfTreeJets   = new nTupleAnalysis::jetData( "Jet",  treeRAW, true, false, jetDetailLevel, pfJetName       );
 
-  if(doCaloJets) caloTreeJets = new nTupleAnalysis::jetData( "Jet",  treeRAW, true, false, jetDetailLevel, "CaloJet."     );
-  if(doPuppiJets) puppiTreeJets = new nTupleAnalysis::jetData( "Jet",  treeRAW, true, false, jetDetailLevel, "PuppiJet."     );
+
+  if(doCaloJets){
+    std::cout << "\t loading calo jets with name " << "CaloJet." << std::endl;    
+    caloTreeJets = new nTupleAnalysis::jetData( "Jet",  treeRAW, true, false, jetDetailLevel, "CaloJet."     );
+  }
+
+  if(doPuppiJets){
+    std::cout << "\t loading puppi jets with name " << "PuppiJet." << std::endl;    
+    puppiTreeJets = new nTupleAnalysis::jetData( "Jet",  treeRAW, true, false, jetDetailLevel, "PuppiJet."     );
+  }
 
   //treeMuons    = new nTupleAnalysis::muonData("PFMuon",     treeRAW);
   //treeElecs    = new nTupleAnalysis::elecData("PFElectron", treeRAW);
