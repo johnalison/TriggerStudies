@@ -210,7 +210,7 @@ namespace TriggerStudies {
 	//hmttPf_isFromV0   = dir.make<TH1F>("mtt_pf_isFromV0",    "BTagAnalysis/mtt_pf_isFromV0;     mtt;   Entries", 100,-0.01, 2);
 
 
-	bool doTracks = jetDetailString.find("doTracks") != std::string::npos;
+	bool doTracks = jetDetailString.find("Tracks") != std::string::npos;
 	if(doTracks){
 	  hOffTracks           = new nTupleAnalysis::trackHists(offName+"Tracks",          fs, "");
 	  hOffTracks_unmatched = new nTupleAnalysis::trackHists(offName+"Tracks_unmatched",fs, "");
