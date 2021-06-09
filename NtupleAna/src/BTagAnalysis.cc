@@ -110,14 +110,19 @@ BTagAnalysis::BTagAnalysis(TChain* _eventsRAW, TChain* _eventsAOD, fwlite::TFile
 
   hOffJetsPreOLap         = new nTupleAnalysis::jetHists("offJetsPreOLap",        fs, "Pre Overlap");
 
-  PFJetHists = new jetAnalysisHists("off","pf", "PF", fs, jetDetailString, isMC);
+  PFJetHists         = new jetAnalysisHists("off","pf", "PF", fs, jetDetailString, isMC);
+  PFJetHists_PVMatch = new jetAnalysisHists("off","pf", "PF", fs, jetDetailString, isMC, "_PVMatch");
 
-  if(doCaloJets)
-    CaloJetHists = new jetAnalysisHists("offCalo","calo", "Calo", fs, jetDetailString, isMC);
 
-  if(doPuppiJets)
-    PuppiJetHists = new jetAnalysisHists("offPuppi","puppi", "Puppi", fs, jetDetailString, isMC);
+  if(doCaloJets){
+    CaloJetHists         = new jetAnalysisHists("offCalo","calo", "Calo", fs, jetDetailString, isMC);
+    CaloJetHists_PVMatch = new jetAnalysisHists("offCalo","calo", "Calo", fs, jetDetailString, isMC, "_PVMatch");
+  }
 
+  if(doPuppiJets){
+    PuppiJetHists         = new jetAnalysisHists("offPuppi","puppi", "Puppi", fs, jetDetailString, isMC);
+    PuppiJetHists_PVMatch = new jetAnalysisHists("offPuppi","puppi", "Puppi", fs, jetDetailString, isMC, "_PVMatch");
+  }
 
   hOffJets                = new nTupleAnalysis::jetHists("offJets",               fs, "", jetDetailString);
   hPfJets          = new nTupleAnalysis::jetHists("pfJets",           fs, "");
@@ -590,6 +595,14 @@ int BTagAnalysis::processEvent(){
 		       OnlineCSVCutPF, OnlineDeepCSVCutPF, 
 		       debug);
 
+      if(hltVtxMatch)
+	PFJetHists_PVMatch->Fill(this, offJet, matchedJet, eventWeight, isMC, 
+				 OfflineDeepCSVLooseCut, OfflineDeepCSVMediumCut, OfflineDeepCSVTightCut, 
+				 OfflineDeepFlavourMediumCut,
+				 OnlineCSVCutPF, OnlineDeepCSVCutPF, 
+				 debug);
+      
+
       ++nOffJets_matched;
 
 
@@ -615,11 +628,19 @@ int BTagAnalysis::processEvent(){
       if( dRCalo < 0.4){
 
 	cutflowJets->Fill("hasHLTMatchCalo", eventWeight);
+
 	CaloJetHists->Fill(this, offJet, matchedCaloJet, eventWeight, isMC, 
 			   OfflineDeepCSVLooseCut, OfflineDeepCSVMediumCut, OfflineDeepCSVTightCut, 
 			   OfflineDeepFlavourMediumCut,
 			   OnlineCSVCutCalo, OnlineDeepCSVCutCalo, 
 			   debug);
+
+	if(hltVtxMatch)
+	  CaloJetHists_PVMatch->Fill(this, offJet, matchedCaloJet, eventWeight, isMC, 
+				     OfflineDeepCSVLooseCut, OfflineDeepCSVMediumCut, OfflineDeepCSVTightCut, 
+				     OfflineDeepFlavourMediumCut,
+				     OnlineCSVCutCalo, OnlineDeepCSVCutCalo, 
+				     debug);
 	
 	++nOffJets_matchedCalo;
       }
@@ -651,6 +672,12 @@ int BTagAnalysis::processEvent(){
 			    OfflineDeepFlavourMediumCut,
 			    OnlineCSVCutPuppi, OnlineDeepCSVCutPuppi, 
 			    debug);
+	if(hltVtxMatch)
+	  PuppiJetHists_PVMatch->Fill(this, offJet, matchedPuppiJet, eventWeight, isMC, 
+				      OfflineDeepCSVLooseCut, OfflineDeepCSVMediumCut, OfflineDeepCSVTightCut, 
+				      OfflineDeepFlavourMediumCut,
+				      OnlineCSVCutPuppi, OnlineDeepCSVCutPuppi, 
+				      debug);
 
 
 	++nOffJets_matchedPuppi;
