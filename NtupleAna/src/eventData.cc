@@ -162,7 +162,7 @@ eventData::eventData(TChain* _treeRAW, TChain* _treeAOD, bool mc, std::string y,
 
 
     if(treeRAW->FindBranch("nPatElec")){
-      treeElecs    = new nTupleAnalysis::elecData("PatElec",     treeRAW, isMC, year);
+      treeElecs    = new nTupleAnalysis::elecData("PatElec",     treeRAW, true, isMC, year);
     }else{
       cout << "No PatElectrons (missing branch 'nPatElec'). Will ignore Elecs" << endl;
       treeElecs = nullptr;
