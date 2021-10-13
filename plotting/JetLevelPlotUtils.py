@@ -140,14 +140,14 @@ def makeEff(var,dirs,inFile,binning,bayesRatio=1,histForXBarycenterCalc=None):
         print "ERROR",var,dirs
 
 
-    print "max num is ",numHist.GetXaxis().GetXmax()
-    print "max den is ",denHist.GetXaxis().GetXmax()
+    #print "max num is ",numHist.GetXaxis().GetXmax()
+    #print "max den is ",denHist.GetXaxis().GetXmax()
     if bayesRatio:
         effHist = makeBayesRatio(num = numHist.Clone(),  den = denHist.Clone(),histForXBarycenterCalc=histForXBarycenterCalc)
     else:
         effHist = makeBayesLikeRatio(num = numHist.Clone(),  den = denHist.Clone())
 
-    print "max effHist is ",effHist.GetXaxis().GetXmax()
+    #print "max effHist is ",effHist.GetXaxis().GetXmax()
     #print numHist.GetXaxis().GetTitle()
     effHist.GetXaxis().SetTitle(numHist.GetXaxis().GetTitle())
     return effHist
@@ -172,7 +172,7 @@ def drawComp(name,inputHists,yTitle,xTitle,outDir,otherText="",setLogy=1,yMax= 1
     yMin = 0
 
     ratio_axis.GetYaxis().SetRangeUser(yMin, yMax)
-    print xMin,"to",xMax
+    #print xMin,"to",xMax
     ratio_axis.GetXaxis().SetRangeUser(xMin, xMax)
     ratio_axis.Draw("axis")
 
@@ -263,7 +263,7 @@ def drawComp(name,inputHists,yTitle,xTitle,outDir,otherText="",setLogy=1,yMax= 1
         yWidth = 0
         for hInfo in inputHists:
             yWidth += 0.06
-            print hInfo[1]
+            #print hInfo[1]
             legInfo.append((hInfo[0],"#scale[0.7]]{"+hInfo[1]+"}","LP"))
         #leg = getLegend([(effHist,"#scale[0.7]]{Data}","PE"),(effHistMC,"#scale[0.7]{t#bar{t} MC}","PE")],  xStart=0.2, xWidth=0.3, yStart=0.6, yWidth=0.16)
         leg = getLegend(legInfo,  xStart=xLeg, xWidth=0.3, yStart=yLeg-yWidth, yWidth=yWidth)
@@ -320,7 +320,7 @@ def drawComp(name,inputHists,yTitle,xTitle,outDir,otherText="",setLogy=1,yMax= 1
         labels = drawText(otherText,textsize=0.05,xStart=xStartOther,yStart=yStartOther)
 
 
-    canvas.SaveAs(outDir+"/"+name+".png")
+    #canvas.SaveAs(outDir+"/"+name+".png")
     canvas.SaveAs(outDir+"/"+name+".pdf")
 
 
@@ -1092,7 +1092,7 @@ def makeInverseTurnOnAll(name,var,dir,inFile1,name1,inFile2,name2,binning, outDi
 
 
     can.SaveAs(outDir+"/"+name+".pdf")
-    can.SaveAs(outDir+"/"+name+".png")
+    #can.SaveAs(outDir+"/"+name+".png")
 
 
 def make2DComp(name,inFile,dir,var,xTitle,yTitle,outDir):
@@ -1116,4 +1116,4 @@ def make2DComp(name,inFile,dir,var,xTitle,yTitle,outDir):
     cmsfistLine.Draw("same")
 
     can.SaveAs(outDir+"/"+name+".pdf")
-    can.SaveAs(outDir+"/"+name+".png")
+    #can.SaveAs(outDir+"/"+name+".png")
