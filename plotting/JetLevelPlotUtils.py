@@ -263,7 +263,6 @@ def drawComp(name,inputHists,yTitle,xTitle,outDir,otherText="",setLogy=1,yMax= 1
         yWidth = 0
         for hInfo in inputHists:
             yWidth += 0.06
-            #print hInfo[1]
             legInfo.append((hInfo[0],"#scale[0.7]]{"+hInfo[1]+"}","LP"))
         #leg = getLegend([(effHist,"#scale[0.7]]{Data}","PE"),(effHistMC,"#scale[0.7]{t#bar{t} MC}","PE")],  xStart=0.2, xWidth=0.3, yStart=0.6, yWidth=0.16)
         leg = getLegend(legInfo,  xStart=xLeg, xWidth=0.3, yStart=yLeg-yWidth, yWidth=yWidth)

@@ -43,6 +43,9 @@ const float OfflineDeepFlavourTightCut2017   = 0.7489;
 const float OfflineDeepFlavourMediumCut2017  = 0.3033;
 const float OfflineDeepFlavourLooseCut2017   = 0.0521;
 
+//const float drTrackToJet = 0.29;
+const float drTrackToJet = 1e6;
+
 
 
 BTagAnalysis::BTagAnalysis(TChain* _eventsRAW, TChain* _eventsAOD, fwlite::TFileService& fs, bool _isMC, std::string _year, int _histogramming, bool _debug, std::string PUFileName, std::string jetDetailString, const edm::ParameterSet& nnConfig, std::string pfJetName){
@@ -319,10 +322,10 @@ int BTagAnalysis::processEvent(){
   std::vector<nTupleAnalysis::elecPtr> selElecs;
   for(nTupleAnalysis::elecPtr& elec: event->elecs){
     hAllElecs->Fill(elec,1.0);
-    if(elec->tightId && elec->isolation_corrected < 0.2){
+    //if(elec->tightId && elec->isolation_corrected < 0.2){
       hSelElecs->Fill(elec,1.0);
       selElecs.push_back(elec);
-    }
+      //}
   }
   if(debug) cout << "Done Elec Loop" << endl;
   hAllElecs->nElecs->Fill(event->elecs.size());
@@ -896,8 +899,8 @@ void BTagAnalysis::OfflineToOnlineTrackMatching(const nTupleAnalysis::jetPtr& of
   for(const nTupleAnalysis::trackPtr& hltTrack: hltJet->tracks){
 
     //need to check that the track (with matching resolution cone r=0.01) is in region where R=0.3 circles inside the two jets overlap!
-    if(hltTrack->dR                  > 0.29) continue; // hltTrack is not in cone of pfJet
-    if(hltTrack->p.DeltaR(offJet->p) > 0.29) continue; // hltTrack is not in cone of offJet
+    if(hltTrack->dR                  > drTrackToJet) continue; // hltTrack is not in cone of pfJet
+    if(hltTrack->p.DeltaR(offJet->p) > drTrackToJet) continue; // hltTrack is not in cone of offJet
 
     float this_dR = offTrk->p.DeltaR(hltTrack->p);
 
@@ -939,8 +942,8 @@ void BTagAnalysis::OfflineToOnlineTrkTagMatching(const nTupleAnalysis::jetPtr& o
   float dR = 1e6;
   nTupleAnalysis::trkTagVarPtr matchedTrkTag  = nullptr;
   for(const nTupleAnalysis::trkTagVarPtr& hltTrkTag: hltJet->trkTagVars){
-    if(hltTrkTag->trackDeltaR                  > 0.29) continue; // hltTrack is not in cone of hltJet
-    if(hltTrkTag->p.DeltaR(offJet->p) > 0.29) continue; // hltTrack is not in cone of offJet
+    if(hltTrkTag->trackDeltaR                  > drTrackToJet) continue; // hltTrack is not in cone of hltJet
+    if(hltTrkTag->p.DeltaR(offJet->p) > drTrackToJet) continue; // hltTrack is not in cone of offJet
 
     float this_dR = offTrkTag->p.DeltaR(hltTrkTag->p);
     if(this_dR < dR){
@@ -1035,8 +1038,8 @@ void BTagAnalysis::jetAnalysisHists::Fill(BTagAnalysis* bTagAna, const nTupleAna
 
       //need to check that the track (with matching resolution cone r=0.01) is in region where R=0.3 circles inside the two jets overlap!
       //if offTrack.dR > 0.29 - offJet.match_dR: continue
-      if(offTrack->dR                  > 0.29) continue; // offTrack is not in cone of offJet
-      if(offTrack->p.DeltaR(hltJet->p) > 0.29) continue; // offTrack is not in cone of pfJet
+      if(offTrack->dR                  > drTrackToJet) continue; // offTrack is not in cone of offJet
+      if(offTrack->p.DeltaR(hltJet->p) > drTrackToJet) continue; // offTrack is not in cone of pfJet
 
 
       hOffTracks->Fill(offTrack, weight);
@@ -1088,8 +1091,8 @@ void BTagAnalysis::jetAnalysisHists::Fill(BTagAnalysis* bTagAna, const nTupleAna
 
       //need to check that the track (with matching resolution cone r=0.01) is in region where R=0.3 circles inside the two jets overlap!
       //if offTrack.dR > 0.29 - offJet.match_dR: continue
-      if(offTrkTag->trackDeltaR                              > 0.29) continue; // offTrack is not in cone of offJet
-      if(offTrkTag->p.DeltaR(hltJet->p) > 0.29) continue; // offTrack is not in cone of pfJet
+      if(offTrkTag->trackDeltaR                              > drTrackToJet) continue; // offTrack is not in cone of offJet
+      if(offTrkTag->p.DeltaR(hltJet->p) > drTrackToJet) continue; // offTrack is not in cone of pfJet
 
       hOffBTags->FillTrkTagVarHists(offTrkTag, weight);
       ++nTrkTags;
@@ -1158,8 +1161,8 @@ void BTagAnalysis::jetAnalysisHists::Fill(BTagAnalysis* bTagAna, const nTupleAna
       //}
 
       //need to check that the track (with matching resolution cone r=0.01) is in region where R=0.3 circles inside the two jets overlap!
-      if(hltTrack->dR                  > 0.29) continue; // hltTrack is not in cone of pfJet
-      if(hltTrack->p.DeltaR(offJet->p) > 0.29) continue; // hltTrack is not in cone of offJet
+      if(hltTrack->dR                  > drTrackToJet) continue; // hltTrack is not in cone of pfJet
+      if(hltTrack->p.DeltaR(offJet->p) > drTrackToJet) continue; // hltTrack is not in cone of offJet
 
       hHltTracks->Fill(hltTrack, weight); //all pftracks in matched jets
       hHltTracks->FillMatchStats(hltTrack, weight); //check how often we match hltTracks to more than one offTrack
@@ -1193,8 +1196,8 @@ void BTagAnalysis::jetAnalysisHists::Fill(BTagAnalysis* bTagAna, const nTupleAna
     for(const nTupleAnalysis::trkTagVarPtr& hltTrkTag: hltJet->trkTagVars){
       //need to check that the track (with matching resolution cone r=0.01) is in region where R=0.3 circles inside the two jets overlap!
       //if offTrack.dR > 0.29 - offJet.match_dR: continue
-      if(hltTrkTag->trackDeltaR         > 0.29) continue; // offTrack is not in cone of offJet
-      if(hltTrkTag->p.DeltaR(offJet->p) > 0.29) continue; // offTrack is not in cone of pfJet
+      if(hltTrkTag->trackDeltaR         > drTrackToJet) continue; // offTrack is not in cone of offJet
+      if(hltTrkTag->p.DeltaR(offJet->p) > drTrackToJet) continue; // offTrack is not in cone of pfJet
 
 
       hHltBTags->FillTrkTagVarHists(hltTrkTag, weight);
