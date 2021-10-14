@@ -41,7 +41,7 @@ maxDict = {"jetNSelectedTracks":20,
 
 def getHist(inFile,dir,var,binning,color):
     hist = inFile.Get(dir+"/"+var)
-    print dir+"/"+var
+    print( dir+"/"+var)
     if type(binning ) == type(list()):
         hist  = do_variable_rebinning(hist,binning)
     else:

@@ -7,8 +7,8 @@ import FWCore.ParameterSet.Types as CfgTypes
 #sys.path.insert(0, 'TriggerStudies/nTupleAnalysis/scripts/')
 #from cfgHelper import *
 
-print "Input command"
-print " ".join(sys.argv)
+print( "Input command")
+print( " ".join(sys.argv))
 
 
 parser = optparse.OptionParser()

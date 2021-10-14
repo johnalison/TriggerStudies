@@ -50,7 +50,6 @@ def getWorkingPoint(var, bkg, sig, dir, varNorm):
     if bkgEff: bkgRej = 1./bkgEff
     else:      bkgRej = 1
 
-    print bkgRej
 
     return (sigEff, bkgRej)
 
@@ -105,7 +104,7 @@ def plotSame(name,graphs,colors,styles, workingPts= None,rocType=None,plotDeepCS
         g_wrkPts.SetMarkerColor(colors[1])
         g_wrkPts.SetMarkerStyle(34)
         for wpItr, wp in enumerate(workingPts):
-            print wpItr,wp
+            #print wpItr,wp
 
             g_wrkPts.SetPoint(wpItr, wp[0],wp[1])
 

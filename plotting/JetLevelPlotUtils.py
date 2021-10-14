@@ -137,7 +137,7 @@ def makeEff(var,dirs,inFile,binning,bayesRatio=1,histForXBarycenterCalc=None):
         numHist = getHist(inFile,dirs,          var[0],binning,color=ROOT.kBlue)
         denHist = getHist(inFile,dirs,          var[1],binning,color=ROOT.kBlue)
     else:
-        print "ERROR",var,dirs
+        print( "ERROR",var,dirs)
 
 
     #print "max num is ",numHist.GetXaxis().GetXmax()
@@ -201,15 +201,15 @@ def drawComp(name,inputHists,yTitle,xTitle,outDir,otherText="",setLogy=1,yMax= 1
                 if doFit:
                     xAve = (ratio_axis.GetXaxis().GetXmin() + ratio_axis.GetXaxis().GetXmax()) /2
                     xmin = max(30,ratio_axis.GetXaxis().GetXmin())
-                    print "Setting Range",xmin, ratio_axis.GetXaxis().GetXmax()
+                    print( "Setting Range",xmin, ratio_axis.GetXaxis().GetXmax())
                     sigmoid = ROOT.TF1("func", "(1.0/(1+ TMath::Exp(-[0]*(x-[1]))))", xmin, ratio_axis.GetXaxis().GetXmax())
                     sigmoid.SetParameters(0.01, xAve)
                     inputHists[0][0].Fit(sigmoid)
                     sigmoid.Draw("same")
 
-                    print hInfo[0].GetName(),":",
-                    print sigmoid.GetParameter(0),
-                    print sigmoid.GetParameter(1)
+                    print( hInfo[0].GetName(),":",)
+                    print( sigmoid.GetParameter(0),)
+                    print( sigmoid.GetParameter(1))
 
                     textFits = []
                     for i in range(2):
@@ -228,7 +228,7 @@ def drawComp(name,inputHists,yTitle,xTitle,outDir,otherText="",setLogy=1,yMax= 1
                 if doFit:
                     xAve = (ratio_axis.GetXaxis().GetXmin() + ratio_axis.GetXaxis().GetXmax()) /2
                     xmin = max(30,ratio_axis.GetXaxis().GetXmin())
-                    print "Setting Range",xmin, ratio_axis.GetXaxis().GetXmax()
+                    print( "Setting Range",xmin, ratio_axis.GetXaxis().GetXmax())
                     sigmoid = ROOT.TF1("func", "(1.0/(1+ TMath::Exp(-[0]*(x-[1]))))", xmin, ratio_axis.GetXaxis().GetXmax())
                     sigmoid.SetParameters(0.01, xAve)
                     inputHists[0][0].Fit(sigmoid,"q")
@@ -236,9 +236,9 @@ def drawComp(name,inputHists,yTitle,xTitle,outDir,otherText="",setLogy=1,yMax= 1
                     sigmoid.SetLineColor(ROOT.kRed)
                     sigmoid.Draw("same")
 
-                    print hInfo[0].GetName(),":",
-                    print sigmoid.GetParameter(0),
-                    print sigmoid.GetParameter(1)
+                    print( hInfo[0].GetName(),":", )
+                    print( sigmoid.GetParameter(0),)
+                    print( sigmoid.GetParameter(1) )
 
                     textFits = []
                     for i in range(2):
@@ -319,7 +319,7 @@ def drawComp(name,inputHists,yTitle,xTitle,outDir,otherText="",setLogy=1,yMax= 1
         labels = drawText(otherText,textsize=0.05,xStart=xStartOther,yStart=yStartOther)
 
 
-    #canvas.SaveAs(outDir+"/"+name+".png")
+    canvas.SaveAs(outDir+"/"+name+".png")
     canvas.SaveAs(outDir+"/"+name+".pdf")
 
 
@@ -405,7 +405,6 @@ def drawCompRatioGraphs(name,inputHists,ratioHistBinning,yTitle,xTitle,outDir,ot
         yWidth = 0
         for hInfo in inputHists:
             yWidth += 0.06
-            print hInfo[1]
             legInfo.append((hInfo[0],"#scale[0.7]]{"+hInfo[1]+"}","LP"))
         #leg = getLegend([(effHist,"#scale[0.7]]{Data}","PE"),(effHistMC,"#scale[0.7]{t#bar{t} MC}","PE")],  xStart=0.2, xWidth=0.3, yStart=0.6, yWidth=0.16)
         leg = getLegend(legInfo,  xStart=xLeg, xWidth=0.3, yStart=yLeg-yWidth, yWidth=yWidth)
@@ -1091,7 +1090,7 @@ def makeInverseTurnOnAll(name,var,dir,inFile1,name1,inFile2,name2,binning, outDi
 
 
     can.SaveAs(outDir+"/"+name+".pdf")
-    #can.SaveAs(outDir+"/"+name+".png")
+    can.SaveAs(outDir+"/"+name+".png")
 
 
 def make2DComp(name,inFile,dir,var,xTitle,yTitle,outDir):
@@ -1115,4 +1114,4 @@ def make2DComp(name,inFile,dir,var,xTitle,yTitle,outDir):
     cmsfistLine.Draw("same")
 
     can.SaveAs(outDir+"/"+name+".pdf")
-    #can.SaveAs(outDir+"/"+name+".png")
+    can.SaveAs(outDir+"/"+name+".png")

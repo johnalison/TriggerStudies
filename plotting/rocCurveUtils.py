@@ -1,4 +1,5 @@
 import ROOT
+import ctypes
 
 def drawWaterMarks(watermarks):
 
@@ -35,8 +36,8 @@ def getEffErrors(num,den):
     errHigh = eff.GetErrorYhigh(0)
     errLow = eff.GetErrorYlow(0)
 
-    xValue = ROOT.Double(0)
-    theEff = ROOT.Double(0)
+    xValue = ctypes.c_double(0)
+    theEff = ctypes.c_double(0)
     eff.GetPoint(0,xValue,theEff)
     
     return (theEff,errHigh,errLow)
@@ -68,7 +69,7 @@ def makeRoc(sigNum,sigDen,bkgNum,bkgDen,bkgMode="Eff",doErr = False, cutAbove=Fa
     for i in range(nbins):
         bin = i
         
-        if debug: print bin
+        if debug: print( bin)
             
 
         if cutAbove:
@@ -92,9 +93,9 @@ def makeRoc(sigNum,sigDen,bkgNum,bkgDen,bkgMode="Eff",doErr = False, cutAbove=Fa
         #print "\t",thisBkg, bkgTot
 
         if debug: 
-            print "bkgEff",bkgEff,
-            print "sigEff",sigEff
-            print "\tbkg:",thisBkg,"total",bkgTot
+            print( "bkgEff",bkgEff,)
+            print( "sigEff",sigEff)
+            print( "\tbkg:",thisBkg,"total",bkgTot)
         if bkgEff:
             bkgRej = 1.0/bkgEff
             bkgRejErr = bkgEffErr/(bkgEff*bkgEff)
@@ -116,9 +117,9 @@ def makeRoc(sigNum,sigDen,bkgNum,bkgDen,bkgMode="Eff",doErr = False, cutAbove=Fa
             #roc.Set(roc.GetN()-2)
             #print roc.GetN()
             #continue
-            xValue = ROOT.Double(0)
-            yValue = ROOT.Double(0)
-            theEff = ROOT.Double(0)
+            xValue = ctypes.c_double(0)
+            yValue = ctypes.c_double(0)
+            theEff = ctypes.c_double(0)
             #print bin
             #roc.GetPoint(bin-1,xValue,yValue)
             #print xValue,yValue
@@ -226,9 +227,9 @@ def GetRoc(inFile, sigNameNum,sigNameDen,bkgNameNum,bkgNameDen,doErr=False,mode=
     hbkgDen = inFile.Get(bkgNameDen)
 
     if not hsigNum:
-        print "Cannot get ",hsigNum,sigNameNum
+        print( "Cannot get ",hsigNum,sigNameNum)
     if not hbkgNum:
-        print "Cannot get ",hbkgNum
+        print( "Cannot get ",hbkgNum)
 
     rocCurve = makeRoc(hsigNum,hsigDen,hbkgNum,hbkgDen,bkgMode=mode,doErr=doErr, cutAbove=cutAbove)
 
@@ -242,7 +243,7 @@ def GetPt(inFile,numSigName,denSigName,numBkgName, denBkgName,doErr=False,mode="
     hnumBkg = inFile.Get(numBkgName)
     hdenBkg = inFile.Get(denBkgName)
 
-    if not hnumSig: print "Cannot get",hnumSig,numSigName
+    if not hnumSig: print( "Cannot get",hnumSig,numSigName)
         
 
     opPt = makePt(hnumSig,hdenSig,hnumBkg,hdenBkg,bkgMode=mode,doErr=doErr)

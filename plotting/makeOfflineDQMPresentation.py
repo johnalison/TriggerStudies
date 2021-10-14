@@ -19,12 +19,12 @@ def makeHeader(outFile):
     outFile.write("\mode<presentation>\n")
     outFile.write("\setbeamertemplate{footline}[frame number]\n")
     outFile.write("\\addtobeamertemplate{frametitle}{\\vspace*{0.4cm}}{\\vspace*{-0.4cm}}\n")
-    outFile.write("{ \usetheme{boxes} }\n")
-    outFile.write("\usepackage{times}  % fonts are up to you\n")
-    outFile.write("\usefonttheme{serif}  % fonts are up to you\n")
-    outFile.write("\usepackage{graphicx}\n")
-    outFile.write("\usepackage{tikz}\n")
-    outFile.write("\usepackage{colortbl}\n")
+    outFile.write("{ \\usetheme{boxes} }\n")
+    outFile.write("\\usepackage{times}  % fonts are up to you\n")
+    outFile.write("\\usefonttheme{serif}  % fonts are up to you\n")
+    outFile.write("\\usepackage{graphicx}\n")
+    outFile.write("\\usepackage{tikz}\n")
+    outFile.write("\\usepackage{colortbl}\n")
     outFile.write("\setlength{\pdfpagewidth}{2\paperwidth}\n")
     outFile.write("\setlength{\pdfpageheight}{2\paperheight}\n")
     outFile.write("\\title{\huge \\textcolor{myblue}{{BTV DQM Study }}}\n")
@@ -34,16 +34,16 @@ def makeHeader(outFile):
     
     outFile.write("\date{  } \n")
     outFile.write("\n")
-    outFile.write("\logo{\n")
-    outFile.write("\\begin{picture}(10,8) %university_of_chicago_logo\n")
-    outFile.write("\put(-2.5,7.6){\includegraphics[height=0.5in]{CMSlogo_outline_black_red_nolabel_May2014.pdf}}\n")
-    outFile.write("\put(8.2,7.7){\includegraphics[height=0.45in]{CMU_Logo_Stack_Red.eps}}\n")
-    outFile.write("\end{picture}\n")
-    outFile.write("}\n")
+    #outFile.write("\logo{\n")
+    #outFile.write("\\begin{picture}(10,8) %university_of_chicago_logo\n")
+    #outFile.write("\put(-2.5,7.6){\includegraphics[height=0.5in]{CMSlogo_outline_black_red_nolabel_May2014.pdf}}\n")
+    #outFile.write("\put(8.2,7.7){\includegraphics[height=0.45in]{CMU_Logo_Stack_Red.eps}}\n")
+    #outFile.write("\end{picture}\n")
+    #outFile.write("}\n")
     outFile.write("\n")
     outFile.write("\\beamertemplatenavigationsymbolsempty\n")
     outFile.write("\n")
-    outFile.write("\unitlength=1cm\n")
+    outFile.write("\\unitlength=1cm\n")
     outFile.write("\definecolor{myblue}{RGB}{33,100,158}\n")
     outFile.write("\definecolor{myblack}{RGB}{0,0,0}\n")
     outFile.write("\definecolor{myred}{RGB}{168,56,39}\n")
@@ -280,7 +280,7 @@ def makePresentation():
     prefix = o.prefix 
 
     
-    outFile.write("\subsection{ROCs} \n")
+    #outFile.write("\subsection{ROCs} \n")
 
     for slideConfig in [
                 ("roc_All_Eff","roc_All_C_Eff","",""),
@@ -292,7 +292,7 @@ def makePresentation():
                 files = files,
                 )
 
-    outFile.write("\subsection{Inputs} \n")
+    #outFile.write("\subsection{Inputs} \n")
     makeTransition(outFile,"Inputs")    
 
 
@@ -404,8 +404,8 @@ if __name__ == "__main__":
     if len(o.name.split("/")):
         fileName = o.name.split("/")[-1]
         filePath = "/".join(o.name.split("/")[0:-1])
-        print "fileName:",fileName
-        print "filePath:",filePath
+        print( "fileName:",fileName)
+        print( "filePath:",filePath)
 
 
     os.system("rm "+fileName+".aux")
