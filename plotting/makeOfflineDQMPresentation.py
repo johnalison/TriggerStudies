@@ -283,7 +283,7 @@ def makePresentation():
     #outFile.write("\subsection{ROCs} \n")
 
     for slideConfig in [
-                ("roc_All_Eff","roc_All_C_Eff","",""),
+            ("roc_All_Eff","roc_All_C_Eff","",""),
         ]:
         files = []
         for i in range(4): 
@@ -301,6 +301,8 @@ def makePresentation():
     #
     for slideConfig in [
             ("DeepCSV_l","deepFlavB","pt_m","eta"),
+            ("Ip2P","Ip3P","Ip2P_l","Ip3P_l"),
+            ("Bprob","Proba","Svx","SvxHP"),
             ("track_nTracks","btag_sv_nSVs","btag_chargedMultiplicity","btag_neutralMultiplicity"),
     ]:
         files = []
@@ -345,8 +347,96 @@ def makePresentation():
         make2x2_ratio(outFile,"Secondary Vertex Inputs",
                       files = files,
                       )
+
+
+
+    #
+    #  Event-by-Event Matching
+    #
+    makeTransition(outFile,"Event Matching")    
+    for slideConfig in [
+            ("dR","dPt","dPhi","dEta"),
+            ("dDeepcsv","ddeepFlavB","dProba","dBprob"),
+            ("dSvx"    ,"dSvxHP"    ,"dIp2P" ,        "dIp3P"),
+            ("btag_djetNTracks","btag_djetNSecondaryVertices","btag_dchargedHadronMultiplicity","btag_dneutralMultiplicity"),
+    ]:
+        files = []
+        for i in range(4): 
+            if slideConfig[i]: files += [pdfDir+"/BvL_matchedJet_"+slideConfig[i]]
+        make2x2(outFile,"Event-by-Event Jet Matching",
+                files = files,
+        )
+
+
+
+    for slideConfig in [
+            ("R"  ,"Z"            ,        "Eta"          ,        "Phi"          ),
+            ("nSVs"         ,"NTracks"                ,"Mass"                   ,"Pt")           ,
+            ("JetDeltaR"              ,        "totCharge"     ,        "Chi2"         ,"EnergyRatio"            ),
+            ("Flight"       ,"FlightSig"    ,"Flight2D"     ,"FlightSig2D")  ,
+
+
+    ]:
+        files = []
+        for i in range(4): 
+            if slideConfig[i]: files += [pdfDir+"/BvL_matchedJet_btag_dsv_"+slideConfig[i]]
+        make2x2(outFile,"Event-by-Event SV Matching",
+                files = files,
+        )
+
+
+
+
+    for slideConfig in [
+
+            ("dtrackEta"            ,"dtrackPhi"            ,        "dtrackPt"             ,        "dtrackMomentum"       ),
+            ("dtrackChi2"            , "dtrackNTotalHits"      , "dtrackNPixelHits"      , "dtrackIsFromV0"  ),
+            ("dip2d","dip2d_sig","dip2d_sig_l","dip2d_err",),
+            ("dip3d","dip3d_sig","dip3d_sig_l","dip3d_err",),
+            ("dtrackPtRel"          ,"dtrackDeltaR"         ,"dtrackJetDistVal"     ,"dtrackPPar"           ),
+
+
+
+        ]:
+    
+
+
+        files = []
+        for i in range(4): 
+            if slideConfig[i]: files += [pdfDir+"/BvL_matchedJet_btag_"+slideConfig[i]]
+        make2x2(outFile,"Event-by-Event Track Matching",
+                files = files,
+        )
+
         
         
+        
+    makeTransition(outFile,"Back-up")    
+                
+    for slideConfig in [
+            ("roc_All_Eff","roc_All_C_Eff","",""),
+            ("roc_Bprob_Eff","roc_Bprob_C_Eff","",""),
+            ("roc_cMVAv2_Eff",   "roc_cMVAv2_C_Eff",   "",""),
+            ("roc_CombIVF_Eff",  "roc_CombIVF_C_Eff",  "",""),
+            ("roc_Svx_Eff",      "roc_Svx_C_Eff",      "",""),
+            ("roc_SvxHP_Eff",    "roc_SvxHP_C_Eff",    "",""),
+            ("roc_Bprob_Eff",    "roc_Bprob_C_Eff",    "",""),
+            ("roc_Proba_Eff",    "roc_Proba_C_Eff",    "",""),
+            ("roc_Ip2P_Eff",     "roc_Ip2P_C_Eff",     "",""),
+            ("roc_Ip3P_Eff",     "roc_Ip3P_C_Eff",     "",""),
+            ("roc_SoftMu_Eff",   "roc_SoftMu_C_Eff",   "",""),
+            ("roc_SoftEl_Eff",   "roc_SoftEl_C_Eff",   "",""),
+
+
+        ]:
+        files = []
+        for i in range(4): 
+            if slideConfig[i]: files += [pdfDir+"/"+slideConfig[i]]
+        make1x2(outFile,"ROCs",
+                files = files,
+                )
+
+
     #
     #  Track Efficiiences
     #
@@ -385,9 +475,7 @@ def makePresentation():
         make2x2(outFile,"Tracking Relative Fake Rates",
                       files = files,
                       )
-        
 
-                
 
 
     outFile.write("\n")

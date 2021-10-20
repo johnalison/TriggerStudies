@@ -156,7 +156,7 @@ if o.doPuppiJets:
 
 #Setup event loop object
 
-if o.inputAOD is 'None':
+if o.inputAOD == 'None':
     print('Configuring HLTOnly...')
     process.BTagAnalyzer = cms.PSet(
         debug   = cms.bool(o.debug),

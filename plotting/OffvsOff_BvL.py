@@ -77,7 +77,7 @@ def doVarRatio(var, binning, xTitle, setLogy=1, minX=None, maxX=None, minY=None,
         offLF.SetMinimum(minY)
 
 
-    offLF.GetYaxis().SetTitle("Simulated Tracks")
+    offLF.GetYaxis().SetTitle("Normalized")
     offLF.GetXaxis().SetTitle(xTitle )
 
     if maxX:
@@ -270,7 +270,15 @@ for v in ["tracks/ip3d_sig",
           # "CSVv2_l",
           "DeepCSV_l",
           "deepFlavB",
-          #"probB",
+          "Bprob",
+          "Proba",
+          "Svx",
+          "SvxHP",
+          "Ip2P",
+          "Ip3P",
+          "Ip2P_l",
+          "Ip3P_l",
+
           #"deepcsv_bb",
           "btags/sv_Flight2D",
           "btags/sv_FlightSig2D",
@@ -343,6 +351,7 @@ for v in ["tracks/ip3d_sig",
           "tracks/origAlgo",
 
           "btags/sv_Pt",
+
           ]:
 
     vName = v.split("/")[-1]

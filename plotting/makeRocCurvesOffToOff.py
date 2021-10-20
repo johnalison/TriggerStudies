@@ -86,10 +86,14 @@ def makeRocPlot(name, var, bkg, sig, dir, varNorm=None,debug=False,vsLight=True)
     return rocPlots
 
 
-def plotSame(name,graphs,colors,styles, workingPts= None,rocType=None,plotDeepCSV=False,plotDeepJet=False):
+def plotSame(name,graphs,colors,styles, workingPts= None,rocType=None,plotDeepCSV=False,plotDeepJet=False, taggerNames=[]):
 
     can = ROOT.TCanvas(name,name)
     can.cd().SetLogy(1)
+    #hist_axis = ROOT.TH1F("hist_axis","hist_axis",1,0.3,1)
+    #hist_axis.Draw()
+    #hist_axis.GetXaxis().SetRangeUser(1e-2,1)
+    #hist_axis.GetYaxis().SetRangeUser(1e-4,1)
     for gItr, g in enumerate(graphs):
         g.SetLineColor(colors[gItr])
         g.SetLineStyle(styles[gItr])
@@ -131,10 +135,14 @@ def plotSame(name,graphs,colors,styles, workingPts= None,rocType=None,plotDeepCS
 
         #offJetText  = getText("Offline Jet  ",xStart=0.6,yStart=0.4,size=0.03,color=ROOT.kBlack)
 
-    yStart = 0.3
-    xStart = 0.6
-    if rocType == "Rej":
-        xStart = 0.2
+
+
+    for t in taggerNames:
+        yStart = yStart - 0.05
+        deepCSVText   = getText(t,xStart=xStart,yStart=yStart,size=0.04,color=ROOT.kRed+2)
+        deepCSVText.Draw("same")
+
+
 
 
     if plotDeepCSV:
@@ -168,81 +176,123 @@ def plotSame(name,graphs,colors,styles, workingPts= None,rocType=None,plotDeepCS
 
 def main():
 
+    mon_roc = {}
+    ref_roc = {}
 
-    mon_deepcsv_roc        = makeRocPlot("Offline_deepcsv",      "DeepCSV_l", bkg="matched_L",sig="matched_B",dir="offJets")
-    mon_deepJet_roc        = makeRocPlot("Offline_deepJet",      "deepFlavB", bkg="matched_L",sig="matched_B",dir="offJets")
+    mon_roc_C = {}
+    ref_roc_C = {}
 
-    ref_deepcsv_roc        = makeRocPlot("PF_deepcsv",      "DeepCSV_l", bkg="matchedJet_L",sig="matchedJet_B",dir="offJets")
-    ref_deepJet_roc        = makeRocPlot("PF_deepJet",      "deepFlavB", bkg="matchedJet_L",sig="matchedJet_B",dir="offJets")
+    taggers = [("DeepCSV","DeepCSV_l"),
+               ("DeepJet","deepFlavB"),
+               ("cMVAv2", "cMVAv2"),
+               ("CombIVF", "CombIVF"),
+               ("Svx", "Svx"),
+               ("SvxHP", "SvxHP"),
+               ("Bprob", "Bprob"),
+               ("Proba", "Proba"),
+               ("Ip2P", "Ip2P_l"),
+               ("Ip3P", "Ip3P_l"),
+               ("SoftMu", "SoftMu"),
+               ("SoftEl", "SoftEl"),
+    ]
 
-    mon_deepcsv_roc_C        = makeRocPlot("Offline_deepcsv",      "DeepCSV_l", bkg="matched_C",sig="matched_B",dir="offJets", vsLight=False)
-    mon_deepJet_roc_C        = makeRocPlot("Offline_deepJet",      "deepFlavB", bkg="matched_C",sig="matched_B",dir="offJets", vsLight=False)
+    for tag in taggers:
+        mon_roc[tag[0]] = makeRocPlot("Offline_"+tag[0],      tag[1], bkg="matched_L",   sig="matched_B",   dir="offJets")
+        ref_roc[tag[0]] = makeRocPlot("PF_"+tag[0],           tag[1], bkg="matchedJet_L",sig="matchedJet_B",dir="offJets")
+        mon_roc_C[tag[0]] = makeRocPlot("Offline_"+tag[0],      tag[1], bkg="matched_C",   sig="matched_B",   dir="offJets", vsLight=False)
+        ref_roc_C[tag[0]] = makeRocPlot("PF_"+tag[0],           tag[1], bkg="matchedJet_C",sig="matchedJet_B",dir="offJets", vsLight=False)
 
-    ref_deepcsv_roc_C        = makeRocPlot("PF_deepcsv",      "DeepCSV_l", bkg="matchedJet_C",sig="matchedJet_B",dir="offJets", vsLight=False)
-    ref_deepJet_roc_C        = makeRocPlot("PF_deepJet",      "deepFlavB", bkg="matchedJet_C",sig="matchedJet_B",dir="offJets", vsLight=False)
 
 
 
     for i, rocType in enumerate(["Rej","Eff"]):
 
 
-        plotSame("DeepCSV_"+rocType,
-                 [mon_deepcsv_roc[i], ref_deepcsv_roc[i]],
-                 [ROOT.kBlack,      ROOT.kBlue],
-                 [ROOT.kSolid,      ROOT.kDashed],
-                 plotDeepJet = False,
-                 plotDeepCSV = True,
-                 rocType = rocType
+        for tag in taggers:
+            plotSame(tag[0]+"_"+rocType,
+                     [mon_roc[tag[0]][i], ref_roc[tag[0]][i]],
+                     [ROOT.kBlack,      ROOT.kBlack],
+                     [ROOT.kSolid,      ROOT.kDashed],
+                     taggerNames = [tag[0]],
+                     plotDeepJet = False,
+                     plotDeepCSV = False,
+                     rocType = rocType
+            )
+
+
+
+            plotSame(tag[0]+"_C_"+rocType,
+                     [mon_roc_C[tag[0]][i], ref_roc_C[tag[0]][i]],
+                     [ROOT.kBlack,      ROOT.kBlack],
+                     [ROOT.kSolid,      ROOT.kDashed],
+                     taggerNames = [tag[0]],
+                     plotDeepJet = False,
+                     plotDeepCSV = False,
+                     rocType = rocType,
                  )
 
-        plotSame("DeepJet_"+rocType,
-                 [mon_deepJet_roc[i], ref_deepJet_roc[i]],
-                 [ROOT.kBlack,      ROOT.kBlack],
-                 [ROOT.kSolid,      ROOT.kSolid],
-                 plotDeepCSV = False,
-                 plotDeepJet = True,
-                 rocType = rocType
-                 )
 
+
+        all_rocs = []
+        all_rocs_C = []
+        all_styles = []
+        all_colors = []
+        
+        def addToAll(roc,roc_c,style,color):
+            all_rocs.append(roc)
+            all_rocs_C.append(roc_c)
+            all_styles.append(style)
+            all_colors.append(color)
+
+        def addTaggerToAll(name, color):
+            addToAll(mon_roc[name][i], mon_roc_C[name][i], ROOT.kDashed, color)
+            addToAll(ref_roc[name][i], ref_roc_C[name][i], ROOT.kSolid,  color)
+
+            
+
+        addTaggerToAll("DeepCSV", ROOT.kBlue)
+        addTaggerToAll("DeepJet", ROOT.kBlack)
 
 
         plotSame("All_"+rocType,
-                 [mon_deepcsv_roc[i], mon_deepJet_roc[i], ref_deepcsv_roc[i], ref_deepJet_roc[i]],
-                 [ROOT.kBlue, ROOT.kBlack,  ROOT.kBlue  ,  ROOT.kBlack   ],
-                 [ROOT.kSolid, ROOT.kSolid, ROOT.kDashed,  ROOT.kDashed ],
+                 all_rocs, all_colors, all_styles,
                  plotDeepCSV = True,
                  plotDeepJet = True,
                  rocType = rocType
-                 )
-
-
-
-        plotSame("DeepCSV_C_"+rocType,
-                 [mon_deepcsv_roc_C[i], ref_deepcsv_roc_C[i]],
-                 [ROOT.kBlack,      ROOT.kBlue],
-                 [ROOT.kSolid,      ROOT.kDashed],
-                 plotDeepJet = False,
-                 plotDeepCSV = True,
-                 rocType = rocType
-                 )
-
-        plotSame("DeepJet_C_"+rocType,
-                 [mon_deepJet_roc_C[i], ref_deepJet_roc_C[i]],
-                 [ROOT.kBlack,      ROOT.kBlack],
-                 [ROOT.kSolid,      ROOT.kSolid],
-                 plotDeepCSV = False,
-                 plotDeepJet = True,
-                 rocType = rocType
-                 )
+             )
 
 
 
         plotSame("All_C_"+rocType,
-                 [mon_deepcsv_roc_C[i], mon_deepJet_roc_C[i], ref_deepcsv_roc_C[i], ref_deepJet_roc_C[i]],
-                 [ROOT.kBlue, ROOT.kBlack,  ROOT.kBlue  ,  ROOT.kBlack   ],
-                 [ROOT.kSolid, ROOT.kSolid, ROOT.kDashed,  ROOT.kDashed ],
+                 all_rocs_C, all_colors, all_styles,
                  plotDeepCSV = True,
                  plotDeepJet = True,
+                 rocType = rocType,
+                 )
+
+
+        addTaggerToAll("cMVAv2", ROOT.kRed)
+        addTaggerToAll("CombIVF", ROOT.kOrange)
+        addTaggerToAll("Svx", ROOT.kPink)
+        addTaggerToAll("SvxHP", ROOT.kRed+2)
+        addTaggerToAll("Bprob", ROOT.kGray)
+        addTaggerToAll("Proba", ROOT.kGray+2)
+        addTaggerToAll("Ip2P"  , ROOT.kGreen+2)
+        addTaggerToAll("Ip3P"  , ROOT.kGreen)
+        addTaggerToAll("SoftMu", ROOT.kMagenta)
+        addTaggerToAll("SoftEl", ROOT.kMagenta+1)
+
+
+
+        plotSame("All_Extra_"+rocType,
+                 all_rocs, all_colors, all_styles,
+                 rocType = rocType
+                 )
+
+
+
+        plotSame("All_Extra_C_"+rocType,
+                 all_rocs_C, all_colors, all_styles,
                  rocType = rocType
                  )
         
