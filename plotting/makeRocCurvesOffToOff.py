@@ -86,21 +86,34 @@ def makeRocPlot(name, var, bkg, sig, dir, varNorm=None,debug=False,vsLight=True)
     return rocPlots
 
 
-def plotSame(name,graphs,colors,styles, workingPts= None,rocType=None,plotDeepCSV=False,plotDeepJet=False, taggerNames=[]):
+def plotSame(name,graphs,colors,styles, workingPts= None,rocType=None,plotDeepCSV=False,plotDeepJet=False, taggerNames=[], logy=True, yMin=1e-4, xMin=0.3):
 
     can = ROOT.TCanvas(name,name)
-    can.cd().SetLogy(1)
-    #hist_axis = ROOT.TH1F("hist_axis","hist_axis",1,0.3,1)
-    #hist_axis.Draw()
-    #hist_axis.GetXaxis().SetRangeUser(1e-2,1)
-    #hist_axis.GetYaxis().SetRangeUser(1e-4,1)
+    if logy:
+        can.cd().SetLogy(1)
+    hist_axis = ROOT.TH1F("hist_axis","hist_axis",1,xMin,1)
+    hist_axis.GetYaxis().SetTitle(graphs[0].GetYaxis().GetTitle())
+    hist_axis.GetXaxis().SetTitle(graphs[0].GetXaxis().GetTitle())
+    hist_axis.Draw()
+
+    xMax = 1 
+    hist_axis.GetXaxis().SetRangeUser(xMin,xMax)
+    hist_axis.GetYaxis().SetRangeUser(yMin,1)
+
+    line = ROOT.TF1("guessing","x",xMin,xMax)
+    line.SetLineColor(ROOT.kGray)
+    line.SetLineStyle(10)
+    line.Draw("same")
+    #line.DrawLine(max(xMin,yMin), 1*max(xMin,yMin), xMax, 1.0*xMax)
+
     for gItr, g in enumerate(graphs):
         g.SetLineColor(colors[gItr])
         g.SetLineStyle(styles[gItr])
-        if not gItr:
-            g.Draw("AL")
-        else:
-            g.Draw("L")
+        #if not gItr:
+        #    g.Draw("AL")
+        #else:
+        #    g.Draw("L")
+        g.Draw("L")
 
     if not workingPts == None:
         g_wrkPts = ROOT.TGraph(len(workingPts))
@@ -124,6 +137,8 @@ def plotSame(name,graphs,colors,styles, workingPts= None,rocType=None,plotDeepCS
         xStart = 0.5
         yStart = 0.875
 
+
+
     offJetText  = getText(labName[0]+" Jets (Solid)  ",xStart=xStart,yStart=yStart,size=0.04,color=ROOT.kBlack)
     yStart = yStart - 0.05
     offJetText.Draw("same")
@@ -144,7 +159,7 @@ def plotSame(name,graphs,colors,styles, workingPts= None,rocType=None,plotDeepCS
 
 
 
-
+    yStart = yStart - 0.05
     if plotDeepCSV:
         if plotDeepJet:
             deepCSVText   = getText("DeepCSV",xStart=xStart,yStart=yStart,size=0.04,color=ROOT.kBlue)
@@ -189,18 +204,23 @@ def main():
                ("Svx", "Svx"),
                ("SvxHP", "SvxHP"),
                ("Bprob", "Bprob"),
-               ("Proba", "Proba"),
+               ("Proba", "Proba",{"xMin":0}),
                ("Ip2P", "Ip2P_l"),
                ("Ip3P", "Ip3P_l"),
                ("SoftMu", "SoftMu"),
                ("SoftEl", "SoftEl"),
+               ("neutralHadronMultiplicity","btags/neutralHadronMultiplicity",{"logy":False,"yMin":0.1}),
+               ("chargedHadronMultiplicity","btags/chargedHadronMultiplicity",{"logy":False,"yMin":0.1}),
+               ("photonMultiplicity","btags/photonMultiplicity",{"logy":False,"yMin":0.1}),
     ]
 
     for tag in taggers:
-        mon_roc[tag[0]] = makeRocPlot("Offline_"+tag[0],      tag[1], bkg="matched_L",   sig="matched_B",   dir="offJets")
-        ref_roc[tag[0]] = makeRocPlot("PF_"+tag[0],           tag[1], bkg="matchedJet_L",sig="matchedJet_B",dir="offJets")
-        mon_roc_C[tag[0]] = makeRocPlot("Offline_"+tag[0],      tag[1], bkg="matched_C",   sig="matched_B",   dir="offJets", vsLight=False)
-        ref_roc_C[tag[0]] = makeRocPlot("PF_"+tag[0],           tag[1], bkg="matchedJet_C",sig="matchedJet_B",dir="offJets", vsLight=False)
+        
+        mon_roc[tag[0]] = makeRocPlot("Mon_"+tag[0],      tag[1], bkg="matchedJet_L",   sig="matched_B",   dir="offJets")
+        mon_roc_C[tag[0]] = makeRocPlot("Mon_"+tag[0],    tag[1], bkg="matchedJet_C",    sig="matched_B",   dir="offJets", vsLight=False)
+
+        ref_roc[tag[0]] = makeRocPlot("Ref_"+tag[0],      tag[1], bkg="matched_L",      sig="matchedJet_B",dir="offJets")
+        ref_roc_C[tag[0]] = makeRocPlot("Ref_"+tag[0],    tag[1], bkg="matched_C",      sig="matchedJet_B",dir="offJets", vsLight=False)
 
 
 
@@ -209,14 +229,21 @@ def main():
 
 
         for tag in taggers:
+            kw = {}
+            if len(tag) > 2: 
+                kw = tag[2]
+                
+
+
             plotSame(tag[0]+"_"+rocType,
                      [mon_roc[tag[0]][i], ref_roc[tag[0]][i]],
                      [ROOT.kBlack,      ROOT.kBlack],
-                     [ROOT.kSolid,      ROOT.kDashed],
+                     [ROOT.kDashed,     ROOT.kSolid],
                      taggerNames = [tag[0]],
                      plotDeepJet = False,
                      plotDeepCSV = False,
-                     rocType = rocType
+                     rocType = rocType,
+                     **kw
             )
 
 
@@ -224,11 +251,12 @@ def main():
             plotSame(tag[0]+"_C_"+rocType,
                      [mon_roc_C[tag[0]][i], ref_roc_C[tag[0]][i]],
                      [ROOT.kBlack,      ROOT.kBlack],
-                     [ROOT.kSolid,      ROOT.kDashed],
+                     [ROOT.kDashed,     ROOT.kSolid],
                      taggerNames = [tag[0]],
                      plotDeepJet = False,
                      plotDeepCSV = False,
                      rocType = rocType,
+                     **kw
                  )
 
 

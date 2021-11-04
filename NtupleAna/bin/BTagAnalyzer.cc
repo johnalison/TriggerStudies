@@ -60,6 +60,7 @@ int main(int argc, char * argv[]){
 
   const edm::ParameterSet& parameters = process.getParameter<edm::ParameterSet>("BTagAnalyzer");
   bool debug = parameters.getParameter<bool>("debug");
+  double minJetPt = parameters.getParameter<double>("minJetPt");
   bool isMC  = parameters.getParameter<bool>("isMC");
   bool isTurnOnStudy  = parameters.getParameter<bool>("isTurnOnStudy");
   bool doLeptonSel = parameters.getParameter<bool>("doLeptonSel");
@@ -130,8 +131,9 @@ int main(int argc, char * argv[]){
     a.eventLoop(maxEvents);
 
   } else{
-    std::cout << "BTagAnalysis " << std::endl;
-    BTagAnalysis a = BTagAnalysis(treeRAW, treeAOD, fsh, isMC, year, histogramming, debug, PUFileName, jetDetailString, nnParameters, pfJetName);
+    std::cout << "BTagAnalysis with minJetPt " << minJetPt << std::endl;
+    
+    BTagAnalysis a = BTagAnalysis(treeRAW, treeAOD, fsh, isMC, year, histogramming, debug, minJetPt, PUFileName, jetDetailString, nnParameters, pfJetName);
     a.doLeptonSel = doLeptonSel;
     //if(!isMC){
     //  a.lumiMask = lumiMask;

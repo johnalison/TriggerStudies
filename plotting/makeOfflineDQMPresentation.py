@@ -371,7 +371,7 @@ def makePresentation():
 
     for slideConfig in [
             ("R"  ,"Z"            ,        "Eta"          ,        "Phi"          ),
-            ("nSVs"         ,"NTracks"                ,"Mass"                   ,"Pt")           ,
+            ("totCharge", "NTracks"                ,"Mass"                   ,"Pt")           ,
             ("JetDeltaR"              ,        "totCharge"     ,        "Chi2"         ,"EnergyRatio"            ),
             ("Flight"       ,"FlightSig"    ,"Flight2D"     ,"FlightSig2D")  ,
 

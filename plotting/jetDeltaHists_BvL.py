@@ -181,7 +181,6 @@ for v in [
         "dsv_Eta"          ,
         "dsv_Phi"          ,
         "dsv_DistJetAxis"  ,
-        "dsv_nSVs"         ,
         "dsv_BoostOverSqrtJetPt"     ,
         "dsv_massVertexEnergyFraction"     ,
         "dsv_totCharge"     ,

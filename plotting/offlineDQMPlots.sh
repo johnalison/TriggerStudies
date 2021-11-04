@@ -4,10 +4,9 @@ output=$2
 monName=$3
 
 
-cmd="echo python3"
-#cmd="python3"
 
-
+cmd=${4:-echo python3}
+echo cmd=$cmd
 
 #echo $cmd
 

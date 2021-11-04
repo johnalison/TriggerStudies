@@ -44,13 +44,15 @@ const float OfflineDeepFlavourMediumCut2017  = 0.3033;
 const float OfflineDeepFlavourLooseCut2017   = 0.0521;
 
 //const float drTrackToJet = 0.29;
-const float drTrackToJet = 1e6;
+//const float drTrackToJet = 1e6;
+const float drTrackToJet = 0.25;
 
 
 
-BTagAnalysis::BTagAnalysis(TChain* _eventsRAW, TChain* _eventsAOD, fwlite::TFileService& fs, bool _isMC, std::string _year, int _histogramming, bool _debug, std::string PUFileName, std::string jetDetailString, const edm::ParameterSet& nnConfig, std::string pfJetName){
+BTagAnalysis::BTagAnalysis(TChain* _eventsRAW, TChain* _eventsAOD, fwlite::TFileService& fs, bool _isMC, std::string _year, int _histogramming, bool _debug, float _minJetPt, std::string PUFileName, std::string jetDetailString, const edm::ParameterSet& nnConfig, std::string pfJetName){
   if(_debug) cout<<"In BTagAnalysis constructor"<<endl;
   debug      = _debug;
+  minJetPt   = _minJetPt;
   isMC       = _isMC;
   year       = _year;
   eventsRAW     = _eventsRAW;
@@ -379,7 +381,7 @@ int BTagAnalysis::processEvent(){
     }
 
     if(fabs(offJet->eta) > 4) continue;
-    if(offJet->pt       < 30)   continue;
+    if(offJet->pt       < minJetPt)   continue;
 
 
     if(nTupleAnalysis::failOverlap(offJet->p,event->elecs,0.4)) continue;
@@ -466,7 +468,7 @@ int BTagAnalysis::processEvent(){
     if(fabs(offJet->eta) > 4) continue;
     cutflowJets->Fill("eta", eventWeight);
 
-    if(offJet->pt       < 30)   continue;
+    if(offJet->pt       < minJetPt)   continue;
     cutflowJets->Fill("pt", eventWeight);
 
     ++nOffJetsPreOLap;
@@ -496,7 +498,7 @@ int BTagAnalysis::processEvent(){
           if(offJetOther == offJet) continue;
     
     
-          if(offJetOther->pt       < 30)   continue;
+          if(offJetOther->pt       < minJetPt)   continue;
           if(fabs(offJetOther->eta) > 4) continue;
           if(nTupleAnalysis::failOverlap(offJetOther->p,event->elecs,0.4)) continue;
           if(nTupleAnalysis::failOverlap(offJetOther->p,event->muons,0.4)) continue;
@@ -712,7 +714,7 @@ int BTagAnalysis::processEvent(){
   //
   for(const nTupleAnalysis::jetPtr& pfJet : event->pfJets){
     if(fabs(pfJet->eta) > 4) continue;
-    if(pfJet->pt       < 30)   continue;
+    if(pfJet->pt       < minJetPt)   continue;
 
     //pfJetHistsPreOLap.Fill(pfJet);
 
@@ -744,7 +746,7 @@ int BTagAnalysis::processEvent(){
   if(doCaloJets){
     for(const nTupleAnalysis::jetPtr& caloJet : event->caloJets){
       if(fabs(caloJet->eta) > 4) continue;
-      if(caloJet->pt       < 30)   continue;
+      if(caloJet->pt       < minJetPt)   continue;
 
       //caloJetHistsPreOLap.Fill(caloJet);
       if(nTupleAnalysis::failOverlap(caloJet->p,event->elecs, 0.4)) continue;
@@ -788,7 +790,7 @@ int BTagAnalysis::processEvent(){
   if(doPuppiJets){
     for(const nTupleAnalysis::jetPtr& puppiJet : event->puppiJets){
       if(fabs(puppiJet->eta) > 4) continue;
-      if(puppiJet->pt       < 30)   continue;
+      if(puppiJet->pt       < minJetPt)   continue;
 
       //puppiJetHistsPreOLap.Fill(puppiJet);
       if(nTupleAnalysis::failOverlap(puppiJet->p,event->elecs, 0.4)) continue;
