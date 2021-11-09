@@ -284,6 +284,7 @@ def makePresentation():
 
     for slideConfig in [
             ("roc_All_Eff","roc_All_C_Eff","",""),
+            ("roc_DeepJetPtBins_Eff","roc_DeepJetEtaBins_Eff","",""),
         ]:
         files = []
         for i in range(4): 

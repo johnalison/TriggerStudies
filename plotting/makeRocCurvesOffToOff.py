@@ -3,6 +3,7 @@ ROOT.gErrorIgnoreLevel = ROOT.kWarning
 
 
 ROOT.gROOT.SetBatch(True)
+ROOT.gErrorIgnoreLevel = ROOT.kWarning
 
 import ROOTHelp.FancyROOTStyle
 
