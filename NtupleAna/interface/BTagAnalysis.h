@@ -34,6 +34,7 @@ namespace TriggerStudies {
     TChain* eventsRAW;
 
     bool debug = false;
+    float minJetPt = 30;
     std::string year;
     bool isMC  = false;
     TFileDirectory dir;
@@ -382,7 +383,7 @@ namespace TriggerStudies {
     std::shared_ptr<NeuralNetworkAndConstants>  neuralNet;
 
 
-    BTagAnalysis(TChain* _eventsRAW, TChain* _eventsAOD, fwlite::TFileService& fs, bool _isMC, std::string _year, int _histogramming, bool _debug, std::string PUFileName, std::string jetDetailString, const edm::ParameterSet& nnConfig, std::string pfJetName);
+    BTagAnalysis(TChain* _eventsRAW, TChain* _eventsAOD, fwlite::TFileService& fs, bool _isMC, std::string _year, int _histogramming, bool _debug, float minJetPt, std::string PUFileName, std::string jetDetailString, const edm::ParameterSet& nnConfig, std::string pfJetName);
     void monitor(long int);
     int eventLoop(int, int nSkipEvents = 0);
     int processEvent();

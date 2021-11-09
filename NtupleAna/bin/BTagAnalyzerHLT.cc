@@ -56,6 +56,7 @@ int main(int argc, char * argv[]){
 
   const edm::ParameterSet& parameters = process.getParameter<edm::ParameterSet>("BTagAnalyzer");
   bool debug = parameters.getParameter<bool>("debug");
+  double minJetPt = parameters.getParameter<double>("minJetPt");
   bool isMC  = parameters.getParameter<bool>("isMC");
   int histogramming = parameters.getParameter<int>("histogramming");
   int skipEvents = parameters.getParameter<int>("skipEvents");
