@@ -56,6 +56,7 @@ def getHist(inFile,dir,var,binning,color):
 
 
 
+
 def doVarRatioPlot(var, offLF, hltLF, offBQ, hltBQ, xTitle, setLogy=1, minX=None, maxX=None, minY=None, yAxisSF=1.0):
     maxY = max(offLF.GetMaximum(),offBQ.GetMaximum(),
                hltLF.GetMaximum(),hltBQ.GetMaximum())
@@ -91,10 +92,10 @@ def doVarRatioPlot(var, offLF, hltLF, offBQ, hltBQ, xTitle, setLogy=1, minX=None
 
     leg = ROOT.TLegend(xpos, ypos, xpos+xwidth, ypos+ywidth)
     leg.SetNColumns(1)
-    leg.AddEntry(offBQ,labName[0]+" b-jets","L")
-    leg.AddEntry(offLF,labName[0]+" light-flavor","L")
-    leg.AddEntry(hltBQ,labName[1]+" b-jets"    ,"PEL")
-    leg.AddEntry(hltLF,labName[1]+" light-flavor" ,"PEL")
+    leg.AddEntry(offBQ,"inner Pix Hit b-jets","L")
+    leg.AddEntry(offLF,"inner Pix Hit light-flavor","L")
+    leg.AddEntry(hltBQ,"no Inner Pix Hit b-jets"    ,"PEL")
+    leg.AddEntry(hltLF,"no Inner Pix Hit light-flavor" ,"PEL")
 
     canvas = makeCanvas(var, var, width=600, height=600)
     split=0.3
@@ -149,8 +150,8 @@ def doVarRatioPlot(var, offLF, hltLF, offBQ, hltBQ, xTitle, setLogy=1, minX=None
     ratio_axis.GetYaxis().SetTitle("Ratio")
     ratio_axis.GetXaxis().SetTitle(offLF.GetXaxis().GetTitle())
     ratio_axis.GetYaxis().SetNdivisions(507)
-    rMin = 0.5
-    rMax = 1.5
+    rMin = 0.0
+    rMax = 2.0
 
 
     if var in maxDict.keys():
@@ -253,13 +254,6 @@ def doVarRatioPlot(var, offLF, hltLF, offBQ, hltBQ, xTitle, setLogy=1, minX=None
 
 
 
-def doVarRatio(var, binning, xTitle, setLogy=1, minX=None, maxX=None, minY=None, yAxisSF=1.0):
-    offLF = getHist(inFile,"offJets_matched_L",          var,binning,ROOT.kBlack)
-    hltLF = getHist(inFile,"offJets_matchedJet_L",var,binning,ROOT.kBlack)
-    offBQ = getHist(inFile,"offJets_matched_B",          var,binning,ROOT.kRed)
-    hltBQ = getHist(inFile,"offJets_matchedJet_B",var,binning,ROOT.kRed)
-    doVarRatioPlot(var, offLF, hltLF, offBQ, hltBQ, xTitle=xTitle, setLogy=setLogy, minX=minX, maxX=maxX, minY=minY, yAxisSF=yAxisSF)
-
 def doVarRatioInnerPixel(var, binning, xTitle, setLogy=1, minX=None, maxX=None, minY=None, yAxisSF=1.0):
     offLF = getHist(inFile,"offJets_matched_L/tracks_innerPixHit",          var,binning,ROOT.kBlack)
     hltLF = getHist(inFile,"offJets_matched_L/tracks_noInnerPixHit",          var,binning,ROOT.kBlack)
@@ -276,264 +270,28 @@ def doVarRatioInnerPixel(var, binning, xTitle, setLogy=1, minX=None, maxX=None, 
 #      #binning = [-100,-90,-80,-70,-60,-50,-40,-30,-20,-10,-5,0,5,10,15,20,30,40,50,60,70,80,90,100]
 #      )
 
-for v in ["tracks/ip3d_sig",
-          "tracks/ip2d_sig",
-          # "CSVv2_l",
-          "DeepCSV_l",
-          "deepFlavB",
-          "Bprob",
-          "Proba",
-          "Svx",
-          "SvxHP",
-          "Ip2P",
-          "Ip3P",
-          "Ip2P_l",
-          "Ip3P_l",
-
-          #"deepcsv_bb",
-          "btags/sv_Flight2D",
-          "btags/sv_FlightSig2D",
-          "btags/sv_FlightSig",
-          "btags/sv_Flight",
-          "tracks/ip2d",
-          "tracks/ip2d_l",
-          "tracks/ip2d_sig",
-          "tracks/ip2d_sig_l",
-          "tracks/ip3d",
-          "tracks/ip3d_l",
-          "tracks/ip3d_sig",
-          "tracks/ip3d_sig_l",
-
-
-          "tracks_innerPixHit/ip2d",
-          "tracks_innerPixHit/ip2d_l",
-          "tracks_innerPixHit/ip2d_sig",
-          "tracks_innerPixHit/ip2d_sig_l",
-          "tracks_innerPixHit/ip3d",
-          "tracks_innerPixHit/ip3d_l",
-          "tracks_innerPixHit/ip3d_sig",
-          "tracks_innerPixHit/ip3d_sig_l",
-
-          "tracks_noInnerPixHit/ip2d",
-          "tracks_noInnerPixHit/ip2d_l",
-          "tracks_noInnerPixHit/ip2d_sig",
-          "tracks_noInnerPixHit/ip2d_sig_l",
-          "tracks_noInnerPixHit/ip3d",
-          "tracks_noInnerPixHit/ip3d_l",
-          "tracks_noInnerPixHit/ip3d_sig",
-          "tracks_noInnerPixHit/ip3d_sig_l",
-
-          "tracks/pt_s",
-          # "tracks/dz",
-          # "tracks/dxy",
-
-          "btags/ip2d",
-          "btags/ip2d_l",
-          "btags/ip2d_sig",
-          "btags/ip2d_sig_l",
-          "btags/ip3d",
-          "btags/ip3d_l",
-          "btags/ip3d_sig",
-          "btags/ip3d_sig_l",
-
-#          "btags_noV0/ip2d",
-#          "btags_noV0/ip2d_l",
-#          "btags_noV0/ip2d_sig",
-#          "btags_noV0/ip2d_sig_l",
-#          "btags_noV0/ip3d",
-#          "btags_noV0/ip3d_l",
-#          "btags_noV0/ip3d_sig",
-#          "btags_noV0/ip3d_sig_l",
-
-
-          "btags/trackPt",
-          "btags/trackEta",
-          "btags/trackPhi",
-          "btags/trackNPixelHits",
-          "btags/trackNTotalHits",
-
-          "eta",
-
-          "pt_s",
-          "pt_m",
-          "phi",
-          "nJets",
-          "DeepCSVb_l",
-          "DeepCSVbb_l",
-#          "DeepJetb_l",
-#          "DeepJetbb_l",
-#          "DeepJetlepb_l",
-          #"trackJetPt",
-          #"trackSip2dSigAboveCharm",
-          #"trackSip2dValAboveCharm",
-          #"trackSip3dSigAboveCharm",
-          #"trackSip3dValAboveCharm",
-          #"trackSumJetDeltaR",
-          #"vertexFitProb",
-
-          "tracks/PtRel"          ,
-          "tracks/PtRatio"        ,
-          "tracks/PPar"           ,
-          "tracks/PParRatio"      ,
-          "tracks/Momentum"       ,
-          "tracks/DecayLenVal_l"  ,
-          "tracks/DecayLenVal"    ,
-          "tracks/algo",
-          "tracks/origAlgo",
-
-          "btags/sv_Pt",
-
-          ]:
+for v in [
+          "ip2d",
+          "ip2d_l",
+          "ip2d_sig",
+          "ip2d_sig_l",
+          "ip3d",
+          "ip3d_l",
+          "ip3d_sig",
+          "ip3d_sig_l",
+        ]:
 
     vName = v.split("/")[-1]
     if vName in rebinningDB:
         binning = rebinningDB[vName]
     else:
         binning = 2
-
-    doVarRatio(v,
+        
+    doVarRatioInnerPixel(v,
                xTitle = v,
                binning = binning,
                yAxisSF = 100
                )
-
-
-
-
-for v in [
-        "tracks/eta",
-        "tracks/ip2d_err",
-        "tracks/ip2d_err_l",
-        "tracks/ip3d_err",
-        "tracks/ip3d_err_l",
-#        "neMult",
-        "eta",
-
-        "phi",
-        "btags/sv_BoostOverSqrtJetPt",
-        "btags/sv_EnergyRatio",
-        "btags/sv_Eta",
-        "btags/sv_NDF",
-        "btags/sv_Phi",
-        "btags/sv_R",
-        "btags/sv_Z",
-        "btags/sv_massVertexEnergyFraction",
-        "btags/sv_Chi2",
-        "btags/sv_JetDeltaR",
-        "btags/sv_DistJetAxis",
-        "tracks/JetDistVal"     ,
-        "tracks/eta"            ,
-        "tracks/phi"            ,
-        "tracks/DeltaR"         ,
-        #"trackEtaRel"         ,
-        #"jetNSelectedTracks",
-        #"mult",
-        # "nTrk",
-        #"jetNTracksEtaRel",
-
-        "btags/chargedHadronMultiplicity",
-        "btags/chargedMultiplicity",
-        "btags/elecMultiplicity",
-        "btags/muonMultiplicity",
-        "btags/neutralHadronMultiplicity",
-        "btags/neutralMultiplicity",
-        "btags/photonMultiplicity",
-        "btags/totalMultiplicity",
-
-        #"vertexCategory",
-        #"ip2d",
-        "tracks/Chi2",
-                  ]:
-
-
-    vName = v.split("/")[-1]
-    if vName in rebinningDB:
-        binning = rebinningDB[vName]
-    else:
-        binning = 2
-
-
-    doVarRatio(v,
-               xTitle = v,
-               binning = binning,
-               setLogy = 0,
-               yAxisSF = 1.25
-               )
-
-
-
-
-for v in [
-        "tracks/HasInnerPixHit",
-        "tracks/NPixelHits",
-        "tracks/NTotalHits",
-        "tracks/NStripHits",
-        "btags/sv_nSVs",
-        "tracks/nTracks",
-#        "btags_noV0/nTracks",
-        "btags/nTracks",
-        "btags/sv_NTracks",
-        ]:
-
-    doVarRatio(v,
-          xTitle = v,
-          binning = 1,
-          setLogy = 0,
-               yAxisSF = 1.25
-               )
-
-
-for v in [
-        "btags/chargedEmEnergyFraction",
-        "btags/chargedHadronEnergyFraction",
-        "btags/elecEnergyFraction",
-        "btags/muonEnergyFraction",
-        "btags/neutralEmEnergyFraction",
-        "btags/neutralHadronEnergyFraction",
-        "btags/photonEnergyFraction",
-
-        "tracks/IsFromV0",
-        "tracks/IsFromSV",
-        # "btags/trackIsFromV0",
-        # "btags_noV0/trackIsFromV0",
-        # "btags/trackIsFromSV",
-        # "btags_noV0/trackIsFromSV",
-        # "neutralHadronEnergyFraction",
-        # "trackSumJetEtRatio",
-        ]:
-    doVarRatio(v,
-          xTitle = v,
-          binning = 1,
-          setLogy = 0,
-               minY = 0,
-               yAxisSF = 1.25
-               )
-
-#
-#
-#for v in [
-#        "muonEnergyFraction",
-#        "muEF",
-#
-#        ]:
-#    doVarRatio(v,
-#          xTitle = v,
-#          binning = 1,
-#          setLogy = 1,
-#          )
-#
-for v in [
-        "btags/sv_Mass",
-        "m",
-        ]:
-    doVarRatio(v,
-          xTitle = v,
-          binning = 1,
-          setLogy = 0,
-          minX = 0,
-          maxX = 15
-          )
-
 
 
 #doVar("trk_z0Sig_signed",
@@ -541,3 +299,4 @@ for v in [
 #      #binning = [-25,-20,-18,-14,-10,-8,-6,-5,-4,-3,-2.5,-2,-1.5,-1,-0.5,0,0.5,1,1.5,2,2.5,3,4,5,6,8,10,12,14,16,18,20,24,25]
 #      binning = [-12,-10,-8,-6,-5,-4,-3,-2.5,-2,-1.5,-1,-0.5,0,0.5,1,1.5,2,2.5,3,4,5,6,8,10,12,15,20]
 #      )
+
