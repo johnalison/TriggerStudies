@@ -283,13 +283,15 @@ def makePresentation():
     #outFile.write("\subsection{ROCs} \n")
 
     for slideConfig in [
-            ("roc_All_Eff","roc_All_C_Eff","",""),
-            ("roc_DeepJetPtBins_Eff","roc_DeepJetEtaBins_Eff","",""),
+            ("roc_All_Eff","roc_All_C_Eff", "DeepJet"),
+            ("roc_DeepJetPtBins_Eff","roc_DeepJetEtaBins_Eff","DeepJet"),
+            ("roc_DeepJetPtBins_C_Eff","roc_DeepJetEtaBins_C_Eff","DeepJet"),
+            ("roc_ProbaPtBins_Eff","roc_ProbaEtaBins_Eff","JetProb"),
         ]:
         files = []
-        for i in range(4): 
+        for i in range(2): 
             if slideConfig[i]: files += [pdfDir+"/"+slideConfig[i]]
-        make1x2(outFile,"ROCs",
+        make1x2(outFile,"ROCs "+slideConfig[2],
                 files = files,
                 )
 

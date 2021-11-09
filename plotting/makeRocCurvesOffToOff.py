@@ -245,15 +245,27 @@ def main():
     mon_roc_C_pt = {}
     ref_roc_C_pt = {}
 
+    taggers = [("DeepJet","deepFlavB"),
+               ("Proba", "Proba"),
+               ]
 
-    for ptB in ptBins:
-        
-        mon_roc_pt[ptB]   = makeRocPlot("Mon_DeepJet_pt"+ptB,    "deepFlavB_pt"+ptB, bkg="matchedJet_L",   sig="matched_B",   dir="offJets")
-        mon_roc_C_pt[ptB] = makeRocPlot("Mon_DeepJet_C_pt"+ptB,    "deepFlavB_pt"+ptB, bkg="matchedJet_C",    sig="matched_B",   dir="offJets", vsLight=False)
+    for tag in taggers:
 
-        ref_roc_pt[ptB]   = makeRocPlot("Ref_DeepJet_pt"+ptB,    "deepFlavB_pt"+ptB, bkg="matched_L",      sig="matchedJet_B",dir="offJets")
-        ref_roc_C_pt[ptB] = makeRocPlot("Ref_DeepJet_C_pt"+ptB,    "deepFlavB_pt"+ptB, bkg="matched_C",      sig="matchedJet_B",dir="offJets", vsLight=False)
+        mon_roc_pt[tag[0]] = {}
+        ref_roc_pt[tag[0]] = {}
 
+        mon_roc_C_pt[tag[0]] = {}
+        ref_roc_C_pt[tag[0]] = {}
+
+
+        for ptB in ptBins:
+            
+            mon_roc_pt[tag[0]][ptB]   = makeRocPlot("Mon_"+tag[0]+"_pt"+ptB,    tag[1]+"_pt"+ptB, bkg="matchedJet_L",   sig="matched_B",   dir="offJets")
+            mon_roc_C_pt[tag[0]][ptB] = makeRocPlot("Mon_"+tag[0]+"_C_pt"+ptB,  tag[1]+"_pt"+ptB, bkg="matchedJet_C",    sig="matched_B",   dir="offJets", vsLight=False)
+
+            ref_roc_pt[tag[0]][ptB]   = makeRocPlot("Ref_"+tag[0]+"_pt"+ptB,    tag[1]+"_pt"+ptB, bkg="matched_L",      sig="matchedJet_B",dir="offJets")
+            ref_roc_C_pt[tag[0]][ptB] = makeRocPlot("Ref_"+tag[0]+"_C_pt"+ptB,  tag[1]+"_pt"+ptB, bkg="matched_C",      sig="matchedJet_B",dir="offJets", vsLight=False)
+    
 
     #
     #  Eta Study
@@ -266,15 +278,22 @@ def main():
     mon_roc_C_eta = {}
     ref_roc_C_eta = {}
 
+    for tag in taggers:
 
-    for etaB in etaBins:
-        
-        mon_roc_eta[etaB]   = makeRocPlot("Mon_DeepJet_eta"+etaB,    "deepFlavB_eta"+etaB, bkg="matchedJet_L",   sig="matched_B",   dir="offJets")
-        mon_roc_C_eta[etaB] = makeRocPlot("Mon_DeepJet_C_eta"+etaB,    "deepFlavB_eta"+etaB, bkg="matchedJet_C",    sig="matched_B",   dir="offJets", vsLight=False)
+        mon_roc_eta[tag[0]] = {}
+        ref_roc_eta[tag[0]] = {}
 
-        ref_roc_eta[etaB]   = makeRocPlot("Ref_DeepJet_eta"+etaB,    "deepFlavB_eta"+etaB, bkg="matched_L",      sig="matchedJet_B",dir="offJets")
-        ref_roc_C_eta[etaB] = makeRocPlot("Ref_DeepJet_C_eta"+etaB,    "deepFlavB_eta"+etaB, bkg="matched_C",      sig="matchedJet_B",dir="offJets", vsLight=False)
+        mon_roc_C_eta[tag[0]] = {}
+        ref_roc_C_eta[tag[0]] = {}
 
+
+        for etaB in etaBins:
+            
+            mon_roc_eta  [tag[0]][etaB] = makeRocPlot("Mon_"+tag[0]+"_eta"+etaB,    tag[1]+"_eta"+etaB, bkg="matchedJet_L",   sig="matched_B",   dir="offJets")
+            mon_roc_C_eta[tag[0]][etaB] = makeRocPlot("Mon_"+tag[0]+"_C_eta"+etaB,  tag[1]+"_eta"+etaB, bkg="matchedJet_C",    sig="matched_B",   dir="offJets", vsLight=False)
+            ref_roc_eta  [tag[0]][etaB] = makeRocPlot("Ref_"+tag[0]+"_eta"+etaB,    tag[1]+"_eta"+etaB, bkg="matched_L",      sig="matchedJet_B",dir="offJets")
+            ref_roc_C_eta[tag[0]][etaB] = makeRocPlot("Ref_"+tag[0]+"_C_eta"+etaB,  tag[1]+"_eta"+etaB, bkg="matched_C",      sig="matchedJet_B",dir="offJets", vsLight=False)
+    
 
 
     for i, rocType in enumerate(["Rej","Eff"]):
@@ -381,22 +400,27 @@ def main():
         #
         #  Pt Study
         #
-        pt_rocs = []
-        pt_rocs_C = []
+        pt_rocs_deepJet = []
+        pt_rocs_deepJet_C = []
+        pt_rocs_Proba = []
+        pt_rocs_Proba_C = []
         pt_styles = []
         pt_colors = []
         pt_text = []
         
-        def addToPt(roc,roc_c,style,color):
-            pt_rocs.append(roc)
-            pt_rocs_C.append(roc_c)
+        def addToPt(rocs,rocs_c,name,i,style,color):
+            pt_rocs_deepJet  .append(rocs  ["DeepJet"][name][i])
+            pt_rocs_deepJet_C.append(rocs_c["DeepJet"][name][i])
+            pt_rocs_Proba  .append(rocs  ["Proba"][name][i])
+            pt_rocs_Proba_C.append(rocs_c["Proba"][name][i])
+
             pt_styles.append(style)
             pt_colors.append(color)
 
         def addPtToPt(name, color, text):
             pt_text.append(text)
-            addToPt(mon_roc_pt[name][i], mon_roc_C_pt[name][i], ROOT.kDashed, color)
-            addToPt(ref_roc_pt[name][i], ref_roc_C_pt[name][i], ROOT.kSolid,  color)
+            addToPt(mon_roc_pt, mon_roc_C_pt, name, i, ROOT.kDashed, color)
+            addToPt(ref_roc_pt, ref_roc_C_pt, name, i, ROOT.kSolid,  color)
 
 
         addPtToPt("50",   ROOT.kBlack, "pt < 50 GeV")
@@ -405,7 +429,7 @@ def main():
         addPtToPt("10000",ROOT.kRed, "pt > 300 GeV")
 
         plotSame("DeepJetPtBins_"+rocType,
-                 pt_rocs, pt_colors, pt_styles,
+                 pt_rocs_deepJet, pt_colors, pt_styles,
                  plotDeepJet = False,
                  plotDeepCSV = False,
                  rocType = rocType,
@@ -414,7 +438,7 @@ def main():
 
 
         plotSame("DeepJetPtBins_C_"+rocType,
-                 pt_rocs_C, pt_colors, pt_styles,
+                 pt_rocs_deepJet_C, pt_colors, pt_styles,
                  plotDeepJet = False,
                  plotDeepCSV = False,
                  rocType = rocType,
@@ -422,27 +446,50 @@ def main():
              )
 
 
+        plotSame("ProbaPtBins_"+rocType,
+                 pt_rocs_Proba, pt_colors, pt_styles,
+                 plotDeepJet = False,
+                 plotDeepCSV = False,
+                 rocType = rocType,
+                 coloredText = pt_text,
+             )
+
+
+        plotSame("ProbaPtBins_C_"+rocType,
+                 pt_rocs_Proba_C, pt_colors, pt_styles,
+                 plotDeepJet = False,
+                 plotDeepCSV = False,
+                 rocType = rocType,
+                 coloredText = pt_text,
+             )
+        
+
 
 
         #
         #  Eta Study
         #
-        eta_rocs = []
-        eta_rocs_C = []
+        eta_rocs_deepJet = []
+        eta_rocs_deepJet_C = []
+        eta_rocs_Proba = []
+        eta_rocs_Proba_C = []
         eta_styles = []
         eta_colors = []
         eta_text = []
         
-        def addToEta(roc,roc_c,style,color):
-            eta_rocs.append(roc)
-            eta_rocs_C.append(roc_c)
+        def addToEta(rocs,rocs_c,name,i,style,color):
+            eta_rocs_deepJet  .append(rocs  ["DeepJet"][name][i])
+            eta_rocs_deepJet_C.append(rocs_c["DeepJet"][name][i])
+            eta_rocs_Proba    .append(rocs  ["Proba"][name][i])
+            eta_rocs_Proba_C  .append(rocs_c["Proba"][name][i])
+
             eta_styles.append(style)
             eta_colors.append(color)
 
         def addEtaToEta(name, color, text):
             eta_text.append(text)
-            addToEta(mon_roc_eta[name][i], mon_roc_C_eta[name][i], ROOT.kDashed, color)
-            addToEta(ref_roc_eta[name][i], ref_roc_C_eta[name][i], ROOT.kSolid,  color)
+            addToEta(mon_roc_eta, mon_roc_C_eta, name, i, ROOT.kDashed, color)
+            addToEta(ref_roc_eta, ref_roc_C_eta, name, i, ROOT.kSolid,  color)
 
 
         addEtaToEta("0.5",  ROOT.kBlack, "|eta| < 0.5")
@@ -452,7 +499,7 @@ def main():
         addEtaToEta("2.5",  ROOT.kGreen+2, "2.0 - 2.5")
 
         plotSame("DeepJetEtaBins_"+rocType,
-                 eta_rocs, eta_colors, eta_styles,
+                 eta_rocs_deepJet, eta_colors, eta_styles,
                  plotDeepJet = False,
                  plotDeepCSV = False,
                  rocType = rocType,
@@ -461,7 +508,25 @@ def main():
 
 
         plotSame("DeepJetEtaBins_C_"+rocType,
-                 eta_rocs_C, eta_colors, eta_styles,
+                 eta_rocs_deepJet_C, eta_colors, eta_styles,
+                 plotDeepJet = False,
+                 plotDeepCSV = False,
+                 rocType = rocType,
+                 coloredText = eta_text,
+             )
+
+
+        plotSame("ProbaEtaBins_"+rocType,
+                 eta_rocs_Proba, eta_colors, eta_styles,
+                 plotDeepJet = False,
+                 plotDeepCSV = False,
+                 rocType = rocType,
+                 coloredText = eta_text,
+             )
+
+
+        plotSame("ProbaEtaBins_C_"+rocType,
+                 eta_rocs_Proba_C, eta_colors, eta_styles,
                  plotDeepJet = False,
                  plotDeepCSV = False,
                  rocType = rocType,
