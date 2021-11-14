@@ -245,11 +245,11 @@ def main():
     mon_roc_C_pt = {}
     ref_roc_C_pt = {}
 
-    taggers = [("DeepJet","deepFlavB"),
+    taggersPt = [("DeepJet","deepFlavB"),
                ("Proba", "Proba"),
                ]
 
-    for tag in taggers:
+    for tag in taggersPt:
 
         mon_roc_pt[tag[0]] = {}
         ref_roc_pt[tag[0]] = {}
@@ -278,7 +278,7 @@ def main():
     mon_roc_C_eta = {}
     ref_roc_C_eta = {}
 
-    for tag in taggers:
+    for tag in taggersPt:
 
         mon_roc_eta[tag[0]] = {}
         ref_roc_eta[tag[0]] = {}
