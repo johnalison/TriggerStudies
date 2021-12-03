@@ -61,6 +61,9 @@ int main(int argc, char * argv[]){
   const edm::ParameterSet& parameters = process.getParameter<edm::ParameterSet>("BTagAnalyzer");
   bool debug = parameters.getParameter<bool>("debug");
   double minJetPt = parameters.getParameter<double>("minJetPt");
+  double minJetAbsEta = parameters.getParameter<double>("minJetAbsEta");
+  double maxJetAbsEta = parameters.getParameter<double>("maxJetAbsEta");
+  double minJetDeepJet = parameters.getParameter<double>("minJetDeepJet");
   bool isMC  = parameters.getParameter<bool>("isMC");
   bool isTurnOnStudy  = parameters.getParameter<bool>("isTurnOnStudy");
   bool doLeptonSel = parameters.getParameter<bool>("doLeptonSel");
@@ -131,9 +134,18 @@ int main(int argc, char * argv[]){
     a.eventLoop(maxEvents);
 
   } else{
-    std::cout << "BTagAnalysis with minJetPt " << minJetPt << std::endl;
+    std::cout << "BTagAnalysis with minJetPt " << minJetPt;
+    std::cout << "\t minJetAbsEta " << minJetAbsEta << std::endl;
+    std::cout << "\t maxJetAbsEta " << maxJetAbsEta << std::endl;
+    std::cout << "\t minJetDeepJet " << minJetDeepJet << std::endl;
     
-    BTagAnalysis a = BTagAnalysis(treeRAW, treeAOD, fsh, isMC, year, histogramming, debug, minJetPt, PUFileName, jetDetailString, nnParameters, pfJetName);
+    BTagAnalysis a = BTagAnalysis(treeRAW, treeAOD, fsh, isMC, year, histogramming, debug, PUFileName, jetDetailString, nnParameters, pfJetName);
+    a.minJetPt       = minJetPt;
+    a.minJetAbsEta   = minJetAbsEta;
+    a.maxJetAbsEta   = maxJetAbsEta;
+    a.minJetDeepJet  = minJetDeepJet;
+    
+
     a.doLeptonSel = doLeptonSel;
     //if(!isMC){
     //  a.lumiMask = lumiMask;

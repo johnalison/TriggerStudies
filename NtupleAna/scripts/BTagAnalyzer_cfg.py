@@ -28,6 +28,9 @@ parser.add_option('-o', '--outputBase',           dest="outputBase",    default=
 parser.add_option('--puFile',                     dest="puFile",       default="", help="PUFileName")
 parser.add_option('-n', '--nevents',              dest="nevents",       default="-1", help="Number of events to process. Default -1 for no limit.")
 parser.add_option(      '--minJetPt',             dest="minJetPt",       default="30", help="Minimm jet pt")
+parser.add_option(      '--minJetAbsEta',             dest="minJetAbsEta",       default="-1", help="Minimm jet |eta|")
+parser.add_option(      '--maxJetAbsEta',             dest="maxJetAbsEta",       default="4", help="Maximium jet |eta|")
+parser.add_option(      '--minJetDeepJet',             dest="minJetDeepJet",       default="-10", help="Minimm jet deepJet")
 parser.add_option(      '--histogramming',        dest="histogramming", default="1e6", help="Histogramming level. 0 to make no kinematic histograms. 1: only make histograms for full event selection, larger numbers add hists in reverse cutflow order.")
 parser.add_option(      '--skipEvents',        dest="skipEvents", default="0", help="")
 parser.add_option(      '--nnConfig',        default=None, help="")
@@ -162,6 +165,8 @@ if o.inputAOD == 'None':
     process.BTagAnalyzer = cms.PSet(
         debug   = cms.bool(o.debug),
         minJetPt   = cms.double(float(o.minJetPt)),
+        minJetAbsEta   = cms.double(float(o.minJetAbsEta)),
+        maxJetAbsEta   = cms.double(float(o.maxJetAbsEta)),
         isMC    = cms.bool(o.isMC),
         year    = cms.string(o.year),
         jetDetailString    = cms.string(jetDetailString),
@@ -176,6 +181,9 @@ else:
     process.BTagAnalyzer = cms.PSet(
         debug   = cms.bool(o.debug),
         minJetPt   = cms.double(float(o.minJetPt)),
+        minJetAbsEta   = cms.double(float(o.minJetAbsEta)),
+        maxJetAbsEta   = cms.double(float(o.maxJetAbsEta)),
+        minJetDeepJet   = cms.double(float(o.minJetDeepJet)),
         fileNamesAOD   = cms.vstring(fileNamesAOD),
         isMC    = cms.bool(o.isMC),
         isTurnOnStudy    = cms.bool(o.isTurnOnStudy),

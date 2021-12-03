@@ -49,10 +49,9 @@ const float drTrackToJet = 0.25;
 
 
 
-BTagAnalysis::BTagAnalysis(TChain* _eventsRAW, TChain* _eventsAOD, fwlite::TFileService& fs, bool _isMC, std::string _year, int _histogramming, bool _debug, float _minJetPt, std::string PUFileName, std::string jetDetailString, const edm::ParameterSet& nnConfig, std::string pfJetName){
+BTagAnalysis::BTagAnalysis(TChain* _eventsRAW, TChain* _eventsAOD, fwlite::TFileService& fs, bool _isMC, std::string _year, int _histogramming, bool _debug, std::string PUFileName, std::string jetDetailString, const edm::ParameterSet& nnConfig, std::string pfJetName){
   if(_debug) cout<<"In BTagAnalysis constructor"<<endl;
   debug      = _debug;
-  minJetPt   = _minJetPt;
   isMC       = _isMC;
   year       = _year;
   eventsRAW     = _eventsRAW;
@@ -129,8 +128,19 @@ BTagAnalysis::BTagAnalysis(TChain* _eventsRAW, TChain* _eventsAOD, fwlite::TFile
     PuppiJetHists_PVMatch = new jetAnalysisHists("offPuppi","puppi", "Puppi", fs, jetDetailString, isMC, "_PVMatch");
   }
 
+  bool doEtaRegions = jetDetailString.find("EtaRegions") != std::string::npos;
+  std::vector<float> etaBins = {1.5,3.0};
+
+  if(!doEtaRegions) 
+    etaBins.clear();
+
   hOffJets                = new nTupleAnalysis::jetHists("offJets",               fs, "", jetDetailString);
+  if(isMC) hOffJets_Truth      = new jetHistsTruthMatched("offJets",    fs, jetDetailString, etaBins);
+    
+
   hPfJets          = new nTupleAnalysis::jetHists("pfJets",           fs, "");
+  if(isMC) hPfJets_Truth      = new jetHistsTruthMatched("pfJets",    fs, jetDetailString, etaBins);
+
   hPfJets_matched  = new nTupleAnalysis::jetHists("pfJets_matched",           fs, "");
   hDeltaROffPf       = dir.make<TH1F>("dR_OffPf",            "BTagAnalysis/dR_OffPf;             DeltaR;   Entries", 100,-0.01, 5);
 
@@ -380,8 +390,10 @@ int BTagAnalysis::processEvent(){
       hOffBTagsAll->FillTrkTagVarHists(trkTag, eventWeight);
     }
 
-    if(fabs(offJet->eta) > 4) continue;
+    float absEta = fabs(offJet->eta);
+    if(absEta > maxJetAbsEta || absEta < minJetAbsEta) continue;
     if(offJet->pt       < minJetPt)   continue;
+    if(offJet->deepFlavB  < minJetDeepJet)   continue;
 
 
     if(nTupleAnalysis::failOverlap(offJet->p,event->elecs,0.4)) continue;
@@ -460,15 +472,19 @@ int BTagAnalysis::processEvent(){
   unsigned int nOffJets_matched     = 0;
   unsigned int nOffJets_matchedCalo = 0;
   unsigned int nOffJets_matchedPuppi = 0;
+  vector<unsigned int> usedJetIndex;
 
   if(debug) cout << "Starting off jets loop  " << endl;
   for(const nTupleAnalysis::jetPtr& offJet : event->offJets){
     cutflowJets->Fill("all", eventWeight);
 
-    if(fabs(offJet->eta) > 4) continue;
+    float absEta = fabs(offJet->eta);
+    if(absEta > maxJetAbsEta || absEta < minJetAbsEta) continue;
+
     cutflowJets->Fill("eta", eventWeight);
 
     if(offJet->pt       < minJetPt)   continue;
+    if(offJet->deepFlavB  < minJetDeepJet)   continue;
     cutflowJets->Fill("pt", eventWeight);
 
     ++nOffJetsPreOLap;
@@ -499,7 +515,9 @@ int BTagAnalysis::processEvent(){
     
     
           if(offJetOther->pt       < minJetPt)   continue;
-          if(fabs(offJetOther->eta) > 4) continue;
+	  float absEta = fabs(offJetOther->eta);
+	  if(absEta > maxJetAbsEta || absEta < minJetAbsEta) continue;
+
           if(nTupleAnalysis::failOverlap(offJetOther->p,event->elecs,0.4)) continue;
           if(nTupleAnalysis::failOverlap(offJetOther->p,event->muons,0.4)) continue;
           float thisDr = offJetOther->p.DeltaR(offJet->p);
@@ -531,6 +549,10 @@ int BTagAnalysis::processEvent(){
     ++nOffJets;
     hOffJets->Fill(offJet,eventWeight);
 
+    if(isMC){
+      hOffJets_Truth   ->Fill(offJet, offJet->hadronFlavour, offJet->flavourCleaned, eventWeight, offJet->p.Eta());
+    }
+
 
     if(debug) cout << "Filling offline BTags " << endl;
 
@@ -552,24 +574,46 @@ int BTagAnalysis::processEvent(){
     float dR = 1e6;
     nTupleAnalysis::jetPtr matchedJet = nullptr;
 
+    unsigned int pfJetIndex = 0;
+    unsigned int pfJetIndexMatch = 0;
+
     if(debug) cout << "Matching to PF jets " << endl;
     for(const nTupleAnalysis::jetPtr& pfJet : event->pfJets){
+      ++pfJetIndex;
+      if(pfJet->pt       < minJetPt)   {
+	continue;
+      }
+      float absEta = fabs(pfJet->eta);
+      if(absEta > maxJetAbsEta || absEta < minJetAbsEta) continue;
+
       if(debug) cout << " new jet " << endl;
       float this_dR = pfJet->p.DeltaR(offJet->p);
       if(debug) cout << " this dR " << this_dR << endl;
       if (this_dR < dR){
 	dR = this_dR;
 	matchedJet = pfJet;
+	pfJetIndexMatch = pfJetIndex;
       }
     }
 
 
     hDeltaROffPf->Fill(dR,eventWeight);
 
+    bool hasValidMatch = (dR < 0.2);
+
+    if(find(usedJetIndex.begin(), usedJetIndex.end(), pfJetIndexMatch) != usedJetIndex.end()){
+      if(debug) cout << "Using Jet again !"  <<endl;
+      hasValidMatch = false;
+    }else{
+      usedJetIndex.push_back(pfJetIndexMatch);
+    }
+    
     //
     //  Have PF Match
     //
-    if( dR < 0.4){
+    if( hasValidMatch){
+      
+
 
       if(debug) cout << "Have a PF jet match " << endl;
       cutflowJets->Fill("hasHLTMatchPF", eventWeight);
@@ -713,15 +757,23 @@ int BTagAnalysis::processEvent(){
   //  pf Jets
   //
   for(const nTupleAnalysis::jetPtr& pfJet : event->pfJets){
-    if(fabs(pfJet->eta) > 4) continue;
-    if(pfJet->pt       < minJetPt)   continue;
 
+    float absEta = fabs(pfJet->eta);
+    if(absEta > maxJetAbsEta || absEta < minJetAbsEta) continue;
+
+    if(pfJet->pt       < minJetPt)   continue;
+    if(pfJet->deepFlavB  < minJetDeepJet)   continue;
     //pfJetHistsPreOLap.Fill(pfJet);
 
     if(nTupleAnalysis::failOverlap(pfJet->p,event->elecs, 0.4)) continue;
     if(nTupleAnalysis::failOverlap(pfJet->p,event->muons, 0.4)) continue;
 
     hPfJets->Fill(pfJet, eventWeight);
+    if(isMC){
+      //cout << pfJet->hadronFlavour << endl;
+      hPfJets_Truth   ->Fill(pfJet, pfJet->hadronFlavour, pfJet->flavourCleaned, eventWeight, pfJet->p.Eta());
+    }
+
 
     const nTupleAnalysis::jetPtr pfJetMatchedJet = pfJet->matchedJet.lock();
     if(pfJetMatchedJet){
@@ -745,7 +797,10 @@ int BTagAnalysis::processEvent(){
 
   if(doCaloJets){
     for(const nTupleAnalysis::jetPtr& caloJet : event->caloJets){
-      if(fabs(caloJet->eta) > 4) continue;
+
+      float absEta = fabs(caloJet->eta);
+      if(absEta > maxJetAbsEta || absEta < minJetAbsEta) continue;
+
       if(caloJet->pt       < minJetPt)   continue;
 
       //caloJetHistsPreOLap.Fill(caloJet);
@@ -789,7 +844,10 @@ int BTagAnalysis::processEvent(){
 
   if(doPuppiJets){
     for(const nTupleAnalysis::jetPtr& puppiJet : event->puppiJets){
-      if(fabs(puppiJet->eta) > 4) continue;
+
+      float absEta = fabs(puppiJet->eta);
+      if(absEta > maxJetAbsEta || absEta < minJetAbsEta) continue;
+
       if(puppiJet->pt       < minJetPt)   continue;
 
       //puppiJetHistsPreOLap.Fill(puppiJet);

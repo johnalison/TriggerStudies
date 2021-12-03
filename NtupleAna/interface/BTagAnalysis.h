@@ -35,6 +35,9 @@ namespace TriggerStudies {
 
     bool debug = false;
     float minJetPt = 30;
+    float minJetAbsEta = -1;
+    float maxJetAbsEta = 4;
+    float minJetDeepJet = -10;
     std::string year;
     bool isMC  = false;
     TFileDirectory dir;
@@ -324,9 +327,11 @@ namespace TriggerStudies {
     //
     nTupleAnalysis::jetHists* hOffJetsPreOLap = nullptr;
     nTupleAnalysis::jetHists* hOffJets         = nullptr;
+    jetHistsTruthMatched*     hOffJets_Truth   = nullptr;
 
     nTupleAnalysis::jetHists* hPfJets = nullptr;
     nTupleAnalysis::jetHists* hPfJets_matched = nullptr;
+    jetHistsTruthMatched*     hPfJets_Truth = nullptr;
 
     nTupleAnalysis::jetHists* hCaloJets = nullptr;
     nTupleAnalysis::jetHists* hCaloJets_matched = nullptr;
@@ -383,7 +388,7 @@ namespace TriggerStudies {
     std::shared_ptr<NeuralNetworkAndConstants>  neuralNet;
 
 
-    BTagAnalysis(TChain* _eventsRAW, TChain* _eventsAOD, fwlite::TFileService& fs, bool _isMC, std::string _year, int _histogramming, bool _debug, float minJetPt, std::string PUFileName, std::string jetDetailString, const edm::ParameterSet& nnConfig, std::string pfJetName);
+    BTagAnalysis(TChain* _eventsRAW, TChain* _eventsAOD, fwlite::TFileService& fs, bool _isMC, std::string _year, int _histogramming, bool _debug, std::string PUFileName, std::string jetDetailString, const edm::ParameterSet& nnConfig, std::string pfJetName);
     void monitor(long int);
     int eventLoop(int, int nSkipEvents = 0);
     int processEvent();

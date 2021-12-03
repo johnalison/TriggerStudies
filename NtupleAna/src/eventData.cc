@@ -137,7 +137,7 @@ eventData::eventData(TChain* _treeRAW, TChain* _treeAOD, bool mc, std::string y,
   }
 
   std::cout << "\t loading pfjets with name " << pfJetName << std::endl;    
-  pfTreeJets   = new nTupleAnalysis::jetData( "Jet",  treeRAW, true, false, jetDetailLevel, pfJetName       );
+  pfTreeJets   = new nTupleAnalysis::jetData( "Jet",  treeRAW, true, isMC, jetDetailLevel, pfJetName       );
 
 
   if(doCaloJets){
@@ -254,13 +254,13 @@ void eventData::update(int e){
     }
   }
 
-
-  if(doOffline) offJets  = offTreeJets->getJets(30,1e6,4);
-  pfJets   = pfTreeJets ->getJets(30,1e6,4);
+  float minJetPt = 30;
+  if(doOffline) offJets  = offTreeJets->getJets(minJetPt,1e6,4);
+  pfJets   = pfTreeJets ->getJets(minJetPt,1e6,4);
   if(doCaloJets)
-    caloJets = caloTreeJets ->getJets(30,1e6,2.4);
+    caloJets = caloTreeJets ->getJets(minJetPt,1e6,2.4);
   if(doPuppiJets)
-    puppiJets = puppiTreeJets ->getJets(30,1e6,4.);
+    puppiJets = puppiTreeJets ->getJets(minJetPt,1e6,4.);
 
   if(doOffline){
     if(treeMuons)
