@@ -55,13 +55,17 @@ def getWorkingPoint(var, bkg, sig, dir, varNorm):
 
     return (sigEff, bkgRej)
 
-def makeRocPlot(name, var, bkg, sig, dir, varNorm=None,debug=False,vsLight=True):
-    sigHist = inFile.Get(dir+"_"+sig+"/"+var)
-    bkgHist = inFile.Get(dir+"_"+bkg+"/"+var)
+def makeRocPlot(name, var, bkg, sig, indir, varNorm=None,debug=False,vsLight=True, vsLandPU=False):
+    sigHist = inFile.Get(indir+sig+"/"+var)
+    bkgHist = inFile.Get(indir+bkg+"/"+var)
+    
+    if not sigHist:
+        print("ERROR: cannot get",indir+sig+"/"+var)
+        print(sigHist)
 
     if varNorm:
-        sigNormHist = inFile.Get(dir+"_"+sig+"/"+varNorm)
-        bkgNormHist = inFile.Get(dir+"_"+bkg+"/"+varNorm)
+        sigNormHist = inFile.Get(indir+sig+"/"+varNorm)
+        bkgNormHist = inFile.Get(indir+bkg+"/"+varNorm)
     else      :
         sigNormHist = sigHist
         bkgNormHist = bkgHist
@@ -76,6 +80,7 @@ def makeRocPlot(name, var, bkg, sig, dir, varNorm=None,debug=False,vsLight=True)
         rocPlots[-1].GetXaxis().SetTitle("B-Jet  Efficiency")
         rocPlots[-1].GetXaxis().SetRangeUser(0.4,1)
         if vsLight: yTitle = "Light Flavor "
+        elif vsLandPU: yTitle = "Light Flavor (w/PU) "
         else:       yTitle = "C-Jet "
         
         if config[0] == "Rej":    yTitle +="Rejection"
@@ -203,8 +208,18 @@ def main():
     mon_roc = {}
     ref_roc = {}
 
+    mon_roc_all = {}
+    ref_roc_all = {}
+
     mon_roc_C = {}
     ref_roc_C = {}
+
+    mon_roc_all_C = {}
+    ref_roc_all_C = {}
+
+    mon_roc_LandPU = {}
+    ref_roc_LandPU = {}
+
 
     taggers = [("DeepCSV","DeepCSV_l"),
                ("DeepJet","deepFlavB"),
@@ -225,11 +240,18 @@ def main():
 
     for tag in taggers:
         
-        mon_roc[tag[0]] = makeRocPlot("Mon_"+tag[0],      tag[1], bkg="matchedJet_L",   sig="matched_B",   dir="offJets")
-        mon_roc_C[tag[0]] = makeRocPlot("Mon_C_"+tag[0],    tag[1], bkg="matchedJet_C",    sig="matched_B",   dir="offJets", vsLight=False)
+        mon_roc[tag[0]]          = makeRocPlot("Mon_"+tag[0],          tag[1], bkg="matchedJet_L",      sig="matchedJet_B",    indir="offJets_")
+        mon_roc_all[tag[0]]      = makeRocPlot("Mon_all"+tag[0],       tag[1], bkg="pfJets_L",          sig="pfJets_B",      indir="")
+        mon_roc_all_C[tag[0]]    = makeRocPlot("Mon_all_C"+tag[0],     tag[1], bkg="pfJets_C",          sig="pfJets_B",      indir="")
+        mon_roc_LandPU[tag[0]]   = makeRocPlot("Mon_LandPU_"+tag[0],   tag[1], bkg="matchedJet_LandPU", sig="matchedJet_B",    indir="offJets_", vsLight=False, vsLandPU=True)
+        mon_roc_C[tag[0]]        = makeRocPlot("Mon_C_"+tag[0],        tag[1], bkg="matchedJet_C",      sig="matchedJet_B",    indir="offJets_", vsLight=False)
 
-        ref_roc[tag[0]] = makeRocPlot("Ref_"+tag[0],      tag[1], bkg="matched_L",      sig="matchedJet_B",dir="offJets")
-        ref_roc_C[tag[0]] = makeRocPlot("Ref_C_"+tag[0],    tag[1], bkg="matched_C",      sig="matchedJet_B",dir="offJets", vsLight=False)
+
+        ref_roc[tag[0]]        = makeRocPlot("Ref_"+tag[0],        tag[1], bkg="matched_L",      sig="matched_B",  indir="offJets_")
+        ref_roc_all[tag[0]]    = makeRocPlot("Ref_all"+tag[0],     tag[1], bkg="offJets_L",      sig="offJets_B",      indir="")
+        ref_roc_all_C[tag[0]]  = makeRocPlot("Ref_all_C_"+tag[0],  tag[1], bkg="offJets_C",      sig="offJets_B",      indir="")
+        ref_roc_LandPU[tag[0]] = makeRocPlot("Ref_LandPU_"+tag[0], tag[1], bkg="matched_LandPU", sig="matched_B",    indir="offJets_", vsLight=False, vsLandPU=True)
+        ref_roc_C[tag[0]]      = makeRocPlot("Ref_C_"+tag[0],      tag[1], bkg="matched_C",      sig="matched_B",  indir="offJets_", vsLight=False)
 
 
 
@@ -260,11 +282,16 @@ def main():
 
         for ptB in ptBins:
             
-            mon_roc_pt[tag[0]][ptB]   = makeRocPlot("Mon_"+tag[0]+"_pt"+ptB,    tag[1]+"_pt"+ptB, bkg="matchedJet_L",   sig="matched_B",   dir="offJets")
-            mon_roc_C_pt[tag[0]][ptB] = makeRocPlot("Mon_"+tag[0]+"_C_pt"+ptB,  tag[1]+"_pt"+ptB, bkg="matchedJet_C",    sig="matched_B",   dir="offJets", vsLight=False)
-
-            ref_roc_pt[tag[0]][ptB]   = makeRocPlot("Ref_"+tag[0]+"_pt"+ptB,    tag[1]+"_pt"+ptB, bkg="matched_L",      sig="matchedJet_B",dir="offJets")
-            ref_roc_C_pt[tag[0]][ptB] = makeRocPlot("Ref_"+tag[0]+"_C_pt"+ptB,  tag[1]+"_pt"+ptB, bkg="matched_C",      sig="matchedJet_B",dir="offJets", vsLight=False)
+            #mon_roc_pt[tag[0]][ptB]   = makeRocPlot("Mon_"+tag[0]+"_pt"+ptB,    tag[1]+"_pt"+ptB, bkg="matchedJet_L",   sig="matchedJet_B",   indir="offJets_")
+            #mon_roc_C_pt[tag[0]][ptB] = makeRocPlot("Mon_"+tag[0]+"_C_pt"+ptB,  tag[1]+"_pt"+ptB, bkg="matchedJet_C",   sig="matchedJet_B",  indir="offJets_", vsLight=False)
+            #
+            #ref_roc_pt[tag[0]][ptB]   = makeRocPlot("Ref_"+tag[0]+"_pt"+ptB,    tag[1]+"_pt"+ptB, bkg="matched_L",      sig="matched_B",indir="offJets_")
+            #ref_roc_C_pt[tag[0]][ptB] = makeRocPlot("Ref_"+tag[0]+"_C_pt"+ptB,  tag[1]+"_pt"+ptB, bkg="matched_C",      sig="matched_B",indir="offJets_", vsLight=False)
+    
+            mon_roc_pt[tag[0]][ptB]   = makeRocPlot("Mon_"+tag[0]+"_pt"+ptB,    tag[1]+"_pt"+ptB, bkg="pfJets_L",       sig="pfJets_B",   indir="")
+            mon_roc_C_pt[tag[0]][ptB] = makeRocPlot("Mon_"+tag[0]+"_C_pt"+ptB,  tag[1]+"_pt"+ptB, bkg="pfJets_C",       sig="pfJets_B",   indir="", vsLight=False)
+            ref_roc_pt[tag[0]][ptB]   = makeRocPlot("Ref_"+tag[0]+"_pt"+ptB,    tag[1]+"_pt"+ptB, bkg="offJets_L",      sig="offJets_B",  indir="")
+            ref_roc_C_pt[tag[0]][ptB] = makeRocPlot("Ref_"+tag[0]+"_C_pt"+ptB,  tag[1]+"_pt"+ptB, bkg="offJets_C",      sig="offJets_B",  indir="", vsLight=False)
     
 
     #
@@ -289,10 +316,15 @@ def main():
 
         for etaB in etaBins:
             
-            mon_roc_eta  [tag[0]][etaB] = makeRocPlot("Mon_"+tag[0]+"_eta"+etaB,    tag[1]+"_eta"+etaB, bkg="matchedJet_L",   sig="matched_B",   dir="offJets")
-            mon_roc_C_eta[tag[0]][etaB] = makeRocPlot("Mon_"+tag[0]+"_C_eta"+etaB,  tag[1]+"_eta"+etaB, bkg="matchedJet_C",    sig="matched_B",   dir="offJets", vsLight=False)
-            ref_roc_eta  [tag[0]][etaB] = makeRocPlot("Ref_"+tag[0]+"_eta"+etaB,    tag[1]+"_eta"+etaB, bkg="matched_L",      sig="matchedJet_B",dir="offJets")
-            ref_roc_C_eta[tag[0]][etaB] = makeRocPlot("Ref_"+tag[0]+"_C_eta"+etaB,  tag[1]+"_eta"+etaB, bkg="matched_C",      sig="matchedJet_B",dir="offJets", vsLight=False)
+            #mon_roc_eta  [tag[0]][etaB] = makeRocPlot("Mon_"+tag[0]+"_eta"+etaB,    tag[1]+"_eta"+etaB, bkg="matchedJet_L",   sig="matchedJet_B",   indir="offJets_")
+            #mon_roc_C_eta[tag[0]][etaB] = makeRocPlot("Mon_"+tag[0]+"_C_eta"+etaB,  tag[1]+"_eta"+etaB, bkg="matchedJet_C",   sig="matchedJet_B",   indir="offJets_", vsLight=False)
+            #ref_roc_eta  [tag[0]][etaB] = makeRocPlot("Ref_"+tag[0]+"_eta"+etaB,    tag[1]+"_eta"+etaB, bkg="matched_L",      sig="matched_B",indir="offJets_")
+            #ref_roc_C_eta[tag[0]][etaB] = makeRocPlot("Ref_"+tag[0]+"_C_eta"+etaB,  tag[1]+"_eta"+etaB, bkg="matched_C",      sig="matched_B",indir="offJets_", vsLight=False)
+    
+            mon_roc_eta  [tag[0]][etaB] = makeRocPlot("Mon_"+tag[0]+"_eta"+etaB,    tag[1]+"_eta"+etaB, bkg="pfJets_L",       sig="pfJets_B",   indir="")
+            mon_roc_C_eta[tag[0]][etaB] = makeRocPlot("Mon_"+tag[0]+"_C_eta"+etaB,  tag[1]+"_eta"+etaB, bkg="pfJets_C",       sig="pfJets_B",   indir="", vsLight=False)
+            ref_roc_eta  [tag[0]][etaB] = makeRocPlot("Ref_"+tag[0]+"_eta"+etaB,    tag[1]+"_eta"+etaB, bkg="offJets_L",      sig="offJets_B",indir="")
+            ref_roc_C_eta[tag[0]][etaB] = makeRocPlot("Ref_"+tag[0]+"_C_eta"+etaB,  tag[1]+"_eta"+etaB, bkg="offJets_C",      sig="offJets_B",indir="", vsLight=False)
     
 
 
@@ -308,6 +340,29 @@ def main():
 
             plotSame(tag[0]+"_"+rocType,
                      [mon_roc[tag[0]][i], ref_roc[tag[0]][i]],
+                     [ROOT.kBlack,      ROOT.kBlack],
+                     [ROOT.kDashed,     ROOT.kSolid],
+                     taggerNames = [tag[0]],
+                     plotDeepJet = False,
+                     plotDeepCSV = False,
+                     rocType = rocType,
+                     **kw
+            )
+
+            plotSame(tag[0]+"_all_"+rocType,
+                     [mon_roc_all[tag[0]][i], ref_roc_all[tag[0]][i]],
+                     [ROOT.kBlack,      ROOT.kBlack],
+                     [ROOT.kDashed,     ROOT.kSolid],
+                     taggerNames = [tag[0]],
+                     plotDeepJet = False,
+                     plotDeepCSV = False,
+                     rocType = rocType,
+                     **kw
+            )
+
+
+            plotSame(tag[0]+"_LandPU_"+rocType,
+                     [mon_roc_LandPU[tag[0]][i], ref_roc_LandPU[tag[0]][i]],
                      [ROOT.kBlack,      ROOT.kBlack],
                      [ROOT.kDashed,     ROOT.kSolid],
                      taggerNames = [tag[0]],
@@ -344,8 +399,11 @@ def main():
             all_colors.append(color)
 
         def addTaggerToAll(name, color):
-            addToAll(mon_roc[name][i], mon_roc_C[name][i], ROOT.kDashed, color)
-            addToAll(ref_roc[name][i], ref_roc_C[name][i], ROOT.kSolid,  color)
+            #addToAll(mon_roc[name][i], mon_roc_C[name][i], ROOT.kDashed, color)
+            #addToAll(ref_roc[name][i], ref_roc_C[name][i], ROOT.kSolid,  color)
+
+            addToAll(mon_roc_all[name][i], mon_roc_all_C[name][i], ROOT.kDashed, color)
+            addToAll(ref_roc_all[name][i], ref_roc_all_C[name][i], ROOT.kSolid,  color)
 
             
 
