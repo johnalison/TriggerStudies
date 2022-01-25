@@ -172,11 +172,11 @@ BTagAnalysis::BTagAnalysis(TChain* eventsRAW, TChain* eventsAOD, fwlite::TFileSe
   //
   // Vertex Hists
   //
-  hVtx       = new nTupleAnalysis::vertexHists("hltVtx", fs, "HLT Vtx");
-  hVtx       ->makeDiffHists("hltVtx", fs, "HLT Vtx");
   hOffVtx    = new nTupleAnalysis::vertexHists("offVtx", fs, "Off Vtx");
 
-  if(doTree2){
+  if(doTree2) {
+    hVtx       = new nTupleAnalysis::vertexHists("hltVtx", fs, "HLT Vtx");
+    hVtx       ->makeDiffHists("hltVtx", fs, "HLT Vtx");
     hVtx_PVMatch       = new nTupleAnalysis::vertexHists("hltVtx_PVMatch", fs, "HLT Vtx (PV Match)");
     hVtx_PVMatch       ->makeDiffHists("hltVtx_PVMatch", fs, "HLT Vtx (PV Match)");
     hOffVtx_PVMatch    = new nTupleAnalysis::vertexHists("offVtx_PVMatch", fs, "Off Vtx (PV Match");
@@ -652,7 +652,7 @@ int BTagAnalysis::processEvent(){
     }//doTree2
 
   }//offJets
-
+  if(debug) cout << "Done jetCol1 " << endl;
 
   hOffJetsPreOLap    ->nJets->Fill(nOffJetsPreOLap ,eventWeight);
   hOffJets           ->nJets->Fill(nOffJets        ,eventWeight);

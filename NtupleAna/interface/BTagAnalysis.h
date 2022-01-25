@@ -43,7 +43,7 @@ namespace TriggerStudies {
 
     bool doTracks = true;
     //bool doCaloJets = true;
-    bool doPuppiJets = true;
+    //bool doPuppiJets = true;
     bool doLeptonSel = false;
     bool doOfflineBTagCut = false;
 
@@ -297,15 +297,8 @@ namespace TriggerStudies {
 
     };
     
-    jetAnalysisHists* PFJetHists;
-    //jetAnalysisHists* CaloJetHists;
-    jetAnalysisHists* PuppiJetHists;
-
-    jetAnalysisHists* PFJetHists_PVMatch;
-    //jetAnalysisHists* CaloJetHists_PVMatch;
-    jetAnalysisHists* PuppiJetHists_PVMatch;
-
-
+    jetAnalysisHists* PFJetHists = nullptr;
+    jetAnalysisHists* PFJetHists_PVMatch  = nullptr;
 
     nTupleAnalysis::eventHists* hEvents = nullptr;
     nTupleAnalysis::eventHists* hEventsNoPUWeight = nullptr;
@@ -335,8 +328,8 @@ namespace TriggerStudies {
     //nTupleAnalysis::jetHists* hCaloJets = nullptr;
     //nTupleAnalysis::jetHists* hCaloJets_matched = nullptr;
 
-    nTupleAnalysis::jetHists* hPuppiJets = nullptr;
-    nTupleAnalysis::jetHists* hPuppiJets_matched = nullptr;
+    //nTupleAnalysis::jetHists* hPuppiJets = nullptr;
+    //nTupleAnalysis::jetHists* hPuppiJets_matched = nullptr;
 
     //
     // BTags
