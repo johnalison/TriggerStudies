@@ -22,8 +22,8 @@ parser.add_option('--pfJetName',                default="PFJet.", help="")
 parser.add_option('--jetDetailString',                default="matched", help="")
 parser.add_option('-y', '--year',                 dest="year",          default="2016", help="Year specifies trigger (and lumiMask for data)")
 #parser.add_option('-l', '--lumi', type="float",   dest="lumi",          default=1.0,    help="Luminosity for MC normalization: units [pb]")
-parser.add_option( '--inputAOD',                dest="inputAOD",         default='None', help="Input file(s). If it ends in .txt, will treat it as a list of input files.")
-parser.add_option( '--inputRAW',                dest="inputRAW",         default="TriggerStudies/fileLists/data2016H.txt", help="Input file(s). If it ends in .txt, will treat it as a list of input files.")
+parser.add_option( '--inputAOD',                dest="inputAOD",         default=None, help="Input file(s). If it ends in .txt, will treat it as a list of input files.")
+parser.add_option( '--inputRAW',                dest="inputRAW",         default=None, help="Input file(s). If it ends in .txt, will treat it as a list of input files.")
 parser.add_option('-o', '--outputBase',           dest="outputBase",    default="/uscms/home/bryantp/nobackup/TriggerStudies/", help="Base path for storing output histograms and picoAOD")
 parser.add_option('--puFile',                     dest="puFile",       default="", help="PUFileName")
 parser.add_option('-n', '--nevents',              dest="nevents",       default="-1", help="Number of events to process. Default -1 for no limit.")
@@ -66,16 +66,17 @@ lumiData   = {'2015':'',
 
 fileNamesAOD = []
 inputList=False
-if ".txt" in o.inputAOD:
-    inputList = True
-    for line in open(o.inputAOD, 'r').readlines():
-        line = line.replace('\n','').strip()
-        if line    == '' : continue
-        if line[0] == '#': continue
-        fileNamesAOD.append(line.replace('\n',''))
-else:
-    fileNamesAOD.append(o.inputAOD)
-
+if o.inputAOD:
+    if ".txt" in o.inputAOD:
+        inputList = True
+        for line in open(o.inputAOD, 'r').readlines():
+            line = line.replace('\n','').strip()
+            if line    == '' : continue
+            if line[0] == '#': continue
+            fileNamesAOD.append(line.replace('\n',''))
+    else:
+        fileNamesAOD.append(o.inputAOD)
+    
 
 fileNamesRAW = []
 inputList=False
@@ -160,40 +161,40 @@ if o.doPuppiJets:
 
 #Setup event loop object
 
-if o.inputAOD == 'None':
-    print('Configuring HLTOnly...')
-    process.BTagAnalyzer = cms.PSet(
-        debug   = cms.bool(o.debug),
-        minJetPt   = cms.double(float(o.minJetPt)),
-        minJetAbsEta   = cms.double(float(o.minJetAbsEta)),
-        maxJetAbsEta   = cms.double(float(o.maxJetAbsEta)),
-        isMC    = cms.bool(o.isMC),
-        year    = cms.string(o.year),
-        jetDetailString    = cms.string(jetDetailString),
-        pfJetName          = cms.string(o.pfJetName),
-        lumiData= cms.string(lumiData[o.year]),
-        histogramming = cms.int32(int(o.histogramming)),
-        skipEvents = cms.int32(int(o.skipEvents)),
-        )
-    print('HLTOnly configured')
-else:
-    print('Configuring RAW+AOD...')
-    process.BTagAnalyzer = cms.PSet(
-        debug   = cms.bool(o.debug),
-        minJetPt   = cms.double(float(o.minJetPt)),
-        minJetAbsEta   = cms.double(float(o.minJetAbsEta)),
-        maxJetAbsEta   = cms.double(float(o.maxJetAbsEta)),
-        minJetDeepJet   = cms.double(float(o.minJetDeepJet)),
-        fileNamesAOD   = cms.vstring(fileNamesAOD),
-        isMC    = cms.bool(o.isMC),
-        isTurnOnStudy    = cms.bool(o.isTurnOnStudy),
-        doLeptonSel      = cms.bool(o.doLeptonSel),
-        year    = cms.string(o.year),
-        puFile    = cms.string(o.puFile),
-        jetDetailString    = cms.string(jetDetailString),
-        pfJetName    = cms.string(o.pfJetName),
-        lumiData= cms.string(lumiData[o.year]),
-        histogramming = cms.int32(int(o.histogramming)),
-        skipEvents = cms.int32(int(o.skipEvents)),
-        )
-    print('RAW+AOD configured')
+#if o.inputAOD == 'None':
+#    print('Configuring HLTOnly...')
+#    process.BTagAnalyzer = cms.PSet(
+#        debug   = cms.bool(o.debug),
+#        minJetPt   = cms.double(float(o.minJetPt)),
+#        minJetAbsEta   = cms.double(float(o.minJetAbsEta)),
+#        maxJetAbsEta   = cms.double(float(o.maxJetAbsEta)),
+#        isMC    = cms.bool(o.isMC),
+#        year    = cms.string(o.year),
+#        jetDetailString    = cms.string(jetDetailString),
+#        pfJetName          = cms.string(o.pfJetName),
+#        lumiData= cms.string(lumiData[o.year]),
+#        histogramming = cms.int32(int(o.histogramming)),
+#        skipEvents = cms.int32(int(o.skipEvents)),
+#        )
+#    print('HLTOnly configured')
+#else:
+#    print('Configuring RAW+AOD...')
+process.BTagAnalyzer = cms.PSet(
+    debug   = cms.bool(o.debug),
+    minJetPt   = cms.double(float(o.minJetPt)),
+    minJetAbsEta   = cms.double(float(o.minJetAbsEta)),
+    maxJetAbsEta   = cms.double(float(o.maxJetAbsEta)),
+    minJetDeepJet   = cms.double(float(o.minJetDeepJet)), 
+    fileNamesAOD   = cms.vstring(fileNamesAOD),
+    isMC    = cms.bool(o.isMC),
+    isTurnOnStudy    = cms.bool(o.isTurnOnStudy) , 
+    doLeptonSel      = cms.bool(o.doLeptonSel),    
+    year    = cms.string(o.year),
+    puFile    = cms.string(o.puFile),              
+    jetDetailString    = cms.string(jetDetailString),
+    pfJetName    = cms.string(o.pfJetName),
+    lumiData= cms.string(lumiData[o.year]),
+    histogramming = cms.int32(int(o.histogramming)),
+    skipEvents = cms.int32(int(o.skipEvents)),
+)
+#    print('RAW+AOD configured')

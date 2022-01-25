@@ -26,11 +26,11 @@ const float OfflineDeepFlavourLooseCut2018   = 0.0494;
 // https://cmswbm.cern.ch/cmsdb/servlet/HLTPath?PATHID=2117358
 // https://cmswbm.cern.ch/cmsdb/servlet/HLTPath?PATHID=2090546
 const float OnlineDeepCSVCutPF    = 0.24;
-const float OnlineDeepCSVCutCalo  = 0.17;
-const float OnlineDeepCSVCutPuppi  = 0.17;
+//const float OnlineDeepCSVCutCalo  = 0.17;
+//const float OnlineDeepCSVCutPuppi  = 0.17;
 const float OnlineCSVCutPF        = 0.7;
-const float OnlineCSVCutCalo      = 0.5;
-const float OnlineCSVCutPuppi      = 0.5;
+//const float OnlineCSVCutCalo      = 0.5;
+//const float OnlineCSVCutPuppi      = 0.5;
 
 
 // 2017
@@ -49,42 +49,51 @@ const float drTrackToJet = 0.25;
 
 
 
-BTagAnalysis::BTagAnalysis(TChain* _eventsRAW, TChain* _eventsAOD, fwlite::TFileService& fs, bool _isMC, std::string _year, int _histogramming, bool _debug, std::string PUFileName, std::string jetDetailString, const edm::ParameterSet& nnConfig, std::string pfJetName){
-  if(_debug) cout<<"In BTagAnalysis constructor"<<endl;
+
+
+
+
+BTagAnalysis::BTagAnalysis(TChain* eventsRAW, TChain* eventsAOD, fwlite::TFileService& fs, bool _isMC, std::string _year, int _histogramming, bool _debug, std::string PUFileName, std::string jetDetailString, const edm::ParameterSet& nnConfig, std::string pfJetName){
+  if(_debug) cout<<"In BTagAnalysis constructor: RAW: "<< eventsRAW << " AOD: " << eventsAOD << endl;
   debug      = _debug;
   isMC       = _isMC;
   year       = _year;
-  eventsRAW     = _eventsRAW;
   eventsRAW->SetBranchStatus("*", 0);
 
-  eventsAOD     = _eventsAOD;
-  eventsAOD->SetBranchStatus("*", 0);
+  if(!eventsAOD){
+    doTree2 = false;
+  }
 
+  if(doTree2) eventsAOD->SetBranchStatus("*", 0);
+  
 
   histogramming = _histogramming;
 
-  doTracks = jetDetailString.find("Tracks") != std::string::npos;
-  doCaloJets = jetDetailString.find("CaloJets") != std::string::npos;
-  doPuppiJets = jetDetailString.find("PuppiJets") != std::string::npos;
+  doTracks    = jetDetailString.find("Tracks")    != std::string::npos;
+  //doCaloJets  = jetDetailString.find("CaloJets")  != std::string::npos;
+  //doPuppiJets = jetDetailString.find("PuppiJets") != std::string::npos;
 
+  if(_debug) cout<<"Making eventData"<<endl;
   event      = new eventData(eventsRAW, eventsAOD, isMC, year, debug, jetDetailString, pfJetName);
   treeEvents = eventsRAW->GetEntries();
 
+  if(_debug) cout<<"Making cutflow"<<endl;
   cutflow    = new nTupleAnalysis::cutflowHists("cutflow", fs);
   cutflow->AddCut("all");
-  cutflow->AddCut("foundMatch");
+  if(doTree2) cutflow->AddCut("foundMatch");
   if(doLeptonSel){
     cutflow->AddCut("passMuonCut");
     cutflow->AddCut("passElecCut");
     cutflow->AddCut("passLeptonCut");
   }
-  cutflow->AddCut("passNJetCut");
+  if(doTree2) cutflow->AddCut("passNJetCut");
   if(doOfflineBTagCut)
     cutflow->AddCut("passNBJetCut");
 
   //
   //  Jets
   //
+  if(_debug) cout<<"Making cutflowJets"<<endl;
   cutflowJets    = new nTupleAnalysis::cutflowHists("cutflowJets", fs);
   cutflowJets->AddCut("all");
   cutflowJets->AddCut("eta");
@@ -92,14 +101,17 @@ BTagAnalysis::BTagAnalysis(TChain* _eventsRAW, TChain* _eventsAOD, fwlite::TFile
   cutflowJets->AddCut("muonOlap");
   cutflowJets->AddCut("elecOlap");
   cutflowJets->AddCut("isProbe");
-  cutflowJets->AddCut("hasHLTMatchPF");
-  cutflowJets->AddCut("hasHLTMatchCalo");
-  cutflowJets->AddCut("hasHLTMatchPuppi");
+  if(doTree2){
+    cutflowJets->AddCut("hasHLTMatchPF");
+    //cutflowJets->AddCut("hasHLTMatchCalo");
+    //cutflowJets->AddCut("hasHLTMatchPuppi");
+  }
 
 
   //
   // hists
   //
+  if(_debug) cout<<"Making hists"<<endl;
   dir = fs.mkdir("BTagAnalysis");
 
   hAllMuons = new nTupleAnalysis::muonHists("AllMuons", fs, "All Muons");
@@ -114,20 +126,6 @@ BTagAnalysis::BTagAnalysis(TChain* _eventsRAW, TChain* _eventsAOD, fwlite::TFile
 
   hOffJetsPreOLap         = new nTupleAnalysis::jetHists("offJetsPreOLap",        fs, "Pre Overlap");
 
-  PFJetHists         = new jetAnalysisHists("off","pf", "PF", fs, jetDetailString, isMC);
-  PFJetHists_PVMatch = new jetAnalysisHists("off","pf", "PF", fs, jetDetailString, isMC, "_PVMatch");
-
-
-  if(doCaloJets){
-    CaloJetHists         = new jetAnalysisHists("offCalo","calo", "Calo", fs, jetDetailString, isMC);
-    CaloJetHists_PVMatch = new jetAnalysisHists("offCalo","calo", "Calo", fs, jetDetailString, isMC, "_PVMatch");
-  }
-
-  if(doPuppiJets){
-    PuppiJetHists         = new jetAnalysisHists("offPuppi","puppi", "Puppi", fs, jetDetailString, isMC);
-    PuppiJetHists_PVMatch = new jetAnalysisHists("offPuppi","puppi", "Puppi", fs, jetDetailString, isMC, "_PVMatch");
-  }
-
   bool doEtaRegions = jetDetailString.find("EtaRegions") != std::string::npos;
   std::vector<float> etaBins = {1.5,3.0};
 
@@ -136,22 +134,16 @@ BTagAnalysis::BTagAnalysis(TChain* _eventsRAW, TChain* _eventsAOD, fwlite::TFile
 
   hOffJets                = new nTupleAnalysis::jetHists("offJets",               fs, "", jetDetailString);
   if(isMC) hOffJets_Truth      = new jetHistsTruthMatched("offJets",    fs, jetDetailString, etaBins);
-    
 
-  hPfJets          = new nTupleAnalysis::jetHists("pfJets",           fs, "");
-  if(isMC) hPfJets_Truth      = new jetHistsTruthMatched("pfJets",    fs, jetDetailString, etaBins);
+  if(doTree2){
+    PFJetHists         = new jetAnalysisHists("off","pf", "PF", fs, jetDetailString, isMC);
+    PFJetHists_PVMatch = new jetAnalysisHists("off","pf", "PF", fs, jetDetailString, isMC, "_PVMatch");
 
-  hPfJets_matched  = new nTupleAnalysis::jetHists("pfJets_matched",           fs, "");
-  hDeltaROffPf       = dir.make<TH1F>("dR_OffPf",            "BTagAnalysis/dR_OffPf;             DeltaR;   Entries", 100,-0.01, 5);
+    hPfJets          = new nTupleAnalysis::jetHists("pfJets",           fs, "");
+    if(isMC) hPfJets_Truth      = new jetHistsTruthMatched("pfJets",    fs, jetDetailString, etaBins);
 
-  if(doCaloJets){
-    hCaloJets            = new nTupleAnalysis::jetHists("caloJets",           fs, "");
-    hCaloJets_matched    = new nTupleAnalysis::jetHists("caloJets_matched",           fs, "");
-  }
-
-  if(doPuppiJets){
-    hPuppiJets            = new nTupleAnalysis::jetHists("puppiJets",           fs, "");
-    hPuppiJets_matched    = new nTupleAnalysis::jetHists("puppiJets_matched",           fs, "");
+    hPfJets_matched  = new nTupleAnalysis::jetHists("pfJets_matched",           fs, "");
+    hDeltaROffPf       = dir.make<TH1F>("dR_OffPf",            "BTagAnalysis/dR_OffPf;             DeltaR;   Entries", 100,-0.01, 5);
   }
 
   if(doTracks){
@@ -184,11 +176,11 @@ BTagAnalysis::BTagAnalysis(TChain* _eventsRAW, TChain* _eventsAOD, fwlite::TFile
   hVtx       ->makeDiffHists("hltVtx", fs, "HLT Vtx");
   hOffVtx    = new nTupleAnalysis::vertexHists("offVtx", fs, "Off Vtx");
 
-
-  hVtx_PVMatch       = new nTupleAnalysis::vertexHists("hltVtx_PVMatch", fs, "HLT Vtx (PV Match)");
-  hVtx_PVMatch       ->makeDiffHists("hltVtx_PVMatch", fs, "HLT Vtx (PV Match)");
-  hOffVtx_PVMatch    = new nTupleAnalysis::vertexHists("offVtx_PVMatch", fs, "Off Vtx (PV Match");
-
+  if(doTree2){
+    hVtx_PVMatch       = new nTupleAnalysis::vertexHists("hltVtx_PVMatch", fs, "HLT Vtx (PV Match)");
+    hVtx_PVMatch       ->makeDiffHists("hltVtx_PVMatch", fs, "HLT Vtx (PV Match)");
+    hOffVtx_PVMatch    = new nTupleAnalysis::vertexHists("offVtx_PVMatch", fs, "Off Vtx (PV Match");
+  }
 
   //
   //  Configure Selection
@@ -228,7 +220,7 @@ BTagAnalysis::BTagAnalysis(TChain* _eventsRAW, TChain* _eventsAOD, fwlite::TFile
   }else{
     neuralNet = nullptr;
   }
-
+  if(_debug) cout<<"Leave constructor"<<endl;
 }
 
 
@@ -306,13 +298,15 @@ int BTagAnalysis::processEvent(){
 
   cutflow->Fill("all", 1.0);
 
-  if(event->run != event->runAOD)
-    return 0;
+  if(doTree2){
+    if(event->run != event->runTree2)
+      return 0;
 
-  if(event->event != event->eventAOD)
-    return 0;
+    if(event->event != event->eventTree2)
+      return 0;
 
-  cutflow->Fill("foundMatch", 1.0);
+    cutflow->Fill("foundMatch", 1.0);
+  }
 
   if(debug) cout << "Fill/Select Muons" << endl;
   std::vector<nTupleAnalysis::muonPtr> selMuons;
@@ -325,8 +319,6 @@ int BTagAnalysis::processEvent(){
   }
   hAllMuons->nMuons->Fill(event->muons.size());
   hSelMuons->nMuons->Fill(selMuons.size());
-
-
 
 
   if(debug) cout << "Fill/Select Elecs" << endl;
@@ -367,7 +359,7 @@ int BTagAnalysis::processEvent(){
   float eventWeight = 1.0;
   float puWeight    = 1.0;
   if(isMC && pileUpTool){
-    puWeight = pileUpTool->getWeight(event->offPVs.size());
+    puWeight = pileUpTool->getWeight(event->pvsTree1.size());
     eventWeight =  puWeight;
     if(doLeptonSel)
       eventWeight *= (selElecs.at(0)->SF * selMuons.at(0)->SF);
@@ -383,8 +375,7 @@ int BTagAnalysis::processEvent(){
   unsigned int nOffJetsForCut = 0;
   unsigned int nOffJetsTaggedForCut = 0;
   float totalSFWeight = 1.0;
-  for(const nTupleAnalysis::jetPtr& offJet : event->offJets){
-
+  for(const nTupleAnalysis::jetPtr& offJet : event->jetCol1){
 
     for(const nTupleAnalysis::trkTagVarPtr& trkTag: offJet->trkTagVars) {
       hOffBTagsAll->FillTrkTagVarHists(trkTag, eventWeight);
@@ -394,7 +385,6 @@ int BTagAnalysis::processEvent(){
     if(absEta > maxJetAbsEta || absEta < minJetAbsEta) continue;
     if(offJet->pt       < minJetPt)   continue;
     if(offJet->deepFlavB  < minJetDeepJet)   continue;
-
 
     if(nTupleAnalysis::failOverlap(offJet->p,event->elecs,0.4)) continue;
     if(nTupleAnalysis::failOverlap(offJet->p,event->muons,0.4)) continue;
@@ -406,13 +396,14 @@ int BTagAnalysis::processEvent(){
       totalSFWeight *= offJet->SF;
   }
 
-  if(nOffJetsForCut < 2      ){
-    if(debug) cout << "Fail NJet Cut" << endl;
-    return 0;
+  if(doTree2){
+     if(nOffJetsForCut < 2      ){
+       if(debug) cout << "Fail NJet Cut" << endl;
+       return 0;
+     }
+     cutflow->Fill("passNJetCut", eventWeight);
+     if(debug) cout << "Pass NJet Cut " << endl;
   }
-  cutflow->Fill("passNJetCut", eventWeight);
-  if(debug) cout << "Pass NJet Cut " << endl;
-
 
   if(doOfflineBTagCut){
 
@@ -428,7 +419,6 @@ int BTagAnalysis::processEvent(){
   if(isMC)
     eventWeight *= totalSFWeight;
 
-
   if(debug) cout << "Fill Leptons " << endl;
   hMuons->nMuons->Fill(event->muons.size());
   for(auto muon: event->muons)
@@ -443,24 +433,24 @@ int BTagAnalysis::processEvent(){
   // Fill All events
   //
   if(debug) cout << "Fill All Events " << endl;
-  hEvents->Fill(event->offPVs.size(),  0.0, eventWeight);
+  hEvents->Fill(event->pvsTree1.size(),  0.0, eventWeight);
   if(puWeight)
-    hEventsNoPUWeight->Fill(event->offPVs.size(),  0.0, eventWeight/puWeight);
+    hEventsNoPUWeight->Fill(event->pvsTree1.size(),  0.0, eventWeight/puWeight);
 
-  hVtx      ->Fill(event->pvs, eventWeight);
-  hVtx      ->FillDiffHists(event->pvs, event->offPVs, eventWeight);
-  hOffVtx   ->Fill(event->offPVs, eventWeight);
+  hVtx      ->Fill(event->pvsTree2, eventWeight);
+  hVtx      ->FillDiffHists(event->pvsTree2, event->pvsTree1, eventWeight);
+  hOffVtx   ->Fill(event->pvsTree1, eventWeight);
 
   bool hltVtxMatch = false;
-  if(event->pvs.size() > 0 && event->offPVs.size() > 0){
-    if( fabs(event->pvs.at(0)->z - event->offPVs.at(0)->z) < 0.02)
+  if(event->pvsTree2.size() > 0 && event->pvsTree1.size() > 0){
+    if( fabs(event->pvsTree2.at(0)->z - event->pvsTree1.at(0)->z) < 0.02)
       hltVtxMatch = true;
   }
 
   if(hltVtxMatch){
-    hVtx_PVMatch      ->Fill(event->pvs, eventWeight);
-    hVtx_PVMatch      ->FillDiffHists(event->pvs, event->offPVs, eventWeight);
-    hOffVtx_PVMatch   ->Fill(event->offPVs, eventWeight);
+    hVtx_PVMatch      ->Fill(event->pvsTree2, eventWeight);
+    hVtx_PVMatch      ->FillDiffHists(event->pvsTree2, event->pvsTree1, eventWeight);
+    hOffVtx_PVMatch   ->Fill(event->pvsTree1, eventWeight);
   }
     
 
@@ -470,12 +460,12 @@ int BTagAnalysis::processEvent(){
   unsigned int nOffJetsPreOLap      = 0;
   unsigned int nOffJets             = 0;
   unsigned int nOffJets_matched     = 0;
-  unsigned int nOffJets_matchedCalo = 0;
-  unsigned int nOffJets_matchedPuppi = 0;
+  //unsigned int nOffJets_matchedCalo = 0;
+  //unsigned int nOffJets_matchedPuppi = 0;
   vector<unsigned int> usedJetIndex;
 
   if(debug) cout << "Starting off jets loop  " << endl;
-  for(const nTupleAnalysis::jetPtr& offJet : event->offJets){
+  for(const nTupleAnalysis::jetPtr& offJet : event->jetCol1){
     cutflowJets->Fill("all", eventWeight);
 
     float absEta = fabs(offJet->eta);
@@ -510,7 +500,7 @@ int BTagAnalysis::processEvent(){
         //const JetData* tagJet = nullptr;
     
         if(debug) cout << "Starting off jets loop for probe check " << endl;
-        for(const nTupleAnalysis::jetPtr& offJetOther : event->offJets){
+        for(const nTupleAnalysis::jetPtr& offJetOther : event->jetCol1){
           if(offJetOther == offJet) continue;
     
     
@@ -570,324 +560,149 @@ int BTagAnalysis::processEvent(){
       cout << "Error " << "Offline" << " DeepCSVbb is " << offJet->DeepCSVbb << endl;
 
 
-    // Match offline to online
-    float dR = 1e6;
-    nTupleAnalysis::jetPtr matchedJet = nullptr;
+    // Match tree1 to tree2
+    if(doTree2){
 
-    unsigned int pfJetIndex = 0;
-    unsigned int pfJetIndexMatch = 0;
+      float dR = 1e6;
+      nTupleAnalysis::jetPtr matchedJet = nullptr;
 
-    if(debug) cout << "Matching to PF jets " << endl;
-    for(const nTupleAnalysis::jetPtr& pfJet : event->pfJets){
-      ++pfJetIndex;
-      if(pfJet->pt       < minJetPt)   {
-	continue;
+      unsigned int pfJetIndex = 0;
+      unsigned int pfJetIndexMatch = 0;
+
+      if(debug) cout << "Matching to PF jets " << endl;
+      for(const nTupleAnalysis::jetPtr& pfJet : event->jetCol2){
+	++pfJetIndex;
+	if(pfJet->pt       < minJetPt)   {
+	  continue;
+	}
+	float absEta = fabs(pfJet->eta);
+	if(absEta > maxJetAbsEta || absEta < minJetAbsEta) continue;
+
+	if(debug) cout << " new jet " << endl;
+	float this_dR = pfJet->p.DeltaR(offJet->p);
+	if(debug) cout << " this dR " << this_dR << endl;
+	if (this_dR < dR){
+	  dR = this_dR;
+	  matchedJet = pfJet;
+	  pfJetIndexMatch = pfJetIndex;
+	}
       }
-      float absEta = fabs(pfJet->eta);
-      if(absEta > maxJetAbsEta || absEta < minJetAbsEta) continue;
 
-      if(debug) cout << " new jet " << endl;
-      float this_dR = pfJet->p.DeltaR(offJet->p);
-      if(debug) cout << " this dR " << this_dR << endl;
-      if (this_dR < dR){
-	dR = this_dR;
-	matchedJet = pfJet;
-	pfJetIndexMatch = pfJetIndex;
+
+      hDeltaROffPf->Fill(dR,eventWeight);
+
+      bool hasValidMatch = (dR < 0.2);
+
+      if(find(usedJetIndex.begin(), usedJetIndex.end(), pfJetIndexMatch) != usedJetIndex.end()){
+	if(debug) cout << "Using Jet again !"  <<endl;
+	hasValidMatch = false;
+      }else{
+	usedJetIndex.push_back(pfJetIndexMatch);
       }
-    }
-
-
-    hDeltaROffPf->Fill(dR,eventWeight);
-
-    bool hasValidMatch = (dR < 0.2);
-
-    if(find(usedJetIndex.begin(), usedJetIndex.end(), pfJetIndexMatch) != usedJetIndex.end()){
-      if(debug) cout << "Using Jet again !"  <<endl;
-      hasValidMatch = false;
-    }else{
-      usedJetIndex.push_back(pfJetIndexMatch);
-    }
     
-    //
-    //  Have PF Match
-    //
-    if( hasValidMatch){
+      //
+      //  Have PF Match
+      //
+      if( hasValidMatch){
       
 
 
-      if(debug) cout << "Have a PF jet match " << endl;
-      cutflowJets->Fill("hasHLTMatchPF", eventWeight);
-      offJet->matchedJet = matchedJet;
+	if(debug) cout << "Have a PF jet match " << endl;
+	cutflowJets->Fill("hasHLTMatchPF", eventWeight);
+	offJet->matchedJet = matchedJet;
 
-      //
-      // Testing Neural Net
-      //
-      if(neuralNet){
-	if(debug) cout << "Testing the NN " << endl;
+	//
+	// Testing Neural Net
+	//
+	if(neuralNet){
+	  if(debug) cout << "Testing the NN " << endl;
 
-	lwt::ValueMap nnout = neuralNet->compute(matchedJet);
-	float DeepCSV_reCalc = nnout["probb"] + nnout["probbb"];
-        matchedJet->DeepCSV_reCalc = DeepCSV_reCalc;
+	  lwt::ValueMap nnout = neuralNet->compute(matchedJet);
+	  float DeepCSV_reCalc = nnout["probb"] + nnout["probbb"];
+	  matchedJet->DeepCSV_reCalc = DeepCSV_reCalc;
 
-	if(fabs(DeepCSV_reCalc - matchedJet->DeepCSV) > 0.001){
-	  cout << "Event: " << event->event << endl;
-	  cout << "DeepCSV_reCalc: " << DeepCSV_reCalc << " vs " << matchedJet->DeepCSV << endl;
-	  nnout = neuralNet->compute(matchedJet, true);
+	  if(fabs(DeepCSV_reCalc - matchedJet->DeepCSV) > 0.001){
+	    cout << "Event: " << event->event << endl;
+	    cout << "DeepCSV_reCalc: " << DeepCSV_reCalc << " vs " << matchedJet->DeepCSV << endl;
+	    nnout = neuralNet->compute(matchedJet, true);
+	  }
 	}
-      }
 
 
-      if(debug) cout << "Doing PFJetAnalysis " << endl;
-      PFJetHists->Fill(this, offJet, matchedJet, eventWeight, isMC, 
-		       OfflineDeepCSVLooseCut, OfflineDeepCSVMediumCut, OfflineDeepCSVTightCut, 
-		       OfflineDeepFlavourMediumCut,
-		       OnlineCSVCutPF, OnlineDeepCSVCutPF, 
-		       debug);
+	if(debug) cout << "Doing PFJetAnalysis " << endl;
+	PFJetHists->Fill(this, offJet, matchedJet, eventWeight, isMC, 
+			 OfflineDeepCSVLooseCut, OfflineDeepCSVMediumCut, OfflineDeepCSVTightCut, 
+			 OfflineDeepFlavourMediumCut,
+			 OnlineCSVCutPF, OnlineDeepCSVCutPF, 
+			 debug);
 
-      if(hltVtxMatch)
-	PFJetHists_PVMatch->Fill(this, offJet, matchedJet, eventWeight, isMC, 
-				 OfflineDeepCSVLooseCut, OfflineDeepCSVMediumCut, OfflineDeepCSVTightCut, 
-				 OfflineDeepFlavourMediumCut,
-				 OnlineCSVCutPF, OnlineDeepCSVCutPF, 
-				 debug);
+	if(hltVtxMatch)
+	  PFJetHists_PVMatch->Fill(this, offJet, matchedJet, eventWeight, isMC, 
+				   OfflineDeepCSVLooseCut, OfflineDeepCSVMediumCut, OfflineDeepCSVTightCut, 
+				   OfflineDeepFlavourMediumCut,
+				   OnlineCSVCutPF, OnlineDeepCSVCutPF, 
+				   debug);
       
 
-      ++nOffJets_matched;
+	++nOffJets_matched;
 
 
-    }//offJet has match
+      }//offJet has match
 
+    }//doTree2
 
-    //
-    //  Calo Jets
-    //
-    if(doCaloJets){
-      float dRCalo = 1e6;
-      nTupleAnalysis::jetPtr matchedCaloJet = nullptr;
-
-      for(const nTupleAnalysis::jetPtr& caloJet : event->caloJets){
-	float this_dR = caloJet->p.DeltaR(offJet->p);
-	if (this_dR < dRCalo){
-	  dRCalo = this_dR;
-	  matchedCaloJet = caloJet;
-	}
-      }
-
-
-      if( dRCalo < 0.4){
-
-	cutflowJets->Fill("hasHLTMatchCalo", eventWeight);
-
-	CaloJetHists->Fill(this, offJet, matchedCaloJet, eventWeight, isMC, 
-			   OfflineDeepCSVLooseCut, OfflineDeepCSVMediumCut, OfflineDeepCSVTightCut, 
-			   OfflineDeepFlavourMediumCut,
-			   OnlineCSVCutCalo, OnlineDeepCSVCutCalo, 
-			   debug);
-
-	if(hltVtxMatch)
-	  CaloJetHists_PVMatch->Fill(this, offJet, matchedCaloJet, eventWeight, isMC, 
-				     OfflineDeepCSVLooseCut, OfflineDeepCSVMediumCut, OfflineDeepCSVTightCut, 
-				     OfflineDeepFlavourMediumCut,
-				     OnlineCSVCutCalo, OnlineDeepCSVCutCalo, 
-				     debug);
-	
-	++nOffJets_matchedCalo;
-      }
-    }
-
-    //
-    //  Puppi Jets
-    //
-    if(doPuppiJets){
-      float dRPuppi = 1e6;
-      nTupleAnalysis::jetPtr matchedPuppiJet = nullptr;
-
-      for(const nTupleAnalysis::jetPtr& puppiJet : event->puppiJets){
-	float this_dR = puppiJet->p.DeltaR(offJet->p);
-	if (this_dR < dRPuppi){
-	  dRPuppi = this_dR;
-	  matchedPuppiJet = puppiJet;
-	}
-      }
-
-
-      if( dRPuppi < 0.4){
-
-	cutflowJets->Fill("hasHLTMatchPuppi", eventWeight);
-	offJet->matchedJet = matchedPuppiJet;
-
-	PuppiJetHists->Fill(this, offJet, matchedPuppiJet, eventWeight, isMC, 
-			    OfflineDeepCSVLooseCut, OfflineDeepCSVMediumCut, OfflineDeepCSVTightCut, 
-			    OfflineDeepFlavourMediumCut,
-			    OnlineCSVCutPuppi, OnlineDeepCSVCutPuppi, 
-			    debug);
-	if(hltVtxMatch)
-	  PuppiJetHists_PVMatch->Fill(this, offJet, matchedPuppiJet, eventWeight, isMC, 
-				      OfflineDeepCSVLooseCut, OfflineDeepCSVMediumCut, OfflineDeepCSVTightCut, 
-				      OfflineDeepFlavourMediumCut,
-				      OnlineCSVCutPuppi, OnlineDeepCSVCutPuppi, 
-				      debug);
-
-
-	++nOffJets_matchedPuppi;
-      }
-    }
   }//offJets
 
 
   hOffJetsPreOLap    ->nJets->Fill(nOffJetsPreOLap ,eventWeight);
   hOffJets           ->nJets->Fill(nOffJets        ,eventWeight);
 
-  PFJetHists->hOffJets_matched     ->nJets->Fill(nOffJets_matched,eventWeight);
-  PFJetHists->hOffJets_matchedJet  ->nJets->Fill(nOffJets_matched,eventWeight);
-
-  if(doCaloJets){
-    CaloJetHists->hOffJets_matched   ->nJets->Fill(nOffJets_matchedCalo,eventWeight);
-    CaloJetHists->hOffJets_matchedJet->nJets->Fill(nOffJets_matchedCalo,eventWeight);
+  if(PFJetHists){
+    PFJetHists->hOffJets_matched     ->nJets->Fill(nOffJets_matched,eventWeight);
+    PFJetHists->hOffJets_matchedJet  ->nJets->Fill(nOffJets_matched,eventWeight);
   }
-
-  if(doPuppiJets){
-    PuppiJetHists->hOffJets_matched   ->nJets->Fill(nOffJets_matchedPuppi,eventWeight);
-    PuppiJetHists->hOffJets_matchedJet->nJets->Fill(nOffJets_matchedPuppi,eventWeight);
-  }
-
 
 
   //
   //  pf Jets
   //
-  for(const nTupleAnalysis::jetPtr& pfJet : event->pfJets){
+  if(doTree2){
+    for(const nTupleAnalysis::jetPtr& pfJet : event->jetCol2){
 
-    float absEta = fabs(pfJet->eta);
-    if(absEta > maxJetAbsEta || absEta < minJetAbsEta) continue;
-
-    if(pfJet->pt       < minJetPt)   continue;
-    if(pfJet->deepFlavB  < minJetDeepJet)   continue;
-    //pfJetHistsPreOLap.Fill(pfJet);
-
-    if(nTupleAnalysis::failOverlap(pfJet->p,event->elecs, 0.4)) continue;
-    if(nTupleAnalysis::failOverlap(pfJet->p,event->muons, 0.4)) continue;
-
-    hPfJets->Fill(pfJet, eventWeight);
-    if(isMC){
-      //cout << pfJet->hadronFlavour << endl;
-      hPfJets_Truth   ->Fill(pfJet, pfJet->hadronFlavour, pfJet->flavourCleaned, eventWeight, pfJet->p.Eta());
-    }
-
-
-    const nTupleAnalysis::jetPtr pfJetMatchedJet = pfJet->matchedJet.lock();
-    if(pfJetMatchedJet){
-      hPfJets_matched->Fill(pfJet, eventWeight);
-
-      //if(isMC){
-      //	if( pfJetMatchedJet->hadronFlavour == 5){
-      //	  hPfJets_matched_B->Fill(pfJet, eventWeight);
-      //	}else if( pfJetMatchedJet->hadronFlavour == 4){
-      //	  hPfJets_matched_C->Fill(pfJet, eventWeight);
-      //	}else if( pfJetMatchedJet->hadronFlavour == 0){
-      //	  hPfJets_matched_L->Fill(pfJet, eventWeight);
-      //	}
-      //}
-    }
-  }
-
-  //
-  //  calo Jets
-  //
-
-  if(doCaloJets){
-    for(const nTupleAnalysis::jetPtr& caloJet : event->caloJets){
-
-      float absEta = fabs(caloJet->eta);
+      float absEta = fabs(pfJet->eta);
       if(absEta > maxJetAbsEta || absEta < minJetAbsEta) continue;
 
-      if(caloJet->pt       < minJetPt)   continue;
+      if(pfJet->pt       < minJetPt)   continue;
+      if(pfJet->deepFlavB  < minJetDeepJet)   continue;
+      //pfJetHistsPreOLap.Fill(pfJet);
 
-      //caloJetHistsPreOLap.Fill(caloJet);
-      if(nTupleAnalysis::failOverlap(caloJet->p,event->elecs, 0.4)) continue;
-      if(nTupleAnalysis::failOverlap(caloJet->p,event->muons, 0.4)) continue;
+      if(nTupleAnalysis::failOverlap(pfJet->p,event->elecs, 0.4)) continue;
+      if(nTupleAnalysis::failOverlap(pfJet->p,event->muons, 0.4)) continue;
 
-      hCaloJets->Fill(caloJet, eventWeight);
-
-      if(caloJet->DeepCSV > 1){
-	       cout << "Error " << "Offline" << " DeepCSV is " << caloJet->DeepCSV << endl;
-       }
-
-      if(caloJet->DeepCSVb > 1){
-  	     cout << "Error " << "Offline" << " DeepCSVb is " << caloJet->DeepCSVb << endl;
-       }
-
-      if(caloJet->DeepCSVbb > 1){
-	       cout << "Error " << "Offline" << " DeepCSVbb is " << caloJet->DeepCSVbb << endl;
-      }
-
-      if(caloJet->DeepCSVb > 1){
-        std::cout << "Error " << "Offline" << " DeepCSVb is " << caloJet->DeepCSVb << std::endl;
+      hPfJets->Fill(pfJet, eventWeight);
+      if(isMC){
+	//cout << pfJet->hadronFlavour << endl;
+	hPfJets_Truth   ->Fill(pfJet, pfJet->hadronFlavour, pfJet->flavourCleaned, eventWeight, pfJet->p.Eta());
       }
 
 
-      const nTupleAnalysis::jetPtr caloJetMatchedJet = caloJet->matchedJet.lock();
-      if(caloJetMatchedJet){
-	hCaloJets_matched->Fill(caloJet, eventWeight);
+      const nTupleAnalysis::jetPtr pfJetMatchedJet = pfJet->matchedJet.lock();
+      if(pfJetMatchedJet){
+	hPfJets_matched->Fill(pfJet, eventWeight);
 
-	//if(caloJet->m_matchedJet->m_hadronFlavour == 5)
-	//	caloJetHists_matchedB.Fill(caloJet);
-	//	else
-	//	  caloJetHists_matchedL.Fill(caloJet);
+	//if(isMC){
+	//	if( pfJetMatchedJet->hadronFlavour == 5){
+	//	  hPfJets_matched_B->Fill(pfJet, eventWeight);
+	//	}else if( pfJetMatchedJet->hadronFlavour == 4){
+	//	  hPfJets_matched_C->Fill(pfJet, eventWeight);
+	//	}else if( pfJetMatchedJet->hadronFlavour == 0){
+	//	  hPfJets_matched_L->Fill(pfJet, eventWeight);
+	//	}
+	//}
       }
     }
-  }
 
-  //
-  //  Puppi Jets
-  //
-
-  if(doPuppiJets){
-    for(const nTupleAnalysis::jetPtr& puppiJet : event->puppiJets){
-
-      float absEta = fabs(puppiJet->eta);
-      if(absEta > maxJetAbsEta || absEta < minJetAbsEta) continue;
-
-      if(puppiJet->pt       < minJetPt)   continue;
-
-      //puppiJetHistsPreOLap.Fill(puppiJet);
-      if(nTupleAnalysis::failOverlap(puppiJet->p,event->elecs, 0.4)) continue;
-      if(nTupleAnalysis::failOverlap(puppiJet->p,event->muons, 0.4)) continue;
-
-      hPuppiJets->Fill(puppiJet, eventWeight);
-
-      if(puppiJet->DeepCSV > 1){
-	       cout << "Error " << "Offline" << " DeepCSV is " << puppiJet->DeepCSV << endl;
-      }
-
-      if(puppiJet->DeepCSVb > 1){
-	       cout << "Error " << "Offline" << " DeepCSVb is " << puppiJet->DeepCSVb << endl;
-       }
-
-      if(puppiJet->DeepCSVbb > 1){
-	       cout << "Error " << "Offline" << " DeepCSVbb is " << puppiJet->DeepCSVbb << endl;
-       }
-
-    if(puppiJet->DeepCSVb > 1){
-      std::cout << "Error " << "Offline" << " DeepCSVb is " << puppiJet->DeepCSVb << std::endl;
-    }
-
-
-      const nTupleAnalysis::jetPtr puppiJetMatchedJet = puppiJet->matchedJet.lock();
-      if(puppiJetMatchedJet){
-      	hPuppiJets_matched->Fill(puppiJet, eventWeight);
-
-      	//if(puppiJet->m_matchedJet->m_hadronFlavour == 5)
-      	//	puppiJetHists_matchedB.Fill(puppiJet);
-      	//	else
-      	//	  puppiJetHists_matchedL.Fill(puppiJet);
-      }
-    }
-  }
-
-
-
-
+  }//doTree2
 
 
 

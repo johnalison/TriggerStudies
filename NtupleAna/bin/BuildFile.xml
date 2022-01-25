@@ -12,7 +12,7 @@
 <environment>
   <bin   file="BTagAnalyzer.cc"></bin>
   <bin   file="HH4bTriggerStudy.cc"></bin>
-  <bin   file="BTagAnalyzerHLT.cc"></bin>
+  <!--<bin   file="BTagAnalyzerHLT.cc"></bin> -->
   <!--<bin   file="TrunOnStudy.cc"></bin>-->
   <!--<bin   file="FWLiteHistograms.cc"></bin>       -->
   <!--<bin   file="FWLiteWithPythonConfig.cc"></bin> -->

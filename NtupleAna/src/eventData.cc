@@ -6,175 +6,161 @@ using namespace TriggerStudies;
 using std::cout;  using std::endl;
 
 
-eventData::eventData(TChain* _treeRAW, TChain* _treeAOD, bool mc, std::string y, bool d, std::string jetDetailLevel, std::string pfJetName){
-  std::cout << "eventData::eventData()" << std::endl;
-  treeRAW  = _treeRAW;
-  treeAOD  = _treeAOD;
+eventData::eventData(TChain* _tree1, TChain* _tree2, bool mc, std::string y, bool d, std::string jetDetailLevel, std::string pfJetName){
+  std::cout << "eventData::eventData()" << _tree1 << " " << _tree2 << std::endl;
+  tree1  = _tree1;
+  tree2  = _tree2;
 
-  if(!treeAOD){
-    cout << "eventData::Only loading HLT data! " << endl;
-    doOffline = false;
+  if(!tree2){
+    cout << "eventData::Only loading data from file1 ! " << endl;
+    doTree2 = false;
   }
 
   isMC  = mc;
   year  = y;
   debug = d;
 
-  doCaloJets = jetDetailLevel.find("CaloJets") != std::string::npos;
-  doPuppiJets = jetDetailLevel.find("PuppiJets") != std::string::npos;
+  //doCaloJets = jetDetailLevel.find("CaloJets") != std::string::npos;
+  //doPuppiJets = jetDetailLevel.find("PuppiJets") != std::string::npos;
 
   bool checkEventDiffs = false;
-  if(checkEventDiffs && doOffline){
+  if(checkEventDiffs && doTree2){
 
     //
-    // Get All events in AOD
+    // Get All events in Tree2
     //
-    inputBranch(treeAOD, "Run",             runAOD);
-    inputBranch(treeAOD, "Evt",           eventAOD);
+    inputBranch(tree2, "Run",             runTree2);
+    inputBranch(tree2, "Evt",           eventTree2);
 
 
-    treeEventsAOD = treeAOD->GetEntries();
+    treeEventsTree2 = tree2->GetEntries();
 
-    for(long int eAOD = 0; eAOD < treeEventsAOD; eAOD++){
-      treeAOD->GetEntry(eAOD);
-      AODEvents.push_back(std::make_pair(runAOD, eventAOD));
+    for(long int eTree2 = 0; eTree2 < treeEventsTree2; eTree2++){
+      tree2->GetEntry(eTree2);
+      Tree2Events.push_back(std::make_pair(runTree2, eventTree2));
     }
 
     //
-    // Get All events in RAW
+    // Get All events in Tree1
     //
-    inputBranch(treeRAW, "Run",             run);
-    inputBranch(treeRAW, "Evt",           event);
-    int treeEventsRAW = treeRAW->GetEntries();
+    inputBranch(tree1, "Run",             run);
+    inputBranch(tree1, "Evt",           event);
+    int treeEventsTree1 = tree1->GetEntries();
 
-    RunEventMap RAWEvents;
-    for(long int eRAW = 0; eRAW < treeEventsRAW; eRAW++){
-      treeRAW->GetEntry(eRAW);
-      RAWEvents.push_back(std::make_pair(run, event));
+    RunEventMap Tree1Events;
+    for(long int eTree1 = 0; eTree1 < treeEventsTree1; eTree1++){
+      tree1->GetEntry(eTree1);
+      Tree1Events.push_back(std::make_pair(run, event));
     }
 
     //
-    // Events in AOD but not in RAW
+    // Events in Tree2 but not in Tree1
     //
-    std::cout << "Events in AOD but not in RAW"  << std::endl;
-    for (auto AODPair : AODEvents) {
-      bool inRAW = false;
-      for (auto RAWPair : RAWEvents ){
-	if(AODPair.first  != RAWPair.first) continue;
-	if(AODPair.second != RAWPair.second) continue;
-	inRAW = true;
+    std::cout << "Events in Tree2 but not in Tree1"  << std::endl;
+    for (auto Tree2Pair : Tree2Events) {
+      bool inTree1 = false;
+      for (auto Tree1Pair : Tree1Events ){
+	if(Tree2Pair.first  != Tree1Pair.first) continue;
+	if(Tree2Pair.second != Tree1Pair.second) continue;
+	inTree1 = true;
       }
-      if(!inRAW) {
-	std::cout << "\t" << AODPair.first << "\t" << AODPair.second << std::endl;
+      if(!inTree1) {
+	std::cout << "\t" << Tree2Pair.first << "\t" << Tree2Pair.second << std::endl;
       }
     }
 
 
     //
-    // Events in RAW but not in AOD
+    // Events in Tree1 but not in Tree2
     //
-    std::cout << "Events in RAW but not in AOD"  << std::endl;
-    for (auto RAWPair : RAWEvents ){
-      bool inAOD = false;
-      for (auto AODPair : AODEvents) {
-	if(AODPair.first  != RAWPair.first) continue;
-	if(AODPair.second != RAWPair.second) continue;
-	inAOD = true;
+    std::cout << "Events in Tree1 but not in Tree2"  << std::endl;
+    for (auto Tree1Pair : Tree1Events ){
+      bool inTree2 = false;
+      for (auto Tree2Pair : Tree2Events) {
+	if(Tree2Pair.first  != Tree1Pair.first) continue;
+	if(Tree2Pair.second != Tree1Pair.second) continue;
+	inTree2 = true;
       }
-      if(!inAOD) {
-	std::cout << "\t" << RAWPair.first << "\t" << RAWPair.second << std::endl;
+      if(!inTree2) {
+	std::cout << "\t" << Tree1Pair.first << "\t" << Tree1Pair.second << std::endl;
       }
     }
 
   } // file check
 
 
-  if(doOffline){
-    treeAOD->SetBranchStatus("Run", 1);
-    treeAOD->SetBranchStatus("Evt", 1);
-    //treeAOD->BuildIndex("Run","Evt");
-    TTreeIndex *index = new TTreeIndex(treeAOD,"Run", "Evt");
-    treeAOD->SetTreeIndex(index);
+  if(doTree2){
+    tree2->SetBranchStatus("Run", 1);
+    tree2->SetBranchStatus("Evt", 1);
+    //tree2->BuildIndex("Run","Evt");
+    TTreeIndex *index = new TTreeIndex(tree2,"Run", "Evt");
+    tree2->SetTreeIndex(index);
   }
 
-  treeRAW->SetBranchStatus("Run", 1);
-  treeRAW->SetBranchStatus("Evt", 1);
-  //treeRAW->BuildIndex("Run","Evt");
-  //TTreeIndex *indexRaw = new TTreeIndex(treeRAW,"Run", "Evt");
-  //treeRAW->SetTreeIndex(indexRaw);
+  tree1->SetBranchStatus("Run", 1);
+  tree1->SetBranchStatus("Evt", 1);
+  //tree1->BuildIndex("Run","Evt");
+  //TTreeIndex *indexRaw = new TTreeIndex(tree1,"Run", "Evt");
+  //tree1->SetTreeIndex(indexRaw);
 
 
 
-  if(doOffline){
-    treeRAW->AddFriend(treeAOD);
+  if(doTree2){
+    tree1->AddFriend(tree2);
   }
 
   //std::cout << "eventData::eventData() tree->Lookup(true)" << std::endl;
   ///tree->Lookup(true);
   //std::cout << "eventData::eventData() tree->LoadTree(0)" << std::endl;
-  //treeRAW->LoadTree(0);
+  //tree1->LoadTree(0);
 
-  inputBranch(treeRAW, "Run",             run);
+  inputBranch(tree1, "Run",             run);
   //inputBranch(tree, "luminosityBlock", lumiBlock);
-  inputBranch(treeRAW, "Evt",           event);
-  //inputBranch(treeRAW, "BitTrigger",    BitTrigger);
+  inputBranch(tree1, "Evt",           event);
+  //inputBranch(tree1, "BitTrigger",    BitTrigger);
 
-  connectBranchArr(true, treeRAW, "BitTrigger", BitTrigger,  "nBitTrigger",  "I");
+  connectBranchArr(true, tree1, "BitTrigger", BitTrigger,  "nBitTrigger",  "I");
 
-  if(doOffline){
-    inputBranch(treeAOD, "Run",             runAOD);
+  if(doTree2){
+    inputBranch(tree2, "Run",             runTree2);
     //inputBranch(tree, "luminosityBlock", lumiBlock);
-    inputBranch(treeAOD, "Evt",           eventAOD);
+    inputBranch(tree2, "Evt",           eventTree2);
   }
 
   std::cout << "eventData::eventData() Initialize jets and muons" << std::endl;
   std::string jetSFName = year;
   if(jetSFName == "2018") jetSFName = "deepcsv2018";
 
-  if(doOffline){
-    std::cout << "\t loading off offline jets with name " << "" << std::endl;    
-    offTreeJets  = new nTupleAnalysis::jetData( "Jet",  treeAOD, true, isMC,  jetDetailLevel, "",      jetSFName );
+  if(doTree2){
+    std::cout << "\t loading jets from tree2 with name " << "" << std::endl;    
+    tree2Jets  = new nTupleAnalysis::jetData( "Jet",  tree2, true, isMC,  jetDetailLevel, "",      jetSFName );
   }
 
-  std::cout << "\t loading pfjets with name " << pfJetName << std::endl;    
-  pfTreeJets   = new nTupleAnalysis::jetData( "Jet",  treeRAW, true, isMC, jetDetailLevel, pfJetName       );
+  std::cout << "\t loading jet from tree1 with name " << pfJetName << std::endl;    
+  tree1Jets   = new nTupleAnalysis::jetData( "Jet",  tree1, true, isMC, jetDetailLevel, pfJetName       );
 
-
-  if(doCaloJets){
-    std::cout << "\t loading calo jets with name " << "CaloJet." << std::endl;    
-    caloTreeJets = new nTupleAnalysis::jetData( "Jet",  treeRAW, true, false, jetDetailLevel, "CaloJet."     );
+  //treeMuons    = new nTupleAnalysis::muonData("PFMuon",     tree1);
+  //treeElecs    = new nTupleAnalysis::elecData("PFElectron", tree1);
+  if(tree1->FindBranch("nPatMuon")){
+    treeMuons    = new nTupleAnalysis::muonData("PatMuon",     tree1, true, isMC, year);
+  }else{
+    cout << "No PatMuons (missing branch 'nPatMuon'). Will ignore Muons" << endl;
+    treeMuons = nullptr;
   }
 
-  if(doPuppiJets){
-    std::cout << "\t loading puppi jets with name " << "PuppiJet." << std::endl;    
-    puppiTreeJets = new nTupleAnalysis::jetData( "Jet",  treeRAW, true, false, jetDetailLevel, "PuppiJet."     );
+  if(tree1->FindBranch("nPatElec")){
+    treeElecs    = new nTupleAnalysis::elecData("PatElec",     tree1, true, isMC, year);
+  }else{
+    cout << "No PatElectrons (missing branch 'nPatElec'). Will ignore Elecs" << endl;
+    treeElecs = nullptr;
   }
 
-  //treeMuons    = new nTupleAnalysis::muonData("PFMuon",     treeRAW);
-  //treeElecs    = new nTupleAnalysis::elecData("PFElectron", treeRAW);
-  if(doOffline){
-    if(treeRAW->FindBranch("nPatMuon")){
-      treeMuons    = new nTupleAnalysis::muonData("PatMuon",     treeRAW, true, isMC, year);
-    }else{
-      cout << "No PatMuons (missing branch 'nPatMuon'). Will ignore Muons" << endl;
-      treeMuons = nullptr;
-    }
-
-
-    if(treeRAW->FindBranch("nPatElec")){
-      treeElecs    = new nTupleAnalysis::elecData("PatElec",     treeRAW, true, isMC, year);
-    }else{
-      cout << "No PatElectrons (missing branch 'nPatElec'). Will ignore Elecs" << endl;
-      treeElecs = nullptr;
-    }
-
-    offTreePVs = new nTupleAnalysis::vertexData("PV",     treeAOD);
-  }
-
-  treePVs    = new nTupleAnalysis::vertexData("PV",     treeRAW);
-
-  if(treeRAW->FindBranch("nGenJets")){
-    genJetTree = new nTupleAnalysis::truthData(treeRAW, debug, "GenJet");
+  tree1PVs = new nTupleAnalysis::vertexData("PV",     tree1);
+  
+  if(doTree2) tree2PVs   = new nTupleAnalysis::vertexData("PV",     tree2);
+  
+  if(tree1->FindBranch("nGenJets")){
+    genJetTree = new nTupleAnalysis::truthData(tree1, debug, "GenJet");
   }
 
 }
@@ -182,58 +168,58 @@ eventData::eventData(TChain* _treeRAW, TChain* _treeAOD, bool mc, std::string y,
 void eventData::update(int e){
   if(debug){
     std::cout<<"Get Entry "<<e<<std::endl;
-    std::cout<<treeRAW->GetCurrentFile()->GetName()<<std::endl;
-    treeRAW->Show();
+    std::cout<<tree1->GetCurrentFile()->GetName()<<std::endl;
+    tree1->Show();
 
-    if(doOffline){
-      std::cout<<"Get Entry (AOD) "<<e<<std::endl;
-      std::cout<<treeAOD->GetCurrentFile()->GetName()<<std::endl;
-      treeAOD->Show();
+    if(doTree2){
+      std::cout<<"Get Entry (Tree2) "<<e<<std::endl;
+      std::cout<<tree2->GetCurrentFile()->GetName()<<std::endl;
+      tree2->Show();
     }
 
   }
-  Long64_t loadStatus = treeRAW->LoadTree(e);
+  Long64_t loadStatus = tree1->LoadTree(e);
   if(loadStatus<0){
     std::cout << "Error "<<loadStatus<<" getting event "<<e<<std::endl;
     return;
   }
 
 
-//  Long64_t loadStatusAOD = treeAOD->LoadTree(e);
-//  if(loadStatusAOD<0){
-//    std::cout << "Error "<<loadStatus<<" getting AOD event "<<e<<std::endl;
+//  Long64_t loadStatusTree2 = tree2->LoadTree(e);
+//  if(loadStatusTree2<0){
+//    std::cout << "Error "<<loadStatus<<" getting Tree2 event "<<e<<std::endl;
 //    return;
 //  }
 
 
-  treeRAW->GetEntry(e);
+  tree1->GetEntry(e);
   if(debug) std::cout<<"Got Entry "<<e<<std::endl;
 
 
-  if(doOffline){
-    if((run != runAOD) || (event != eventAOD)){
-      if(debug) std::cout << "Run: " << run << " vs " << runAOD  << "  Evt: " << event << " vs " << eventAOD << std::endl;
-      //std::cout << "Tryuing with inedex " << treeAOD->GetEntryWithIndex(run,event)  << std::endl;
+  if(doTree2){
+    if((run != runTree2) || (event != eventTree2)){
+      if(debug) std::cout << "Run: " << run << " vs " << runTree2  << "  Evt: " << event << " vs " << eventTree2 << std::endl;
+      //std::cout << "Tryuing with inedex " << tree2->GetEntryWithIndex(run,event)  << std::endl;
     }
   }
 
-  //if((run != runAOD) || (event != eventAOD)){
-  //  if(debug) std::cout << "Run: " << run << " vs " << runAOD  << "  Evt: " << event << " vs " << eventAOD << std::endl;
-  //  std::cout << "Run: " << run << " vs " << runAOD  << "  Evt: " << event << " vs " << eventAOD << std::endl;
+  //if((run != runTree2) || (event != eventTree2)){
+  //  if(debug) std::cout << "Run: " << run << " vs " << runTree2  << "  Evt: " << event << " vs " << eventTree2 << std::endl;
+  //  std::cout << "Run: " << run << " vs " << runTree2  << "  Evt: " << event << " vs " << eventTree2 << std::endl;
   //
   //  std::cout << "Try manual lookup" << std::endl;
   //  Int_t runToPrint = -99;
-  //  treeAOD->GetEntries();
-  //  for(long int eAOD = 0; eAOD < treeEventsAOD; eAOD++){
-  //    treeAOD->GetEntry(eAOD);
-  //    if(runAOD != runToPrint){
-  //	std::cout << " \t now! " << runAOD << " " << eventAOD << std::endl;
-  //	runToPrint = runAOD;
+  //  tree2->GetEntries();
+  //  for(long int eTree2 = 0; eTree2 < treeEventsTree2; eTree2++){
+  //    tree2->GetEntry(eTree2);
+  //    if(runTree2 != runToPrint){
+  //	std::cout << " \t now! " << runTree2 << " " << eventTree2 << std::endl;
+  //	runToPrint = runTree2;
   //    }
   //
-  //    if(run != runAOD) continue;
-  //    std::cout << " \t now! " << runAOD << " " << eventAOD << std::endl;
-  //    if(event != eventAOD) continue;
+  //    if(run != runTree2) continue;
+  //    std::cout << " \t now! " << runTree2 << " " << eventTree2 << std::endl;
+  //    if(event != eventTree2) continue;
   //    std::cout << " Found match! " << std::endl;
   //    break;
   //  }
@@ -241,38 +227,35 @@ void eventData::update(int e){
   //
   //}
 
-  if(doOffline){
-    if(run != runAOD){
-      if(debug) std::cout << "run: " << run << " vs " << runAOD << std::endl;
+  if(doTree2){
+    if(run != runTree2){
+      if(debug) std::cout << "run: " << run << " vs " << runTree2 << std::endl;
       return;
     }
 
-
-    if(event != eventAOD){
-      if(debug) std::cout << "evt: " << event << " vs " << eventAOD << std::endl;
+    if(event != eventTree2){
+      if(debug) std::cout << "evt: " << event << " vs " << eventTree2 << std::endl;
       return;
     }
   }
 
   float minJetPt = 30;
-  if(doOffline) offJets  = offTreeJets->getJets(minJetPt,1e6,4);
-  pfJets   = pfTreeJets ->getJets(minJetPt,1e6,4);
-  if(doCaloJets)
-    caloJets = caloTreeJets ->getJets(minJetPt,1e6,2.4);
-  if(doPuppiJets)
-    puppiJets = puppiTreeJets ->getJets(minJetPt,1e6,4.);
+  jetCol1   = tree1Jets ->getJets(minJetPt,1e6,4);
+  pvsTree1    = tree1PVs     ->getVerticies();
+  
+  if(treeMuons)
+    muons    = treeMuons  ->getMuons(30, 3.);
 
-  if(doOffline){
-    if(treeMuons)
-      muons    = treeMuons  ->getMuons(30, 3.);
+  if(treeElecs)
+    elecs    = treeElecs  ->getElecs(30, 3.);
 
-    if(treeElecs)
-      elecs    = treeElecs  ->getElecs(30, 3.);
 
-    offPVs = offTreePVs  ->getVerticies();
+  if(doTree2){
+    
+    jetCol2  = tree2Jets->getJets(minJetPt,1e6,4);
+
+    pvsTree2 = tree2PVs  ->getVerticies();
   }
-
-  pvs    = treePVs     ->getVerticies();
 
   if(genJetTree) genJetTree->update();
 

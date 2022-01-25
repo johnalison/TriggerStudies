@@ -25,38 +25,41 @@ namespace TriggerStudies {
 
   public:
     // Member variables
-    TChain* treeRAW;
-    TChain* treeAOD = nullptr;
-    bool doOffline = true;
+    TChain* tree1;
+    TChain* tree2 = nullptr;
+    bool doTree2 = true;
 
     typedef std::vector<std::pair<Int_t, Int_t> > RunEventMap;
-    RunEventMap AODEvents;
-    int treeEventsAOD;
+    RunEventMap Tree2Events;
+    int treeEventsTree2;
 
     bool isMC;
     std::string year;
     bool debug;
-    bool doCaloJets;
-    bool doPuppiJets;
+    //bool doCaloJets;
+    //bool doPuppiJets;
     Int_t    run       =  0;
     UInt_t    lumiBlock =  0;
     Int_t    event     =  0;
-    Int_t    runAOD       =  0;
-    UInt_t    lumiBlockAOD =  0;
-    Int_t eventAOD     =  0;
+    Int_t    runTree2       =  0;
+    UInt_t    lumiBlockTree2 =  0;
+    Int_t eventTree2     =  0;
     Int_t BitTrigger[1000];
 
-    nTupleAnalysis::jetData* offTreeJets;
-    std::vector<nTupleAnalysis::jetPtr> offJets;
+    // Jets from TTree 1
+    nTupleAnalysis::jetData* tree1Jets;
+    std::vector<nTupleAnalysis::jetPtr> jetCol1;
 
-    nTupleAnalysis::jetData* pfTreeJets;
-    std::vector<nTupleAnalysis::jetPtr> pfJets;
+    // Jets from TTree 2
+    nTupleAnalysis::jetData* tree2Jets;
+    std::vector<nTupleAnalysis::jetPtr> jetCol2;
 
-    nTupleAnalysis::jetData* caloTreeJets;
-    std::vector<nTupleAnalysis::jetPtr> caloJets;
-    
-    nTupleAnalysis::jetData* puppiTreeJets;
-    std::vector<nTupleAnalysis::jetPtr> puppiJets;
+    // Can load thee from separate calls to BTagAnalysis
+    //nTupleAnalysis::jetData* caloTreeJets;
+    //std::vector<nTupleAnalysis::jetPtr> caloJets;
+    //
+    //nTupleAnalysis::jetData* puppiTreeJets;
+    //std::vector<nTupleAnalysis::jetPtr> puppiJets;
 
     nTupleAnalysis::muonData* treeMuons;
     std::vector<nTupleAnalysis::muonPtr> muons;
@@ -64,16 +67,19 @@ namespace TriggerStudies {
     nTupleAnalysis::elecData* treeElecs;
     std::vector<nTupleAnalysis::elecPtr> elecs;
 
-    nTupleAnalysis::vertexData* treePVs;
-    std::vector<nTupleAnalysis::vertexPtr> pvs;
+    nTupleAnalysis::vertexData* tree1PVs;
+    std::vector<nTupleAnalysis::vertexPtr> pvsTree1;
+
+    nTupleAnalysis::vertexData* tree2PVs;
+    std::vector<nTupleAnalysis::vertexPtr> pvsTree2;
+
+
 
     nTupleAnalysis::truthData* genJetTree = NULL;
 
-    nTupleAnalysis::vertexData* offTreePVs;
-    std::vector<nTupleAnalysis::vertexPtr> offPVs;
 
     // Constructors and member functions
-    eventData(TChain* _treeRAW, TChain* _treeAOD, bool mc, std::string y, bool d, std::string jetDetailLevel, std::string pfJetName = "PFJet.");
+    eventData(TChain* _tree1, TChain* _tree2, bool mc, std::string y, bool d, std::string jetDetailLevel, std::string pfJetName = "PFJet.");
     void update(int);
 
     void dump();

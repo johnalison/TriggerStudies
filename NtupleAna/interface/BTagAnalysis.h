@@ -30,8 +30,7 @@ namespace TriggerStudies {
   class BTagAnalysis {
   public:
 
-    TChain* eventsAOD;
-    TChain* eventsRAW;
+    bool doTree2 = true;
 
     bool debug = false;
     float minJetPt = 30;
@@ -43,7 +42,7 @@ namespace TriggerStudies {
     TFileDirectory dir;
 
     bool doTracks = true;
-    bool doCaloJets = true;
+    //bool doCaloJets = true;
     bool doPuppiJets = true;
     bool doLeptonSel = false;
     bool doOfflineBTagCut = false;
@@ -299,11 +298,11 @@ namespace TriggerStudies {
     };
     
     jetAnalysisHists* PFJetHists;
-    jetAnalysisHists* CaloJetHists;
+    //jetAnalysisHists* CaloJetHists;
     jetAnalysisHists* PuppiJetHists;
 
     jetAnalysisHists* PFJetHists_PVMatch;
-    jetAnalysisHists* CaloJetHists_PVMatch;
+    //jetAnalysisHists* CaloJetHists_PVMatch;
     jetAnalysisHists* PuppiJetHists_PVMatch;
 
 
@@ -333,8 +332,8 @@ namespace TriggerStudies {
     nTupleAnalysis::jetHists* hPfJets_matched = nullptr;
     jetHistsTruthMatched*     hPfJets_Truth = nullptr;
 
-    nTupleAnalysis::jetHists* hCaloJets = nullptr;
-    nTupleAnalysis::jetHists* hCaloJets_matched = nullptr;
+    //nTupleAnalysis::jetHists* hCaloJets = nullptr;
+    //nTupleAnalysis::jetHists* hCaloJets_matched = nullptr;
 
     nTupleAnalysis::jetHists* hPuppiJets = nullptr;
     nTupleAnalysis::jetHists* hPuppiJets_matched = nullptr;
@@ -388,7 +387,7 @@ namespace TriggerStudies {
     std::shared_ptr<NeuralNetworkAndConstants>  neuralNet;
 
 
-    BTagAnalysis(TChain* _eventsRAW, TChain* _eventsAOD, fwlite::TFileService& fs, bool _isMC, std::string _year, int _histogramming, bool _debug, std::string PUFileName, std::string jetDetailString, const edm::ParameterSet& nnConfig, std::string pfJetName);
+    BTagAnalysis(TChain* eventsRAW, TChain* eventsAOD, fwlite::TFileService& fs, bool _isMC, std::string _year, int _histogramming, bool _debug, std::string PUFileName, std::string jetDetailString, const edm::ParameterSet& nnConfig, std::string pfJetName);
     void monitor(long int);
     int eventLoop(int, int nSkipEvents = 0);
     int processEvent();

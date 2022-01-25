@@ -28,9 +28,7 @@
 #include "PhysicsTools/FWLite/interface/TFileService.h"
 
 #include "TriggerStudies/NtupleAna/interface/BTagAnalysis.h"
-//#include "TriggerStudies/NtupleAna/interface/BTagAnalysisHLT.h"
-#include "TriggerStudies/NtupleAna/interface/TrigTurnOnStudy.h"
-//#include "TriggerStudies/NtupleAna/interface/TrigTurnOnStudyHLT.h"
+
 using namespace TriggerStudies;
 
 int main(int argc, char * argv[]){
@@ -65,7 +63,6 @@ int main(int argc, char * argv[]){
   double maxJetAbsEta = parameters.getParameter<double>("maxJetAbsEta");
   double minJetDeepJet = parameters.getParameter<double>("minJetDeepJet");
   bool isMC  = parameters.getParameter<bool>("isMC");
-  bool isTurnOnStudy  = parameters.getParameter<bool>("isTurnOnStudy");
   bool doLeptonSel = parameters.getParameter<bool>("doLeptonSel");
   int histogramming = parameters.getParameter<int>("histogramming");
   int skipEvents = parameters.getParameter<int>("skipEvents");
@@ -107,14 +104,16 @@ int main(int argc, char * argv[]){
   //
   //  Add AOD Files
   //
-  TChain* treeAOD     = new TChain("btagana/ttree");
-  for(unsigned int iFile=0; iFile<filesAOD.size(); ++iFile){
-    std::cout << "           Input AOD File: " << filesAOD[iFile].c_str() << std::endl;
-    int e = treeAOD    ->AddFile(filesAOD[iFile].c_str());
-    if(e!=1){ std::cout << "ERROR" << std::endl; return 1;}
-    if(debug) std::cout<<"Added to TChain"<<std::endl;
+  TChain* treeAOD     = nullptr;
+  if(filesAOD.size()){
+    treeAOD     = new TChain("btagana/ttree");
+    for(unsigned int iFile=0; iFile<filesAOD.size(); ++iFile){
+      std::cout << "           Input AOD File: " << filesAOD[iFile].c_str() << std::endl;
+      int e = treeAOD    ->AddFile(filesAOD[iFile].c_str());
+      if(e!=1){ std::cout << "ERROR" << std::endl; return 1;}
+      if(debug) std::cout<<"Added to TChain"<<std::endl;
+    }
   }
-
 
   //Histogram output
   fwlite::OutputFiles histOutput(process);
@@ -126,35 +125,26 @@ int main(int argc, char * argv[]){
   //
   std::cout << "Initialize analysis: ";
 
-  if(isTurnOnStudy){
-    std::cout << "TurnOnStudy " << std::endl;
-    TrigTurnOnStudy a = TrigTurnOnStudy(treeRAW, treeAOD, fsh, isMC, year, histogramming, debug);
-
-    int maxEvents = inputHandler.maxEvents();
-    a.eventLoop(maxEvents);
-
-  } else{
-    std::cout << "BTagAnalysis with minJetPt " << minJetPt;
-    std::cout << "\t minJetAbsEta " << minJetAbsEta << std::endl;
-    std::cout << "\t maxJetAbsEta " << maxJetAbsEta << std::endl;
-    std::cout << "\t minJetDeepJet " << minJetDeepJet << std::endl;
+  std::cout << "BTagAnalysis with minJetPt " << minJetPt;
+  std::cout << "\t minJetAbsEta " << minJetAbsEta << std::endl;
+  std::cout << "\t maxJetAbsEta " << maxJetAbsEta << std::endl;
+  std::cout << "\t minJetDeepJet " << minJetDeepJet << std::endl;
     
-    BTagAnalysis a = BTagAnalysis(treeRAW, treeAOD, fsh, isMC, year, histogramming, debug, PUFileName, jetDetailString, nnParameters, pfJetName);
-    a.minJetPt       = minJetPt;
-    a.minJetAbsEta   = minJetAbsEta;
-    a.maxJetAbsEta   = maxJetAbsEta;
-    a.minJetDeepJet  = minJetDeepJet;
+  BTagAnalysis a = BTagAnalysis(treeRAW, treeAOD, fsh, isMC, year, histogramming, debug, PUFileName, jetDetailString, nnParameters, pfJetName);
+  a.minJetPt       = minJetPt;
+  a.minJetAbsEta   = minJetAbsEta;
+  a.maxJetAbsEta   = maxJetAbsEta;
+  a.minJetDeepJet  = minJetDeepJet;
     
 
-    a.doLeptonSel = doLeptonSel;
-    //if(!isMC){
-    //  a.lumiMask = lumiMask;
-    //  std::string lumiData = parameters.getParameter<std::string>("lumiData");
-    //  a.getLumiData(lumiData);
-    //}
-    int maxEvents = inputHandler.maxEvents();
-    a.eventLoop(maxEvents, skipEvents);
-  }
+  a.doLeptonSel = doLeptonSel;
+  //if(!isMC){
+  //  a.lumiMask = lumiMask;
+  //  std::string lumiData = parameters.getParameter<std::string>("lumiData");
+  //  a.getLumiData(lumiData);
+  //}
+  int maxEvents = inputHandler.maxEvents();
+  a.eventLoop(maxEvents, skipEvents);
 
   std::cout << std::endl;
   std::cout << "Done Event Loop" << std::endl;
