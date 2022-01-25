@@ -53,19 +53,18 @@ const float drTrackToJet = 0.25;
 
 
 
-BTagAnalysis::BTagAnalysis(TChain* eventsRAW, TChain* eventsAOD, fwlite::TFileService& fs, bool _isMC, std::string _year, int _histogramming, bool _debug, std::string PUFileName, std::string jetDetailString, const edm::ParameterSet& nnConfig, std::string pfJetName){
-  if(_debug) cout<<"In BTagAnalysis constructor: RAW: "<< eventsRAW << " AOD: " << eventsAOD << endl;
+BTagAnalysis::BTagAnalysis(TChain* eventsTree1, TChain* eventsTree2, fwlite::TFileService& fs, bool _isMC, std::string _year, int _histogramming, bool _debug, std::string PUFileName, std::string jetDetailString, const edm::ParameterSet& nnConfig, std::string pfJetName){
+  if(_debug) cout<<"In BTagAnalysis constructor: Tree1: "<< eventsTree1 << " Tree2: " << eventsTree2 << endl;
   debug      = _debug;
   isMC       = _isMC;
   year       = _year;
-  eventsRAW->SetBranchStatus("*", 0);
+  eventsTree1->SetBranchStatus("*", 0);
 
-  if(!eventsAOD){
+  if(!eventsTree2){
     doTree2 = false;
   }
 
-  if(doTree2) eventsAOD->SetBranchStatus("*", 0);
-  
+  if(doTree2) eventsTree2->SetBranchStatus("*", 0);
 
   histogramming = _histogramming;
 
@@ -74,8 +73,8 @@ BTagAnalysis::BTagAnalysis(TChain* eventsRAW, TChain* eventsAOD, fwlite::TFileSe
   //doPuppiJets = jetDetailString.find("PuppiJets") != std::string::npos;
 
   if(_debug) cout<<"Making eventData"<<endl;
-  event      = new eventData(eventsRAW, eventsAOD, isMC, year, debug, jetDetailString, pfJetName);
-  treeEvents = eventsRAW->GetEntries();
+  event      = new eventData(eventsTree1, eventsTree2, isMC, year, debug, jetDetailString, pfJetName);
+  treeEvents = eventsTree1->GetEntries();
 
   if(_debug) cout<<"Making cutflow"<<endl;
   cutflow    = new nTupleAnalysis::cutflowHists("cutflow", fs);
@@ -437,20 +436,23 @@ int BTagAnalysis::processEvent(){
   if(puWeight)
     hEventsNoPUWeight->Fill(event->pvsTree1.size(),  0.0, eventWeight/puWeight);
 
-  hVtx      ->Fill(event->pvsTree2, eventWeight);
-  hVtx      ->FillDiffHists(event->pvsTree2, event->pvsTree1, eventWeight);
   hOffVtx   ->Fill(event->pvsTree1, eventWeight);
 
   bool hltVtxMatch = false;
-  if(event->pvsTree2.size() > 0 && event->pvsTree1.size() > 0){
-    if( fabs(event->pvsTree2.at(0)->z - event->pvsTree1.at(0)->z) < 0.02)
-      hltVtxMatch = true;
-  }
 
-  if(hltVtxMatch){
-    hVtx_PVMatch      ->Fill(event->pvsTree2, eventWeight);
-    hVtx_PVMatch      ->FillDiffHists(event->pvsTree2, event->pvsTree1, eventWeight);
-    hOffVtx_PVMatch   ->Fill(event->pvsTree1, eventWeight);
+  if(doTree2){
+    hVtx      ->Fill(event->pvsTree2, eventWeight);
+    hVtx      ->FillDiffHists(event->pvsTree2, event->pvsTree1, eventWeight);
+    if(event->pvsTree2.size() > 0 && event->pvsTree1.size() > 0){
+      if( fabs(event->pvsTree2.at(0)->z - event->pvsTree1.at(0)->z) < 0.02)
+	hltVtxMatch = true;
+    }
+
+    if(hltVtxMatch){
+      hVtx_PVMatch      ->Fill(event->pvsTree2, eventWeight);
+      hVtx_PVMatch      ->FillDiffHists(event->pvsTree2, event->pvsTree1, eventWeight);
+      hOffVtx_PVMatch   ->Fill(event->pvsTree1, eventWeight);
+    }
   }
     
 
@@ -604,8 +606,6 @@ int BTagAnalysis::processEvent(){
       //  Have PF Match
       //
       if( hasValidMatch){
-      
-
 
 	if(debug) cout << "Have a PF jet match " << endl;
 	cutflowJets->Fill("hasHLTMatchPF", eventWeight);

@@ -22,8 +22,9 @@ parser.add_option('--pfJetName',                default="PFJet.", help="")
 parser.add_option('--jetDetailString',                default="matched", help="")
 parser.add_option('-y', '--year',                 dest="year",          default="2016", help="Year specifies trigger (and lumiMask for data)")
 #parser.add_option('-l', '--lumi', type="float",   dest="lumi",          default=1.0,    help="Luminosity for MC normalization: units [pb]")
-parser.add_option( '--inputAOD',                dest="inputAOD",         default=None, help="Input file(s). If it ends in .txt, will treat it as a list of input files.")
-parser.add_option( '--inputRAW',                dest="inputRAW",         default=None, help="Input file(s). If it ends in .txt, will treat it as a list of input files.")
+parser.add_option( '--inputTree1',                dest="inputTree1",         default=None, help="Input file(s). If it ends in .txt, will treat it as a list of input files.")
+parser.add_option( '--inputTree2',                dest="inputTree2",         default=None, help="Input file(s). If it ends in .txt, will treat it as a list of input files.")
+
 parser.add_option('-o', '--outputBase',           dest="outputBase",    default="/uscms/home/bryantp/nobackup/TriggerStudies/", help="Base path for storing output histograms and picoAOD")
 parser.add_option('--puFile',                     dest="puFile",       default="", help="PUFileName")
 parser.add_option('-n', '--nevents',              dest="nevents",       default="-1", help="Number of events to process. Default -1 for no limit.")
@@ -64,39 +65,39 @@ lumiData   = {'2015':'',
 ## store all process cross sections in pb. Can compute xs of sample with GenXsecAnalyzer. Example:
 ## cd genproductions/test/calculateXSectionAndFilterEfficiency; ./calculateXSectionAndFilterEfficiency.sh -f ../../../ZZ_dataset.txt -c RunIIAutumn18MiniAOD-102X_upgrade2018_realistic_v15-v1 -d MINIAODSIM -n -1
 
-fileNamesAOD = []
+fileNamesTree2 = []
 inputList=False
-if o.inputAOD:
-    if ".txt" in o.inputAOD:
+if o.inputTree2:
+    if ".txt" in o.inputTree2:
         inputList = True
-        for line in open(o.inputAOD, 'r').readlines():
+        for line in open(o.inputTree2, 'r').readlines():
             line = line.replace('\n','').strip()
             if line    == '' : continue
             if line[0] == '#': continue
-            fileNamesAOD.append(line.replace('\n',''))
+            fileNamesTree2.append(line.replace('\n',''))
     else:
-        fileNamesAOD.append(o.inputAOD)
+        fileNamesTree2.append(o.inputTree2)
     
 
-fileNamesRAW = []
+fileNamesTree1 = []
 inputList=False
-if ".txt" in o.inputRAW:
+if ".txt" in o.inputTree1:
     inputList = True
-    for line in open(o.inputRAW, 'r').readlines():
+    for line in open(o.inputTree1, 'r').readlines():
         line = line.replace('\n','').strip()
         if line    == '' : continue
         if line[0] == '#': continue
-        fileNamesRAW.append(line.replace('\n',''))
+        fileNamesTree1.append(line.replace('\n',''))
 else:
-    fileNamesRAW.append(o.inputRAW)
+    fileNamesTree1.append(o.inputTree1)
     if cms.bool(o.debug):
-        print('fileNamesRAW:', fileNamesRAW)
+        print('fileNamesTree1:', fileNamesTree1)
 
 
 
 pathOut = outputBase
 if "root://cmsxrootd-site.fnal.gov//store/" in pathOut:
-    pathOut = pathOut + fileNamesAOD[0].replace("root://cmsxrootd-site.fnal.gov//store/", "") #make it a local path
+    pathOut = pathOut + fileNamesTree2[0].replace("root://cmsxrootd-site.fnal.gov//store/", "") #make it a local path
 pathOut = '/'.join(pathOut.split("/")[:-1])+"/" #remove <fileName>.root
 
 #if inputList: #use simplified directory structure based on grouping of filelists
@@ -114,7 +115,7 @@ process = cms.PSet()
 
 #Setup framework lite input file object
 process.fwliteInput = cms.PSet(
-    fileNames   = cms.vstring(fileNamesRAW),
+    fileNames   = cms.vstring(fileNamesTree1),
     maxEvents   = cms.int32(int(o.nevents)),
     )
 
@@ -161,31 +162,13 @@ if o.doPuppiJets:
 
 #Setup event loop object
 
-#if o.inputAOD == 'None':
-#    print('Configuring HLTOnly...')
-#    process.BTagAnalyzer = cms.PSet(
-#        debug   = cms.bool(o.debug),
-#        minJetPt   = cms.double(float(o.minJetPt)),
-#        minJetAbsEta   = cms.double(float(o.minJetAbsEta)),
-#        maxJetAbsEta   = cms.double(float(o.maxJetAbsEta)),
-#        isMC    = cms.bool(o.isMC),
-#        year    = cms.string(o.year),
-#        jetDetailString    = cms.string(jetDetailString),
-#        pfJetName          = cms.string(o.pfJetName),
-#        lumiData= cms.string(lumiData[o.year]),
-#        histogramming = cms.int32(int(o.histogramming)),
-#        skipEvents = cms.int32(int(o.skipEvents)),
-#        )
-#    print('HLTOnly configured')
-#else:
-#    print('Configuring RAW+AOD...')
 process.BTagAnalyzer = cms.PSet(
     debug   = cms.bool(o.debug),
     minJetPt   = cms.double(float(o.minJetPt)),
     minJetAbsEta   = cms.double(float(o.minJetAbsEta)),
     maxJetAbsEta   = cms.double(float(o.maxJetAbsEta)),
     minJetDeepJet   = cms.double(float(o.minJetDeepJet)), 
-    fileNamesAOD   = cms.vstring(fileNamesAOD),
+    fileNamesTree2   = cms.vstring(fileNamesTree2),
     isMC    = cms.bool(o.isMC),
     isTurnOnStudy    = cms.bool(o.isTurnOnStudy) , 
     doLeptonSel      = cms.bool(o.doLeptonSel),    
@@ -197,4 +180,4 @@ process.BTagAnalyzer = cms.PSet(
     histogramming = cms.int32(int(o.histogramming)),
     skipEvents = cms.int32(int(o.skipEvents)),
 )
-#    print('RAW+AOD configured')
+

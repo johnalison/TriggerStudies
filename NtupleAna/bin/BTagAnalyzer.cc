@@ -67,7 +67,7 @@ int main(int argc, char * argv[]){
   int histogramming = parameters.getParameter<int>("histogramming");
   int skipEvents = parameters.getParameter<int>("skipEvents");
   std::string year = parameters.getParameter<std::string>("year");
-  std::vector<std::string> filesAOD = parameters.getParameter<std::vector<std::string> >("fileNamesAOD");
+  std::vector<std::string> filesTree2 = parameters.getParameter<std::vector<std::string> >("fileNamesTree2");
   std::string PUFileName = parameters.getParameter<std::string>("puFile");
   std::string jetDetailString = parameters.getParameter<std::string>("jetDetailString");
   std::string pfJetName = parameters.getParameter<std::string>("pfJetName");
@@ -90,26 +90,26 @@ int main(int argc, char * argv[]){
   fwlite::InputSource inputHandler(process);
 
   //
-  //  Add RAW Files
+  //  Add Tree1 Files
   //
-  TChain* treeRAW     = new TChain("btagana/ttree");
+  TChain* treeTree1     = new TChain("btagana/ttree");
   for(unsigned int iFile=0; iFile<inputHandler.files().size(); ++iFile){
-    std::cout << "           Input RAW File: " << inputHandler.files()[iFile].c_str() << std::endl;
-    int e = treeRAW    ->AddFile(inputHandler.files()[iFile].c_str());
+    std::cout << "           Input Tree1 File: " << inputHandler.files()[iFile].c_str() << std::endl;
+    int e = treeTree1    ->AddFile(inputHandler.files()[iFile].c_str());
     if(e!=1){ std::cout << "ERROR" << std::endl; return 1;}
     if(debug) std::cout<<"Added to TChain"<<std::endl;
   }
 
 
   //
-  //  Add AOD Files
+  //  Add Tree2 Files
   //
-  TChain* treeAOD     = nullptr;
-  if(filesAOD.size()){
-    treeAOD     = new TChain("btagana/ttree");
-    for(unsigned int iFile=0; iFile<filesAOD.size(); ++iFile){
-      std::cout << "           Input AOD File: " << filesAOD[iFile].c_str() << std::endl;
-      int e = treeAOD    ->AddFile(filesAOD[iFile].c_str());
+  TChain* treeTree2     = nullptr;
+  if(filesTree2.size()){
+    treeTree2     = new TChain("btagana/ttree");
+    for(unsigned int iFile=0; iFile<filesTree2.size(); ++iFile){
+      std::cout << "           Input Tree2 File: " << filesTree2[iFile].c_str() << std::endl;
+      int e = treeTree2    ->AddFile(filesTree2[iFile].c_str());
       if(e!=1){ std::cout << "ERROR" << std::endl; return 1;}
       if(debug) std::cout<<"Added to TChain"<<std::endl;
     }
@@ -130,7 +130,7 @@ int main(int argc, char * argv[]){
   std::cout << "\t maxJetAbsEta " << maxJetAbsEta << std::endl;
   std::cout << "\t minJetDeepJet " << minJetDeepJet << std::endl;
     
-  BTagAnalysis a = BTagAnalysis(treeRAW, treeAOD, fsh, isMC, year, histogramming, debug, PUFileName, jetDetailString, nnParameters, pfJetName);
+  BTagAnalysis a = BTagAnalysis(treeTree1, treeTree2, fsh, isMC, year, histogramming, debug, PUFileName, jetDetailString, nnParameters, pfJetName);
   a.minJetPt       = minJetPt;
   a.minJetAbsEta   = minJetAbsEta;
   a.maxJetAbsEta   = maxJetAbsEta;
