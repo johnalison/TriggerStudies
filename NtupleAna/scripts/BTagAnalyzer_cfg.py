@@ -23,6 +23,8 @@ parser.add_option('--jetDetailString',                default="matched", help=""
 parser.add_option('-y', '--year',                 dest="year",          default="2016", help="Year specifies trigger (and lumiMask for data)")
 #parser.add_option('-l', '--lumi', type="float",   dest="lumi",          default=1.0,    help="Luminosity for MC normalization: units [pb]")
 parser.add_option( '--inputTree1',                dest="inputTree1",         default=None, help="Input file(s). If it ends in .txt, will treat it as a list of input files.")
+parser.add_option( '--tree1Name',                 default="btagana/tree", help="Input tree name")
+parser.add_option( '--tree2Name',                 default="btagana/tree", help="Input tree name")
 parser.add_option( '--inputTree2',                dest="inputTree2",         default=None, help="Input file(s). If it ends in .txt, will treat it as a list of input files.")
 
 parser.add_option('-o', '--outputBase',           dest="outputBase",    default="/uscms/home/bryantp/nobackup/TriggerStudies/", help="Base path for storing output histograms and picoAOD")
@@ -47,7 +49,10 @@ isData     = not o.isMC
 JSONfiles  = {'2015':'',
               '2016':'TriggerStudies/lumiMasks/Cert_271036-284044_13TeV_PromptReco_Collisions16_JSON.txt', #Final, unlikely to change
               '2017':'TriggerStudies/lumiMasks/Cert_294927-306462_13TeV_PromptReco_Collisions17_JSON.txt',
-              '2018':'TriggerStudies/lumiMasks/Cert_314472-325175_13TeV_PromptReco_Collisions18_JSON.txt'} #Not Final, should be updated at some point
+              '2018':'TriggerStudies/lumiMasks/Cert_314472-325175_13TeV_PromptReco_Collisions18_JSON.txt', #Not Final, should be updated at some point
+              'Run3' : None
+              }
+              
 # Calculated lumi per lumiBlock from brilcalc. See README
 lumiData   = {'2015':'',
               '2016':'TriggerStudies/lumiMasks/',
@@ -123,7 +128,8 @@ process.fwliteInput = cms.PSet(
 process.inputs = cms.PSet(
     lumisToProcess = CfgTypes.untracked(CfgTypes.VLuminosityBlockRange())
     )
-if isData:
+
+if isData and JSONfiles[o.year]:
     # get JSON file correctly parced
     myList = LumiList.LumiList(filename = JSONfiles[o.year]).getCMSSWString().split(',')
     process.inputs.lumisToProcess.extend(myList)
@@ -164,6 +170,8 @@ if o.doPuppiJets:
 
 process.BTagAnalyzer = cms.PSet(
     debug   = cms.bool(o.debug),
+    tree1Name = cms.string(o.tree1Name),
+    tree2Name = cms.string(o.tree2Name),
     minJetPt   = cms.double(float(o.minJetPt)),
     minJetAbsEta   = cms.double(float(o.minJetAbsEta)),
     maxJetAbsEta   = cms.double(float(o.maxJetAbsEta)),

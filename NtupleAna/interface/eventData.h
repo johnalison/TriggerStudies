@@ -1,7 +1,7 @@
 // -*- C++ -*-
 
-#if !defined(eventData_H)
-#define eventData_H
+#if !defined(TriggerStudies_eventData_H)
+#define TriggerStudies_eventData_H
 
 #include <iostream>
 #include <TChain.h>
@@ -13,6 +13,7 @@
 #include "nTupleAnalysis/baseClasses/interface/elecData.h"
 #include "nTupleAnalysis/baseClasses/interface/vertexData.h"
 #include "nTupleAnalysis/baseClasses/interface/truthData.h"
+#include "nTupleAnalysis/baseClasses/interface/eventData.h"
 
 // for jet pseudoTag calculations
 #include <TRandom3.h>
@@ -36,15 +37,9 @@ namespace TriggerStudies {
     bool isMC;
     std::string year;
     bool debug;
-    //bool doCaloJets;
-    //bool doPuppiJets;
-    Int_t    run       =  0;
-    UInt_t    lumiBlock =  0;
-    Int_t    event     =  0;
-    Int_t    runTree2       =  0;
-    UInt_t    lumiBlockTree2 =  0;
-    Int_t eventTree2     =  0;
-    Int_t BitTrigger[1000];
+
+    nTupleAnalysis::eventData* eventDataTree1 = NULL;
+    nTupleAnalysis::eventData* eventDataTree2 = NULL;
 
     // Jets from TTree 1
     nTupleAnalysis::jetData* tree1Jets;
@@ -67,11 +62,12 @@ namespace TriggerStudies {
     nTupleAnalysis::elecData* treeElecs;
     std::vector<nTupleAnalysis::elecPtr> elecs;
 
-    nTupleAnalysis::vertexData* tree1PVs;
-    std::vector<nTupleAnalysis::vertexPtr> pvsTree1;
-
-    nTupleAnalysis::vertexData* tree2PVs;
-    std::vector<nTupleAnalysis::vertexPtr> pvsTree2;
+    // Move to event data
+    //nTupleAnalysis::vertexData* tree1PVs;
+    //std::vector<nTupleAnalysis::vertexPtr> pvsTree1;
+    //
+    //nTupleAnalysis::vertexData* tree2PVs;
+    //std::vector<nTupleAnalysis::vertexPtr> pvsTree2;
 
 
 

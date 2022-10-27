@@ -282,14 +282,15 @@ int BTagAnalysis::eventLoop(int maxEvents, int nSkipEvents){
 
 int BTagAnalysis::processEvent(){
   if(debug) cout << "processEvent start" << endl;
+  cout << "Run/Event: " << event->eventDataTree1->run << "/" << event->eventDataTree1->event << endl;
 
   cutflow->Fill("all", 1.0);
 
   if(doTree2){
-    if(event->run != event->runTree2)
+    if(event->eventDataTree1->run != event->eventDataTree2->run)
       return 0;
 
-    if(event->event != event->eventTree2)
+    if(event->eventDataTree1->event != event->eventDataTree2->event)
       return 0;
 
     cutflow->Fill("foundMatch", 1.0);
@@ -346,11 +347,13 @@ int BTagAnalysis::processEvent(){
   float eventWeight = 1.0;
   float puWeight    = 1.0;
   if(isMC && pileUpTool){
-    puWeight = pileUpTool->getWeight(event->pvsTree1.size());
-    eventWeight =  puWeight;
-    if(doLeptonSel)
-      eventWeight *= (selElecs.at(0)->SF * selMuons.at(0)->SF);
+//    puWeight = pileUpTool->getWeight(event->pvsTree1.size());
+//    eventWeight =  puWeight;
+//    if(doLeptonSel)
+//      eventWeight *= (selElecs.at(0)->SF * selMuons.at(0)->SF);
   }
+
+
 
   //
   //  Jet1 BTags
@@ -417,27 +420,27 @@ int BTagAnalysis::processEvent(){
   // Fill All events
   //
   if(debug) cout << "Fill All Events " << endl;
-  hEvents->Fill(event->pvsTree1.size(),  0.0, eventWeight);
+  hEvents->Fill(*event->eventDataTree1, eventWeight);
   if(puWeight)
-    hEventsNoPUWeight->Fill(event->pvsTree1.size(),  0.0, eventWeight/puWeight);
+    hEventsNoPUWeight->Fill(*event->eventDataTree1, eventWeight/puWeight);
 
-  hTree1Vtx   ->Fill(event->pvsTree1, eventWeight);
+//  hTree1Vtx   ->Fill(event->pvsTree1, eventWeight);
 
   bool vtxMatch = false;
 
   if(doTree2){
-    hTree2Vtx      ->Fill(event->pvsTree2, eventWeight);
-    hTree2Vtx      ->FillDiffHists(event->pvsTree2, event->pvsTree1, eventWeight);
-    if(event->pvsTree2.size() > 0 && event->pvsTree1.size() > 0){
-      if( fabs(event->pvsTree2.at(0)->z - event->pvsTree1.at(0)->z) < 0.02)
-	vtxMatch = true;
-    }
-
-    if(vtxMatch){
-      hTree2Vtx_PVMatch      ->Fill(event->pvsTree2, eventWeight);
-      hTree2Vtx_PVMatch      ->FillDiffHists(event->pvsTree2, event->pvsTree1, eventWeight);
-      hTree1Vtx_PVMatch   ->Fill(event->pvsTree1, eventWeight);
-    }
+//    hTree2Vtx      ->Fill(event->pvsTree2, eventWeight);
+//    hTree2Vtx      ->FillDiffHists(event->pvsTree2, event->pvsTree1, eventWeight);
+//    if(event->pvsTree2.size() > 0 && event->pvsTree1.size() > 0){
+//      if( fabs(event->pvsTree2.at(0)->z - event->pvsTree1.at(0)->z) < 0.02)
+//	vtxMatch = true;
+//    }
+//
+//    if(vtxMatch){
+//      hTree2Vtx_PVMatch      ->Fill(event->pvsTree2, eventWeight);
+//      hTree2Vtx_PVMatch      ->FillDiffHists(event->pvsTree2, event->pvsTree1, eventWeight);
+//      hTree1Vtx_PVMatch   ->Fill(event->pvsTree1, eventWeight);
+//    }
   }
     
 
@@ -607,7 +610,7 @@ int BTagAnalysis::processEvent(){
 	  matchedJet->DeepCSV_reCalc = DeepCSV_reCalc;
 
 	  if(fabs(DeepCSV_reCalc - matchedJet->DeepCSV) > 0.001){
-	    cout << "Event: " << event->event << endl;
+	    cout << "Event: " << event->eventDataTree1->event << endl;
 	    cout << "DeepCSV_reCalc: " << DeepCSV_reCalc << " vs " << matchedJet->DeepCSV << endl;
 	    nnout = neuralNet->compute(matchedJet, true);
 	  }

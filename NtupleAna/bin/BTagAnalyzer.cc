@@ -67,6 +67,8 @@ int main(int argc, char * argv[]){
   int histogramming = parameters.getParameter<int>("histogramming");
   int skipEvents = parameters.getParameter<int>("skipEvents");
   std::string year = parameters.getParameter<std::string>("year");
+  std::string tree1Name = parameters.getParameter<std::string>("tree1Name");
+  std::string tree2Name = parameters.getParameter<std::string>("tree2Name");
   std::vector<std::string> filesTree2 = parameters.getParameter<std::vector<std::string> >("fileNamesTree2");
   std::string PUFileName = parameters.getParameter<std::string>("puFile");
   std::string jetDetailString = parameters.getParameter<std::string>("jetDetailString");
@@ -92,7 +94,7 @@ int main(int argc, char * argv[]){
   //
   //  Add Tree1 Files
   //
-  TChain* treeTree1     = new TChain("btagana/ttree");
+  TChain* treeTree1     = new TChain(tree1Name.c_str());
   for(unsigned int iFile=0; iFile<inputHandler.files().size(); ++iFile){
     std::cout << "           Input Tree1 File: " << inputHandler.files()[iFile].c_str() << std::endl;
     int e = treeTree1    ->AddFile(inputHandler.files()[iFile].c_str());
@@ -106,7 +108,7 @@ int main(int argc, char * argv[]){
   //
   TChain* treeTree2     = nullptr;
   if(filesTree2.size()){
-    treeTree2     = new TChain("btagana/ttree");
+    treeTree2     = new TChain(tree2Name.c_str());
     for(unsigned int iFile=0; iFile<filesTree2.size(); ++iFile){
       std::cout << "           Input Tree2 File: " << filesTree2[iFile].c_str() << std::endl;
       int e = treeTree2    ->AddFile(filesTree2[iFile].c_str());
