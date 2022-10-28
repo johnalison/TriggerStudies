@@ -132,6 +132,11 @@ eventData::eventData(TChain* _tree1, TChain* _tree2, bool mc, std::string y, boo
   std::cout << "\t loading jet from tree1 with name " << pfJetName << std::endl;    
   tree1Jets   = new nTupleAnalysis::jetData( "Jet",  tree1, true, isMC, jetDetailLevel, pfJetName       );
 
+  std::string trackName = "PFCands";
+  std::cout << "\t loading tracks from tree1 with name " << trackName << std::endl;    
+  tree1Tracks   = new nTupleAnalysis::trackData( trackName,  tree1 );
+
+
   //treeMuons    = new nTupleAnalysis::muonData("PFMuon",     tree1);
   //treeElecs    = new nTupleAnalysis::elecData("PFElectron", tree1);
   if(tree1->FindBranch("nMuon")){
@@ -234,6 +239,8 @@ void eventData::update(int e){
   float minJetPt = 30;
   jetCol1   = tree1Jets ->getJets(minJetPt,1e6,4);
   //pvsTree1    = tree1PVs     ->getVerticies();
+
+  trkCol1   = tree1Tracks ->getTracks();
   
   if(treeMuons)
     muons    = treeMuons  ->getMuons(30, 3.);

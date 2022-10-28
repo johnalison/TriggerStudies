@@ -344,6 +344,8 @@ namespace TriggerStudies {
     nTupleAnalysis::vertexHists* hTree2Vtx_PVMatch = nullptr;
     nTupleAnalysis::vertexHists* hTree1Vtx_PVMatch = nullptr;
 
+    nTupleAnalysis::trackHists* hAllTracks           = nullptr;
+
     float OfflineDeepCSVTightCut  = -99;
     float OfflineDeepCSVMediumCut = -99;
     float OfflineDeepCSVLooseCut  = -99;

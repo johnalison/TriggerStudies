@@ -9,6 +9,7 @@
 #include <TLorentzVector.h>
 #include "nTupleAnalysis/baseClasses/interface/initBranch.h"
 #include "nTupleAnalysis/baseClasses/interface/jetData.h"
+#include "nTupleAnalysis/baseClasses/interface/trackData.h"
 #include "nTupleAnalysis/baseClasses/interface/muonData.h"
 #include "nTupleAnalysis/baseClasses/interface/elecData.h"
 #include "nTupleAnalysis/baseClasses/interface/vertexData.h"
@@ -48,6 +49,11 @@ namespace TriggerStudies {
     // Jets from TTree 2
     nTupleAnalysis::jetData* tree2Jets;
     std::vector<nTupleAnalysis::jetPtr> jetCol2;
+
+    // Tracks from TTree 1
+    nTupleAnalysis::trackData* tree1Tracks;
+    std::vector<nTupleAnalysis::trackPtr> trkCol1;
+
 
     // Can load thee from separate calls to BTagAnalysis
     //nTupleAnalysis::jetData* caloTreeJets;

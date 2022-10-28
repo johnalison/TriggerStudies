@@ -153,6 +153,10 @@ BTagAnalysis::BTagAnalysis(TChain* eventsTree1, TChain* eventsTree2, fwlite::TFi
 //    hmttPf_isFromV0   = dir.make<TH1F>("mtt_pf_isFromV0",    "BTagAnalysis/mtt_pf_isFromV0;     mtt;   Entries", 100,-0.01, 2);
   }
 
+  //
+  //  Track Hists
+  //
+  hAllTracks    = new nTupleAnalysis::trackHists("allTracks", fs, "allTracks");
 
   //
   // Vertex Hists
@@ -282,7 +286,7 @@ int BTagAnalysis::eventLoop(int maxEvents, int nSkipEvents){
 
 int BTagAnalysis::processEvent(){
   if(debug) cout << "processEvent start" << endl;
-  cout << "Run/Event: " << event->eventDataTree1->run << "/" << event->eventDataTree1->event << endl;
+  if(debug) cout << "Run/Event: " << event->eventDataTree1->run << "/" << event->eventDataTree1->event << endl;
 
   cutflow->Fill("all", 1.0);
 
@@ -423,6 +427,11 @@ int BTagAnalysis::processEvent(){
   hEvents->Fill(*event->eventDataTree1, eventWeight);
   if(puWeight)
     hEventsNoPUWeight->Fill(*event->eventDataTree1, eventWeight/puWeight);
+
+  hAllTracks->nTracks->Fill(event->trkCol1.size());
+  for(auto trk : event->trkCol1)
+    hAllTracks->Fill(trk, eventWeight);
+  
 
 //  hTree1Vtx   ->Fill(event->pvsTree1, eventWeight);
 
