@@ -304,7 +304,7 @@ int BTagAnalysis::processEvent(){
   std::vector<nTupleAnalysis::muonPtr> selMuons;
   for(nTupleAnalysis::muonPtr& muon: event->muons){
     hAllMuons->Fill(muon,1.0);
-    if(muon->tightId && muon->isolation_corrected < 0.2){
+    if(muon->tightId && muon->miniPFRelIso_all < 0.2){
       hSelMuons->Fill(muon,1.0);
       selMuons.push_back(muon);
     }
@@ -318,10 +318,10 @@ int BTagAnalysis::processEvent(){
   std::vector<nTupleAnalysis::elecPtr> selElecs;
   for(nTupleAnalysis::elecPtr& elec: event->elecs){
     hAllElecs->Fill(elec,1.0);
-    //if(elec->tightId && elec->isolation_corrected < 0.2){
+    if(elec->mvaIso_WP80){
       hSelElecs->Fill(elec,1.0);
       selElecs.push_back(elec);
-      //}
+    }
   }
   if(debug) cout << "Done Elec Loop" << endl;
   hAllElecs->nElecs->Fill(event->elecs.size());

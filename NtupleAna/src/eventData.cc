@@ -240,8 +240,12 @@ void eventData::update(int e){
   jetCol1   = tree1Jets ->getJets(minJetPt,1e6,4);
   //pvsTree1    = tree1PVs     ->getVerticies();
 
-  trkCol1   = tree1Tracks ->getTracks();
+  trkCol1   = tree1Tracks ->getTracks(true);
   
+  for(const nTupleAnalysis::jetPtr& jet1 : jetCol1){
+    jet1->addTracks(trkCol1);
+  }
+
   if(treeMuons)
     muons    = treeMuons  ->getMuons(30, 3.);
 
