@@ -24,8 +24,23 @@ def getOpts():
     return o, a
 
 
-def doTrackEffs():
+def doTrackEffs(**kwargs):
 
+    file1           = kwargs["file1"]
+    effDirName1Num  = kwargs["effDirName1Num"]
+    effDirName1Den  = kwargs["effDirName1Den"]
+    fakeDirName1Num = kwargs["fakeDirName1Num"]
+    fakeDirName1Den = kwargs["fakeDirName1Den"]
+    name1           = kwargs["name1"]
+
+    file2           = kwargs["file2"]
+    effDirName2Num  = kwargs["effDirName2Num"]
+    effDirName2Den  = kwargs["effDirName2Den"]
+    fakeDirName2Num = kwargs["fakeDirName2Num"]
+    fakeDirName2Den = kwargs["fakeDirName2Den"]
+    name2           = kwargs["name2"]
+
+    outputDir           = kwargs["outputDir"]
 
     #
     #  Offline Turnon curves:
@@ -83,8 +98,8 @@ def doTrackEffs():
     for v in vars:
         binning = 1
 
-        eff_Matched_Ref = makeEff(v ,         ["offTracks_matched","offTracks"],inFileMC,binning=binning)
-        eff_Matched_Mon = makeEff(v ,         ["pfTracks_matched","pfTracks"],inFileMC,binning=binning)
+        eff_Matched_1 = makeEff(v ,         [effDirName1Num, effDirName1Den],  file1,binning=binning)
+        eff_Matched_2 = makeEff(v ,         [effDirName2Num, effDirName2Den],  file2,binning=binning)
     
         vBtag = "track"+v
         if v=="phi": vBtag = "trackPhi"
@@ -93,28 +108,25 @@ def doTrackEffs():
         yLeg = 0.93
         xLeg = 0.5
     
-        drawComp("Eff_"+v,[(eff_Matched_Ref,labName[0],ROOT.kBlack),
-                           # (eff_Matched_noV0,"t#bar{t} MC (After V0 veto)",ROOT.kRed),
-                           (eff_Matched_Mon,labName[1],ROOT.kRed),
-                           #(eff_Matched_BTag,"t#bar{t} MC ",ROOT.kBlue),
-                           #(eff_Matched_BTag_noV0,"t#bar{t} MC ",ROOT.kGreen)
+        drawComp("Eff_"+v,[(eff_Matched_1,name1,ROOT.kBlack),
+                           (eff_Matched_2,name2,ROOT.kRed),
                            ]
-                 ,yTitle="Online Track Efficiency Relative to Offline",xTitle=eff_Matched_Ref.GetXaxis().GetTitle(),outDir=o.outDir,yMax=1.2,yLeg=yLeg,xLeg=xLeg,
-                 xMax=eff_Matched_Ref.GetXaxis().GetXmax(),
-                 xMin=eff_Matched_Ref.GetXaxis().GetXmin()
+                 ,yTitle="Relative Track Efficiency",xTitle=eff_Matched_1.GetXaxis().GetTitle(),outDir=outputDir,yMax=1.2,yLeg=yLeg,xLeg=xLeg,
+                 xMax=eff_Matched_1.GetXaxis().GetXmax(),
+                 xMin=eff_Matched_1.GetXaxis().GetXmin()
                  )
     
     
     
     
-        fake_Matched_Ref = makeEff(v ,        ["pfTracks_unmatched","pfTracks"],  inFileMC,binning=1)
-        fake_Matched_Mon = makeEff(v ,        ["offTracks_unmatched","offTracks"],inFileMC,binning=1)
-        drawComp("Fake_"+v,[(fake_Matched_Ref,labName[0],ROOT.kBlack),
-                            (fake_Matched_Mon,labName[1],ROOT.kRed),
+        fake_Matched_1 = makeEff(v ,        [fakeDirName1Num,fakeDirName1Den],  file1,binning=1)
+        fake_Matched_2 = makeEff(v ,        [fakeDirName2Num,fakeDirName2Den],  file2,binning=1)
+        drawComp("Fake_"+v,[(fake_Matched_1,name1,ROOT.kBlack),
+                            (fake_Matched_2,name2,ROOT.kRed),
                             ]
-                 ,yTitle="Online Track Fake-Rate Relative to Offline",xTitle=fake_Matched_Mon.GetXaxis().GetTitle(),outDir=o.outDir,yMax=0.4,yLeg=0.9,xLeg=0.6,
-                 xMax=fake_Matched_Mon.GetXaxis().GetXmax(),
-                 xMin=fake_Matched_Mon.GetXaxis().GetXmin()
+                 ,yTitle="Relative Track Fake-Rate",xTitle=fake_Matched_2.GetXaxis().GetTitle(),outDir=outputDir,yMax=0.4,yLeg=0.9,xLeg=0.6,
+                 xMax=fake_Matched_2.GetXaxis().GetXmax(),
+                 xMin=fake_Matched_2.GetXaxis().GetXmin()
                  )
     
 
@@ -130,9 +142,14 @@ if __name__ == "__main__":
     #inFileData  = ROOT.TFile(o.inFileData,  "READ")
     inFileMC    = ROOT.TFile(o.inputFile,  "READ")
 
+
     import os
     if not os.path.exists(o.outDir):
         os.makedirs(o.outDir)
 
 
-    doTrackEffs()
+    doTrackEffs(file1=inFileMC, effDirName1Num="offTracks_matched",effDirName1Den = "offTracks",fakeDirName1Num="pfTracks_unmatched", fakeDirName1Den="pfTracks", name1=labName[0],
+                file2=inFileMC, effDirName2Num="pfTracks_matched", effDirName2Den = "pfTracks", fakeDirName2Num="offTracks_unmatched",fakeDirName2Den="offTracks",name2=labName[1],
+                outputDir = o.outDir)
+    
+                
