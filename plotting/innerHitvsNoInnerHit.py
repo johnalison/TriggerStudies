@@ -1,37 +1,32 @@
 import ROOT
 
-
-ROOT.gROOT.SetBatch(True)
-ROOT.gErrorIgnoreLevel = ROOT.kWarning
-
-import ROOTHelp.FancyROOTStyle
-
-from optparse import OptionParser
-p = OptionParser()
-p.add_option('--input',  type = 'string', default = "outBTag.FTKBtagging.ttbar.mwt2.All.root", dest = 'inFile', help = 'intput File' )
-p.add_option('--output', type = 'string', default = "makeRocCurves", dest = 'outDir', help = 'output dir' )
-p.add_option('--cmsText', type = 'string', default = "Work in Progress",  help = '' )
-p.add_option('--labName', type = 'string', default = "Reference,Monitored",  help = '' )
-#p.add_option('--lumiText', default = "",  help = '' )
-(o,a) = p.parse_args()
-
-
-
 from   ROOTHelp.Utils         import do_variable_rebinning, makeCanvas
 from   ROOTHelp.Plotting      import makeRatio
 #from rocCurveUtils            import drawWaterMarks
 #import rebinning
 from Rebinning import rebinningDB
 
+
+ROOT.gROOT.SetBatch(True)
+ROOT.gErrorIgnoreLevel = ROOT.kWarning
+
+import ROOTHelp.FancyROOTStyle
 from JetLevelPlotUtils import getCMSText
+from optparse import OptionParser
 
-inFile  = ROOT.TFile(o.inFile,  "READ")
+def getOpts():
 
-labName = o.labName.split(",")
+    p = OptionParser()
+    p.add_option('--input',  type = 'string', default = "outBTag.FTKBtagging.ttbar.mwt2.All.root", dest = 'inFile', help = 'intput File' )
+    p.add_option('--input2',  type = 'string', default = None, dest = 'inFile2', help = 'intput File' )
+    p.add_option('--output', type = 'string', default = "makeRocCurves", dest = 'outDir', help = 'output dir' )
+    p.add_option('--cmsText', type = 'string', default = "Work in Progress",  help = '' )
+    #p.add_option('--labName', type = 'string', default = "Reference,Monitored",  help = '' )
+    #p.add_option('--lumiText', default = "",  help = '' )
+    (o,a) = p.parse_args()
 
-import os
-if not os.path.exists(o.outDir):
-    os.makedirs(o.outDir)
+    return o, a
+
 
 
 maxDict = {"jetNSelectedTracks":20,
@@ -57,7 +52,7 @@ def getHist(inFile,dir,var,binning,color):
 
 
 
-def doVarRatioPlot(var, offLF, hltLF, offBQ, hltBQ, xTitle, setLogy=1, minX=None, maxX=None, minY=None, yAxisSF=1.0):
+def doVarRatioPlot(var, offLF, hltLF, offBQ, hltBQ, xTitle, setLogy=1, minX=None, maxX=None, minY=None, yAxisSF=1.0, subText="", outputDir=""):
     maxY = max(offLF.GetMaximum(),offBQ.GetMaximum(),
                hltLF.GetMaximum(),hltBQ.GetMaximum())
 
@@ -133,7 +128,7 @@ def doVarRatioPlot(var, offLF, hltLF, offBQ, hltBQ, xTitle, setLogy=1, minX=None
 
 
 
-    cmsLines = getCMSText(xStart=0.2,yStart=0.85,subtext=o.cmsText)
+    cmsLines = getCMSText(xStart=0.2,yStart=0.85,subtext=subText)
     for cmsl in cmsLines:
         cmsl.Draw("same")
 
@@ -248,18 +243,21 @@ def doVarRatioPlot(var, offLF, hltLF, offBQ, hltBQ, xTitle, setLogy=1, minX=None
     #varName = var.replace("tracks/","").replace("btags/","btags_")
     varName = var.replace("tracks/","track_").replace("btags/","btag_").replace("btags_noV0/","btag_noV0_")
     varName = varName.replace("tracks_innerPixHit/","track_innerPixHit_").replace("tracks_noInnerPixHit/","track_noInnerPixHit_")
-    canvas.SaveAs(o.outDir+"/BvL_"+varName+".pdf")
+    canvas.SaveAs(outputDir+"/BvL_"+varName+".pdf")
     #canvas.SaveAs(o.outDir+"/"+var+".eps")
     #canvas.SaveAs(o.outDir+"/"+var+".png")
 
 
 
-def doVarRatioInnerPixel(var, binning, xTitle, setLogy=1, minX=None, maxX=None, minY=None, yAxisSF=1.0):
-    offLF = getHist(inFile,"offJets_matched_L/tracks_innerPixHit",          var,binning,ROOT.kBlack)
-    hltLF = getHist(inFile,"offJets_matched_L/tracks_noInnerPixHit",          var,binning,ROOT.kBlack)
-    offBQ = getHist(inFile,"offJets_matched_B/tracks_innerPixHit",          var,binning,ROOT.kRed)
-    hltBQ = getHist(inFile,"offJets_matched_B/tracks_noInnerPixHit",var,binning,ROOT.kRed)
-    doVarRatioPlot(var+"_compInnerPix", offLF, hltLF, offBQ, hltBQ, xTitle=xTitle, setLogy=setLogy, minX=minX, maxX=maxX, minY=minY, yAxisSF=yAxisSF)
+def doVarRatioInnerPixel(inFile1, inFile2, BQName1, LFName1, BQName2, LFName2, var, binning, xTitle, setLogy=1, minX=None, maxX=None, minY=None, yAxisSF=1.0, subText="", outputDir=""):
+    
+    
+    
+    offLF = getHist(inFile1,LFName1+"/tracks_innerPixHit",   var,binning,ROOT.kBlack)
+    hltLF = getHist(inFile2,LFName2+"/tracks_noInnerPixHit", var,binning,ROOT.kBlack)
+    offBQ = getHist(inFile1,BQName1+"/tracks_innerPixHit",   var,binning,ROOT.kRed)
+    hltBQ = getHist(inFile2,BQName2+"/tracks_noInnerPixHit", var,binning,ROOT.kRed)
+    doVarRatioPlot(var+"_compInnerPix", offLF, hltLF, offBQ, hltBQ, xTitle=xTitle, setLogy=setLogy, minX=minX, maxX=maxX, minY=minY, yAxisSF=yAxisSF, subText=subText, outputDir=outputDir)
 #    doVarRatioPlot(offLF, hltLF, offBQ, hltBQ, xTitle, setLogy=1, minX=None, maxX=None, minY=None, yAxisSF=1.0)
 
 
@@ -270,33 +268,71 @@ def doVarRatioInnerPixel(var, binning, xTitle, setLogy=1, minX=None, maxX=None, 
 #      #binning = [-100,-90,-80,-70,-60,-50,-40,-30,-20,-10,-5,0,5,10,15,20,30,40,50,60,70,80,90,100]
 #      )
 
-for v in [
-          "ip2d",
-          "ip2d_l",
-          "ip2d_sig",
-          "ip2d_sig_l",
-          "ip3d",
-          "ip3d_l",
-          "ip3d_sig",
-          "ip3d_sig_l",
-        ]:
+def makePlots(inFile1, inFile2, extraText, outputDir, BQName1, LFName1, BQName2, LFName2):
 
-    vName = v.split("/")[-1]
-    if vName in rebinningDB:
-        binning = rebinningDB[vName]
+
+
+    for v in [
+              "ip2d",
+              "ip2d_l",
+              "ip2d_sig",
+              "ip2d_sig_l",
+              "ip3d",
+              "ip3d_l",
+              "ip3d_sig",
+              "ip3d_sig_l",
+            ]:
+    
+        vName = v.split("/")[-1]
+        if vName in rebinningDB:
+            binning = rebinningDB[vName]
+        else:
+            binning = 2
+            
+        doVarRatioInnerPixel(inFile1, 
+                             inFile2, 
+                             BQName1, 
+                             LFName1, 
+                             BQName2, 
+                             LFName2, 
+                             v,
+                             xTitle = v,
+                             binning = binning,
+                             yAxisSF = 100,
+                             subText=extraText,
+                             outputDir = outputDir
+        )
+    
+
+
+
+if __name__ == "__main__":
+    o, a = getOpts()
+
+    inFile1  = ROOT.TFile(o.inFile,  "READ")
+
+    if o.inFile2: 
+        inFile2  = ROOT.TFile(o.inFile2,  "READ")
     else:
-        binning = 2
-        
-    doVarRatioInnerPixel(v,
-               xTitle = v,
-               binning = binning,
-               yAxisSF = 100
-               )
+        inFile2 = inFile1
+    
+
+    #labName = o.labName.split(",")
+    
+    import os
+    if not os.path.exists(o.outDir):
+        os.makedirs(o.outDir)
 
 
-#doVar("trk_z0Sig_signed",
-#      xTitle = "z_{0} Significance",
-#      #binning = [-25,-20,-18,-14,-10,-8,-6,-5,-4,-3,-2.5,-2,-1.5,-1,-0.5,0,0.5,1,1.5,2,2.5,3,4,5,6,8,10,12,14,16,18,20,24,25]
-#      binning = [-12,-10,-8,-6,-5,-4,-3,-2.5,-2,-1.5,-1,-0.5,0,0.5,1,1.5,2,2.5,3,4,5,6,8,10,12,15,20]
-#      )
+    makePlots(
+        BQName1 = "offJets_matched_B",
+        BQName2 = "offJets_matched_B",
+        LFName1 = "offJets_matched_L",
+        LFName2 = "offJets_matched_L",
+        inFile1   = inFile1,
+        inFile2   = inFile2,
+        extraText = o.cmsText,
+        outputDir = o.outDir
+    )
+
 

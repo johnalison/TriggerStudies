@@ -12,7 +12,7 @@ class Plotter:
             raise Exception("Missing filename or filename1 for Plotter")
             
         if "fileName2" in kwargs:
-            self.file2    = ROOT.TFile(kwargs["fileName1"],  "READ")                                       
+            self.file2    = ROOT.TFile(kwargs["fileName2"],  "READ")                                       
         else:
             self.file2   = self.file1
 
@@ -23,7 +23,10 @@ class Plotter:
         import os
         if not os.path.exists(self.outputName):
             os.makedirs(self.outputName)
-   
+
+
+        if "doTracks" not in kwargs:
+            self.doTracks = True
 
 
 
@@ -48,4 +51,38 @@ class Plotter:
                     outputDir = self.outputName
                   )
     
+
+
+
+    def doBvL(self):
+        from OffvsOff_BvL import makePlots
+
+        makePlots(inFile1   = self.file1, 
+                  inFile2   = self.file2,
+                  LFName1   = self.LFDirName1,
+                  LFName2   = self.LFDirName2,
+                  BQName1   = self.BQDirName1,
+                  BQName2   = self.BQDirName2,
+                  extraText = self.extraText,
+                  name1     = self.name1,
+                  name2     = self.name2,
+                  outputDir = self.outputName,
+                  doTracks  = self.doTracks,
+                  
+              )
+
+
+
+    def doInnerHitvsNoInnerHit(self):
+        from innerHitvsNoInnerHit import makePlots
+        
+        makePlots(inFile1   = self.file1, 
+                  inFile2   = self.file2,
+                  LFName1   = self.LFDirName1, # These should indeed be the same  
+                  LFName2   = self.LFDirName1, # These should indeed be the same 
+                  BQName1   = self.BQDirName1, #
+                  BQName2   = self.BQDirName1, # Ditto
+                  extraText = self.extraText,
+                  outputDir = self.outputName,
+              )
 
