@@ -8,7 +8,7 @@ from   ROOTHelp.Plotting      import makeRatio
 from Rebinning import rebinningDB
 
 from JetLevelPlotUtils import getCMSText
-
+from optparse import OptionParser
 
 ROOT.gROOT.SetBatch(True)
 ROOT.gErrorIgnoreLevel = ROOT.kWarning
@@ -17,7 +17,6 @@ import ROOTHelp.FancyROOTStyle
 
 
 def getOpts():
-    from optparse import OptionParser
     p = OptionParser()
     p.add_option('--input',  type = 'string', default = "outBTag.FTKBtagging.ttbar.mwt2.All.root", dest = 'inFile1', help = 'intput File' )
     p.add_option('--input2',  type = 'string', default = None, dest = 'inFile2', help = 'intput File' )
@@ -37,7 +36,7 @@ maxDict = {"jetNSelectedTracks":20,
 
 
 def getHist(inFile,dir,var,binning,color):
-    hist = inFile.Get(dir+"/"+var)
+    hist = inFile.Get(dir+"/"+var).Clone()
     print( dir+"/"+var)
     if type(binning ) == type(list()):
         hist  = do_variable_rebinning(hist,binning)
@@ -257,6 +256,70 @@ def doVarRatio(inFile1, inFile2, BQName1, LFName1, BQName2, LFName2, var, binnin
     doVarRatioPlot(var, offLF, hltLF, offBQ, hltBQ, xTitle=xTitle, setLogy=setLogy, minX=minX, maxX=maxX, minY=minY, yAxisSF=yAxisSF, cmsText=extraText, name1=name1,name2=name2, outputDir=outputDir )
 
 
+
+def makePlotsAll(inFile1, inFile2, LFName1, BQName1, LFName2, BQName2, extraText, name1, name2, outputDir, doTracks=True): 
+
+
+    varNames = []
+
+
+    d = inFile1.Get(BQName1)
+    
+    for k in d.GetListOfKeys():
+        name =k.GetName()
+        obj = k.ReadObj()
+        if obj.InheritsFrom(ROOT.TH1F.Class()):
+            
+            # skip histograms with no Entries
+            if not obj.GetEntries():
+                continue
+            
+            if not obj.GetRMS():
+                continue
+
+            varNames.append(obj.GetName())
+            #print(obj.GetName())
+            #print("\tEntries",obj.GetEntries())
+            #print("\tRMS",obj.GetRMS())
+            
+                
+
+        obj.Delete()
+
+    print(varNames)
+
+
+
+    for v in varNames: 
+    
+        vName = v.split("/")[-1]
+        if vName in rebinningDB:
+            binning = rebinningDB[vName]
+        else:
+            binning = 2
+
+
+        doVarRatio(inFile1,
+                   inFile2,
+                   BQName1,
+                   LFName1,
+                   BQName2,
+                   LFName2,
+                   v,
+                   xTitle = v,
+                   binning = binning,
+                   yAxisSF = 100,
+                   extraText = extraText,
+                   name1=name1,
+                   name2=name2,
+                   outputDir = outputDir,
+                   )
+
+
+        
+    return
+
+    
 
 
 def makePlots(inFile1, inFile2, LFName1, BQName1, LFName2, BQName2, extraText, name1, name2, outputDir, doTracks=True): 

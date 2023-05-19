@@ -20,6 +20,13 @@ plots = Plotter(fileName1   = "hists_TestPU60All.root",
 
 plots.doBvL()
 
-
+#plots.doRoc(rocs = [{"name":"deepFlavB_BvsL","var":"deepFlavB",
+#                     "dir1":[plots.LFDirName1,plots.BQDirName1],"dir2":[plots.LFDirName1,plots.BQDirName1]},
+#                    
+#                    {"name":"deepFlavB_BvsC","var":"deepFlavB","vsLight":False,
+#                     "dir1":["offJets_C",plots.BQDirName1],"dir2":["offJets_C",plots.BQDirName1],}
+#                    ]
+#        )
+#
 
 #python3 TriggerStudies/plotting/OffvsOff_BvL.py --input hists_TestPU60.root --input2 hists_TestPU70.root --out hists_TestPU60and70 --labName PU60,PU70

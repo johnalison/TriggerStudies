@@ -1,5 +1,6 @@
 import ROOT
 import ctypes
+from JetLevelPlotUtils import getCMSText, getText
 
 def drawWaterMarks(watermarks):
 
@@ -174,6 +175,158 @@ def makeRoc(sigNum,sigDen,bkgNum,bkgDen,bkgMode="Eff",doErr = False, cutAbove=Fa
     
 
     return roc
+
+#
+#  Calls makeRoc make 
+#
+def makeRocPlot(inFile, name, var, bkg, sig, indir="", varNorm=None,debug=False,vsLight=True, vsLandPU=False):
+    sigHist = inFile.Get(indir+sig+"/"+var).Clone()
+    bkgHist = inFile.Get(indir+bkg+"/"+var).Clone()
+    
+    if not sigHist:
+        print("ERROR: cannot get",indir+sig+"/"+var)
+        print(sigHist)
+
+    if varNorm:
+        sigNormHist = inFile.Get(indir+sig+"/"+varNorm)
+        bkgNormHist = inFile.Get(indir+bkg+"/"+varNorm)
+    else      :
+        sigNormHist = sigHist
+        bkgNormHist = bkgHist
+
+    rocPlots = []
+    for config in [("Rej",1,5e4),("Eff",5e-4,1)]:
+        rocPlots.append(makeRoc(sigHist, sigNormHist, bkgHist, bkgNormHist,doErr=False,bkgMode=config[0],cleanNoCut=True,debug=debug))
+
+        ##can = ROOT.TCanvas(name+"_"+config[0], name+"_"+config[0])
+        ##can.cd().SetLogy(1)
+        rocPlots[-1].SetLineWidth(5)
+        rocPlots[-1].GetXaxis().SetTitle("B-Jet  Efficiency")
+        rocPlots[-1].GetXaxis().SetRangeUser(0.4,1)
+        if vsLight: yTitle = "Light Flavor "
+        elif vsLandPU: yTitle = "Light Flavor (w/PU) "
+        else:       yTitle = "C-Jet "
+        
+        if config[0] == "Rej":    yTitle +="Rejection"
+        elif config[0] == "Eff":  yTitle +="Efficiency"
+        rocPlots[-1].GetYaxis().SetTitle(yTitle)
+        rocPlots[-1].GetYaxis().SetRangeUser(config[1],config[2])
+        rocPlots[-1].Draw("AL")
+        # can.SaveAs(o.outDir+"/roc_"+name+"_"+config[0]+".pdf")
+        # can.SaveAs(o.outDir+"/roc_"+name+"_"+config[0]+".png")
+
+    return rocPlots
+
+
+
+#
+#
+#
+def plotSame(name,graphs,colors,styles, workingPts= None,rocType="Eff",plotDeepCSV=False,plotDeepJet=False, taggerNames=[], coloredText=[], logy=True, yMin=1e-4, xMin=0.3, labelNames =[], cmsText="",outputDir = ""):
+
+    can = ROOT.TCanvas(name,name)
+    if logy:
+        can.cd().SetLogy(1)
+    hist_axis = ROOT.TH1F("hist_axis","hist_axis",1,xMin,1)
+    hist_axis.GetYaxis().SetTitle(graphs[0].GetYaxis().GetTitle())
+    hist_axis.GetXaxis().SetTitle(graphs[0].GetXaxis().GetTitle())
+    hist_axis.Draw()
+
+    xMax = 1 
+    hist_axis.GetXaxis().SetRangeUser(xMin,xMax)
+    hist_axis.GetYaxis().SetRangeUser(yMin,1)
+
+    line = ROOT.TF1("guessing","x",xMin,xMax)
+    line.SetLineColor(ROOT.kGray)
+    line.SetLineStyle(10)
+    line.Draw("same")
+    #line.DrawLine(max(xMin,yMin), 1*max(xMin,yMin), xMax, 1.0*xMax)
+
+    for gItr, g in enumerate(graphs):
+        g.SetLineColor(colors[gItr])
+        g.SetLineStyle(styles[gItr])
+        #if not gItr:
+        #    g.Draw("AL")
+        #else:
+        #    g.Draw("L")
+        g.Draw("L")
+
+    if not workingPts == None:
+        g_wrkPts = ROOT.TGraph(len(workingPts))
+        g_wrkPts.SetMarkerSize(2)
+        g_wrkPts.SetMarkerColor(colors[1])
+        g_wrkPts.SetMarkerStyle(34)
+        for wpItr, wp in enumerate(workingPts):
+            #print wpItr,wp
+
+            g_wrkPts.SetPoint(wpItr, wp[0],wp[1])
+
+        g_wrkPts.Draw("P")
+
+    cmsLine1, cmsLine2 = getCMSText(xStart=0.2,yStart=0.875,subtext=cmsText)
+    cmsLine1.Draw("same")
+    cmsLine2.Draw("same")
+
+    yStart = 0.75
+    xStart = 0.2
+    if rocType == "Rej":
+        xStart = 0.5
+        yStart = 0.875
+
+
+
+    offJetText  = getText(labelNames[0]+" Jets (Solid)  ",xStart=xStart,yStart=yStart,size=0.04,color=ROOT.kBlack)
+    yStart = yStart - 0.05
+    offJetText.Draw("same")
+
+    pfJetText   = getText(labelNames[1]+" Jet (Dashed)  ",xStart=xStart,yStart=yStart,size=0.04,color=ROOT.kBlack)
+    pfJetText.Draw("same")
+
+        #offJetTextDeep  = getText("Offline DeepCSV (Dashed)  ",xStart=0.6,yStart=0.36,size=0.03,color=ROOT.kBlack)
+
+        #offJetText  = getText("Offline Jet  ",xStart=0.6,yStart=0.4,size=0.03,color=ROOT.kBlack)
+
+
+
+    for t in taggerNames:
+        yStart = yStart - 0.05
+        deepCSVText   = getText(t,xStart=xStart,yStart=yStart,size=0.04,color=ROOT.kRed+2)
+        deepCSVText.Draw("same")
+
+
+    cTexts = [ ]
+    for iCt, ct in enumerate(coloredText):
+        yStart = yStart - 0.05
+        cTexts.append(getText(ct,xStart=xStart,yStart=yStart,size=0.04,color=colors[2*iCt]))
+        cTexts[-1].Draw("same")
+
+
+
+    yStart = yStart - 0.05
+    if plotDeepCSV:
+        if plotDeepJet:
+            deepCSVText   = getText("DeepCSV",xStart=xStart,yStart=yStart,size=0.04,color=ROOT.kBlue)
+        else:
+            deepCSVText   = getText("DeepJet",xStart=xStart,yStart=yStart,size=0.04,color=ROOT.kBlack)
+
+        deepCSVText.Draw("same")
+        yStart = yStart - 0.05
+
+    if plotDeepJet:
+        if plotDeepCSV:
+            deepJetText   = getText("DeepJet",xStart=xStart,yStart=yStart,size=0.04,color=ROOT.kBlack)
+        else:
+            deepJetText   = getText("DeepCSV",xStart=xStart,yStart=yStart,size=0.04,color=ROOT.kBlue)
+        deepJetText.Draw("same")
+        yStart = yStart - 0.05
+
+
+
+
+
+    #offJetTextDeep.Draw("same")
+
+    can.SaveAs(outputDir+"/roc_"+name+".pdf")
 
 
 

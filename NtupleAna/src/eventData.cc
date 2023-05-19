@@ -113,7 +113,7 @@ eventData::eventData(TChain* _tree1, TChain* _tree2, bool mc, std::string y, boo
   if(doTree2){
     tree1->AddFriend(tree2);
   }
-
+  
   eventDataTree1 = new nTupleAnalysis::eventData("", tree1, true, isMC);
 
   if(doTree2){
@@ -130,9 +130,12 @@ eventData::eventData(TChain* _tree1, TChain* _tree2, bool mc, std::string y, boo
   }
 
   std::cout << "\t loading jet from tree1 with name " << pfJetName << std::endl;    
-  tree1Jets   = new nTupleAnalysis::jetData( "Jet",  tree1, true, isMC, jetDetailLevel, pfJetName       );
+  std::string jetName = "Jet";
+  //std::string jetName = "btag";
+  tree1Jets   = new nTupleAnalysis::jetData(jetName,  tree1, true, isMC, jetDetailLevel, pfJetName       );
 
-  std::string trackName = "PFCands";
+  //std::string trackName = "PFCands";
+  std::string trackName = "Track";
   std::cout << "\t loading tracks from tree1 with name " << trackName << std::endl;    
   tree1Tracks   = new nTupleAnalysis::trackData( trackName,  tree1 );
 
