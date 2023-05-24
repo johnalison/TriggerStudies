@@ -14,20 +14,11 @@
 #include "DataFormats/FWLite/interface/OutputFiles.h"
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
 
-// Uncomment for SCL6
-
-//#define BTagAnalysis_SLC6 1
-
-#if defined BTagAnalysis_SLC6
-#include "nTupleAnalysis/baseClasses/interface/myParameterSetReader.h"
-#else
 #include "FWCore/PythonParameterSet/interface/MakePyBind11ParameterSets.h"
-#endif
-
 
 #include "PhysicsTools/FWLite/interface/TFileService.h"
 
-#include "TriggerStudies/NtupleAna/interface/BTagAnalysis.h"
+#include "TriggerStudies/NtupleAna/interface/ttbarTandPAnalysis.h"
 
 using namespace TriggerStudies;
 
@@ -50,20 +41,14 @@ int main(int argc, char * argv[]){
   //
   // get the python configuration
   //
-#if defined BTagAnalysis_SLC6
-  const edm::ParameterSet& process    = edm::readPSetsFrom(argv[1], argc, argv)->getParameter<edm::ParameterSet>("process");
-#else
   const edm::ParameterSet& process    = edm::cmspybind11::readPSetsFrom(argv[1], argc, argv)->getParameter<edm::ParameterSet>("process");
-#endif
 
   const edm::ParameterSet& parameters = process.getParameter<edm::ParameterSet>("BTagAnalyzer");
   bool debug = parameters.getParameter<bool>("debug");
   double minJetPt = parameters.getParameter<double>("minJetPt");
-  double minJetAbsEta = parameters.getParameter<double>("minJetAbsEta");
-  double maxJetAbsEta = parameters.getParameter<double>("maxJetAbsEta");
-  double minJetDeepJet = parameters.getParameter<double>("minJetDeepJet");
   bool isMC  = parameters.getParameter<bool>("isMC");
   bool doEMuTandP = parameters.getParameter<bool>("doEMuTandP");
+  bool doMuTandP  = parameters.getParameter<bool>("doMuTandP");
   int histogramming = parameters.getParameter<int>("histogramming");
   int skipEvents = parameters.getParameter<int>("skipEvents");
   std::string year = parameters.getParameter<std::string>("year");
@@ -74,7 +59,6 @@ int main(int argc, char * argv[]){
   std::string jetDetailString = parameters.getParameter<std::string>("jetDetailString");
   std::string pfJetName = parameters.getParameter<std::string>("pfJetName");
 
-  const edm::ParameterSet& nnParameters = process.getParameter<edm::ParameterSet>("NNConfig");
 
   //
   //lumiMask
@@ -127,17 +111,19 @@ int main(int argc, char * argv[]){
   //
   std::cout << "Initialize analysis: ";
 
-  std::cout << "BTagAnalysis with minJetPt " << minJetPt;
-  std::cout << "\t minJetAbsEta " << minJetAbsEta << std::endl;
-  std::cout << "\t maxJetAbsEta " << maxJetAbsEta << std::endl;
-  std::cout << "\t minJetDeepJet " << minJetDeepJet << std::endl;
     
-  BTagAnalysis a = BTagAnalysis(treeTree1, treeTree2, fsh, isMC, year, histogramming, debug, PUFileName, jetDetailString, nnParameters, pfJetName, doEMuTandP);
-  a.minJetPt       = minJetPt;
-  a.minJetAbsEta   = minJetAbsEta;
-  a.maxJetAbsEta   = maxJetAbsEta;
-  a.minJetDeepJet  = minJetDeepJet;
-    
+  ttbarTandPAnalysis a = ttbarTandPAnalysis();
+  a.minJetPt      = minJetPt;
+  a.debug         = debug;
+  a.isMC          = isMC;
+  a.year          = year;
+
+
+  a.doEMuTandP         = doEMuTandP;
+  a.doMuTandP          = doMuTandP;
+  
+
+  a.init(treeTree1, treeTree2, fsh, pfJetName, jetDetailString);
   //if(!isMC){
   //  a.lumiMask = lumiMask;
   //  std::string lumiData = parameters.getParameter<std::string>("lumiData");

@@ -49,9 +49,7 @@ namespace TriggerStudies {
     bool doTracks = true;
     //bool doCaloJets = true;
     //bool doPuppiJets = true;
-    bool doLeptonSel = false;
-    bool doNJetCut = false;
-    bool doBTagCut = false;
+    bool doEMuTandP = false;
 
     int histogramming = 1e6;
     int treeEvents;
@@ -325,7 +323,8 @@ namespace TriggerStudies {
     // 
     // jet1 Jets
     //
-    nTupleAnalysis::jetHists* hJets1PreOLap = nullptr;
+    nTupleAnalysis::jetHists* hSelJets1      = nullptr;
+    nTupleAnalysis::jetHists* hJets1PreOLap  = nullptr;
     nTupleAnalysis::jetHists* hJets1         = nullptr;
     jetHistsTruthMatched*     hJets1_Truth   = nullptr;
 
@@ -384,7 +383,7 @@ namespace TriggerStudies {
     std::shared_ptr<NeuralNetworkAndConstants>  neuralNet;
 
 
-    BTagAnalysis(TChain* eventsTree1, TChain* eventsTree2, fwlite::TFileService& fs, bool _isMC, std::string _year, int _histogramming, bool _debug, std::string PUFileName, std::string jetDetailString, const edm::ParameterSet& nnConfig, std::string pfJetName);
+    BTagAnalysis(TChain* eventsTree1, TChain* eventsTree2, fwlite::TFileService& fs, bool _isMC, std::string _year, int _histogramming, bool _debug, std::string PUFileName, std::string jetDetailString, const edm::ParameterSet& nnConfig, std::string pfJetName, bool _doEMuTandP = false);
     void monitor(long int);
     int eventLoop(int, int nSkipEvents = 0);
     int processEvent();
@@ -401,7 +400,7 @@ namespace TriggerStudies {
 				const nTupleAnalysis::jetPtr& jet2,
 				float dRMatch);
 
-    void JetToJetSVMatching(const nTupleAnalysis::svPtr& jet1SV,
+    void JetToJetSVMatching(const nTupleAnalysis::secondaryVertexPtr& jet1SV,
 			    const nTupleAnalysis::jetPtr& jet2,
 			    float dRMatch);
 

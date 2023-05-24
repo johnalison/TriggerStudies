@@ -1,5 +1,6 @@
 
 #include "TriggerStudies/NtupleAna/interface/eventData.h"
+#include "nTupleAnalysis/baseClasses/interface/helpers.h"
 #include <TTreeIndex.h>
 using namespace TriggerStudies;
 
@@ -137,11 +138,24 @@ eventData::eventData(TChain* _tree1, TChain* _tree2, bool mc, std::string y, boo
   //std::string trackName = "PFCands";
   std::string trackName = "Track";
   std::cout << "\t loading tracks from tree1 with name " << trackName << std::endl;    
-  tree1Tracks   = new nTupleAnalysis::trackData( trackName,  tree1 );
+  if(tree1->FindBranch("nTrack")){
+    tree1Tracks   = new nTupleAnalysis::trackData( trackName,  tree1 );
+  }else{
+    cout << "No Tracks (missing branch 'nTrack'). Will ignore Tracks" << endl;
+    tree1Tracks = nullptr;
+  }
+
+  std::string svName = "SV";
+  std::cout << "\t loading svs from tree1 with name " << svName << std::endl;    
+  if(tree1->FindBranch("nSV")){
+    tree1SVs   = new nTupleAnalysis::svData( svName,  tree1 );
+  }else{
+    cout << "No SVs (missing branch 'nSV'). Will ignore SVs" << endl;
+    tree1SVs = nullptr;
+  }
 
 
-  //treeMuons    = new nTupleAnalysis::muonData("PFMuon",     tree1);
-  //treeElecs    = new nTupleAnalysis::elecData("PFElectron", tree1);
+
   if(tree1->FindBranch("nMuon")){
     treeMuons    = new nTupleAnalysis::muonData("Muon",     tree1, true, isMC, year);
   }else{
@@ -239,27 +253,50 @@ void eventData::update(int e){
     }
   }
 
-  float minJetPt = 30;
-  jetCol1   = tree1Jets ->getJets(minJetPt,1e6,4);
-  //pvsTree1    = tree1PVs     ->getVerticies();
 
-  trkCol1   = tree1Tracks ->getTracks(true);
-  
-  for(const nTupleAnalysis::jetPtr& jet1 : jetCol1){
-    jet1->addTracks(trkCol1);
+  if(treeMuons){
+    muons       = treeMuons  ->getMuons(30, 2.4);
+    selMuons    = treeMuons  ->getMuons(30, 2.4, 3, true, 3);
   }
 
-  if(treeMuons)
-    muons    = treeMuons  ->getMuons(30, 3.);
+  if(treeElecs){
+    elecs    = treeElecs  ->getElecs(30, 2.0);
+    selElecs = treeElecs  ->getElecs(30, 2.0, true);
+  }
 
-  if(treeElecs)
-    elecs    = treeElecs  ->getElecs(30, 3.);
+
+  float minJetPt = 30;
+  jetCol1   = tree1Jets ->getJets(minJetPt,1e6,2.4);
+  selJets1.clear();
+  for(const nTupleAnalysis::jetPtr& jet1 : jetCol1){
+
+    if(nTupleAnalysis::failOverlap(jet1->p,muons,0.4)) continue;
+    if(nTupleAnalysis::failOverlap(jet1->p,elecs,0.4)) continue;
+    selJets1.push_back(jet1);
+  }
+
+  //pvsTree1    = tree1PVs     ->getVerticies();
+
+  if(tree1Tracks){
+    trkCol1   = tree1Tracks ->getTracks(true);
+    for(const nTupleAnalysis::jetPtr& jet1 : selJets1){
+      jet1->addTracks(trkCol1);
+    }
+
+  }
+
+
+  if(tree1SVs){
+    svCol1   = tree1SVs ->getSVs();
+    for(const nTupleAnalysis::jetPtr& jet1 : selJets1){
+      jet1->addSVs(svCol1);
+    }
+
+  }
 
 
   if(doTree2){
-    
-    jetCol2  = tree2Jets->getJets(minJetPt,1e6,4);
-
+    jetCol2  = tree2Jets->getJets(minJetPt,1e6,2.4);
     //pvsTree2 = tree2PVs  ->getVerticies();
   }
 

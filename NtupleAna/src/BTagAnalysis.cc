@@ -53,12 +53,13 @@ const float drTrackToJet = 0.25;
 
 
 
-BTagAnalysis::BTagAnalysis(TChain* eventsTree1, TChain* eventsTree2, fwlite::TFileService& fs, bool _isMC, std::string _year, int _histogramming, bool _debug, std::string PUFileName, std::string jetDetailString, const edm::ParameterSet& nnConfig, std::string pfJetName){
+BTagAnalysis::BTagAnalysis(TChain* eventsTree1, TChain* eventsTree2, fwlite::TFileService& fs, bool _isMC, std::string _year, int _histogramming, bool _debug, std::string PUFileName, std::string jetDetailString, const edm::ParameterSet& nnConfig, std::string pfJetName, bool _doEMuTandP){
   if(_debug) cout<<"In BTagAnalysis constructor: Tree1: "<< eventsTree1 << " Tree2: " << eventsTree2 << endl;
   debug      = _debug;
   isMC       = _isMC;
   year       = _year;
   eventsTree1->SetBranchStatus("*", 0);
+  doEMuTandP = _doEMuTandP;
 
   if(!eventsTree2){
     doTree2 = false;
@@ -80,13 +81,13 @@ BTagAnalysis::BTagAnalysis(TChain* eventsTree1, TChain* eventsTree2, fwlite::TFi
   cutflow    = new nTupleAnalysis::cutflowHists("cutflow", fs);
   cutflow->AddCut("all");
   if(doTree2) cutflow->AddCut("foundMatch");
-  if(doLeptonSel){
+  if(doEMuTandP){
     cutflow->AddCut("passMuonCut");
     cutflow->AddCut("passElecCut");
     cutflow->AddCut("passLeptonCut");
+    cutflow->AddCut("passNJetCut"); 
+    cutflow->AddCut("passNBJetCut");
   }
-  if(doNJetCut) cutflow->AddCut("passNJetCut"); 
-  if(doBTagCut) cutflow->AddCut("passNBJetCut");
     
 
   //
@@ -129,6 +130,7 @@ BTagAnalysis::BTagAnalysis(TChain* eventsTree1, TChain* eventsTree2, fwlite::TFi
     etaBins.clear();
 
   hJets1                     = new nTupleAnalysis::jetHists(jet1HistName+"Jets",  fs, "", jetDetailString);
+  if(doEMuTandP) hSelJets1   = new nTupleAnalysis::jetHists(jet1HistName+"SelJets",  fs, "", jetDetailString);
   if(isMC) hJets1_Truth      = new jetHistsTruthMatched(jet1HistName+"Jets",      fs, jetDetailString, etaBins);
 
   if(doTree2){
@@ -328,7 +330,7 @@ int BTagAnalysis::processEvent(){
   hSelElecs->nElecs->Fill(selElecs.size());
   if(debug) cout << "Done Elec Fill " << endl;
 
-  if(doLeptonSel){
+  if(doEMuTandP){
     if(debug) cout << "Doing Lepton Cuts " << endl;
     if(selMuons.size() == 1)
       cutflow->Fill("passMuonCut", 1.0);
@@ -381,13 +383,13 @@ int BTagAnalysis::processEvent(){
     if(nTupleAnalysis::failOverlap(jet1->p,event->muons,0.4)) continue;
 
     ++nJets1ForCut;
-    if(jet1->DeepCSV > OfflineDeepCSVTightCut) ++nJets1TaggedForCut;
+    if(jet1->deepFlavB > OfflineDeepFlavourMediumCut2018) ++nJets1TaggedForCut;
 
     if(isMC)
       totalSFWeight *= jet1->SF;
   }
 
-  if(doNJetCut){
+  if(doEMuTandP){
      if(nJets1ForCut < 2      ){
        if(debug) cout << "Fail NJet Cut" << endl;
        return 0;
@@ -396,7 +398,7 @@ int BTagAnalysis::processEvent(){
      if(debug) cout << "Pass NJet Cut " << endl;
   }
 
-  if(doBTagCut){
+  if(doEMuTandP){
 
     if(nJets1TaggedForCut < 1) {
       if(debug) cout << "Fail NBJet Cut" << endl;
@@ -486,10 +488,11 @@ int BTagAnalysis::processEvent(){
     if(nTupleAnalysis::failOverlap(jet1->p,event->elecs,0.4)) continue;
     cutflowJets->Fill("elecOlap", eventWeight);
 
-
-    bool requireProbe = false;
     
-    if(requireProbe){
+    if(doEMuTandP){
+      
+      hSelJets1->Fill(jet1, eventWeight);
+
         //
         // Check if jet is a Probe
         //
@@ -512,7 +515,7 @@ int BTagAnalysis::processEvent(){
           float thisDr = jet1Other->p.DeltaR(jet1->p);
           if(thisDr < min_dR_all) min_dR_all = thisDr;
     
-          if(jet1Other->DeepCSV       < OfflineDeepCSVTightCut)   continue;
+          if(jet1Other->deepFlavB       < OfflineDeepFlavourMediumCut2018)   continue;
     
           if(thisDr < min_dR_bjet) min_dR_bjet = thisDr;
     
@@ -844,14 +847,14 @@ void BTagAnalysis::JetToJetTrkTagMatching(const nTupleAnalysis::jetPtr& jet1, co
 //
 //  Set Match Track Tags
 //
-void BTagAnalysis::JetToJetSVMatching(const nTupleAnalysis::svPtr& jet1SV,
+void BTagAnalysis::JetToJetSVMatching(const nTupleAnalysis::secondaryVertexPtr& jet1SV,
 				      const nTupleAnalysis::jetPtr& jet2,
 				      float dRMatch){
 
   float dR2 = 1e6;
 
-  nTupleAnalysis::svPtr matchedSV  = nullptr;
-  for(const nTupleAnalysis::svPtr& jet2SV: jet2->svs){
+  nTupleAnalysis::secondaryVertexPtr matchedSV  = nullptr;
+  for(const nTupleAnalysis::secondaryVertexPtr& jet2SV: jet2->secondaryVertices){
 
     float dX = (jet1SV->x - jet2SV->x);
     float dY = (jet1SV->y - jet2SV->y);
@@ -1003,7 +1006,7 @@ void BTagAnalysis::jetAnalysisHists::Fill(BTagAnalysis* bTagAna, const nTupleAna
     //
     //  Jet1 BTags SVs
     //
-    for(const nTupleAnalysis::svPtr& jet1SV: jet1->svs){
+    for(const nTupleAnalysis::secondaryVertexPtr& jet1SV: jet1->secondaryVertices){
 
       bTagAna->JetToJetSVMatching(jet1SV, jet2, 0.01);
 

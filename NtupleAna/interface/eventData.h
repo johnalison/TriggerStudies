@@ -10,6 +10,7 @@
 #include "nTupleAnalysis/baseClasses/interface/initBranch.h"
 #include "nTupleAnalysis/baseClasses/interface/jetData.h"
 #include "nTupleAnalysis/baseClasses/interface/trackData.h"
+#include "nTupleAnalysis/baseClasses/interface/svData.h"
 #include "nTupleAnalysis/baseClasses/interface/muonData.h"
 #include "nTupleAnalysis/baseClasses/interface/elecData.h"
 #include "nTupleAnalysis/baseClasses/interface/vertexData.h"
@@ -45,6 +46,7 @@ namespace TriggerStudies {
     // Jets from TTree 1
     nTupleAnalysis::jetData* tree1Jets;
     std::vector<nTupleAnalysis::jetPtr> jetCol1;
+    std::vector<nTupleAnalysis::jetPtr> selJets1;
 
     // Jets from TTree 2
     nTupleAnalysis::jetData* tree2Jets;
@@ -53,6 +55,10 @@ namespace TriggerStudies {
     // Tracks from TTree 1
     nTupleAnalysis::trackData* tree1Tracks;
     std::vector<nTupleAnalysis::trackPtr> trkCol1;
+
+    nTupleAnalysis::svData* tree1SVs;
+    std::vector<nTupleAnalysis::svPtr> svCol1;
+
 
 
     // Can load thee from separate calls to BTagAnalysis
@@ -64,9 +70,11 @@ namespace TriggerStudies {
 
     nTupleAnalysis::muonData* treeMuons;
     std::vector<nTupleAnalysis::muonPtr> muons;
+    std::vector<nTupleAnalysis::muonPtr> selMuons;
 
     nTupleAnalysis::elecData* treeElecs;
     std::vector<nTupleAnalysis::elecPtr> elecs;
+    std::vector<nTupleAnalysis::elecPtr> selElecs;
 
     // Move to event data
     //nTupleAnalysis::vertexData* tree1PVs;

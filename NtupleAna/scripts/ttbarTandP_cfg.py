@@ -14,10 +14,10 @@ print( " ".join(sys.argv))
 parser = optparse.OptionParser()
 parser.add_option('-d', '--debug',                dest="debug",         action="store_true", default=False, help="debug")
 parser.add_option('-m', '--isMC',                 dest="isMC",          action="store_true", default=False, help="isMC")
-parser.add_option('--isTurnOnStudy',              action="store_true",  default=False, help="doTurn On Study")
 parser.add_option('--doTracks',                   action="store_true",  default=False, help="doTurn On Study")
 parser.add_option('--doPuppiJets',                   action="store_true",  default=False, help="do puppi jets")
-parser.add_option('--doEMuTandP',                action="store_true",  default=False, help="doEMuTandP Selection")
+parser.add_option('--noEMuTandP',                action="store_true",  default=False, help="doEMuTandP Selection")
+parser.add_option('--noMuTandP',                action="store_true",  default=False, help="doEMuTandP Selection")
 parser.add_option('--pfJetName',                default="PFJet.", help="")
 parser.add_option('--jetDetailString',                default="matched", help="")
 parser.add_option('-y', '--year',                 dest="year",          default="2016", help="Year specifies trigger (and lumiMask for data)")
@@ -36,7 +36,6 @@ parser.add_option(      '--maxJetAbsEta',             dest="maxJetAbsEta",      
 parser.add_option(      '--minJetDeepJet',             dest="minJetDeepJet",       default="-10", help="Minimm jet deepJet")
 parser.add_option(      '--histogramming',        dest="histogramming", default="1e6", help="Histogramming level. 0 to make no kinematic histograms. 1: only make histograms for full event selection, larger numbers add hists in reverse cutflow order.")
 parser.add_option(      '--skipEvents',        dest="skipEvents", default="0", help="")
-parser.add_option(      '--nnConfig',        default=None, help="")
 parser.add_option(      '--histFile',             dest="histFile",      default="hists.root", help="name of ouptut histogram file")
 o, a = parser.parse_args()
 
@@ -99,7 +98,6 @@ else:
         print('fileNamesTree1:', fileNamesTree1)
 
 
-
 pathOut = outputBase
 if "root://cmsxrootd-site.fnal.gov//store/" in pathOut:
     pathOut = pathOut + fileNamesTree2[0].replace("root://cmsxrootd-site.fnal.gov//store/", "") #make it a local path
@@ -146,27 +144,6 @@ jetDetailString = o.jetDetailString
 if o.doTracks:
     jetDetailString += ".Tracks.btagInputs"
 
-#
-#  Recalc NN weights
-#
-if o.nnConfig:
-    jetDetailString += "reCalcDeepCSV"
-    process.NNConfig = cms.PSet(
-        reCalcWeights = cms.bool(True),
-        NNConfig = cms.FileInPath(o.nnConfig),
-        checkSVForDefaults = cms.bool(True),
-        meanPadding = cms.bool(True),
-        toAdd = cms.PSet(probbb = cms.string('probb'))
-        )
-else:
-    process.NNConfig = cms.PSet(
-        reCalcWeights = cms.bool(False),
-        )
-
-if o.doPuppiJets:
-    jetDetailString += ".PuppiJets"
-
-#Setup event loop object
 
 process.BTagAnalyzer = cms.PSet(
     debug   = cms.bool(o.debug),
@@ -178,8 +155,8 @@ process.BTagAnalyzer = cms.PSet(
     minJetDeepJet   = cms.double(float(o.minJetDeepJet)), 
     fileNamesTree2   = cms.vstring(fileNamesTree2),
     isMC    = cms.bool(o.isMC),
-    isTurnOnStudy    = cms.bool(o.isTurnOnStudy) , 
-    doEMuTandP      = cms.bool(o.doEMuTandP),    
+    doEMuTandP      = cms.bool(not o.noEMuTandP),    
+    doMuTandP      = cms.bool(not o.noMuTandP),    
     year    = cms.string(o.year),
     puFile    = cms.string(o.puFile),              
     jetDetailString    = cms.string(jetDetailString),
