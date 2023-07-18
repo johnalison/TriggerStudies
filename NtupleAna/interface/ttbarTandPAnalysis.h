@@ -113,6 +113,7 @@ namespace TriggerStudies {
 	// jets
 	//
 	unsigned int nProbeJets1             = 0;
+	unsigned int nMedTagJets1            = 0;
 	for(const nTupleAnalysis::jetPtr& jet1 : event->selJets1){
 	  hAllJets1->Fill(jet1,weight);
 	  if(hAllJets1->vsLB) hAllJets1->vsLB->Fill(event->eventDataTree1->luminosityBlock,weight);	    
@@ -131,6 +132,7 @@ namespace TriggerStudies {
 	    if(hProbeJets1->vsLB) hProbeJets1->vsLB->Fill(event->eventDataTree1->luminosityBlock,weight);	    
 
 	    if(jet1->deepFlavB  > OfflineDeepFlavourMediumCut2018){
+	      ++nMedTagJets1;
 	      hMedTagJets1->Fill(jet1,weight);	    
 	      if(hMedTagJets1->vsLB) hMedTagJets1->vsLB->Fill(event->eventDataTree1->luminosityBlock,weight);	    
 	    }
@@ -139,6 +141,7 @@ namespace TriggerStudies {
 	}
 	hAllJets1  ->nJets->Fill(event->selJets1.size(),weight);
 	hProbeJets1->nJets->Fill(nProbeJets1,weight);
+	hMedTagJets1->nJets->Fill(nMedTagJets1,weight);
 	
       };
 

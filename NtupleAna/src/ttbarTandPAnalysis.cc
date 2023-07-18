@@ -267,7 +267,7 @@ int ttbarTandPAnalysis::processEvent(){
 
 
 
-  bool passEMuTandP2J = passEMuTandP2J;
+  bool passEMuTandP2J = passEMuTandP;
   if(doEMuTandP || doMuTandP){
 
      if(nJetsForCut >=  2      ){
@@ -288,8 +288,9 @@ int ttbarTandPAnalysis::processEvent(){
       if(doEMuTandP) cutflow->Fill("passTTEMu_NBJetCut", eventWeight);
       if(doMuTandP)  cutflow->Fill("passTTMu_NBJetCut", eventWeight);
     }else{
-      passEMuTandP = false;
-      passMuTandP = false;
+      passEMuTandP   = false;
+      passEMuTandP2J = false;
+      passMuTandP    = false;
     }
 
      if(nJetsForCut ==  2      ){
